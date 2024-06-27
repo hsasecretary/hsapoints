@@ -2,7 +2,6 @@ import './Dashboard.css';
 import Points from './Points'
 import Attendance from './Attendance';
 import CreateCode from './CreateCode';
-import CreateTier from './CreateTier';
 import Logout from './Logout';
 
 import React, { useEffect, useState } from "react";
@@ -49,7 +48,7 @@ function Dashboard() {
 			<br/>
 			<CreateCode />
 			<br/>
-			<CreateTier />
+			
 		</div>
 	);
 }
