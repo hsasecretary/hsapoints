@@ -1,17 +1,23 @@
 import './Master.css';
-// import React, { useEffect, useState } from "react";
-// import { db, auth } from './firebase';
-// import { onAuthStateChanged, createUserWithEmailAndPassword } from "firebase/auth";
-// import { setDoc, doc } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 function Login() {
-	
+	const auth = getAuth();
 	let navigate = useNavigate();
 	function check(event)
 	{
 		event.preventDefault();
-		navigate('/dashboard');
+		document.getElementById("loginError").innerText = "";
+		var email = document.getElementById("uflEmail").value;
+		var pass = document.getElementById("password").value;
+		signInWithEmailAndPassword(auth, email, pass).then((userCredential) => {
+			navigate('/dashboard');
+		})
+		.catch((error) => {
+			document.getElementById("loginError").innerText = "Email/Password incorrect. Please try again";
+		});		
+		
 	}
 	return (
 		<div className="form" >
@@ -22,11 +28,12 @@ function Login() {
 				<input type="text" id="uflEmail" placeholder='albert@ufl.edu'></input>
 				<label htmlFor="password">Password: </label><br/>
 				<input type="password" id="password"></input>
-				
+				{/*functional submit on backlog*/}
 				<div className="center"><input type='submit' value='Log In'></input></div>
 			</form>
-			<div className="center"><a href="./SignUp">New? Create an account</a></div>
-			<div className="center"><a href="./">Forget Password? Click to Reset</a></div><br/>
+			<div className="center"><a href="./SignUp">New? Create an account</a></div> 
+			{/* Forgot password on */}
+			<div className="center"><a href="./">Forget Password? Click to Reset</a></div><br/> 
 		</div>
 	);
 }
