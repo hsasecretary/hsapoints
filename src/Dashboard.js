@@ -6,7 +6,7 @@ import Logout from './Logout';
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './firebase';
 
 function Dashboard() {
@@ -14,19 +14,20 @@ function Dashboard() {
 	const [authUser, setAuthUser] = useState(null); 
 
 	useEffect(() => {
-		const listen = onAuthStateChanged(auth, (user) => {
-		if(user) {
-			setAuthUser(user);
-		} else {
-			setAuthUser(null);
-		}
+		const listen = onAuthStateChanged(auth, (user) =>{
+			if(user)
+			{
+				setAuthUser(user);
+			} else {
+				signOut(auth);
+				navigate("/login");
+			}
 		});
-
-		return () => {
-			listen();
-		}
-	}, []);
-
+        return () => {
+            listen();
+        }
+    }, []);
+	
 	
 
 	return (
