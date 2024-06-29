@@ -4,21 +4,18 @@ import Attendance from './Attendance';
 import CreateCode from './CreateCode';
 import Logout from './Logout';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './firebase';
 
 function Dashboard() {
 	let navigate = useNavigate(); //Function to navigate to different pages
-	const [authUser, setAuthUser] = useState(null); 
 
 	useEffect(() => {
 		const listen = onAuthStateChanged(auth, (user) =>{
-			if(user)
+			if(!user)
 			{
-				setAuthUser(user);
-			} else {
 				signOut(auth);
 				navigate("/login");
 			}
@@ -26,7 +23,7 @@ function Dashboard() {
         return () => {
             listen();
         }
-    }, []);
+    }, [navigate]);
 	
 	
 
