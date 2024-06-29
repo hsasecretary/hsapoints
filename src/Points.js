@@ -1,18 +1,21 @@
 import './Dashboard.css';
 import React, { useEffect, useState } from "react";
 import { auth, db } from './firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 function Points() {
 	const [fallPoints, setFallPoints] = useState(null);
 	const [springPoints, setSpringPoints] = useState(null);
 	const [totalPoints, setTotalPoints] = useState(null);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const getPoints =  onAuthStateChanged(auth, async (user) => {
-			
-				var user = auth.currentUser;
+			if(user)
+			{
+				user = auth.currentUser;
 				var email = user.email;
 				console.log("Points: " + email);
 				var userDocRef = doc(db, "users", email);
@@ -28,12 +31,16 @@ function Points() {
 					setSpringPoints(springPoints);
 					setTotalPoints(totalPoints);
 				}
-			
+			} else {
+				signOut(auth);
+                console.log("Dashboad: no one home");
+                navigate("/login");
+			}
 		}) 
 		return () => {
             getPoints();
         }
-	}, []);
+	}, [navigate]);
 	return (
 		<div id="pointsForm">
 			<div className="subForm" >
