@@ -1,30 +1,35 @@
 import './Logout.css';
 import { useNavigate } from 'react-router-dom';
-import { getAuth, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from './firebase';
+
+import React, {useEffect, useState} from "react";
 function Logout() {
-    const auth = getAuth();
-	let navigate = useNavigate();
-    if(!auth.currentUser == null)
-        {
-            //calls the variable navigate, which has the navigation function
-            //redirects to the login page
-            navigate('/login'); 
-            
+    const navigate = useNavigate(); 
+    const [authUser, setAuthUser] = useState(null);
+
+    useEffect(() => {
+        const listen = onAuthStateChanged(auth, (user) => {
+            if(user) {
+                setAuthUser(user);
+                console.log("Dashboard: " + user.email);
+            } else {
+                signOut(auth);
+                console.log("Dashboad: no one home");
+                navigate("/login");
+            }
+        });
+        return () => {
+            listen();
         }
+    }, []);
+
 	function logout()
     {
-        if(auth.currentUser == null)
-            {
-                //calls the variable navigate, which has the navigation function
-                //redirects to the login page
-                navigate('/login'); 
-                
-            }
-        const user = auth.currentUser;
-        console.log(user.email);
         signOut(auth);
         navigate('/login');
     };
+
 	return (
         <button onClick= {logout}>Logout</button>
 	);

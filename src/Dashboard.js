@@ -27,15 +27,7 @@ function Dashboard() {
 		}
 	}, []);
 
-	//If no user is logged in, redirect to login page
-	if(!authUser)
-	{
-		//calls the variable navigate, which has the navigation function
-		//redirects to the login page
-		navigate('/login'); 
-		
-	}
-
+	
 
 	return (
 		
