@@ -2,7 +2,7 @@ import './Dashboard.css';
 import Points from './Points'
 import Attendance from './Attendance';
 import CreateCode from './CreateCode';
-import CreateTier from './CreateTier';
+import Logout from './Logout';
 
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
@@ -27,19 +27,12 @@ function Dashboard() {
 		}
 	}, []);
 
-	//If no user is logged in, redirect to login page
-	if(!authUser)
-	{
-		//calls the variable navigate, which has the navigation function
-		//redirects to the login page
-		navigate('/login'); 
-		
-	}
-
+	
 
 	return (
 		
 		<div className="formDash" >
+			<Logout></Logout>
 			<div id="dash"><h2>Dashboard</h2></div>
 			<Points />
 			<br/>
@@ -47,7 +40,7 @@ function Dashboard() {
 			<br/>
 			<CreateCode />
 			<br/>
-			<CreateTier />
+			
 		</div>
 	);
 }

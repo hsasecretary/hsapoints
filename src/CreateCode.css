@@ -68,3 +68,21 @@ input[type="submit"]:active
     padding-right: 10px;
 }
 
+.subForm
+{
+    background-color: #d5e4d9;
+	border: 2px solid #669372;
+    flex: 1 1 auto;
+    width:25%;
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+
+input[type="checkbox"]
+{
+    width:1em;
+}
