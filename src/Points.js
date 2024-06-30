@@ -26,6 +26,7 @@ function Points() {
 					const fallPoints = data.fallPoints;
 					const springPoints = data.springPoints;
 					const totalPoints = fallPoints + springPoints;
+					console.log("Fall Points: " + fallPoints);
 
 					setFallPoints(fallPoints);
 					setSpringPoints(springPoints);

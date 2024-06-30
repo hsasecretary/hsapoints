@@ -10,6 +10,7 @@ function CreateCode() {
         document.getElementById("eventCodeError").textContent = "";
         document.getElementById("pointsError").textContent = "";
         document.getElementById("categoryError").textContent = "";
+        document.getElementById("semesterError").textContent = "";
         document.getElementById("graphicDateError").textContent = "";
         document.getElementById("eventDateError").textContent = "";
         document.getElementById("cabinetRequiredError").textContent = "";
@@ -25,6 +26,7 @@ function CreateCode() {
         document.getElementById("eventCode").value = "";
         document.getElementById("points").value = "";
         document.getElementById("category").value = "select";
+        document.getElementById("semester").value = "select";
         document.getElementById("graphicDate").value = "";
         document.getElementById("noGraphic").checked = false;
         document.getElementById("eventDate").value = "";
@@ -41,6 +43,7 @@ function CreateCode() {
         eventCode = eventCode.trim();
         var points = document.getElementById("points").value;
         var category = document.getElementById("category").value;
+        var semester = document.getElementById("semester").value;
         var graphicDate = document.getElementById("graphicDate").value;
         var noGraphic = document.getElementById("noGraphic").checked;
         var eventDate = document.getElementById("eventDate").value;
@@ -78,9 +81,15 @@ function CreateCode() {
             document.getElementById("pointsError").innerText = "*Required: Input a points value greater or equal to 0";
             ready = false;
         }
+        points = Number(points);
         if(category === "select")
         {
             document.getElementById("categoryError").innerText = "*Required: Select an event category";
+            ready = false;
+        }
+        if(semester === "select")
+        {
+            document.getElementById("semesterError").innerText = "*Required: Select the semester the event will count towards";
             ready = false;
         }
         if(graphicDate === "" && !noGraphic)
@@ -124,14 +133,13 @@ function CreateCode() {
         }
         if(ready)
         {
-            createCode(eventName, eventCode, points, category, graphicDate, eventDate, cabinetRequired, cabinetOnly, voterEligible);
+            createCode(eventName, eventCode, points, category, semester, graphicDate, eventDate, cabinetRequired, cabinetOnly, voterEligible);
             clearForm();
         }
     }
-    async function createCode(eventName, eventCode, points, category, graphicDate, eventDate, cabinetRequired, cabinetOnly, voterEligible)
+    async function createCode(eventName, eventCode, points, category, semester, graphicDate, eventDate, cabinetRequired, cabinetOnly, voterEligible)
     {
-        console.log(eventName + " " + eventCode + " " + points + " " + category + " " + graphicDate + " " + eventDate + " " + cabinetRequired + " " + cabinetOnly + " " + voterEligible);
-        await setDoc(doc(db, "codes", eventCode), {cabinetOnly:cabinetOnly, cabinetRequired: cabinetRequired, category:category, event: eventName, eventDate:eventDate, graphicDate:graphicDate, points:points, voterEligible:voterEligible});
+        await setDoc(doc(db, "codes", eventCode), {cabinetOnly:cabinetOnly, cabinetRequired: cabinetRequired, category:category, event: eventName, eventDate:eventDate, graphicDate:graphicDate, points:points, semester:semester, voterEligible:voterEligible});
     }
 	return (
 		<div id='eboardContainer'>
@@ -159,6 +167,13 @@ function CreateCode() {
                         <option value="cabinet">Cabinet</option>
                         <option value="other">Other</option>
                     </select><br/>
+                    <p className= 'errorMsg' id="semesterError"></p>
+                    <label htmlFor="semester">Semester:</label><br/>
+                    <select id="semester">
+                        <option value="select">Select</option>
+                        <option value="fallPoints">Fall</option>
+                        <option value="springPoints">Spring</option>
+                    </select>
                     <p className='errorMsg' id='graphicDateError'></p>
                     <label htmlFor="graphicDate">Date Graphic Posted on Instagram:</label>
                     <input type="date" id="graphicDate"></input>
