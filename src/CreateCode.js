@@ -42,6 +42,7 @@ function CreateCode() {
         var eventCode = document.getElementById("eventCode").value;
         eventCode = eventCode.trim();
         var points = document.getElementById("points").value;
+        points = Number(points);
         var category = document.getElementById("category").value;
         var semester = document.getElementById("semester").value;
         var graphicDate = document.getElementById("graphicDate").value;
@@ -170,8 +171,8 @@ function CreateCode() {
                     <label htmlFor="semester">Semester:</label>
                     <select id="semester">
                         <option value="select">Select</option>
-                        <option value="fall">Fall</option>
-                        <option value="spring">Spring</option>
+                        <option value="fallPoints">Fall</option>
+                        <option value="springPoints">Spring</option>
                     </select>
                     <p className='errorMsg' id='graphicDateError'></p>
                     <label htmlFor="graphicDate">Date Graphic Posted on Instagram:</label>
