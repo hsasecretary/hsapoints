@@ -8,21 +8,6 @@ import { useNavigate } from 'react-router-dom';
 function SignUp() {
 	let navigate = useNavigate();
 
-	// const [authUser, setAuthUser] = useState(null);
-
-	// useEffect(() => {
-	// 	const listen = onAuthStateChanged(auth, (user) => {
-	// 	if(user) {
-	// 		setAuthUser(user);
-	// 	} else {
-	// 		setAuthUser(null);
-	// 	}
-	// 	});
-
-	// 	return () => {
-	// 		listen();
-	// 	}
-	// }, []);
 	function errorReset()
 	{
 		document.getElementById("firstNameError").innerText = "";
