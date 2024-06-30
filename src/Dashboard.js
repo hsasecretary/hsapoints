@@ -25,12 +25,11 @@ function Dashboard() {
         }
     }, [navigate]);
 	
-	
 
 	return (
 		
 		<div className="formDash" >
-			<Logout></Logout>
+			<Logout/>
 			<div id="dash"><h2>Dashboard</h2></div>
 			<Points />
 			<br/>
