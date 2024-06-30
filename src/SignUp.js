@@ -77,7 +77,7 @@ function SignUp() {
 			createUserWithEmailAndPassword(auth, uflEmail, password)
 			.then(async (userCredential) => {
 				uflEmail = uflEmail.toLowerCase();
-				await setDoc(doc(db, "users", uflEmail), {firstName: firstName, lastName: lastName, cabinet: cabinet, position: position, approved: approved, eboard: false, fallPoints: 0, springPoints: 0,  points: 0, strikes: 0, eventCodes: []});
+				await setDoc(doc(db, "users", uflEmail), {firstName: firstName, lastName: lastName, cabinet: cabinet, position: position, approved: approved, eboard: false, fallPoints: 0, springPoints: 0, strikes: 0, eventCodes: []});
                 navigate('/login');
 			})
 			.catch((error) => {
