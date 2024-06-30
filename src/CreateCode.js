@@ -42,7 +42,6 @@ function CreateCode() {
         var eventCode = document.getElementById("eventCode").value;
         eventCode = eventCode.trim();
         var points = document.getElementById("points").value;
-        points = Number(points);
         var category = document.getElementById("category").value;
         var semester = document.getElementById("semester").value;
         var graphicDate = document.getElementById("graphicDate").value;
@@ -82,6 +81,7 @@ function CreateCode() {
             document.getElementById("pointsError").innerText = "*Required: Input a points value greater or equal to 0";
             ready = false;
         }
+        points = Number(points);
         if(category === "select")
         {
             document.getElementById("categoryError").innerText = "*Required: Select an event category";
@@ -168,7 +168,7 @@ function CreateCode() {
                         <option value="other">Other</option>
                     </select><br/>
                     <p className= 'errorMsg' id="semesterError"></p>
-                    <label htmlFor="semester">Semester:</label>
+                    <label htmlFor="semester">Semester:</label><br/>
                     <select id="semester">
                         <option value="select">Select</option>
                         <option value="fallPoints">Fall</option>
