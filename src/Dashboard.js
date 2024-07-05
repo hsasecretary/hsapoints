@@ -27,6 +27,11 @@ function Dashboard() {
 	
 	function userEmail()
 	{
+		if(null === auth.currentUser || null === auth.currentUser.email)
+		{
+			navigate("/login")
+			return false;
+		}
 		var email = auth.currentUser.email;
 		if(email === "matthewurra@ufl.edu"
 			|| email === "garibaldig@ufl.edu"
