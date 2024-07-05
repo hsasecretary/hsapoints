@@ -4,12 +4,13 @@ import Attendance from './Attendance';
 import CreateCode from './CreateCode';
 import Logout from './Logout';
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './firebase';
 
 function Dashboard() {
+	const [userEmail, setUserEmail] = useState(null);
 	let navigate = useNavigate(); //Function to navigate to different pages
 
 	useEffect(() => {
@@ -18,6 +19,8 @@ function Dashboard() {
 			{
 				signOut(auth);
 				navigate("/login");
+			} else {
+				setUserEmail(user.email);
 			}
 		});
         return () => {
@@ -25,28 +28,21 @@ function Dashboard() {
         }
     }, [navigate]);
 	
-	function userEmail()
-	{
-		if(null === auth.currentUser || null === auth.currentUser.email)
-		{
-			navigate("/login")
-			return false;
-		}
-		var email = auth.currentUser.email;
-		if(email === "matthewurra@ufl.edu"
-			|| email === "garibaldig@ufl.edu"
-			|| email === "urdanetalucia@ufl.edu"
-			|| email === "amberhaydar@ufl.edu"
-			|| email === "gcroasdaile@ufl.edu"
-			|| email === "sofia.lynch@ufl.edu"
-			|| email === "chaparteguimaite@ufl.edu"
-			|| email === "m.hudtwalcker@ufl.edu"
-			|| email === "imani.sanchez@ufl.edu")
-		{
-			return true;
-		}
-		return false; 
+	function isAdmin(email) {
+		const adminEmails = [
+			"matthewurra@ufl.edu",
+            "garibaldig@ufl.edu",
+            "urdanetalucia@ufl.edu",
+            "amberhaydar@ufl.edu",
+            "gcroasdaile@ufl.edu",
+            "sofia.lynch@ufl.edu",
+            "chaparteguimaite@ufl.edu",
+            "m.hudtwalcker@ufl.edu",
+            "imani.sanchez@ufl.edu"
+		];
+		return adminEmails.includes(email);
 	}
+	
 	return (
 		
 		<div className="formDash" >
@@ -56,7 +52,7 @@ function Dashboard() {
 			<br/>
 			<Attendance />
 			<br/>
-			{userEmail() && (
+			{isAdmin(userEmail) && (
 				<CreateCode />	
 			)}
 			<br/>
