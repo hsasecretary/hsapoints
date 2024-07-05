@@ -44,15 +44,15 @@ function Points() {
 	}, [navigate]);
 	return (
 		<div id="pointsForm">
-			<div className="subForm" >
+			<div className="pointsSubForm" >
 				<h2>Fall Points</h2>
 				<h3 id="fallPoints"> {fallPoints}</h3>
 			</div>
-			<div className="subForm" >
+			<div className="pointsSubForm" >
 				<h2>Spring Points</h2>
 				<h3 id="springPoints">{springPoints}</h3>
 			</div>
-			<div className="subForm" >
+			<div className="pointsSubForm" >
 				<h2>Total Points</h2>
 				<h3 id="totalSemesterPoints">{totalPoints}</h3>
 			</div>

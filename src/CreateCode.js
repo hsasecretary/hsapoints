@@ -142,8 +142,8 @@ function CreateCode() {
         await setDoc(doc(db, "codes", eventCode), {cabinetOnly:cabinetOnly, cabinetRequired: cabinetRequired, category:category, event: eventName, eventDate:eventDate, graphicDate:graphicDate, points:points, semester:semester, voterEligible:voterEligible});
     }
 	return (
-		<div id='eboardContainer'>
-                <form className='subForm' id="eboard" onSubmit={checkForm}>
+		<div className="attendanceForm" id='eboardContainer'>
+                <form id="eboard" onSubmit={checkForm}>
                     <h3>Create New Code</h3>
                     <p className='successMsg' id='attendanceFormSuccess'></p>
                     <p className='errorMsg' id='eventNameError'></p>
@@ -173,15 +173,15 @@ function CreateCode() {
                         <option value="select">Select</option>
                         <option value="fallPoints">Fall</option>
                         <option value="springPoints">Spring</option>
-                    </select>
+                    </select> <br/>
                     <p className='errorMsg' id='graphicDateError'></p>
                     <label htmlFor="graphicDate">Date Graphic Posted on Instagram:</label>
-                    <input type="date" id="graphicDate"></input>
+                    <input type="date" id="graphicDate"></input><br/>
                     <label htmlFor= "noGraphic">Graphic will NOT be posted:</label>
                     <input type="checkbox" id="noGraphic"></input>
                     <p className='errorMsg' id='eventDateError'></p>
                     <label htmlFor="eventDate">Event Date:</label>
-                    <input type="date" id="eventDate"></input>
+                    <input type="date" id="eventDate"></input><br/>
                     <p className='errorMsg' id="cabinetRequiredError"></p>
                     <label htmlFor="cabinetRequired">Cabinet Required to Attend:</label>
                     <input type="checkbox" id="cabinetRequired"></input><br/>
