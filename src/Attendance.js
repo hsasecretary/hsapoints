@@ -17,7 +17,18 @@ function Attendance() {
         } else if(code.length > 45) {
             document.getElementById("attendanceCodeError").innerText = "*Error: Code is Too Long";
         }
-
+        let date = new Date();
+        let day = date.getDate();
+        if(day < 10) {
+            day = "0" + day;
+        }
+        let month = date.getMonth()+1;
+        if(month < 10) {
+            month = "0" + month;
+        }
+        let year = date.getFullYear();
+        date = year + "-" + month + "-" +day;
+        
         const userDocRef = doc(db, "users", email);
         const userDocSnap = await getDoc(userDocRef);
         if(userDocSnap.exists())
@@ -39,6 +50,12 @@ function Attendance() {
             var added = false;
             if(codeDocSnap.exists())
             {
+                
+                if(date !== codeDocSnap.data().eventDate)
+                {
+                    document.getElementById("attendanceCodeError").innerText = "*Error: Code is not active";
+                    return;
+                }
                 added = true;
                 var semester = codeDocSnap.data().semester;
                 var addPoints = codeDocSnap.data().points;
