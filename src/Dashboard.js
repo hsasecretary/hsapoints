@@ -25,7 +25,23 @@ function Dashboard() {
         }
     }, [navigate]);
 	
-
+	function userEmail()
+	{
+		var email = auth.currentUser.email;
+		if(email === "matthewurra@ufl.edu"
+			|| email === "garibaldig@ufl.edu"
+			|| email === "urdanetalucia@ufl.edu"
+			|| email === "amberhaydar@ufl.edu"
+			|| email === "gcroasdaile@ufl.edu"
+			|| email === "sofia.lynch@ufl.edu"
+			|| email === "chaparteguimaite@ufl.edu"
+			|| email === "m.hudtwalcker@ufl.edu"
+			|| email === "imani.sanchez@ufl.edu")
+		{
+			return true;
+		}
+		return false; 
+	}
 	return (
 		
 		<div className="formDash" >
@@ -35,7 +51,9 @@ function Dashboard() {
 			<br/>
 			<Attendance />
 			<br/>
-			<CreateCode />
+			{userEmail() && (
+				<CreateCode />	
+			)}
 			<br/>
 			
 		</div>
