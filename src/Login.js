@@ -33,7 +33,7 @@ function Login() {
 			</form>
 			<div className="center"><a href="./SignUp">New? Create an account</a></div> 
 			{/* Forgot password on */}
-			<div className="center"><a href="./">Forget Password? Click to Reset</a></div><br/> 
+			<br/>
 		</div>
 	);
 }
