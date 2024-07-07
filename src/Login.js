@@ -20,7 +20,7 @@ function Login() {
 		
 	}
 	return (
-		<div className="form" >
+		<div className="form">
 			<h2>Login</h2>
 			<form onSubmit={check}>
 				<p className='errorMsg' id="loginError"></p>
