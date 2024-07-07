@@ -60,21 +60,219 @@ function Attendance() {
                 var semester = codeDocSnap.data().semester;
                 var addPoints = codeDocSnap.data().points;
                 var currentPoints;
+                var voterEligible = codeDocSnap.data().voterEligible;
+                var category = codeDocSnap.data().category;
+                if(category === "Cabinet")
+                {
+                    var cabinetPoints = userDocSnap.data().cabinetPoints;
+                    cabinetPoints += 1;
+                    await updateDoc(userDocRef, {
+                        "eventCodes": arrayUnion(code),
+                        "cabinetPoints": cabinetPoints
+                    });
+                    return;
+                }
+               
                 if(semester === "fallPoints")
                 {
                     currentPoints = userDocSnap.data().fallPoints;
                     currentPoints = currentPoints + addPoints;
-                    await updateDoc(userDocRef, {
-                        "eventCodes": arrayUnion(code),
-                        "fallPoints": currentPoints
-                    });
+                    if(voterEligible === false)
+                    {
+                        if(category === "GBM")
+                        {
+                            var gbmNVE = userDocSnap.data().gbmPointsNVE;
+                            gbmNVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "fallPoints": currentPoints, 
+                                "gbmPointsNVE": gbmNVE
+                            });
+                        } else if(category === "MLP Fall") {
+                            var mlpFallNVE = userDocSnap.data().mlpFallPointsNVE;
+                            mlpFallNVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "fallPoints": currentPoints, 
+                                "mlpFallPointsNVE": mlpFallNVE
+                            });
+                        } else if(category === "MLP Spring") {
+                            var mlpSpringNVE = userDocSnap.data().mlpSpringPointsNVE;
+                            mlpSpringNVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "fallPoints": currentPoints, 
+                                "mlpSpringPointsNVE": mlpSpringNVE
+                            });
+                        } else if(category === "OPA") {
+                            var opa = userDocSnap.data().opaPointsNVE;
+                            opa += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "fallPoints": currentPoints,
+                                "opaPointsNVE": opa
+                            });
+                        } else if(category === "Programming") {
+                            var prgmNVE = userDocSnap.data().programmingPointsNVE;
+                            prgmNVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "fallPoints": currentPoints,
+                                "programmingPointsNVE": prgmNVE
+                            });
+                        } else {
+                            var other = userDocSnap.data().otherPoints;
+                            other += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "fallPoints": currentPoints,
+                                "otherPoints": other
+                            });
+                        }
+                    } else {
+                        if(category === "Programming")
+                        {
+                            var prgmVE = userDocSnap.data().programmingPointsVE;
+                            prgmVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "fallPoints": currentPoints,
+                                "programmingPointsVE": prgmVE
+                            });
+                        } else if(category === "GBM") {
+                            var gbmVE = userDocSnap.data().gbmPointsVE;
+                            gbmVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "fallPoints": currentPoints, 
+                                "gbmPointsVE": gbmVE
+                            });
+                        } else if(category === "MLP Fall") {
+                            var mlpFallVE = userDocSnap.data().mlpFallPointsVE;
+                            mlpFallVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "fallPoints": currentPoints, 
+                                "mlpFallPointsVE": mlpFallVE
+                            });
+                        } else if(category === "MLP Spring") {
+                            var mlpSpringVE = userDocSnap.data().mlpSpringPointsVE;
+                            mlpSpringVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "fallPoints": currentPoints, 
+                                "mlpSpringPointsVE": mlpSpringVE
+                            });
+                        } else if(category === "OPA") {
+                            var opaVE = userDocSnap.data().opaPointsVE;
+                            opaVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "fallPoints": currentPoints, 
+                                "opaPointsVE": opaVE
+                            });
+                        } 
+                    }
+                        
                 } else {
                     currentPoints = userDocSnap.data().springPoints;
                     currentPoints += addPoints;
-                    await updateDoc(userDocRef, {
-                        "eventCodes": arrayUnion(code),
-                        "springPoints": currentPoints
-                    });
+                    if(voterEligible === false)
+                    {
+                        if(category === "GBM")
+                        {
+                            gbmNVE = userDocSnap.data().gbmPointsNVE;
+                            gbmNVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "springPoints": currentPoints, 
+                                "gbmPointsNVE": gbmNVE
+                            });
+                        } else if(category === "MLP Fall") {
+                            mlpFallNVE = userDocSnap.data().mlpFallPointsNVE;
+                            mlpFallNVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "springPoints": currentPoints, 
+                                "mlpFallPointsNVE": mlpFallNVE
+                            });
+                        } else if(category === "MLP Spring") {
+                            mlpSpringNVE = userDocSnap.data().mlpSpringPointsNVE;
+                            mlpSpringNVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "springPoints": currentPoints, 
+                                "mlpSpringPointsNVE": mlpSpringNVE
+                            });
+                        } else if(category === "OPA") {
+                            opa = userDocSnap.data().opaPointsNVE;
+                            opa += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "springPoints": currentPoints,
+                                "opaPointsNVE": opa
+                            });
+                        } else if(category === "Programming") {
+                            prgmNVE = userDocSnap.data().programmingPointsNVE;
+                            prgmNVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "springPoints": currentPoints,
+                                "programmingPointsNVE": prgmNVE
+                            });
+                        } else {
+                            other = userDocSnap.data().otherPoints;
+                            other += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "springPoints": currentPoints,
+                                "otherPoints": other
+                            });
+                        }
+                    } else {
+                        if(category === "Programming")
+                        {
+                            prgmVE = userDocSnap.data().programmingPointsVE;
+                            prgmVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "springPoints": currentPoints,
+                                "programmingPointsVE": prgmVE
+                            });
+                        } else if(category === "GBM") {
+                            gbmVE = userDocSnap.data().gbmPointsVE;
+                            gbmVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "springPoints": currentPoints, 
+                                "gbmPointsVE": gbmVE
+                            });
+                        } else if(category === "MLP Fall") {
+                            mlpFallVE = userDocSnap.data().mlpFallPointsVE;
+                            mlpFallVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "springPoints": currentPoints, 
+                                "mlpFallPointsVE": mlpFallVE
+                            });
+                        } else if(category === "MLP Spring") {
+                            mlpSpringVE = userDocSnap.data().mlpSpringPointsVE;
+                            mlpSpringVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "springPoints": currentPoints, 
+                                "mlpSpringPointsVE": mlpSpringVE
+                            });
+                        } else if(category === "OPA") {
+                            opaVE = userDocSnap.data().opaPointsVE;
+                            opaVE += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "springPoints": currentPoints, 
+                                "opaPointsVE": opaVE
+                            });
+                        } 
+                    }
                 }
             }
             if(added)
