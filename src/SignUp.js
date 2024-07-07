@@ -2,7 +2,7 @@ import './Master.css';
 // import React, { useEffect, useState } from "react";
 import { db, auth } from './firebase';
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { setDoc, doc } from "firebase/firestore";
+import { setDoc, doc, arrayUnion, updateDoc } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
 
 function SignUp() {
@@ -78,7 +78,20 @@ function SignUp() {
 			.then(async (userCredential) => {
 				uflEmail = uflEmail.toLowerCase();
 				await setDoc(doc(db, "users", uflEmail), {firstName: firstName, lastName: lastName, cabinet: cabinet, position: position, approved: approved, eboard: false, fallPoints: 0, springPoints: 0, strikes: 0, eventCodes: []});
-                navigate('/login');
+                if(!approved)
+				{
+					const pendingDocref = await doc(db, "cabinets", "pending");
+					await updateDoc(pendingDocref,{
+						"emails": arrayUnion(uflEmail)
+					});
+				} else {
+					const pendingDocref = await doc(db, "cabinets", "regular");
+					await updateDoc(pendingDocref,{
+						"emails": arrayUnion(uflEmail)
+					});
+					
+				}
+				navigate('/login');
 			})
 			.catch((error) => {
 				console.error('Error signing up:', error);
