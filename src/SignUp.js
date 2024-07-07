@@ -186,7 +186,7 @@ function SignUp() {
 
 		} else {
 			options = "<option value='select'>Select</option>";
-			options = "<option value='none'>Not in Cabinet</option>";
+			options = "<option value='none'>Regular GBMer</option>";
 
 		}
 		document.getElementById("position").innerHTML = options;
