@@ -17,7 +17,6 @@ function Points() {
 			{
 				user = auth.currentUser;
 				var email = user.email;
-				console.log("Points: " + email);
 				var userDocRef = doc(db, "users", email);
 				var userDocSnap = await getDoc(userDocRef);
 				if(userDocSnap.exists())
@@ -26,7 +25,6 @@ function Points() {
 					const fallPoints = data.fallPoints;
 					const springPoints = data.springPoints;
 					const totalPoints = fallPoints + springPoints;
-					console.log("Fall Points: " + fallPoints);
 
 					setFallPoints(fallPoints);
 					setSpringPoints(springPoints);

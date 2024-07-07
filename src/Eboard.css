@@ -1,0 +1,47 @@
+.formDash
+{
+	background-color: #ffffff;
+	border-radius: 5px;
+	border: 2px solid #e3e8ea;
+    max-width:1200px;
+    margin:auto;
+    margin-top: 25px;
+    width: 95%;
+    margin:auto;
+    margin-top: 25px;
+    display: flex;
+    flex-flow: wrap;
+    justify-content: flex-start;
+}
+
+table
+{
+    margin:auto;
+    margin-top: 5%;
+    width:85%;
+    border-collapse:collapse;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+th, td
+{
+    border: 1px solid #669372;
+}
+.even
+{
+    background-color: #d5e4d9;
+}
+.odd
+{
+    background-color: #eef0ee;
+}
+th
+{
+    font-size: 1.2em;
+    text-align: center;
+}
+td
+{
+    font-size: 1.1em;
+
+}

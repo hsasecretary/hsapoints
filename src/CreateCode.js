@@ -99,18 +99,18 @@ function CreateCode() {
         } else if (graphicDate !== "" && noGraphic) {
             document.getElementById("graphicDateError").innerText = "*Error: A graphic can not be simultaneously posted and not posted. Either delete the date the graphic will be posted OR uncheck the 'Graphic will NOT be posted' checkbox";
         } else if(noGraphic) {
-            graphicDate = "1900-01-01";
+            graphicDate = "None";
         }
         
         if(eventDate === "")
         {
             document.getElementById("eventDateError").innerText = "*Required: Input date event will occur";
             ready = false; 
-        } else if(graphicDate !== "" && graphicDate > eventDate){
+        } else if((graphicDate !== "" && graphicDate != "None")&& graphicDate > eventDate){
             document.getElementById("graphicDateError").innerText = "*Error: Graphic cannot be posted after event";
             ready = false;
         }
-        if(category === "cabinet" && !cabinetOnly) 
+        if(category === "Cabinet" && !cabinetOnly) 
         {
             document.getElementById("categoryError").innerText = "*Error: Events in the 'Cabinet' Category are only for cabinet. Either change the event Category or Check the 'Cabinet ONLY Event' checkbox";
             document.getElementById("cabinetOnlyError").innerText = "*Error: Events in the 'Cabinet' Category are only for cabinet. Either change the event Category or Check the 'Cabinet ONLY Event' checkbox";
@@ -136,6 +136,7 @@ function CreateCode() {
             createCode(eventName, eventCode, points, category, semester, graphicDate, eventDate, cabinetRequired, cabinetOnly, voterEligible);
             clearForm();
         }
+        
     }
     async function createCode(eventName, eventCode, points, category, semester, graphicDate, eventDate, cabinetRequired, cabinetOnly, voterEligible)
     {
@@ -159,13 +160,13 @@ function CreateCode() {
                     <label htmlFor="category">Category:</label><br/>
                     <select id="category">
                         <option value="select">Select</option>
-                        <option value="programming">Programming</option>
-                        <option value="gbm">GBM</option>
-                        <option value="mlpFall">MLP Fall</option>
-                        <option value="mlpSpring">MLP Spring</option>
-                        <option value="opa">OPA</option>
-                        <option value="cabinet">Cabinet</option>
-                        <option value="other">Other</option>
+                        <option value="Programming">Programming</option>
+                        <option value="GBM">GBM</option>
+                        <option value="MLP Fall">MLP Fall</option>
+                        <option value="MLP Spring">MLP Spring</option>
+                        <option value="OPA">OPA</option>
+                        <option value="Cabinet">Cabinet</option>
+                        <option value="Other">Other</option>
                     </select><br/>
                     <p className= 'errorMsg' id="semesterError"></p>
                     <label htmlFor="semester">Semester:</label><br/>
