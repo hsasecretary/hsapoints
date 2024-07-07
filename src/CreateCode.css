@@ -58,6 +58,7 @@ input[type="submit"]:active
 {
     margin:auto;
     margin-top: 5%;
+    width:85%;
     display: flex;
     flex-flow: wrap;
     justify-content: flex-start;
@@ -66,5 +67,11 @@ input[type="submit"]:active
 {
     padding-left: 10px;
     padding-right: 10px;
+    
 }
 
+
+input[type="checkbox"]
+{
+    width:1em;
+}

@@ -1,0 +1,23 @@
+button
+{
+	background-color:#f2f6f8;
+	min-width: 10em;
+    min-height: 2em;
+    border-radius: 5px;
+    font-size: 1.2em;
+    font-family: 'Georgia';
+}
+button:hover
+{
+	background-color:#cf6d6d;
+	border: 1px solid #bc0e0e;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+
+}
+
+button:active
+{
+	background-color:#bc0e0e;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.5), 0 6px 20px 0 rgba(0,0,0,0.19);
+
+}
