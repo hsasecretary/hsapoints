@@ -2,7 +2,7 @@ import './Dashboard.css';
 import Points from './Points'
 import Attendance from './Attendance';
 import Logout from './Logout';
-
+import CabinetPoints from './CabinetPoints';
 
 function Dashboard({eboard}) {
 	
@@ -15,8 +15,9 @@ function Dashboard({eboard}) {
 			<br/>
 			<Attendance />
 			<br/>
-			
-			
+			<CabinetPoints/>
+			<br/>
+
 		</div>
 	);
 }

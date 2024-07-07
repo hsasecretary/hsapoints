@@ -77,7 +77,30 @@ function SignUp() {
 			createUserWithEmailAndPassword(auth, uflEmail, password)
 			.then(async (userCredential) => {
 				uflEmail = uflEmail.toLowerCase();
-				await setDoc(doc(db, "users", uflEmail), {firstName: firstName, lastName: lastName, cabinet: cabinet, position: position, approved: approved, eboard: false, fallPoints: 0, springPoints: 0, strikes: 0, eventCodes: []});
+				await setDoc(doc(db, "users", uflEmail), {
+					firstName: firstName, 
+					lastName: lastName, 
+					cabinet: cabinet, 
+					position: position, 
+					approved: approved, 
+					eboard: false, 
+					fallPoints: 0, 
+					springPoints: 0, 
+					cabinetPoints:0,
+					programmingPointsVE:0,
+					gbmPointsVE:0,
+					mlpFallPointsVE:0,
+					mlpSpringPointsVE:0,
+					programmingPointsNVE:0,
+					gbmPointsNVE:0,
+					mlpFallPointsNVE:0,
+					mlpSpringPointsNVE:0,
+					opaPointsNVE:0,
+					opaPointsVE:0,
+					otherPoints:0,
+					strikes: 0,
+					eventCodes: []
+				});
                 if(!approved)
 				{
 					const pendingDocref = await doc(db, "cabinets", "pending");

@@ -126,9 +126,11 @@ function CreateCode() {
             voterEligible = false;
         } else {
             var diffDays = Math.ceil(diff/(1000*60*60*24));
-            if(diffDays >= 7) 
+            if(diffDays >= 7 && (category === "GBM" || category === "Programming" || category === "MLP Fall" || category === "MLP Spring" || category === "OPA")) 
             {
                 voterEligible = true;
+            } else {
+                voterEligible = false;
             }
         }
         if(ready)
