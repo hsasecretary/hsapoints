@@ -106,7 +106,7 @@ function CreateCode() {
         {
             document.getElementById("eventDateError").innerText = "*Required: Input date event will occur";
             ready = false; 
-        } else if((graphicDate !== "" && graphicDate != "None")&& graphicDate > eventDate){
+        } else if((graphicDate !== "" && graphicDate !== "None")&& graphicDate > eventDate){
             document.getElementById("graphicDateError").innerText = "*Error: Graphic cannot be posted after event";
             ready = false;
         }
