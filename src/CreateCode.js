@@ -1,6 +1,6 @@
 import './CreateCode.css';
 import { db } from './firebase'
-import {getDoc, doc, setDoc} from 'firebase/firestore';
+import {getDoc, doc, setDoc, updateDoc} from 'firebase/firestore';
 
 
 function CreateCode() {
@@ -142,6 +142,173 @@ function CreateCode() {
     }
     async function createCode(eventName, eventCode, points, category, semester, graphicDate, eventDate, cabinetRequired, cabinetOnly, voterEligible)
     {
+        const ptsDocRef = doc(db, "voterEligibility", "points");
+        const ptsDocSnap = await getDoc(ptsDocRef);
+        const ptsData = ptsDocSnap.data();
+        var pts;
+        if(voterEligible)
+        {
+            if(cabinetRequired)
+            {
+                if(category === "GBM")
+                {
+                    pts = ptsData.GBMVE + points;
+                    var cpts = ptsData.cabinetGBM + points;
+                    await updateDoc(ptsDocRef, {
+                        "GBMVE": pts,
+                        "cabinetGBM": cpts
+                    });
+                } else if(category === "Programming") {
+                    pts = ptsData.ProgrammingVE + points;
+                    cpts = ptsData.cabinetProgramming + points;
+                    await updateDoc(ptsDocRef, {
+                        "ProgrammingVE": pts,
+                        "cabinetProgramming": cpts
+                    })
+                } else if(category === "OPA") {
+                    pts = ptsData.opaVE + points;
+                    cpts = ptsData.cabinetOPA + points;
+                    await updateDoc(ptsDocRef, {
+                        "opaVE": pts,
+                        "cabinetOPA": cpts
+                    })
+                } else if(category === "MLP Fall") {
+                    pts = ptsData.mlpFallVE + points;
+                    cpts = ptsData.cabinetMLPFall + points;
+                    await updateDoc(ptsDocRef, {
+                        "mlpFallVE": pts,
+                        "cabinetMLPFall": cpts
+                    })
+                } else if(category === "MLP Spring") {
+                    pts = ptsData.mlpSpringVE + points;
+                    cpts = ptsData.cabinetMLPSpring + points;
+                    await updateDoc(ptsDocRef, {
+                        "mlpSpringVE": pts,
+                        "cabinetMLPSpring": cpts
+                    })
+                }
+            } else {
+                if(category === "GBM")
+                {
+                    pts = ptsData.GBMVE + points;
+                    await updateDoc(ptsDocRef, {
+                        "GBMVE": pts
+                    });
+                } else if(category === "Programming") {
+                    pts = ptsData.ProgrammingVE + points;
+                    await updateDoc(ptsDocRef, {
+                        "ProgrammingVE": pts
+                    })
+                } else if(category === "OPA") {
+                    pts = ptsData.opaVE + points;
+                    await updateDoc(ptsDocRef, {
+                        "opaVE": pts
+                    })
+                } else if(category === "MLP Fall") {
+                    pts = ptsData.mlpFallVE + points;
+                    await updateDoc(ptsDocRef, {
+                        "mlpFallVE": pts
+                    })
+                } else if(category === "MLP Spring") {
+                    pts = ptsData.mlpSpringVE + points;
+                    await updateDoc(ptsDocRef, {
+                        "mlpSpringVE": pts
+                    })
+                }
+            }
+            
+        } else {
+            if(cabinetRequired)
+            {
+                if(category === "GBM")
+                {
+                    pts = ptsData.GBMNVE + points;
+                    cpts = ptsData.cabinetGBM + points;
+                    await updateDoc(ptsDocRef, {
+                        "GBMNVE": pts,
+                        "cabinetGBM": cpts
+                    });
+                } else if(category === "Programming") {
+                    pts = ptsData.ProgrammingNVE + points;
+                    cpts = ptsData.cabinetProgramming + points;
+                    await updateDoc(ptsDocRef, {
+                        "ProgrammingNVE": pts,
+                        "cabinetProgramming": cpts
+                    })
+                } else if(category === "OPA") {
+                    pts = ptsData.opaNVE + points;
+                    cpts = ptsData.cabinetOPA + points;
+                    await updateDoc(ptsDocRef, {
+                        "opaNVE": pts,
+                        "cabinetOPA": cpts
+                    })
+                } else if(category === "MLP Fall") {
+                    pts = ptsData.mlpFallNVE + points;
+                    cpts = ptsData.cabinetMLPFall + points;
+                    await updateDoc(ptsDocRef, {
+                        "mlpFallNVE": pts,
+                        "cabinetMLPFall": cpts
+                    })
+                } else if(category === "MLP Spring") {
+                    pts = ptsData.mlpSpringNVE + points;
+                    cpts = ptsData.cabinetMLPSpring + points;
+                    await updateDoc(ptsDocRef, {
+                        "mlpSpringNVE": pts,
+                        "cabinetMLPSpring":cpts
+                    })
+                } else if(category === "Cabinet") {
+                    pts = ptsData.cabinet + 1;
+                    await updateDoc(ptsDocRef, {
+                        "cabinet": pts
+                    })
+                } else {
+                    pts = ptsData.other + points;
+                    cpts = ptsData.cabinetOther + points;
+                    await updateDoc(ptsDocRef, {
+                        "other": pts,
+                        "cabinetOther": cpts
+                    })
+                }
+            } else {
+                if(category === "GBM")
+                {
+                    pts = ptsData.GBMNVE + points;
+                    await updateDoc(ptsDocRef, {
+                        "GBMNVE": pts
+                    });
+                } else if(category === "Programming") {
+                    pts = ptsData.ProgrammingNVE + points;
+                    await updateDoc(ptsDocRef, {
+                        "ProgrammingNVE": pts
+                    })
+                } else if(category === "OPA") {
+                    pts = ptsData.opaNVE + points;
+                    await updateDoc(ptsDocRef, {
+                        "opaNVE": pts
+                    })
+                } else if(category === "MLP Fall") {
+                    pts = ptsData.mlpFallNVE + points;
+                    await updateDoc(ptsDocRef, {
+                        "mlpFallNVE": pts
+                    })
+                } else if(category === "MLP Spring") {
+                    pts = ptsData.mlpSpringNVE + points;
+                    await updateDoc(ptsDocRef, {
+                        "mlpSpringNVE": pts
+                    })
+                } else if(category === "Cabinet") {
+                    pts = ptsData.cabinet + 1;
+                    await updateDoc(ptsDocRef, {
+                        "cabinet": pts
+                    })
+                } else {
+                    pts = ptsData.other + points;
+                    await updateDoc(ptsDocRef, {
+                        "other": pts
+                    })
+                }
+            }
+        }
         await setDoc(doc(db, "codes", eventCode), {cabinetOnly:cabinetOnly, cabinetRequired: cabinetRequired, category:category, event: eventName, eventDate:eventDate, graphicDate:graphicDate, points:points, semester:semester, voterEligible:voterEligible});
     }
 	return (

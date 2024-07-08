@@ -31,9 +31,10 @@ function Attendance() {
         
         const userDocRef = doc(db, "users", email);
         const userDocSnap = await getDoc(userDocRef);
+        var data = userDocSnap.data();
         if(userDocSnap.exists())
         {
-            const eventCodes = userDocSnap.data().eventCodes;
+            const eventCodes = data.eventCodes;
             if(eventCodes.length !== 0)
             {
                 for(var i = 0; i < eventCodes.length; i++)
@@ -64,7 +65,7 @@ function Attendance() {
                 var category = codeDocSnap.data().category;
                 if(category === "Cabinet")
                 {
-                    var cabinetPoints = userDocSnap.data().cabinetPoints;
+                    var cabinetPoints = data.cabinetPoints;
                     cabinetPoints += 1;
                     await updateDoc(userDocRef, {
                         "eventCodes": arrayUnion(code),
@@ -75,13 +76,13 @@ function Attendance() {
                
                 if(semester === "fallPoints")
                 {
-                    currentPoints = userDocSnap.data().fallPoints;
+                    currentPoints = data.fallPoints;
                     currentPoints = currentPoints + addPoints;
                     if(voterEligible === false)
                     {
                         if(category === "GBM")
                         {
-                            var gbmNVE = userDocSnap.data().gbmPointsNVE;
+                            var gbmNVE = data.gbmPointsNVE;
                             gbmNVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -89,7 +90,7 @@ function Attendance() {
                                 "gbmPointsNVE": gbmNVE
                             });
                         } else if(category === "MLP Fall") {
-                            var mlpFallNVE = userDocSnap.data().mlpFallPointsNVE;
+                            var mlpFallNVE = data.mlpFallPointsNVE;
                             mlpFallNVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -97,7 +98,7 @@ function Attendance() {
                                 "mlpFallPointsNVE": mlpFallNVE
                             });
                         } else if(category === "MLP Spring") {
-                            var mlpSpringNVE = userDocSnap.data().mlpSpringPointsNVE;
+                            var mlpSpringNVE = data.mlpSpringPointsNVE;
                             mlpSpringNVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -105,7 +106,7 @@ function Attendance() {
                                 "mlpSpringPointsNVE": mlpSpringNVE
                             });
                         } else if(category === "OPA") {
-                            var opa = userDocSnap.data().opaPointsNVE;
+                            var opa = data.opaPointsNVE;
                             opa += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -113,7 +114,7 @@ function Attendance() {
                                 "opaPointsNVE": opa
                             });
                         } else if(category === "Programming") {
-                            var prgmNVE = userDocSnap.data().programmingPointsNVE;
+                            var prgmNVE = data.programmingPointsNVE;
                             prgmNVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -121,7 +122,7 @@ function Attendance() {
                                 "programmingPointsNVE": prgmNVE
                             });
                         } else {
-                            var other = userDocSnap.data().otherPoints;
+                            var other = data.otherPoints;
                             other += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -132,7 +133,7 @@ function Attendance() {
                     } else {
                         if(category === "Programming")
                         {
-                            var prgmVE = userDocSnap.data().programmingPointsVE;
+                            var prgmVE = data.programmingPointsVE;
                             prgmVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -140,7 +141,7 @@ function Attendance() {
                                 "programmingPointsVE": prgmVE
                             });
                         } else if(category === "GBM") {
-                            var gbmVE = userDocSnap.data().gbmPointsVE;
+                            var gbmVE = data.gbmPointsVE;
                             gbmVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -148,7 +149,7 @@ function Attendance() {
                                 "gbmPointsVE": gbmVE
                             });
                         } else if(category === "MLP Fall") {
-                            var mlpFallVE = userDocSnap.data().mlpFallPointsVE;
+                            var mlpFallVE = data.mlpFallPointsVE;
                             mlpFallVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -156,7 +157,7 @@ function Attendance() {
                                 "mlpFallPointsVE": mlpFallVE
                             });
                         } else if(category === "MLP Spring") {
-                            var mlpSpringVE = userDocSnap.data().mlpSpringPointsVE;
+                            var mlpSpringVE = data.mlpSpringPointsVE;
                             mlpSpringVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -164,7 +165,7 @@ function Attendance() {
                                 "mlpSpringPointsVE": mlpSpringVE
                             });
                         } else if(category === "OPA") {
-                            var opaVE = userDocSnap.data().opaPointsVE;
+                            var opaVE = data.opaPointsVE;
                             opaVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -175,13 +176,13 @@ function Attendance() {
                     }
                         
                 } else {
-                    currentPoints = userDocSnap.data().springPoints;
+                    currentPoints = data.springPoints;
                     currentPoints += addPoints;
                     if(voterEligible === false)
                     {
                         if(category === "GBM")
                         {
-                            gbmNVE = userDocSnap.data().gbmPointsNVE;
+                            gbmNVE = data.gbmPointsNVE;
                             gbmNVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -189,7 +190,7 @@ function Attendance() {
                                 "gbmPointsNVE": gbmNVE
                             });
                         } else if(category === "MLP Fall") {
-                            mlpFallNVE = userDocSnap.data().mlpFallPointsNVE;
+                            mlpFallNVE = data.mlpFallPointsNVE;
                             mlpFallNVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -197,7 +198,7 @@ function Attendance() {
                                 "mlpFallPointsNVE": mlpFallNVE
                             });
                         } else if(category === "MLP Spring") {
-                            mlpSpringNVE = userDocSnap.data().mlpSpringPointsNVE;
+                            mlpSpringNVE = data.mlpSpringPointsNVE;
                             mlpSpringNVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -205,7 +206,7 @@ function Attendance() {
                                 "mlpSpringPointsNVE": mlpSpringNVE
                             });
                         } else if(category === "OPA") {
-                            opa = userDocSnap.data().opaPointsNVE;
+                            opa = data.opaPointsNVE;
                             opa += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -213,7 +214,7 @@ function Attendance() {
                                 "opaPointsNVE": opa
                             });
                         } else if(category === "Programming") {
-                            prgmNVE = userDocSnap.data().programmingPointsNVE;
+                            prgmNVE = data.programmingPointsNVE;
                             prgmNVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -221,7 +222,7 @@ function Attendance() {
                                 "programmingPointsNVE": prgmNVE
                             });
                         } else {
-                            other = userDocSnap.data().otherPoints;
+                            other = data.otherPoints;
                             other += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -232,7 +233,7 @@ function Attendance() {
                     } else {
                         if(category === "Programming")
                         {
-                            prgmVE = userDocSnap.data().programmingPointsVE;
+                            prgmVE = data.programmingPointsVE;
                             prgmVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -240,7 +241,7 @@ function Attendance() {
                                 "programmingPointsVE": prgmVE
                             });
                         } else if(category === "GBM") {
-                            gbmVE = userDocSnap.data().gbmPointsVE;
+                            gbmVE = data.gbmPointsVE;
                             gbmVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -248,7 +249,7 @@ function Attendance() {
                                 "gbmPointsVE": gbmVE
                             });
                         } else if(category === "MLP Fall") {
-                            mlpFallVE = userDocSnap.data().mlpFallPointsVE;
+                            mlpFallVE = data.mlpFallPointsVE;
                             mlpFallVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -256,7 +257,7 @@ function Attendance() {
                                 "mlpFallPointsVE": mlpFallVE
                             });
                         } else if(category === "MLP Spring") {
-                            mlpSpringVE = userDocSnap.data().mlpSpringPointsVE;
+                            mlpSpringVE = data.mlpSpringPointsVE;
                             mlpSpringVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
@@ -264,7 +265,7 @@ function Attendance() {
                                 "mlpSpringPointsVE": mlpSpringVE
                             });
                         } else if(category === "OPA") {
-                            opaVE = userDocSnap.data().opaPointsVE;
+                            opaVE = data.opaPointsVE;
                             opaVE += addPoints;
                             await updateDoc(userDocRef, {
                                 "eventCodes": arrayUnion(code),
