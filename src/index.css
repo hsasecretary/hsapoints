@@ -1,7 +1,7 @@
 body {
   margin: 0;
   src: url("https://fonts.google.com/specimen/Reddit+Mono");
-  font-family: Georgia, serif;
+  font-family: 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f0f1f2;
@@ -13,5 +13,5 @@ code {
 }
 input, select
 {
-  font-family: Georgia, serif;
+  font-family: Montserrat, sans-serif;
 }
