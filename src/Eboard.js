@@ -14,7 +14,7 @@ function Eboard({ eboard }) {
       const table = document.getElementById("codeTable");
       if (table) {
         let rows = "";
-        rows += "<tr class='even'>";
+        rows += "<tr id='codeTableHeader'>";
         rows += "<th>Event</th>";
         rows += "<th>Code</th>";
         rows += "<th>Category</th>";
@@ -29,17 +29,17 @@ function Eboard({ eboard }) {
         const codesSnapshot = await getDocs(codes);
 
         codesSnapshot.forEach((code) => {
-          let curr = num % 2 === 0 ? "<tr class='even'>" : "<tr class='odd'>";
-          curr += `<td>${code.data().event}</td>`;
-          curr += `<td>${code.id}</td>`;
-          curr += `<td>${code.data().category}</td>`;
-          curr += `<td>${code.data().graphicDate}</td>`;
-          curr += `<td>${code.data().eventDate}</td>`;
-          curr += `<td>${code.data().points}</td>`;
-          curr += `<td>${code.data().voterEligible}</td>`;
-          curr += "</tr>";
-          rows += curr;
-          num += 1;
+            let curr = num % 2 === 0 ? "<tr class='even'>" : "<tr class='odd'>";
+            curr += `<td>${code.data().event}</td>`;
+            curr += `<td>${code.id}</td>`;
+            curr += `<td>${code.data().category}</td>`;
+            curr += `<td>${code.data().graphicDate}</td>`;
+            curr += `<td>${code.data().eventDate}</td>`;
+            curr += `<td>${code.data().points}</td>`;
+            curr += `<td>${code.data().voterEligible}</td>`;
+            curr += "</tr>";
+            rows += curr;
+            num += 1;
         });
 
         table.innerHTML = rows;

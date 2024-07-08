@@ -25,7 +25,7 @@ table
 
 th, td
 {
-    border: 1px solid #669372;
+    border: 1px solid #3f684a;
 }
 .even
 {
@@ -44,4 +44,12 @@ td
 {
     font-size: 1.1em;
 
+}
+#codeTableHeader
+{
+    background-color: #5d976b;
+}
+tr:hover
+{
+  background-color: #5d976b;
 }

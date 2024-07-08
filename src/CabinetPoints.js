@@ -45,7 +45,6 @@ function CabinetPoints() {
 				}
 			} else {
 				signOut(auth);
-                console.log("Dashboad: no one home");
                 navigate("/login");
 			}
 		}) 
@@ -59,7 +58,7 @@ function CabinetPoints() {
             <p id="cabinetPointsDescription">Below is a breakdown by category of your total points. </p>
             <div id="pointsForm">
                 
-                <div className="pointsSubForm" >
+                <div className="pointsSubForm">
                     <h3>Programming</h3>
                     <h4 id="programmingPoints"> {programmingPoints}</h4>
                 </div>

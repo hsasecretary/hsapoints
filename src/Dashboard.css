@@ -96,6 +96,10 @@ input[type="submit"]:active
     margin-right: 15px;
     margin-bottom: 15px;
     border-radius: 5px;
+    word-wrap: break-word; /* Deprecated, but still supported */
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
 
 }
 .subForm h3, .pointsSubForm h3, #eboard h3
