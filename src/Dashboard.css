@@ -46,6 +46,7 @@ form label
 input[type="submit"]
 {
 	background-color:#f2f6f8;
+    color: black;
 	min-width: 140px;
 }
 input[type="submit"]:hover

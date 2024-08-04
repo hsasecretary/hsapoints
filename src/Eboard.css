@@ -21,6 +21,7 @@ table
     width:85%;
     border-collapse:collapse;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1), 0 6px 20px 0 rgba(0,0,0,0.19);
+    overflow-x: auto;
 }
 
 th, td
@@ -52,4 +53,11 @@ td
 tr:hover
 {
   background-color: #5d976b;
+}
+
+#pointsTable
+{
+    width:85%;
+    margin:auto;
+    overflow-x: auto;
 }
