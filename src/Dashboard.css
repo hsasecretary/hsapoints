@@ -124,3 +124,17 @@ input[type="submit"]:active
     margin:auto;
 }
 
+
+@media only screen and (max-width:500px)
+{
+    .subForm h3, .pointsSubForm h3, #eboard h3
+    {
+        font-size: 1.3em;
+        text-align: center;
+    }
+    .pointsSubForm h2
+    {
+        font-size: 1.5em;
+        text-align: center;
+    }
+}
