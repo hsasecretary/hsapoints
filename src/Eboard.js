@@ -31,12 +31,12 @@ function Eboard({ eboard }) {
         codesSnapshot.forEach((code) => {
             let curr = num % 2 === 0 ? "<tr class='even'>" : "<tr class='odd'>";
             curr += `<td>${code.data().event}</td>`;
-            curr += `<td>${code.id}</td>`;
+            curr += `<td>${code.id.toUpperCase()}</td>`;
             curr += `<td>${code.data().category}</td>`;
             curr += `<td>${code.data().graphicDate}</td>`;
             curr += `<td>${code.data().eventDate}</td>`;
             curr += `<td>${code.data().points}</td>`;
-            curr += `<td>${code.data().voterEligible}</td>`;
+            curr += `<td>${code.data().voterEligible ? 'True':'False'}</td>`;
             curr += "</tr>";
             rows += curr;
             num += 1;
@@ -62,17 +62,19 @@ function Eboard({ eboard }) {
       <br /><Logout />
       {isEboard(eboard) && <CreateCode />}
       <br />
-      <table id="codeTable">
-        <tr className="even">
-          <th>Event:</th>
-          <th>Code:</th>
-          <th>Category:</th>
-          <th>Graphic Date:</th>
-          <th>Event Date:</th>
-          <th>Points:</th>
-          <th>Voter Eligible:</th>
-        </tr>
-      </table>
+      <div id='pointsTable'>
+        <table id="codeTable">
+          <tr className="even">
+            <th>Event:</th>
+            <th>Code:</th>
+            <th>Category:</th>
+            <th>Graphic Date:</th>
+            <th>Event Date:</th>
+            <th>Points:</th>
+            <th>Voter Eligible:</th>
+          </tr>
+        </table>
+      </div>
       <br />
       <br />
       <br />
