@@ -4,52 +4,82 @@ import { db } from './firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
 function ApprovedCabinet() {
-    useEffect(()=> {
-        const fetchPending= async() => {
-          var table= document.getElementById('pendingApprovalTable');
-          const pendingDocRef=  await doc(db,'cabinets','pending');
-          const pendingDocSnap= await getDoc(pendingDocRef);
-          if(pendingDocSnap.exists()){
-            var data= pendingDocSnap.data();
-            var emails= data.emails;
-            console.log(emails);
-            for(var i=0; i<emails.length; i++){
-                const userDocRef= await doc(db,'users',emails[i]);
-                const userDocSnap= await getDoc(userDocRef);
-                if(userDocSnap.exists()){
-                    var userData= userDocSnap.data();
-                    var name= '<td>' + userData.firstName + ' ' + userData.lastName + '</td>';
-                    var cabinet= '<td>' + userData.cabinet + '</td>'; 
-                    var position= '<td>' + userData.position + '</td>';
-                    var dropDown= '<td>dropdown</td>';
-                    var submit= '<td>submit</td>';
-                    table += '<tr>'+ name+cabinet+position+dropDown+submit+ '</tr>';
-                }
+    const [emails, setEmails] = useState([]);
+
+    const updateDatabase = (email, status) => {
+        console.log(`Updating ${email} with status ${status}`);
+        // Add your update logic here
+    };
+
+    useEffect(() => {
+        const fetchPending = async () => {
+            const pendingDocRef = doc(db, 'cabinets', 'pending');
+            const pendingDocSnap = await getDoc(pendingDocRef);
+            if (pendingDocSnap.exists()) {
+                const data = pendingDocSnap.data();
+                setEmails(data.emails);
             }
-            document.getElementById('pendingApprovalTable').innerHTML=table;
-
-          };
-
-
         };
         fetchPending();
-    },[]);
+    }, []);
+
+    const handleSubmit = (email, status) => {
+        updateDatabase(email, status);
+    };
 
     return (
-        <div id='approvedCabinetContainer'className='attendanceForm'>
-        <h3> Pending E-board Approval </h3>
-        <table id='pendingApprovalTable'> 
-            <tr>
-                <th> Name </th>
-                <th> Cabinet </th>
-                <th> Position </th>
-                <th> Status </th>
-                <th> Submit </th>
-            </tr>
-
-        </table>
+        <div id='approvedCabinetContainer' className='attendanceForm'>
+            <h3>Pending E-board Approval</h3>
+            <table id='pendingApprovalTable'>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Cabinet</th>
+                        <th>Position</th>
+                        <th>Status</th>
+                        <th>Submit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {emails.map((email, index) => (
+                        <TableRow key={index} email={email} onSubmit={handleSubmit} />
+                    ))}
+                </tbody>
+            </table>
         </div>
-    )
+    );
 }
+
+const TableRow = ({ email, onSubmit }) => {
+    const [status, setStatus] = useState('select');
+    
+    const handleChange = (event) => {
+        setStatus(event.target.value);
+    };
+
+    return (
+        <tr>
+            <td>{email}</td>
+            <td>Cabinet</td> {/* Replace with actual data */}
+            <td>Position</td> {/* Replace with actual data */}
+            <td>
+                <select value={status} onChange={handleChange}>
+                    <option value='select'>Select</option>
+                    <option value='approve'>Approve</option>
+                    <option value='deny'>Deny</option>
+                </select>
+            </td>
+            <td>
+                <button
+                    type='button'
+                    onClick={() => onSubmit(email, status)}
+                    disabled={status === 'select'}
+                >
+                    Submit
+                </button>
+            </td>
+        </tr>
+    );
+};
 
 export default ApprovedCabinet;
