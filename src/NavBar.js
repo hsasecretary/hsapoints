@@ -9,7 +9,7 @@ function NavBar({eboard}) {
 				<ul>
 					<li><a href="https://ufhsa.com">UF HSA</a></li>
 					<li><a href="./dashboard">Attendance</a></li>
-					<li><a href="https://calendar.google.com/calendar/u/0/embed?src=35d16e33191e0ceb51859f2be92d07766293164ab7257c6c044c9de96c04f545@group.calendar.google.com&ctz=America/New_York" target="_blank" rel="noopener noreferrer">Calendar</a></li>
+					<li><a href="https://calendar.google.com/calendar/embed?src=ae505ce1dedb0a52bddc341d9e8d65e996a61aac295d00d89af40640bdb51762%40group.calendar.google.com&ctz=America%2FNew_York">Calendar</a></li>
 					{eboard && (
 						<li><a href="./eboard">E-Board</a></li>	
 					)}
