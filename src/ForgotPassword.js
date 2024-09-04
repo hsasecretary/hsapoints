@@ -1,10 +1,8 @@
 import './Master.css';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from './firebase';
-import { useNavigate } from 'react-router-dom';
 
 function ForgotPassword() {
-    let navigate = useNavigate();
 	function check(event) 
     {
         event.preventDefault();
