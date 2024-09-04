@@ -6,6 +6,7 @@ import Dashboard from './Dashboard';
 import Header from './Header';
 import NavBar from './NavBar';
 import Eboard from './Eboard';
+import ForgotPassword from './ForgotPassword';
 
 import React, { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -53,6 +54,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/dashboard" element={<Dashboard eboard ={isAdmin(userEmail)}/>}/>
                     <Route path="/eboard" element={<Eboard eboard ={isAdmin(userEmail)}/>}/>
+                    <Route path="/forgotPassword" element={<ForgotPassword/>} />
                 </Routes>
             </Router>
         </div>
