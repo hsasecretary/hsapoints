@@ -4,7 +4,7 @@ function Header() { //IDK WHY FUNCTION
 	
 	return (
 		<div className="header" >
-			<h1>Hispanic Student Association</h1>
+			<h1>Hispanic-Latine Student Association</h1>
             
 		</div>
 	);

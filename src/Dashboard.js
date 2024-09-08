@@ -16,8 +16,8 @@ function Dashboard({eboard}) {
 			<br/>
 			<Attendance />
 			<br/>
-			{/* <CabinetPoints/>
-			<br/> */}
+			<CabinetPoints/>
+			<br/>
 
 		</div>
 	);
