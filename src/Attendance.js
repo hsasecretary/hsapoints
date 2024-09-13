@@ -8,7 +8,8 @@ function Attendance() {
     {
         event.preventDefault();
         document.getElementById("attendanceCodeError").innerText = "";
-        
+        document.getElementById("attendanceCodeSuccess").innerText="";
+
         var email = auth.currentUser.email;
         var code = document.getElementById("code").value.toLowerCase();
         if(code === "")
@@ -71,7 +72,6 @@ function Attendance() {
                         "eventCodes": arrayUnion(code),
                         "cabinetPoints": cabinetPoints
                     });
-                    return;
                 }
                
                 if(semester === "fallPoints")
@@ -164,6 +164,7 @@ function Attendance() {
                                 "fallPoints": currentPoints, 
                                 "mlpSpringPointsVE": mlpSpringVE
                             });
+                            
                         } else if(category === "OPA") {
                             var opaVE = data.opaPointsVE;
                             opaVE += addPoints;
@@ -276,9 +277,11 @@ function Attendance() {
                     }
                 }
             }
+            console.log('here');
             if(added)
             {
                 document.getElementById("code").value = "";
+                document.getElementById("attendanceCodeSuccess").innerText="Success! Please reload page!";
                 window.location.reload();
             } else {
                 document.getElementById("attendanceCodeError").innerText = "*Error: Code in Invalid";
@@ -292,6 +295,7 @@ function Attendance() {
             <form onSubmit={checkCode}>
                 <div id="attendanceInput">
                     <p className='errorMsg' id="attendanceCodeError"></p>
+                    <p className='successMsg' id="attendanceCodeSuccess"></p>
                     <label htmlFor="code">Attendance Code:</label><br/>
                     <input type="text" id="code"  placeholder="GBM1"></input>
                 </div>

@@ -1,6 +1,7 @@
 import './Eboard.css';
 import CreateCode from './CreateCode';
 import Logout from './Logout';
+import ApprovedCabinet from './ApprovedCabinet';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
@@ -78,7 +79,7 @@ function Eboard({ eboard }) {
       <br />
       <br />
       <br />
-
+      {isEboard(eboard) && <ApprovedCabinet />}
     </div>
   );
 }

@@ -84,6 +84,7 @@ function CabinetPoints() {
                 </div>
                 <div className="pointsSubForm" >
                     <h3>Cabinet</h3>
+                    <p className='center'>Please Note: Cabinet points do NOT count towards overal semester or total points in order keep fairness with non-cabinet members in competitions</p>
                     <h4 id="cabinet">{cabinetPoints}</h4>
                 </div>
             </div>
