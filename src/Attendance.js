@@ -164,6 +164,7 @@ function Attendance() {
                                 "fallPoints": currentPoints, 
                                 "mlpSpringPointsVE": mlpSpringVE
                             });
+                            
                         } else if(category === "OPA") {
                             var opaVE = data.opaPointsVE;
                             opaVE += addPoints;
