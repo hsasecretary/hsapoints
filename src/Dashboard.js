@@ -2,8 +2,9 @@ import './Dashboard.css';
 import Points from './Points'
 import Attendance from './Attendance';
 import Logout from './Logout';
+import EventsAttended from './EventsAttended';
 
-function Dashboard({eboard}) {
+function Dashboard({cabinet, email}) {
 	
 	return (
 		
@@ -15,7 +16,8 @@ function Dashboard({eboard}) {
 			<br/>
 			<Attendance />
 			<br/>
-
+			<EventsAttended cabinet = {cabinet} email= {email}/>
+			<br/>
 		</div>
 	);
 }

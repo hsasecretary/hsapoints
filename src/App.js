@@ -92,7 +92,7 @@ function App() {
                     <Route path="/" element={<Navigate to="/login"/>} />
                     <Route path="/signup" element={<SignUp />} />
                     <Route path="/login" element={<Login />} />
-                    <Route path="/dashboard" element={<Dashboard eboard ={isAdmin(userEmail)}/>}/>
+                    <Route path="/dashboard" element={<Dashboard cabinet ={isCabinet(userEmail)} email ={userEmail}/>}/>
                     <Route path="/cabinet" element={<Cabinet cabinet={isCabinet(userEmail)}/>}/>
                     <Route path="/eboard" element={<Eboard eboard ={isAdmin(userEmail)}/>}/>
                     <Route path="/forgotPassword" element={<ForgotPassword/>} />

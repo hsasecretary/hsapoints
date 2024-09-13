@@ -1,0 +1,34 @@
+#EventsAttended
+{
+    width: 100%;
+    margin-top: 40px;
+}
+
+#EventsAttended tr{
+    height: 2em;
+}
+
+#EventsAttended thead
+{
+    background-color: #5d976b;
+}
+
+#EventsAttended td
+{
+    width: 33%;
+}
+
+#EventsAttended h3
+{
+    margin-bottom: -1em;
+}
+
+#EventsAttended table
+{
+    margin-bottom: 2em;
+}
+
+#EventsAttended p
+{
+    margin-bottom: 0;
+}

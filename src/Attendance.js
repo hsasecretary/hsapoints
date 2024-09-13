@@ -11,13 +11,16 @@ function Attendance() {
         document.getElementById("attendanceCodeSuccess").innerText="";
 
         var email = auth.currentUser.email;
-        var code = document.getElementById("code").value.toLowerCase();
+        var code = document.getElementById("code").value;
         if(code === "")
         {
             document.getElementById("attendanceCodeError").innerText = "*Required: Type in a Code to Submit";
+            return;
         } else if(code.length > 45) {
             document.getElementById("attendanceCodeError").innerText = "*Error: Code is Too Long";
+            return;
         }
+        code = code.toLowerCase();
         let date = new Date();
         let day = date.getDate();
         if(day < 10) {
@@ -67,7 +70,7 @@ function Attendance() {
                 if(category === "Cabinet")
                 {
                     var cabinetPoints = data.cabinetPoints;
-                    cabinetPoints += 1;
+                    cabinetPoints += addPoints;
                     await updateDoc(userDocRef, {
                         "eventCodes": arrayUnion(code),
                         "cabinetPoints": cabinetPoints
