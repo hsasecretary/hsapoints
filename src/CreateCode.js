@@ -257,7 +257,7 @@ function CreateCode() {
                         "cabinetMLPSpring":cpts
                     })
                 } else if(category === "Cabinet") {
-                    pts = ptsData.cabinet + 1;
+                    pts = ptsData.cabinet + points;
                     await updateDoc(ptsDocRef, {
                         "cabinet": pts
                     })
@@ -297,7 +297,7 @@ function CreateCode() {
                         "mlpSpringNVE": pts
                     })
                 } else if(category === "Cabinet") {
-                    pts = ptsData.cabinet + 1;
+                    pts = ptsData.cabinet + points;
                     await updateDoc(ptsDocRef, {
                         "cabinet": pts
                     })

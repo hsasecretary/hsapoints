@@ -10,7 +10,6 @@ function ApprovedCabinet() {
 
     const updateDatabase = async (email, status, cabinet) => {
         cabinet = cabinet.charAt(0).toLowerCase() + cabinet.slice(1);
-        console.log(`Updating ${email} with status ${status} and cabinet ${cabinet}`);
 
         if(cabinet === "mLP Fall") 
         {
@@ -144,7 +143,8 @@ const TableRow = ({className, email,cabinet, position, onSubmit }) => {
         setStatus(event.target.value);
     };
 
-    return (        <tr className = {className}>
+    return (        
+        <tr className = {className}>
             <td>{email}</td>
             <td>{cabinet}</td> 
             <td>{position}</td>
