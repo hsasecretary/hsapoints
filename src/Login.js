@@ -1,6 +1,6 @@
 import './Master.css';
 import { useNavigate } from 'react-router-dom';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword} from 'firebase/auth';
 
 function Login() {
 	const auth = getAuth();
@@ -19,6 +19,7 @@ function Login() {
 		});		
 		
 	}
+	
 	return (
 		<div className="form">
 			<h2>Login</h2>
@@ -33,6 +34,7 @@ function Login() {
 			</form>
 			<div className="center"><a href="./SignUp">New? Create an account</a></div> 
 			{/* Forgot password on */}
+			<div className="center"><a href="/forgotPassword" id="reset">Forgot Password? Click here</a></div>
 			<br/>
 		</div>
 	);
