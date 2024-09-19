@@ -94,7 +94,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/dashboard" element={<Dashboard cabinet ={isCabinetMember} email ={userEmail}/>}/>
                     <Route path="/cabinet" element={<Cabinet cabinet={isCabinetMember}/>}/>
-                    <Route path="/eboard" element={<Eboard eboard ={isEboard}/>}/>
+                    <Route path="/eboard" element={<Eboard eboard ={isAdmin(userEmail)}/>}/>
                     <Route path="/forgotPassword" element={<ForgotPassword/>} />
                 </Routes>
             </Router>
