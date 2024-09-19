@@ -265,7 +265,7 @@ function EventsAttended({email, cabinet})
                                 />
                             ))}
                         </tbody>
-                    </table>
+                    </table><br/>
                 </div>
             )}
             <br/><br/><br/>
