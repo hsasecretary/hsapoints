@@ -12,6 +12,7 @@ function EventsAttended({email, cabinet})
     const [opaEvents, setOpa] = useState([]);
     const [cabinetEvents, setCabinet] = useState([]);
     const [otherEvents, setOther] = useState([]);
+    const [missedEvents, setMissed] = useState([]);
 
     useEffect(() => {
         const fetchAttended = async () => {
@@ -36,10 +37,13 @@ function EventsAttended({email, cabinet})
                 const opa = [];
                 const other = [];
                 const cabinet =[];
-                attended.forEach(code => {
-                    codesDocSnap.forEach((doc) => {
+                const missed = [];
+                codesDocSnap.forEach((doc) => {
+                    var added = false; 
+                    attended.forEach(code => {
                         if(code === doc.id)
                         {
+                            added = true;
                             const docData = doc.data();
                             if(docData.category === "GBM")
                             {
@@ -60,6 +64,21 @@ function EventsAttended({email, cabinet})
                             return;
                         }
                      })
+                     if(!added)
+                     {
+                        var missedData = doc.data();
+                        const today = new Date();
+                        let day = today.getDate();
+                        let month = today.getMonth() + 1;
+                        let year = today.getFullYear();
+                        let date = year + "-" + month + "-" + day;
+                        
+                        if(missedData.cabinetRequired && (new Date(missedData.eventDate) < new Date(date))) 
+                        {
+                            missed.push(doc);
+                        }
+                       
+                     }
                 })
 
                 //Update state
@@ -70,6 +89,7 @@ function EventsAttended({email, cabinet})
                 setOpa(opa);
                 setOther(other);
                 setCabinet(cabinet);
+                setMissed(missed);
             }
         };
         fetchAttended();
@@ -214,6 +234,25 @@ function EventsAttended({email, cabinet})
                         <tbody>
                             {cabinetEvents.map((event, index) => (
                                 
+                                <TableRow
+                                    key = {index}
+                                    event = {event}
+                                />
+                            ))}
+                        </tbody>
+                    </table>
+                    <h3>Missed</h3>
+                    <p style={{textAlign:'center'}}>These are required events you missed</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Event Date</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {missedEvents.map((event, index) => (
                                 <TableRow
                                     key = {index}
                                     event = {event}
