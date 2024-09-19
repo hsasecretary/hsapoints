@@ -72,9 +72,15 @@ function EventsAttended({email, cabinet})
                         let month = today.getMonth() + 1;
                         let year = today.getFullYear();
                         let date = year + "-" + month + "-" + day;
+                        let missedDate = missedData.eventDate;
                         
-                        if(missedData.cabinetRequired && (new Date(missedData.eventDate) < new Date(date))) 
+                        if(missedDate.substring(5,6) === "0")
                         {
+                            missedDate = missedDate.substring(0, 5) + missedDate.substring(6);
+                        }
+
+                        if(missedData.cabinetRequired && (new Date(missedDate) < new Date(date))) 
+                        { 
                             missed.push(doc);
                         }
                        
