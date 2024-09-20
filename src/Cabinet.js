@@ -4,19 +4,13 @@ import { useNavigate } from 'react-router-dom';
 
 function Cabinet({ cabinet }) {
     let navigate = useNavigate();
-    function isCabinet(cabinet) {
-        if (cabinet) {
-          console.log('cabinet true');
-          return true;
-        } else {
-          navigate("/dashboard");
-        }
-      }
+    
     return (
         <div>
             <br/>
             <Logout/>
-            {isCabinet(cabinet) && <CabinetPoints />}
+            {cabinet && <CabinetPoints />}
+            {!cabinet && navigate("/dashboard")}
         </div>
     )
 }

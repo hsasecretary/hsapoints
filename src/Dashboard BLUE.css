@@ -28,6 +28,8 @@
     display: flex;
     flex-flow: wrap;
     justify-content: flex-start;
+    margin-bottom: 120px;
+
 }
 
 h2
