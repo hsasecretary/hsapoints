@@ -45,8 +45,6 @@ function App() {
         const checkCabinetStatus = async (email) => {
             if (email) {
                 const result = await isCabinet(email);
-                console.log('curr status: ', isCabinetMember);
-                console.log("Cabinet status result:", result); // Debugging line
                 setIsCabinetMember(result);  // Set the state based on result
             }
         };
@@ -56,10 +54,6 @@ function App() {
         }
     }, [userEmail]);
     
-    // Add a console log to see if the state is updated
-    useEffect(() => {
-        console.log("isCabinetMember updated:", isCabinetMember); // Debugging line
-    }, [isCabinetMember]);
 
     function isAdmin(email) {
 		const adminEmails = [
@@ -86,13 +80,10 @@ function App() {
             const data = userDocSnap.data();
             if(data.approved && data.cabinet !== "none") 
             {
-                console.log("true 89")
                 return true;
             }
-            console.log("false 91");
             return false; 
         }
-        console.log("false 94");
         return false;
     }
 
