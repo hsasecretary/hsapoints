@@ -45,11 +45,21 @@ function App() {
         const checkCabinetStatus = async (email) => {
             if (email) {
                 const result = await isCabinet(email);
-                setIsCabinetMember(result);
+                console.log('curr status: ', isCabinetMember);
+                console.log("Cabinet status result:", result); // Debugging line
+                setIsCabinetMember(result);  // Set the state based on result
             }
         };
-        checkCabinetStatus(userEmail);
+        
+        if (userEmail) {
+            checkCabinetStatus(userEmail);
+        }
     }, [userEmail]);
+    
+    // Add a console log to see if the state is updated
+    useEffect(() => {
+        console.log("isCabinetMember updated:", isCabinetMember); // Debugging line
+    }, [isCabinetMember]);
 
     function isAdmin(email) {
 		const adminEmails = [
@@ -76,13 +86,16 @@ function App() {
             const data = userDocSnap.data();
             if(data.approved && data.cabinet !== "none") 
             {
-
+                console.log("true 89")
                 return true;
             }
+            console.log("false 91");
             return false; 
         }
+        console.log("false 94");
         return false;
     }
+
     return (
         <div>
             <Router>
@@ -93,7 +106,7 @@ function App() {
                     <Route path="/signup" element={<SignUp />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/dashboard" element={<Dashboard cabinet ={isCabinetMember} email ={userEmail}/>}/>
-                    <Route path="/cabinet" element={<Cabinet cabinet={isCabinetMember}/>}/>
+                    <Route path="/cabinet" element={<Cabinet cabinet={isCabinet(userEmail)}/>}/>
                     <Route path="/eboard" element={<Eboard eboard ={isAdmin(userEmail)}/>}/>
                     <Route path="/forgotPassword" element={<ForgotPassword/>} />
                 </Routes>

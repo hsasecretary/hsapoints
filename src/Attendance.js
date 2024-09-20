@@ -75,10 +75,7 @@ function Attendance() {
                         "eventCodes": arrayUnion(code),
                         "cabinetPoints": cabinetPoints
                     });
-                }
-               
-                if(semester === "fallPoints")
-                {
+                } else if (semester === "fallPoints") {
                     currentPoints = data.fallPoints;
                     currentPoints = currentPoints + addPoints;
                     if(voterEligible === false)
@@ -276,11 +273,19 @@ function Attendance() {
                                 "springPoints": currentPoints, 
                                 "opaPointsVE": opaVE
                             });
-                        } 
+                        } else {
+                            other = data.otherPoints;
+                            other += addPoints;
+                            await updateDoc(userDocRef, {
+                                "eventCodes": arrayUnion(code),
+                                "springPoints": currentPoints,
+                                "otherPoints": other
+                            });
+                        }
                     }
                 }
             }
-            console.log('here');
+
             if(added)
             {
                 document.getElementById("code").value = "";
