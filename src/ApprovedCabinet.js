@@ -105,7 +105,7 @@ function ApprovedCabinet() {
 
     return (
         <div id='approvedCabinetContainer'>
-            <h3>Pending E-board Approval</h3>
+            <h2>Pending E-board Approval</h2>
             <table id='pendingApprovalTable'>
                 <thead className='head'>
                     <tr>
