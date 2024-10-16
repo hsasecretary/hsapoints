@@ -5,6 +5,7 @@ import { arrayRemove, arrayUnion, doc, getDoc, updateDoc } from 'firebase/firest
 
 function ExcuseAbscense() {
     const[user, setUser] = useState();
+    const[userSnap, setUserSnap] = useState();
     async function updateUsers(event)
     {
         event.preventDefault();
@@ -21,6 +22,7 @@ function ExcuseAbscense() {
         const user = await getDoc(userRef);
 
         setUser(userRef);
+        setUserSnap(user);
         if(user.exists())
         {
             document.getElementById("findUserForm").classList.toggle("hidden");
@@ -84,9 +86,11 @@ function ExcuseAbscense() {
             } else {
                 detail = "Excused due to Point Recovery: " + detail;
             }
+            let addedExcuse = userSnap.data().excusedReason;
+            addedExcuse.push(detail);
             updateDoc(user, {
                 excusedEvents:arrayUnion(unexcusedAbsense),
-                excusedReason: arrayUnion(detail), 
+                excusedReason: addedExcuse, 
                 unexcusedEvents:arrayRemove(unexcusedAbsense)
 
             })
