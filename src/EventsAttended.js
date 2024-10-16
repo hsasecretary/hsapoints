@@ -102,7 +102,6 @@ function EventsAttended({email, cabinet})
                 updateDoc(userDocRef, {
                     unexcusedEvents: missedCodes
                 });
-                console.log(excusedReasons);
                 if(cabinet.length !== 0 && excusedReasons !== null)
                 {
                     let tableData = "";

@@ -87,7 +87,13 @@ function ExcuseAbscense() {
                 detail = "Excused due to Point Recovery: " + detail;
             }
             let addedExcuse = userSnap.data().excusedReason;
-            addedExcuse.push(detail);
+            if(addedExcuse === undefined)
+            {
+                addedExcuse = [detail];
+            } else {
+                addedExcuse.push(detail);
+            }
+            console.log(addedExcuse);
             updateDoc(user, {
                 excusedEvents:arrayUnion(unexcusedAbsense),
                 excusedReason: addedExcuse, 
