@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './EventsAttended.css';
-import { collection, doc, getDoc, getDocs} from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, updateDoc} from 'firebase/firestore';
 import { db } from './firebase';
 
 function EventsAttended({email, cabinet})
@@ -38,6 +38,12 @@ function EventsAttended({email, cabinet})
                 const other = [];
                 const cabinet =[];
                 const missed = [];
+                const missedCodes = [];
+                const excused = [];
+                const excusedCodes = [];
+                const excusedEvents = data.excusedEvents;               
+                const excusedReasons = data.excusedReason || null;
+
                 codesDocSnap.forEach((doc) => {
                     var added = false; 
                     attended.forEach(code => {
@@ -72,11 +78,14 @@ function EventsAttended({email, cabinet})
                         today = today.replace('-0', '-');                    
 
 
-                        if(missedData.cabinetRequired && (new Date(missedDate) < new Date(today))) 
+                        if(!excusedEvents.includes(doc.id) && missedData.cabinetRequired && (new Date(missedDate) < new Date(today))) 
                         { 
                             missed.push(doc);
+                            missedCodes.push(doc.id);
+                        } else if(excusedEvents.includes(doc.id) && missedData.cabinetRequired && (new Date(missedDate) < new Date(today))) {
+                            excused.push(doc);
+                            excusedCodes.push(doc.id);
                         }
-                       
                      }
                 })
 
@@ -89,10 +98,40 @@ function EventsAttended({email, cabinet})
                 setOther(other);
                 setCabinet(cabinet);
                 setMissed(missed);
-            }
+
+                updateDoc(userDocRef, {
+                    unexcusedEvents: missedCodes
+                });
+                console.log(excusedReasons);
+                if(cabinet.length !== 0 && excusedReasons !== null)
+                {
+                    let tableData = "";
+                    console.log(cabinet);
+                    for(let i = 0; i < excusedEvents.length; i++)
+                    {
+                    
+                        //Find the event data 
+                        let currentEventId = excusedEvents[i];
+                        let excusedIndex = excusedCodes.indexOf(currentEventId);
+                        let currentExcusedDoc = excused[excusedIndex];
+                        if(excusedReasons[i] === undefined)
+                        {
+                            excusedReasons[i] = "N/A";
+                        }
+                        tableData += "<tr>";
+                        tableData += "<td>" + currentExcusedDoc.data().event + "</td>";
+                        tableData += "<td>" + currentExcusedDoc.data().eventDate + "</td>";
+                        tableData += "<td>" + currentExcusedDoc.data().category + "</td>";
+                        tableData += "<td>" + currentExcusedDoc.data().points + "</td>";
+                        tableData += "<td>" + excusedReasons[i] + "</td>";
+                        tableData += "</tr>";
+                    }
+                    document.getElementById("excusedTableData").innerHTML = tableData;
+                }
+             }
         };
         fetchAttended();
-    }, [email]);
+    }, [email, cabinet]);
     return (
         <div id='EventsAttended'>
             <h2>Events Attended</h2>
@@ -240,7 +279,7 @@ function EventsAttended({email, cabinet})
                             ))}
                         </tbody>
                     </table>
-                    <h3>Missed</h3>
+                    <h3>Unexcused Absenses</h3>
                     <p style={{textAlign:'center'}}>These are required events you missed</p>
                     <table>
                         <thead>
@@ -257,6 +296,22 @@ function EventsAttended({email, cabinet})
                                     event = {event}
                                 />
                             ))}
+                        </tbody>
+                    </table><br/>
+                    <h3>Excused Absenses</h3>
+                    <p style={{textAlign:'center'}}>These are required events you missed</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Event Date</th>
+                                <th>Event Category</th>
+                                <th>Points</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="excusedTableData">
+                            
                         </tbody>
                     </table><br/>
                 </div>

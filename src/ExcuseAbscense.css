@@ -7,3 +7,21 @@ input[type="text"]
 {
     margin-left: 10px;
 }
+
+select 
+{
+    width: 100%;
+}
+
+.hidden 
+{
+    display:none;
+}
+
+#backToUserEmail
+{
+    font-size: 1em;
+    min-width: 5em;
+    border-color: #bbc93A;
+    margin-bottom: .5em;
+}
