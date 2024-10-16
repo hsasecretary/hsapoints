@@ -2,6 +2,7 @@ import './Eboard.css';
 import CreateCode from './CreateCode';
 import Logout from './Logout';
 import ApprovedCabinet from './ApprovedCabinet';
+import ExcuseAbscense  from './ExcuseAbscense';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
@@ -64,6 +65,7 @@ function Eboard({ eboard }) {
       {isEboard(eboard) && <CreateCode />}
       <br />
       <div id='pointsTable'>
+        <h2>Table of Event Codes</h2>
         <table id="codeTable">
           <tr className="even">
             <th>Event:</th>
@@ -79,6 +81,7 @@ function Eboard({ eboard }) {
       <br />
       <br />
       <br />
+      {isEboard(eboard) && <ExcuseAbscense/>}
       {isEboard(eboard) && <ApprovedCabinet />}
     </div>
   );
