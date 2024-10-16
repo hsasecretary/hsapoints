@@ -99,7 +99,10 @@ function SignUp() {
 					opaPointsVE:0,
 					otherPoints:0,
 					strikes: 0,
-					eventCodes: []
+					eventCodes: [],
+					excusedEvents: [],
+					excusedReason: [],
+					unexcusedEvents: []
 				});
                 if(!approved)
 				{
