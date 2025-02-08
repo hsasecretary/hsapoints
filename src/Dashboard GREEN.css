@@ -90,8 +90,8 @@ input[type="submit"]:active
 }
 .pointsSubForm
 {
-	background-color: #80beda58;
-	border: 2px solid #155776;
+	background-color: #d5e4d9;
+	border: 2px solid #669372;
     flex: 1 1 auto;
     width:25%;
     margin-left: 15px;
@@ -111,8 +111,8 @@ input[type="submit"]:active
 }
 .attendanceForm {
     display:block;
-    background-color: #80beda58;
-    border: 2px solid #155776;
+    background-color: #d5e4d9;
+    border: 2px solid #669372;
     width: 100%;
     margin: 15px 15px 15px 15px;
     border-radius: 5px;

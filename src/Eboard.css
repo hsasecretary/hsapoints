@@ -11,11 +11,11 @@ table
 
 th, td
 {
-    border: 1px solid #3f684a;
+    border: 1px solid #155776;
 }
 .even
 {
-    background-color: #d5e4d9;
+    background-color: #80beda58;
 }
 .odd
 {
@@ -33,11 +33,11 @@ td
 }
 #codeTableHeader
 {
-    background-color: #5d976b;
+    background-color: #155776;
 }
 tr:hover
 {
-  background-color: #5d976b;
+  background-color: #0076ad;
 }
 
 #pointsTable

@@ -1,6 +1,6 @@
 .header
 {
-	background-color: #227035;
+	background-color: #155776;
 	padding: 10px;
 }
 .header h1
@@ -14,11 +14,11 @@
 
 .form
 {
-	background-color: #d5e4d9;
+	background-color: #80beda58;
 	width: 85%;
 	margin:auto;
 	border-radius: 5px;
-	border: 2px solid #669372;
+	border: 2px solid #155776;
 	margin-top: 7.5%;
 	max-width: 700px;
 }
@@ -44,7 +44,7 @@ input, select
 	width:100%;
 	font-size: 1.5rem;
 	border-radius: 5px;
-	border: 1px solid #bbc93A;
+	border: 1px solid #155776;
 	margin: .3em 0 .3em 0;
 }
 
