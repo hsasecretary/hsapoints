@@ -29,7 +29,6 @@ function Points() {
 					const springPoints = data.springPoints;
 					const totalPoints = fallPoints + springPoints;
 					var gbm = data.gbmPointsVE/8*100;
-
 					var programming = (data.programmingPointsVE + data.opaPointsVE)/12*100;
 					var mlpFall = (data.mlpFallPointsVE)/2*50;
 					var mlpSpring = (data.mlpSpringPointsVE)/2*50;
