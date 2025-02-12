@@ -34,7 +34,6 @@ function Points() {
 					var mlpSpring = (data.mlpSpringPointsVE)/2*50;
 					var total = gbm+programming+mlpFall+mlpSpring;
 					total = Math.round(total);
-					total = 59;
 					if(total < 60)
 					{
 						document.getElementById("ineligibleText").className = "";
