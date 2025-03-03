@@ -174,7 +174,7 @@ function Attendance() {
                                 "opaPointsVE": opaVE
                             });
                         } else if(category === "Cabinet") {
-                            var cabinet = data.cabinetPoints;
+                            cabinet = data.cabinetPoints;
                             cabinet += addPoints;
                             await updateDoc(userDocRef, { 
                                 "eventCodes":arrayUnion(code), 
@@ -231,7 +231,7 @@ function Attendance() {
                                 "programmingPointsNVE": prgmNVE
                             });
                         } else if(category === "Cabinet") {
-                            var cabinet = data.cabinetPoints;
+                            cabinet = data.cabinetPoints;
                             cabinet += addPoints;
                             await updateDoc(userDocRef, { 
                                 "eventCodes":arrayUnion(code), 
@@ -290,7 +290,7 @@ function Attendance() {
                                 "opaPointsVE": opaVE
                             });
                         } else if(category === "Cabinet") {
-                            var cabinet = data.cabinetPoints;
+                            cabinet = data.cabinetPoints;
                             cabinet += addPoints;
                             await updateDoc(userDocRef, { 
                                 "eventCodes":arrayUnion(code), 
