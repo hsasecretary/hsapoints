@@ -67,15 +67,7 @@ function Attendance() {
                 var currentPoints;
                 var voterEligible = codeDocSnap.data().voterEligible;
                 var category = codeDocSnap.data().category;
-                if(category === "Cabinet")
-                {
-                    var cabinetPoints = data.cabinetPoints;
-                    cabinetPoints += addPoints;
-                    await updateDoc(userDocRef, {
-                        "eventCodes": arrayUnion(code),
-                        "cabinetPoints": cabinetPoints
-                    });
-                } else if (semester === "fallPoints") {
+                if (semester === "fallPoints") {
                     currentPoints = data.fallPoints;
                     currentPoints = currentPoints + addPoints;
                     if(voterEligible === false)
@@ -121,6 +113,14 @@ function Attendance() {
                                 "fallPoints": currentPoints,
                                 "programmingPointsNVE": prgmNVE
                             });
+                        } else if(category === "Cabinet") {
+                            var cabinet = data.cabinetPoints;
+                            cabinet += addPoints;
+                            await updateDoc(userDocRef, { 
+                                "eventCodes":arrayUnion(code), 
+                                "fallPoints":currentPoints,
+                                "cabinetPoints":cabinet
+                            })
                         } else {
                             var other = data.otherPoints;
                             other += addPoints;
@@ -173,6 +173,14 @@ function Attendance() {
                                 "fallPoints": currentPoints, 
                                 "opaPointsVE": opaVE
                             });
+                        } else if(category === "Cabinet") {
+                            var cabinet = data.cabinetPoints;
+                            cabinet += addPoints;
+                            await updateDoc(userDocRef, { 
+                                "eventCodes":arrayUnion(code), 
+                                "fallPoints":currentPoints,
+                                "cabinetPoints":cabinet
+                            })
                         } 
                     }
                         
@@ -222,6 +230,14 @@ function Attendance() {
                                 "springPoints": currentPoints,
                                 "programmingPointsNVE": prgmNVE
                             });
+                        } else if(category === "Cabinet") {
+                            var cabinet = data.cabinetPoints;
+                            cabinet += addPoints;
+                            await updateDoc(userDocRef, { 
+                                "eventCodes":arrayUnion(code), 
+                                "springPoints":currentPoints,
+                                "cabinetPoints":cabinet
+                            })
                         } else {
                             other = data.otherPoints;
                             other += addPoints;
@@ -273,6 +289,14 @@ function Attendance() {
                                 "springPoints": currentPoints, 
                                 "opaPointsVE": opaVE
                             });
+                        } else if(category === "Cabinet") {
+                            var cabinet = data.cabinetPoints;
+                            cabinet += addPoints;
+                            await updateDoc(userDocRef, { 
+                                "eventCodes":arrayUnion(code), 
+                                "springPoints":currentPoints,
+                                "cabinetPoints":cabinet
+                            })
                         } else {
                             other = data.otherPoints;
                             other += addPoints;
