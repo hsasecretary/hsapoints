@@ -42,7 +42,7 @@ function SignUp() {
 			document.getElementById("lastNameError").innerText = "*Required: Input your last name";
 			ready = false
 		}
-		if((uflEmail.length <= 8 || uflEmail.substring(uflEmail.length-8) !== "@ufl.edu") && (uflEmail.length <= 14 || uflEmail.substring(uflEmail.length-14) !== "@sfcollege.com"))
+		if((uflEmail.length <= 8 || uflEmail.substring(uflEmail.length-8) !== "@ufl.edu") && (uflEmail.length <= 14 || uflEmail.substring(uflEmail.length-14) !== "@sfcollege.edu"))
 		{
 			document.getElementById("uflEmailError").innerText = "*Required: Input your UFL/SF email";
 			ready = false; 
