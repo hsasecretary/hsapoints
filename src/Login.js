@@ -25,7 +25,7 @@ function Login() {
 			<h2>Login</h2>
 			<form onSubmit={check}>
 				<p className='errorMsg' id="loginError"></p>
-				<label htmlFor="uflEmail">UFL Email: </label><br/>
+				<label htmlFor="uflEmail">UFL/SF Email: </label><br/>
 				<input type="text" id="uflEmail" placeholder='albert@ufl.edu'></input>
 				<label htmlFor="password">Password: </label><br/>
 				<input type="password" id="password"></input>

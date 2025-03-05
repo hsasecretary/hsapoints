@@ -42,9 +42,9 @@ function SignUp() {
 			document.getElementById("lastNameError").innerText = "*Required: Input your last name";
 			ready = false
 		}
-		if(uflEmail.length <= 8 || uflEmail.substring(uflEmail.length-8) !== "@ufl.edu")
+		if((uflEmail.length <= 8 || uflEmail.substring(uflEmail.length-8) !== "@ufl.edu") && (uflEmail.length <= 14 || uflEmail.substring(uflEmail.length) !== "@sfcollege.com"))
 		{
-			document.getElementById("uflEmailError").innerText = "*Required: Input your UFL email";
+			document.getElementById("uflEmailError").innerText = "*Required: Input your UFL/SF email";
 			ready = false; 
 		}
 		if(cabinet === "select")
@@ -228,7 +228,7 @@ function SignUp() {
 				<label htmlFor="lastName">Last Name/Apellido: </label><br/>
 				<input type="text" id="lastName" placeholder='Gator'></input>
 				<p className='errorMsg' id="uflEmailError"></p>
-				<label htmlFor="uflEmail">UFL Email: </label><br/>
+				<label htmlFor="uflEmail">UFL/SF Email: </label><br/>
 				<input type="text" id="uflEmail" placeholder='albert@ufl.edu'></input>
 				<p className='errorMsg' id="cabinetError"></p>
 				<label htmlFor="cabinet">Involvement in HSA Cabinet:</label> <br/>
