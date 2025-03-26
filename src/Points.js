@@ -3,7 +3,7 @@ import './Points.css';
 import React, { useEffect, useState } from "react";
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, getDocs, collection} from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
 function Points() {
@@ -22,32 +22,56 @@ function Points() {
 				var email = user.email;
 				var userDocRef = doc(db, "users", email);
 				var userDocSnap = await getDoc(userDocRef);
+				//Fetch event code data
+				const codesCollectionRef = collection(db, "codes");
+				const codesDocSnap = await getDocs(codesCollectionRef);
 				if(userDocSnap.exists())
 				{
 					const data = userDocSnap.data();
-					const fallPoints = data.fallPoints;
-					const springPoints = data.springPoints;
-					const totalPoints = fallPoints + springPoints;
-					var gbm = data.gbmPointsVE/8*100;
-					var programming = (data.programmingPointsVE + data.opaPointsVE)/12*100;
-					var mlpFall = (data.mlpFallPointsVE)/2*50;
-					var mlpSpring = (data.mlpSpringPointsVE)/2*50;
+					var attended = data.eventCodes;
+					var gbm = 0;
+					var programming = 0;
+					var mlpFall = 0;
+					var mlpSpring = 0;
+					
+					codesDocSnap.forEach((doc) => {
+						attended.forEach(code => {
+							if(doc.data().voterEligible && code === doc.id)
+							{
+								const docData = doc.data();
+								if(docData.category === "GBM")
+								{
+									gbm++;
+								} else if(docData.category === "Programming" || docData.category === "OPA") {
+									programming++;
+								} else if(docData.category === "MLP Fall") {
+									mlpFall++;
+								} else if(docData.category === "MLP Spring") {
+									mlpSpring++;
+								} 
+								return;
+							}
+						})
+					})
+					gbm = gbm/8*100;
+					programming = programming/12*100;
+					mlpFall = mlpFall/2*50;
+					mlpSpring = mlpSpring/2*50;
 					var total = gbm+programming+mlpFall+mlpSpring;
 					total = Math.round(total);
+					
 					if(total < 60)
 					{
 						document.getElementById("ineligibleText").className = "";
-						document.getElementById("ineligibleList").className = "";
 						document.getElementById("eligibleText").className = "hide";
 
 					} else {
 						document.getElementById("ineligibleText").className = "hide";
-						document.getElementById("ineligibleList").className = "hide";
 						document.getElementById("eligibleText").className = "";
 					}
-					setFallPoints(fallPoints);
-					setSpringPoints(springPoints);
-					setTotalPoints(totalPoints);
+					setFallPoints(data.fallPoints);
+					setSpringPoints(data.springPoints);
+					setTotalPoints(data.fallPoints + data.springPoints);
 					setVoterEligible(total);
 				}
 			} else {
@@ -81,23 +105,14 @@ function Points() {
 				this feature is help you track your voter eligiblity status.</p>
 				<p id="eligibleText" style={{ textAlign: "center" }} className = "hide">Congratulations! You have amassed over 60 points, making you voter eligible.
 				This means you are able to vote and run in the upcoming Executive Board elections! 
-					<br/>Make sure to attend GBM 2 or GBM 3 to be nominated if interested for running for an Executive Board position.
 				</p>
 			
 				<h3 id="voterEligible">{voterEligible}</h3>
 				<div id="ineligibleText"  className = "hide">
 				<p style={{ textAlign: "center" }}>Unfortunately, you are NOT voter eligible. You currently cannot vote or run in the upcoming Executive Board elections.</p>
-				<p style={{ textAlign: "center" }}>Here are some events and their point value if you are interested in becoming voter eligible:</p>
 				</div>
 				
-				<ul id="ineligibleList" className = "hide">
-					<li>
-					8 Points Each:
-						<ul>
-							<li>Study to the (HBO)Max - Casita 3/26 from 12 to 3pm</li>
-						</ul>
-					</li>
-				</ul>
+				
 				
 			</div>
 		</div>
