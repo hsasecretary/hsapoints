@@ -92,27 +92,9 @@ function Points() {
 				
 				<ul id="ineligibleList" className = "hide">
 					<li>
-					25 Points Each:
-						<ul>
-							<li>MLP Spring Food and Dance Festival - March 4th </li>
-							<li>MLP Spring Meet the Candidates - March 24th</li>
-						</ul>
-					</li>
-					<li>
-					12.5 Points Each:
-						<ul>
-							<li>GBM #2 - February 13th, 6.30pm, Senate Chambers </li>
-							<li>GBM #3 - March 13th, 6.30pm, NPB1001</li>
-							<li>Note: You MUST attend one of these two GBMs in order to be nominated before elections. You can be nominated while being not voter eligible, however you must attain voter eligiblity (60 points) before election day on March 27th.</li>
-						</ul>
-					</li>
-					<li>
 					8 Points Each:
 						<ul>
-							<li>CRASH Extravaganza - 2/26, 11am, Reitz North Lawn</li>
-							<li>Solidarity Session #2 - 2/26, 6.30pm, La Casita</li>
-							<li>Solidarity Session #3 - 3/26, 6.30pm, La Casita </li>
-							<li>HSA Chalk Social - Date TBD</li>
+							<li>Study to the (HBO)Max - Casita 3/26 from 12 to 3pm</li>
 						</ul>
 					</li>
 				</ul>
