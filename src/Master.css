@@ -1,0 +1,84 @@
+.header
+{
+	background-color: #155776;
+	padding: 10px;
+}
+.header h1
+{
+	font-size: 2.5em;
+	text-align: center;
+	color: white;
+}
+
+
+
+.form
+{
+	background-color: #80beda58;
+	width: 85%;
+	margin:auto;
+	border-radius: 5px;
+	border: 2px solid #155776;
+	margin-top: 7.5%;
+	max-width: 700px;
+}
+
+h2
+{
+	text-align: center;
+	font-size: 2rem;
+}
+
+form
+{
+	width:80%;
+	margin:auto;
+}
+
+form label
+{
+	font-size: 1em;
+}
+input, select
+{
+	width:100%;
+	font-size: 1.5rem;
+	border-radius: 5px;
+	border: 1px solid #155776;
+	margin: .3em 0 .3em 0;
+}
+
+select
+{
+	width: 50%;
+}
+
+input[type="submit"]
+{
+	background-color:#f2f6f8;
+	width: 25%;
+	min-width: 140px;
+}
+input[type="submit"]:hover
+{
+	background-color:#6db0cf;
+	border: 1px solid #bbc93A;
+
+}
+
+input[type="submit"]:active
+{
+	background-color:#4892b4;
+}
+
+.center
+{
+	text-align:center;
+	margin:auto;
+}
+
+.errorMsg
+{
+	color:red;
+}
+

@@ -1,0 +1,52 @@
+
+table
+{
+    margin:auto;
+    margin-top: 5%;
+    width:85%;
+    border-collapse:collapse;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1), 0 6px 20px 0 rgba(0,0,0,0.19);
+    overflow-x: auto;
+}
+
+th, td
+{
+    border: 1px solid #155776;
+}
+thead
+{
+    background-color: #0076ad;
+}
+.even
+{
+    background-color: #80beda58;
+}
+.odd
+{
+    background-color: #eef0ee;
+}
+th
+{
+    font-size: 1.2em;
+    text-align: center;
+}
+td
+{
+    font-size: 1.1em;
+
+}
+#codeTableHeader
+{
+    background-color: #155776;
+}
+tr:hover
+{
+  background-color: #0076ad;
+}
+
+#pointsTable
+{
+    width:85%;
+    margin:auto;
+    overflow-x: auto;
+}
