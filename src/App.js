@@ -67,7 +67,8 @@ function App() {
             "drodriguezgomez@ufl.edu",
             "briannacastro@ufl.edu",
             "lizetmejia@ufl.edu",
-            "leslyrivero11@gmail.com"
+         //ADD LESLY UFL EMAIL!!!!!!!!!
+            "isabelhernandez@ufl.edu"
 		];
 		return adminEmails.includes(email);
 	}
