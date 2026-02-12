@@ -1,0 +1,438 @@
+/* EditableCodesTable Styles */
+.editable-codes-table {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.loading-message {
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+    margin: 50px 0;
+}
+
+/* Table Header */
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px solid #155776;
+}
+
+.table-header h2 {
+    margin: 0;
+    color: #155776;
+}
+
+.table-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.refresh-button, .add-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.refresh-button {
+    background: #17a2b8;
+    color: white;
+}
+
+.refresh-button:hover:not(:disabled) {
+    background: #138496;
+}
+
+.refresh-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.add-button {
+    background: #28a745;
+    color: white;
+}
+
+.add-button:hover {
+    background: #218838;
+}
+
+/* Add Form */
+.add-form {
+    background: white;
+    border: 2px solid #28a745;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.add-form h3 {
+    color: #28a745;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.new-code-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #155776;
+}
+
+.checkboxes {
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.save-button, .cancel-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.save-button {
+    background: #28a745;
+    color: white;
+}
+
+.save-button:hover {
+    background: #218838;
+}
+
+.cancel-button {
+    background: #6c757d;
+    color: white;
+}
+
+.cancel-button:hover {
+    background: #5a6268;
+}
+
+/* Table Container */
+.table-container {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border: 2px solid #155776;
+}
+
+.codes-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.codes-table th {
+    background: #155776;
+    color: white;
+    padding: 15px 10px;
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.codes-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e1e5e9;
+    vertical-align: middle;
+}
+
+.codes-table tr.even {
+    background-color: #f8f9fa;
+}
+
+.codes-table tr.odd {
+    background-color: white;
+}
+
+.codes-table tr:hover {
+    background-color: #e3f2fd;
+}
+
+.code-id {
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-weight: bold;
+    color: #155776;
+    min-width: 80px;
+}
+
+/* Edit Inputs */
+.edit-input, .edit-select {
+    padding: 6px 8px;
+    border: 2px solid #155776;
+    border-radius: 4px;
+    font-size: 13px;
+    width: 100%;
+    min-width: 100px;
+}
+
+.edit-input:focus, .edit-select:focus {
+    outline: none;
+    border-color: #0d3f54;
+}
+
+.points-input {
+    max-width: 80px;
+}
+
+/* Badges */
+.badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+    min-width: 40px;
+}
+
+.badge-yes {
+    background-color: #28a745;
+    color: white;
+}
+
+.badge-no {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Action Buttons */
+.actions-cell {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.edit-btn, .delete-btn, .save-btn, .cancel-btn {
+    padding: 6px 10px;
+    margin: 0 2px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.edit-btn {
+    background: #17a2b8;
+    color: white;
+}
+
+.edit-btn:hover {
+    background: #138496;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
+.save-btn {
+    background: #28a745;
+    color: white;
+    font-weight: bold;
+}
+
+.save-btn:hover {
+    background: #218838;
+}
+
+.cancel-btn {
+    background: #6c757d;
+    color: white;
+    font-weight: bold;
+}
+
+.cancel-btn:hover {
+    background: #5a6268;
+}
+
+/* No Codes Message */
+.no-codes {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 16px;
+    border-top: 2px solid #e1e5e9;
+}
+
+/* Responsive Design */
+@media (max-width: 1400px) {
+    .editable-codes-table {
+        padding: 15px;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 1024px) {
+    .table-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .table-actions {
+        justify-content: center;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .codes-table {
+        font-size: 12px;
+    }
+    
+    .codes-table th,
+    .codes-table td {
+        padding: 8px 6px;
+    }
+}
+
+@media (max-width: 768px) {
+    .editable-codes-table {
+        padding: 10px;
+    }
+    
+    .checkboxes {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .edit-input {
+        min-width: 80px;
+    }
+    
+    .codes-table {
+        font-size: 11px;
+    }
+    
+    .actions-cell {
+        white-space: normal;
+    }
+    
+    .edit-btn, .delete-btn, .save-btn, .cancel-btn {
+        padding: 4px 6px;
+        font-size: 12px;
+        margin: 1px;
+    }
+}
+
+@media (max-width: 480px) {
+    .table-header h2 {
+        font-size: 18px;
+    }
+    
+    .add-button, .refresh-button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .codes-table th,
+    .codes-table td {
+        padding: 6px 4px;
+    }
+}
+
+/* Loading states */
+.refresh-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Hover effects */
+.codes-table tbody tr:hover .edit-btn,
+.codes-table tbody tr:hover .delete-btn {
+    transform: scale(1.05);
+}
+
+/* Focus states for accessibility */
+.edit-btn:focus,
+.delete-btn:focus,
+.save-btn:focus,
+.cancel-btn:focus {
+    outline: 2px solid #155776;
+    outline-offset: 2px;
+}
