@@ -1,6 +1,7 @@
 import './Master.css';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from './firebase';
+import Header from './Header';
 
 function ForgotPassword() {
 	function check(event) 
@@ -24,18 +25,21 @@ function ForgotPassword() {
             });
     }
 	return (
-		<div className="form">
-			<h2>Forgot Password</h2>
-			<form onSubmit={check}>
-				<p className='errorMsg' id="emailError"></p>
-				<label htmlFor="uflEmail">UFL Email: </label><br/>
-				<input type="text" id="uflEmail" placeholder='albert@ufl.edu'></input>
-				<div className="center"><input type='submit' value='Reset'></input></div>
-                <div className="center"><a href="./SignUp">New? Create an account</a></div> 
-                <div className="center"><a href="/login">Remember Your Password? Login</a></div>
-                <br/>
-			</form>
-		</div>
+			<div>
+				<Header />
+				<div className="form">
+					<h2>Forgot Password</h2>
+					<form onSubmit={check}>
+						<p className='errorMsg' id="emailError"></p>
+						<label htmlFor="uflEmail">UFL Email: </label><br/>
+						<input type="text" id="uflEmail" placeholder='albert@ufl.edu'></input>
+						<div className="center"><input type='submit' value='Reset'></input></div>
+						<div className="center"><a href="./SignUp">New? Create an account</a></div> 
+						<div className="center"><a href="/login">Remember Your Password? Login</a></div>
+						<br/>
+					</form>
+				</div>
+			</div>
 	);
 }
 

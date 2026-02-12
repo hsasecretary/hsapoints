@@ -18,15 +18,18 @@ function App() {
     const [userEmail, setUserEmail] = useState(null);
     const [isEboard, setIsEboard] = useState(false);
     const [isCabinetMember, setIsCabinetMember] = useState(false);
+    const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		const listen = onAuthStateChanged(auth, (user) =>{
 			if(!user)
 			{
+				setUserEmail(null);
 				signOut(auth);
 			} else {
 				setUserEmail(user.email);
 			}
+			setLoading(false);
 		});
         return () => {
             listen();
@@ -90,18 +93,22 @@ function App() {
         return false;
     }
 
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <div>
-            <Router>
-                <Header/>
-                <NavBar eboard = {isEboard} cabinet = {isCabinetMember}/>
+            <Router basename="/hsa-points-website">
+                {userEmail && <Header/>}
+                {userEmail && <NavBar eboard = {isEboard} cabinet = {isCabinetMember}/>}
                 <Routes>
                     <Route path="/" element={<Navigate to="/login"/>} />
                     <Route path="/signup" element={<SignUp />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/dashboard" element={<Dashboard cabinet ={isCabinetMember} email ={userEmail}/>}/>
-                    <Route path="/cabinet" element={<Cabinet cabinet={isCabinet(userEmail)}/>}/>
-                    <Route path="/eboard" element={<Eboard eboard ={isAdmin(userEmail)}/>}/>
+                    <Route path="/login" element={userEmail ? <Navigate to="/dashboard"/> : <Login />} />
+                    <Route path="/dashboard" element={userEmail ? <Dashboard cabinet ={isCabinetMember} email ={userEmail}/> : <Navigate to="/login"/>}/>
+                    <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember}/> : <Navigate to="/login"/>}/>
+                    <Route path="/eboard" element={userEmail ? <Eboard eboard ={isAdmin(userEmail)}/> : <Navigate to="/login"/>}/>
                     <Route path="/forgotPassword" element={<ForgotPassword/>} />
                 </Routes>
             </Router>

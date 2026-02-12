@@ -1,23 +1,58 @@
-button
-{
-	background-color:#f2f6f8;
-	min-width: 10em;
+button:not(.logout-button) {
+    background-color: #f2f6f8;
+    min-width: 10em;
     min-height: 2em;
     border-radius: 5px;
     font-size: 1.2em;
     font-family: 'Montserrat', sans-serif;
 }
-button:hover
-{
-	background-color:#cf6d6d;
-	border: 1px solid #bc0e0e;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 
+button:not(.logout-button):hover {
+    background-color: #6db0cf;
+    border: 1px solid #155776;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
 }
 
-button:active
-{
-	background-color:#bc0e0e;
+button:not(.logout-button):active {
+    background-color: #4892b4;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.5), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
 
+.logout-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px 25px 15px 25px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+.logout-button {
+    background-color: #f2f6f8;
+    border: 2px solid #155776;
+    border-radius: 8px;
+    padding: 12px 25px;
+    font-size: 1.2em;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: #155776;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: auto;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    letter-spacing: 0.5px;
+}
+
+.logout-button:hover {
+    background-color: #cf6d6d;
+    border-color: #bc0e0e;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.logout-button:active {
+    background-color: #bc0e0e;
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }

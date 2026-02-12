@@ -16,7 +16,7 @@ function EditableCodesTable() {
         graphicDate: '',
         eventDate: '',
         points: '',
-        voterEligible: false,
+        voterEligible: true,  // Changed from false to true to default to voter eligible
         semester: 'springPoints',
         cabinetRequired: false
     });
@@ -140,7 +140,7 @@ function EditableCodesTable() {
                 graphicDate: '',
                 eventDate: '',
                 points: '',
-                voterEligible: false,
+                voterEligible: true,  // Changed to true to match the default
                 semester: 'springPoints',
                 cabinetRequired: false
             });
@@ -292,7 +292,7 @@ function EditableCodesTable() {
                                         checked={newCode.voterEligible}
                                         onChange={(e) => handleNewCodeChange('voterEligible', e.target.checked)}
                                     />
-                                    Voter Eligible
+                                    Voter Eligible to Vote
                                 </label>
                                 <label className="checkbox-label">
                                     <input
@@ -300,7 +300,7 @@ function EditableCodesTable() {
                                         checked={newCode.cabinetRequired}
                                         onChange={(e) => handleNewCodeChange('cabinetRequired', e.target.checked)}
                                     />
-                                    Cabinet Required
+                                    Cabinet Required to Attend
                                 </label>
                             </div>
                         </div>

@@ -7,8 +7,6 @@ import UserPointsLookup from './UserPointsLookup';
 import PointRequestReview from './PointRequestReview';
 import EditableCodesTable from './EditableCodesTable';
 import scrapeCabinetRoles from './scrapeCabinetRoles';
-import removeAllCabinetRoles from './removeAllCabinetRoles';
-import assignCabinetRoles from './assignCabinetRoles';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 
@@ -37,39 +35,6 @@ function Eboard({ eboard }) {
     }
   };
 
-  const handleRemoveAllCabinetRoles = async () => {
-    const confirmed = window.confirm(
-      "⚠️ WARNING: This will remove ALL cabinet roles from ALL users and set everyone to 'none'. This action cannot be undone. Are you sure you want to continue?"
-    );
-    
-    if (confirmed) {
-      try {
-        const result = await removeAllCabinetRoles();
-        alert(`Cabinet roles removal completed! ${result.totalUpdated} users updated out of ${result.totalProcessed} total users. Check console for details and download for report.`);
-      } catch (error) {
-        console.error('Error removing cabinet roles:', error);
-        alert('Error occurred while removing cabinet roles. Check the console for details.');
-      }
-    }
-  };
-
-  // Add handler for assigning cabinet roles from CSV
-  const handleAssignCabinetRoles = async () => {
-    const confirmed = window.confirm(
-      "This will assign cabinet roles to all users listed in the CSV data. Users will be assigned to their respective cabinets and positions. Continue?"
-    );
-    
-    if (confirmed) {
-      try {
-        const result = await assignCabinetRoles();
-        alert(`Cabinet roles assignment completed! ${result.totalUpdated} users updated, ${result.totalNotFound} not found, ${result.totalAlreadyAssigned} already assigned. Check console for details.`);
-      } catch (error) {
-        console.error('Error assigning cabinet roles:', error);
-        alert('Error occurred while assigning cabinet roles. Check the console for details.');
-      }
-    }
-  };
-
   return (
     <div>
       <br /><Logout />
@@ -89,48 +54,14 @@ function Eboard({ eboard }) {
               borderRadius: '5px',
               fontSize: '16px',
               cursor: 'pointer',
-              marginBottom: '10px',
-              marginRight: '10px'
+              marginBottom: '10px'
             }}
           >
             Scrape Cabinet Roles (One-Time)
           </button>
           
-          <button 
-            onClick={handleRemoveAllCabinetRoles}
-            style={{
-              backgroundColor: '#dc3545',
-              color: 'white',
-              padding: '10px 20px',
-              border: 'none',
-              borderRadius: '5px',
-              fontSize: '16px',
-              cursor: 'pointer',
-              marginBottom: '10px',
-              marginRight: '10px'
-            }}
-          >
-            ⚠️ Remove ALL Cabinet Roles
-          </button>
-          
-          <button 
-            onClick={handleAssignCabinetRoles}
-            style={{
-              backgroundColor: '#28a745',
-              color: 'white',
-              padding: '10px 20px',
-              border: 'none',
-              borderRadius: '5px',
-              fontSize: '16px',
-              cursor: 'pointer',
-              marginBottom: '10px'
-            }}
-          >
-            Assign Cabinet Roles from CSV
-          </button>
-          
           <p style={{fontSize: '12px', color: '#666'}}>
-            Scrape: Export cabinet roles to JSON | Remove: Set everyone's cabinet to "none" | Assign: Assign roles from CSV
+            Export cabinet roles to JSON
           </p>
         </div>
       )}
