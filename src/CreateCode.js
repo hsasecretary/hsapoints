@@ -39,31 +39,6 @@ function CreateCode() {
         }));
     };
 
-    const calculateVoterEligibility = (data) => {
-        // Not eligible if no graphic or cabinet only
-        if (data.noGraphic || data.category === 'Cabinet') {
-            return false;
-        }
-
-        // Must have both dates and be in eligible categories
-        if (!data.graphicDate || !data.eventDate) {
-            return false;
-        }
-
-        const eligibleCategories = ['GBM', 'Programming', 'MLP Fall', 'MLP Spring', 'OPA'];
-        if (!eligibleCategories.includes(data.category)) {
-            return false;
-        }
-
-        // Calculate days between graphic and event
-        const graphicDate = new Date(data.graphicDate);
-        const eventDate = new Date(data.eventDate);
-        const diffDays = Math.ceil((eventDate - graphicDate) / (1000 * 60 * 60 * 24));
-
-        // Must be at least 7 days advance notice
-        return diffDays >= 7;
-    };
-
     const validateForm = async () => {
         const errors = [];
 
