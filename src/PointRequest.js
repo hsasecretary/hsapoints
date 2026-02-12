@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import './PointRequest.css';
-import { auth, db } from './firebase';
-import { doc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { db } from './firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { auth } from './firebase';
 
 function PointRequest() {
     const [formData, setFormData] = useState({

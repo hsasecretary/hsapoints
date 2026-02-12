@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './CreateCode.css';
 import { db } from './firebase';
-import { doc, addDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { addDoc, collection, getDocs } from 'firebase/firestore';
 
 function CreateCode() {
     const [formData, setFormData] = useState({

@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { doc, updateDoc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 // Flag to ensure script runs only once
 let hasRunBefore = false;

@@ -179,7 +179,7 @@ function SignUp() {
 			const approved = formData.cabinet === "none";
 			const email = formData.uflEmail.toLowerCase();
 
-			const userCredential = await createUserWithEmailAndPassword(auth, email, formData.password);
+			await createUserWithEmailAndPassword(auth, email, formData.password);
 			
 			await setDoc(doc(db, "users", email), {
 				firstName: formData.firstName.trim(),

@@ -10,27 +10,13 @@ import scrapeCabinetRoles from './scrapeCabinetRoles';
 import removeAllCabinetRoles from './removeAllCabinetRoles';
 import assignCabinetRoles from './assignCabinetRoles';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from './firebase';
+import { useEffect } from 'react';
 
 function Eboard({ eboard }) {
   let navigate = useNavigate();
-  const [codes, setCodes] = useState([]);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
   useEffect(() => {
-    const fetchCodes = async () => {
-      const codesCollection = collection(db, "codes");
-      const codesSnapshot = await getDocs(codesCollection);
-      const codesData = codesSnapshot.docs.map(doc => ({
-        id: doc.id.toUpperCase(),
-        ...doc.data(),
-      }));
-      setCodes(codesData);
-    };
-
-    fetchCodes();
+    // Effect can be removed since EditableCodesTable handles its own data fetching
   }, []);
 
   function isEboard(eboard) {
@@ -40,22 +26,6 @@ function Eboard({ eboard }) {
       navigate("/dashboard");
     }
   }
-
-  const handleSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
-
-    const sortedCodes = [...codes].sort((a, b) => {
-      if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
-      if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
-      return 0;
-    });
-
-    setCodes(sortedCodes);
-  };
 
   const handleScrapeCabinetRoles = async () => {
     try {
