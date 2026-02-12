@@ -99,7 +99,7 @@ function App() {
 
     return (
         <div>
-            <Router basename="/hsa-points-website">
+            <Router>
                 {userEmail && <Header/>}
                 {userEmail && <NavBar eboard = {isEboard} cabinet = {isCabinetMember}/>}
                 <Routes>
