@@ -1,0 +1,281 @@
+/* PointRequest Styles */
+.point-request {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.point-request h2 {
+    text-align: center;
+    color: #155776;
+    margin-bottom: 10px;
+}
+
+.description {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Messages */
+.message {
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Form Styles */
+.request-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #155776;
+    box-shadow: 0 0 0 3px rgba(21, 87, 118, 0.1);
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.help-text {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* Image Upload and Preview */
+.form-group input[type="file"] {
+    padding: 8px;
+    border: 2px dashed #ddd;
+    background-color: #f9f9f9;
+}
+
+.form-group input[type="file"]:hover {
+    border-color: #155776;
+    background-color: #f0f8ff;
+}
+
+.image-preview {
+    margin-top: 15px;
+    padding: 15px;
+    border: 2px solid #155776;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.image-preview h4 {
+    margin: 0 0 10px 0;
+    color: #155776;
+}
+
+.preview-container {
+    position: relative;
+    display: inline-block;
+}
+
+.preview-container img {
+    max-width: 300px;
+    max-height: 300px;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.clear-image {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.clear-image:hover {
+    background-color: #c82333;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.submit-button {
+    background: linear-gradient(135deg, #155776, #1a6b8a);
+    color: white;
+    padding: 15px 40px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.submit-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    background: linear-gradient(135deg, #0d3f54, #155776);
+}
+
+.submit-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Information Section */
+.info-section {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #e3f2fd;
+    border-radius: 8px;
+    border-left: 4px solid #155776;
+}
+
+.info-section h3 {
+    color: #155776;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.info-section ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.info-section li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+    color: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .point-request {
+        margin: 10px;
+        padding: 15px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .preview-container img {
+        max-width: 100%;
+        max-height: 250px;
+    }
+    
+    .submit-button {
+        padding: 12px 30px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .point-request h2 {
+        font-size: 24px;
+    }
+    
+    .description {
+        font-size: 14px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 14px;
+        padding: 10px;
+    }
+    
+    .preview-container img {
+        max-height: 200px;
+    }
+}
+
+/* Required field indicator */
+.form-group label:after {
+    content: '';
+}
+
+.form-group label[for*="activityType"]:after,
+.form-group label[for*="customActivityName"]:after,
+.form-group label[for*="description"]:after,
+.form-group label[for*="date"]:after,
+.form-group label[for*="pointsRequested"]:after,
+.form-group label[for*="imageUpload"]:after {
+    content: ' *';
+    color: #dc3545;
+}

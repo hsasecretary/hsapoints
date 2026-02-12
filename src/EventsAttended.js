@@ -13,6 +13,7 @@ function EventsAttended({email, cabinet})
     const [cabinetEvents, setCabinet] = useState([]);
     const [otherEvents, setOther] = useState([]);
     const [missedEvents, setMissed] = useState([]);
+    const [excusedEventsData, setExcusedEventsData] = useState([]); // Add state for excused events
 
     useEffect(() => {
         const fetchAttended = async () => {
@@ -29,7 +30,7 @@ function EventsAttended({email, cabinet})
             if(userDocSnap.exists())
             {
                 const data = userDocSnap.data();
-                const attended = data.eventCodes;
+                const attended = data.eventCodes || [];
                 const gbm = [];
                 const programming = [];
                 const mlpFall = [];
@@ -41,8 +42,8 @@ function EventsAttended({email, cabinet})
                 const missedCodes = [];
                 const excused = [];
                 const excusedCodes = [];
-                const excusedEvents = data.excusedEvents;               
-                const excusedReasons = data.excusedReason || null;
+                const excusedEvents = data.excusedEvents || [];               
+                const excusedReasons = data.excusedReason || [];
 
                 codesDocSnap.forEach((doc) => {
                     var added = false; 
@@ -73,18 +74,19 @@ function EventsAttended({email, cabinet})
                      if(!added)
                      {
                         var missedData = doc.data();
-                        let missedDate = missedData.eventDate.replace('-0', '-');
-                        var today = new Date().toISOString().split('T')[0];
-                        today = today.replace('-0', '-');                    
+                        if(missedData.eventDate) {
+                            let missedDate = missedData.eventDate.replace('-0', '-');
+                            var today = new Date().toISOString().split('T')[0];
+                            today = today.replace('-0', '-');                    
 
-
-                        if(!excusedEvents.includes(doc.id) && missedData.cabinetRequired && (new Date(missedDate) < new Date(today))) 
-                        { 
-                            missed.push(doc);
-                            missedCodes.push(doc.id);
-                        } else if(excusedEvents.includes(doc.id) && missedData.cabinetRequired && (new Date(missedDate) < new Date(today))) {
-                            excused.push(doc);
-                            excusedCodes.push(doc.id);
+                            if(!excusedEvents.includes(doc.id) && missedData.cabinetRequired && (new Date(missedDate) < new Date(today))) 
+                            { 
+                                missed.push(doc);
+                                missedCodes.push(doc.id);
+                            } else if(excusedEvents.includes(doc.id) && missedData.cabinetRequired && (new Date(missedDate) < new Date(today))) {
+                                excused.push(doc);
+                                excusedCodes.push(doc.id);
+                            }
                         }
                      }
                 })
@@ -99,38 +101,46 @@ function EventsAttended({email, cabinet})
                 setCabinet(cabinet);
                 setMissed(missed);
 
-                updateDoc(userDocRef, {
-                    unexcusedEvents: missedCodes
-                });
-                if(cabinet.length !== 0 && excusedReasons !== null)
+                // Update unexcused events in database
+                try {
+                    await updateDoc(userDocRef, {
+                        unexcusedEvents: missedCodes
+                    });
+                } catch (error) {
+                    console.error("Error updating unexcused events:", error);
+                }
+
+                // Process excused events data using React state instead of DOM manipulation
+                if(cabinet && excusedEvents.length > 0 && excused.length > 0)
                 {
-                    let tableData = "";
-                    console.log(cabinet);
+                    const excusedTableData = [];
                     for(let i = 0; i < excusedEvents.length; i++)
                     {
-                    
                         //Find the event data 
                         let currentEventId = excusedEvents[i];
                         let excusedIndex = excusedCodes.indexOf(currentEventId);
                         let currentExcusedDoc = excused[excusedIndex];
-                        if(excusedReasons[i] === undefined)
-                        {
-                            excusedReasons[i] = "N/A";
+                        
+                        if(currentExcusedDoc) {
+                            const reason = excusedReasons[i] || "N/A";
+                            excusedTableData.push({
+                                event: currentExcusedDoc.data().event,
+                                eventDate: currentExcusedDoc.data().eventDate,
+                                category: currentExcusedDoc.data().category,
+                                points: currentExcusedDoc.data().points,
+                                reason: reason
+                            });
                         }
-                        tableData += "<tr>";
-                        tableData += "<td>" + currentExcusedDoc.data().event + "</td>";
-                        tableData += "<td>" + currentExcusedDoc.data().eventDate + "</td>";
-                        tableData += "<td>" + currentExcusedDoc.data().category + "</td>";
-                        tableData += "<td>" + currentExcusedDoc.data().points + "</td>";
-                        tableData += "<td>" + excusedReasons[i] + "</td>";
-                        tableData += "</tr>";
                     }
-                    document.getElementById("excusedTableData").innerHTML = tableData;
+                    setExcusedEventsData(excusedTableData);
+                } else {
+                    setExcusedEventsData([]);
                 }
              }
         };
         fetchAttended();
     }, [email, cabinet]);
+
     return (
         <div id='EventsAttended'>
             <h2>Events Attended</h2>
@@ -309,8 +319,16 @@ function EventsAttended({email, cabinet})
                                 <th>Details</th>
                             </tr>
                         </thead>
-                        <tbody id="excusedTableData">
-                            
+                        <tbody>
+                            {excusedEventsData.map((excusedEvent, index) => (
+                                <tr key={index}>
+                                    <td>{excusedEvent.event}</td>
+                                    <td>{excusedEvent.eventDate}</td>
+                                    <td>{excusedEvent.category}</td>
+                                    <td>{excusedEvent.points}</td>
+                                    <td>{excusedEvent.reason}</td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table><br/>
                 </div>
