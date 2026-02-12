@@ -168,17 +168,18 @@ input[type="submit"]:active {
 }
 
 .input-group input {
-	padding: 12px 16px;
-	font-size: 1.1rem;
-	border: 2px solid #ddd;
-	border-radius: 8px;
+	padding: 12px 16px !important;
+	font-size: 1.1rem !important;
+	border: 2px solid #ddd !important;
+	border-radius: 8px !important;
 	transition: border-color 0.3s ease, box-shadow 0.3s ease;
+	width: 100% !important;
 }
 
 .input-group input:focus {
 	outline: none;
-	border-color: #155776;
-	box-shadow: 0 0 0 3px rgba(21, 87, 118, 0.1);
+	border-color: #155776 !important;
+	box-shadow: 0 0 0 3px rgba(21, 87, 118, 0.1) !important;
 }
 
 .button-group {
@@ -186,30 +187,34 @@ input[type="submit"]:active {
 	text-align: center;
 }
 
-.login-button {
-	background: linear-gradient(135deg, #155776 0%, #1e6b8a 100%);
-	color: white;
-	border: none;
-	padding: 14px 32px;
-	font-size: 1.1rem;
-	font-weight: 600;
-	border-radius: 8px;
+.login-form input.login-button,
+.login-form input[type="submit"].login-button {
+	background: linear-gradient(135deg, #155776 0%, #1e6b8a 100%) !important;
+	color: white !important;
+	border: none !important;
+	padding: 14px 32px !important;
+	font-size: 1.1rem !important;
+	font-weight: 600 !important;
+	border-radius: 8px !important;
 	cursor: pointer;
 	transition: all 0.3s ease;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
-	min-width: 160px;
+	min-width: 160px !important;
+	width: auto !important;
 }
 
-.login-button:hover {
-	background: linear-gradient(135deg, #1e6b8a 0%, #267ba3 100%);
+.login-form input.login-button:hover,
+.login-form input[type="submit"].login-button:hover {
+	background: linear-gradient(135deg, #1e6b8a 0%, #267ba3 100%) !important;
 	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(21, 87, 118, 0.3);
+	box-shadow: 0 4px 12px rgba(21, 87, 118, 0.3) !important;
 }
 
-.login-button:active {
+.login-form input.login-button:active,
+.login-form input[type="submit"].login-button:active {
 	transform: translateY(0);
-	box-shadow: 0 2px 6px rgba(21, 87, 118, 0.3);
+	box-shadow: 0 2px 6px rgba(21, 87, 118, 0.3) !important;
 }
 
 .login-links {
@@ -249,10 +254,11 @@ input[type="submit"]:active {
 		padding: 0 10px;
 	}
 	
-	.login-button {
-		padding: 12px 24px;
-		font-size: 1rem;
-		min-width: 140px;
+	.login-form input.login-button,
+	.login-form input[type="submit"].login-button {
+		padding: 12px 24px !important;
+		font-size: 1rem !important;
+		min-width: 140px !important;
 	}
 }
 
@@ -263,12 +269,13 @@ input[type="submit"]:active {
 	}
 	
 	.input-group input {
-		padding: 10px 14px;
-		font-size: 1rem;
+		padding: 10px 14px !important;
+		font-size: 1rem !important;
 	}
 	
-	.login-button {
-		width: 100%;
+	.login-form input.login-button,
+	.login-form input[type="submit"].login-button {
+		width: 100% !important;
 		max-width: 200px;
 	}
 }

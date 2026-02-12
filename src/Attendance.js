@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { auth, db} from './firebase';
 import { doc, getDoc, arrayUnion, updateDoc } from 'firebase/firestore';
 
-function Attendance() {
+function Attendance({ onPointsUpdate }) {
     const [code, setCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
@@ -326,8 +326,12 @@ function Attendance() {
                 if(added) {
                     setCode('');
                     setMessage({ text: 'Success! Code submitted and points added to your account!', type: 'success' });
+                    
+                    // Call the callback to refresh points instead of reloading the page
                     setTimeout(() => {
-                        window.location.reload();
+                        if (onPointsUpdate) {
+                            onPointsUpdate();
+                        }
                     }, 1500);
                 } else {
                     setMessage({ text: '*Error: Code is Invalid', type: 'error' });
