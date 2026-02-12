@@ -35,36 +35,71 @@
 }
 
 .refresh-button, .add-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
+    padding: 12px 20px;
+    border: 2px solid transparent;
+    border-radius: 8px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    min-width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .refresh-button {
-    background: #17a2b8;
+    background: #155776;
     color: white;
+    border-color: #155776;
 }
 
 .refresh-button:hover:not(:disabled) {
-    background: #138496;
+    background: #0d3f54;
+    border-color: #0d3f54;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .refresh-button:disabled {
     background: #ccc;
+    border-color: #ccc;
     cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
 }
 
 .add-button {
     background: #28a745;
     color: white;
+    border-color: #28a745;
 }
 
 .add-button:hover {
     background: #218838;
+    border-color: #1e7e34;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.add-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.refresh-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Enhanced focus states for better accessibility */
+.refresh-button:focus,
+.add-button:focus {
+    outline: 3px solid #ffd700;
+    outline-offset: 2px;
 }
 
 /* Add Form */
@@ -139,6 +174,24 @@
 .checkbox-label input[type="checkbox"] {
     width: auto;
     margin: 0;
+}
+
+.voter-eligible-label {
+    font-weight: 600;
+}
+
+.checkbox-status {
+    font-weight: bold;
+    margin-left: 5px;
+    transition: color 0.3s ease;
+}
+
+.checkbox-status.enabled {
+    color: #28a745;
+}
+
+.checkbox-status.disabled {
+    color: #dc3545;
 }
 
 .form-actions {
@@ -398,6 +451,22 @@
         font-size: 12px;
         margin: 1px;
     }
+    
+    .refresh-button, .add-button {
+        padding: 10px 16px;
+        font-size: 13px;
+        min-width: 120px;
+    }
+    
+    .table-actions {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .refresh-button, .add-button {
+        width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
@@ -406,8 +475,9 @@
     }
     
     .add-button, .refresh-button {
-        padding: 8px 12px;
-        font-size: 12px;
+        padding: 12px 16px;
+        font-size: 14px;
+        font-weight: 700;
     }
     
     .codes-table th,

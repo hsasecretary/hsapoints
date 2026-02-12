@@ -28,7 +28,11 @@ function Logout() {
     };
 
 	return (
-        <button onClick= {logout}>Logout</button>
+        <div className="logout-container">
+            <button className="logout-button" onClick={logout}>
+                Logout
+            </button>
+        </div>
 	);
 }
 

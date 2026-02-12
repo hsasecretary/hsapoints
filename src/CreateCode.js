@@ -12,7 +12,7 @@ function CreateCode() {
         graphicDate: '',
         points: '',
         semester: 'springPoints',
-        voterEligible: false,
+        voterEligible: true,  // Changed to true by default
         cabinetRequired: false,
         noGraphic: false
     });
@@ -33,16 +33,10 @@ function CreateCode() {
     ];
 
     const handleInputChange = (field, value) => {
-        setFormData(prev => {
-            const newData = { ...prev, [field]: value };
-            
-            // Auto-calculate voter eligibility
-            if (field === 'graphicDate' || field === 'eventDate' || field === 'category' || field === 'noGraphic') {
-                newData.voterEligible = calculateVoterEligibility(newData);
-            }
-            
-            return newData;
-        });
+        setFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
     };
 
     const calculateVoterEligibility = (data) => {
@@ -167,7 +161,7 @@ function CreateCode() {
                 graphicDate: '',
                 points: '',
                 semester: 'springPoints',
-                voterEligible: false,
+                voterEligible: true,  // Changed to true by default
                 cabinetRequired: false,
                 noGraphic: false
             });
@@ -305,20 +299,15 @@ function CreateCode() {
                             />
                             Cabinet required to attend
                         </label>
+                        <label className="checkbox-label">
+                            <input
+                                type="checkbox"
+                                checked={formData.voterEligible}
+                                onChange={(e) => handleInputChange('voterEligible', e.target.checked)}
+                            />
+                            Voter Eligible to Vote
+                        </label>
                     </div>
-                </div>
-
-                {/* Voter Eligibility Indicator */}
-                <div className="voter-eligibility-info">
-                    <div className={`eligibility-badge ${formData.voterEligible ? 'eligible' : 'not-eligible'}`}>
-                        {formData.voterEligible ? '✓ Voter Eligible' : '✗ Not Voter Eligible'}
-                    </div>
-                    <p className="eligibility-note">
-                        {formData.voterEligible 
-                            ? 'This event will count toward voter eligibility (7+ days advance notice required)'
-                            : 'This event will not count toward voter eligibility'
-                        }
-                    </p>
                 </div>
 
                 <div className="form-actions">

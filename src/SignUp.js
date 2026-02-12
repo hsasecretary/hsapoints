@@ -4,6 +4,7 @@ import { db, auth } from './firebase';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc, arrayUnion, updateDoc } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
+import Header from './Header';
 
 function SignUp() {
 	let navigate = useNavigate();
@@ -228,102 +229,105 @@ function SignUp() {
 	const currentPositions = formData.cabinet !== 'select' ? positionOptions[formData.cabinet] || [] : [];
 
 	return (
-		<div className="form">
-			<h2>Sign Up</h2>
-			<form onSubmit={handleSubmit}>
-				{errors.general && <p className='errorMsg'>{errors.general}</p>}
-				
-				<p className='errorMsg'>{errors.firstName}</p>
-				<label htmlFor='firstName'>First Name/Nombre: </label><br/>
-				<input 
-					type="text" 
-					id='firstName' 
-					placeholder='Albert'
-					value={formData.firstName}
-					onChange={(e) => handleInputChange('firstName', e.target.value)}
-				/>
-				
-				<p className='errorMsg'>{errors.lastName}</p>
-				<label htmlFor="lastName">Last Name/Apellido: </label><br/>
-				<input 
-					type="text" 
-					id="lastName" 
-					placeholder='Gator'
-					value={formData.lastName}
-					onChange={(e) => handleInputChange('lastName', e.target.value)}
-				/>
-				
-				<p className='errorMsg'>{errors.uflEmail}</p>
-				<label htmlFor="uflEmail">UFL/SF Email: </label><br/>
-				<input 
-					type="email" 
-					id="uflEmail" 
-					placeholder='albert@ufl.edu'
-					value={formData.uflEmail}
-					onChange={(e) => handleInputChange('uflEmail', e.target.value)}
-				/>
-				
-				<p className='errorMsg'>{errors.cabinet}</p>
-				<label htmlFor="cabinet">Involvement in HSA Cabinet:</label> <br/>
-				<select 
-					id="cabinet" 
-					value={formData.cabinet}
-					onChange={(e) => handleInputChange('cabinet', e.target.value)}
-				>
-					<option value="select">Select</option>
-					<option value="none">Not in Cabinet</option>
-					<option value="president">Presidential Cabinet</option>
-					<option value="operations">Operations Cabinet</option>
-					<option value="programming">Programming Cabinet</option>
-					<option value="communications">Communications Cabinet</option>
-					<option value="treasurey">Treasurer Cabinet</option>
-					<option value="secretary">Secretary Cabinet</option>
-					<option value="mlpFall">MLP Fall Cabinet</option>
-					<option value="mlpSpring">MLP Spring Cabinet</option>
-					<option value="opa">Office of Political Affairs</option>
-				</select>
-				
-				<p className='errorMsg'>{errors.position}</p>
-				<label htmlFor="position">Position:</label><br/>
-				<select 
-					id="position"
-					value={formData.position}
-					onChange={(e) => handleInputChange('position', e.target.value)}
-				>
-					<option value="select">Select</option>
-					{currentPositions.map(pos => (
-						<option key={pos.value} value={pos.value}>{pos.label}</option>
-					))}
-				</select>
-				
-				<p className='errorMsg'>{errors.password}</p>
-				<label htmlFor="password">Password: </label><br/>
-				<input 
-					type="password" 
-					id="password"
-					value={formData.password}
-					onChange={(e) => handleInputChange('password', e.target.value)}
-				/>
-				
-				<p className='errorMsg'>{errors.confirmPassword}</p>
-				<label htmlFor="confirmPassword">Confirm Password: </label><br/>
-				<input 
-					type="password" 
-					id="confirmPassword"
-					value={formData.confirmPassword}
-					onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-				/>
-				
-				<div className="center">
-					<input 
-						type='submit' 
-						value={loading ? 'Creating Account...' : 'Sign Up'}
-						disabled={loading}
-					/>
+			<div>
+				<Header />
+				<div className="form">
+					<h2>Sign Up</h2>
+					<form onSubmit={handleSubmit}>
+						{errors.general && <p className='errorMsg'>{errors.general}</p>}
+						
+						<p className='errorMsg'>{errors.firstName}</p>
+						<label htmlFor='firstName'>First Name/Nombre: </label><br/>
+						<input 
+							type="text" 
+							id='firstName' 
+							placeholder='Albert'
+							value={formData.firstName}
+							onChange={(e) => handleInputChange('firstName', e.target.value)}
+						/>
+						
+						<p className='errorMsg'>{errors.lastName}</p>
+						<label htmlFor="lastName">Last Name/Apellido: </label><br/>
+						<input 
+							type="text" 
+							id="lastName" 
+							placeholder='Gator'
+							value={formData.lastName}
+							onChange={(e) => handleInputChange('lastName', e.target.value)}
+						/>
+						
+						<p className='errorMsg'>{errors.uflEmail}</p>
+						<label htmlFor="uflEmail">UFL/SF Email: </label><br/>
+						<input 
+							type="email" 
+							id="uflEmail" 
+							placeholder='albert@ufl.edu'
+							value={formData.uflEmail}
+							onChange={(e) => handleInputChange('uflEmail', e.target.value)}
+						/>
+						
+						<p className='errorMsg'>{errors.cabinet}</p>
+						<label htmlFor="cabinet">Involvement in HSA Cabinet:</label> <br/>
+						<select 
+							id="cabinet" 
+							value={formData.cabinet}
+							onChange={(e) => handleInputChange('cabinet', e.target.value)}
+						>
+							<option value="select">Select</option>
+							<option value="none">Not in Cabinet</option>
+							<option value="president">Presidential Cabinet</option>
+							<option value="operations">Operations Cabinet</option>
+							<option value="programming">Programming Cabinet</option>
+							<option value="communications">Communications Cabinet</option>
+							<option value="treasurey">Treasurer Cabinet</option>
+							<option value="secretary">Secretary Cabinet</option>
+							<option value="mlpFall">MLP Fall Cabinet</option>
+							<option value="mlpSpring">MLP Spring Cabinet</option>
+							<option value="opa">Office of Political Affairs</option>
+						</select>
+						
+						<p className='errorMsg'>{errors.position}</p>
+						<label htmlFor="position">Position:</label><br/>
+						<select 
+							id="position"
+							value={formData.position}
+							onChange={(e) => handleInputChange('position', e.target.value)}
+						>
+							<option value="select">Select</option>
+							{currentPositions.map(pos => (
+								<option key={pos.value} value={pos.value}>{pos.label}</option>
+							))}
+						</select>
+						
+						<p className='errorMsg'>{errors.password}</p>
+						<label htmlFor="password">Password: </label><br/>
+						<input 
+							type="password" 
+							id="password"
+							value={formData.password}
+							onChange={(e) => handleInputChange('password', e.target.value)}
+						/>
+						
+						<p className='errorMsg'>{errors.confirmPassword}</p>
+						<label htmlFor="confirmPassword">Confirm Password: </label><br/>
+						<input 
+							type="password" 
+							id="confirmPassword"
+							value={formData.confirmPassword}
+							onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+						/>
+						
+						<div className="center">
+							<input 
+								type='submit' 
+								value={loading ? 'Creating Account...' : 'Sign Up'}
+								disabled={loading}
+							/>
+						</div>
+					</form>
+					<div className="center"><a href="./Login">Already have an account? Log In</a></div><br/>
 				</div>
-			</form>
-			<div className="center"><a href="./Login">Already have an account? Log In</a></div><br/>
-		</div>
+			</div>
 	);
 }
 

@@ -3,7 +3,6 @@ import Points from './Points'
 import Attendance from './Attendance';
 import PointRequest from './PointRequest';
 import Logout from './Logout';
-import EventsAttended from './EventsAttended';
 
 function Dashboard({cabinet, email}) {
 	
@@ -18,8 +17,6 @@ function Dashboard({cabinet, email}) {
 			<Attendance />
 			<br/>
 			<PointRequest />
-			<br/>
-			<EventsAttended cabinet = {cabinet} email= {email}/>
 			<br/>
 		</div>
 	);
