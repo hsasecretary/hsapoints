@@ -60,7 +60,8 @@ function Attendance({ onPointsUpdate }) {
                 const eventCodes = data.eventCodes;
                 if(eventCodes.length !== 0) {
                     for(var i = 0; i < eventCodes.length; i++) {
-                        if(eventCodes[i] === codeToCheck) {
+                        // Make duplicate check case-insensitive by comparing uppercase versions
+                        if(eventCodes[i].toUpperCase() === codeToCheck) {
                             setMessage({ text: '*Error: Already Submitted This Code', type: 'error' });
                             setLoading(false);
                             return;
