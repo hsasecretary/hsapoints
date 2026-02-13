@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './CreateCode.css';
 import { db } from './firebase';
-import { addDoc, collection, getDocs } from 'firebase/firestore';
+import { setDoc, doc, collection, getDocs } from 'firebase/firestore';
 
 function CreateCode() {
     const [formData, setFormData] = useState({
@@ -124,8 +124,8 @@ function CreateCode() {
                 cabinetOnly: formData.category === 'Cabinet'
             };
 
-            // Create the code in Firebase
-            await addDoc(collection(db, 'codes'), codeData);
+            // Create the code in Firebase using the event code as the document ID
+            await setDoc(doc(db, 'codes', formData.eventCode.trim().toUpperCase()), codeData);
 
             // Reset form and show success
             setFormData({
