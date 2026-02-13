@@ -38,7 +38,7 @@ function Attendance({ onPointsUpdate }) {
 
         try {
             var email = auth.currentUser.email;
-            var codeToCheck = code.toLowerCase().trim();
+            var codeToCheck = code.toUpperCase().trim(); // Changed to uppercase to match database
             
             let date = new Date();
             let day = date.getDate();
