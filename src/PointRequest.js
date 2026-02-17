@@ -19,7 +19,7 @@ function PointRequest() {
 
     const activityTypes = [
         { value: 'tabling', label: 'Tabling', defaultPoints: 1 },
-        { value: 'fundraiser', label: 'Fundraiser', defaultPoints: 2 },
+        { value: 'fundraiser', label: 'Fundraiser', defaultPoints: 1 },
         { value: 'open_mlp_event', label: 'Open MLP Event', defaultPoints: 1 },
         { value: 'affiliated_org_event', label: 'Affiliated Organization Event', defaultPoints: 1 },
         { value: 'committee_meeting', label: 'Committee Meeting', defaultPoints: 1 },
