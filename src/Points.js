@@ -96,7 +96,7 @@ export default function Points() {
 								if (docData.voterEligible) {
 									switch (docData.category) {
 										case "GBM":
-											voterEligibleTotal += userData.cabinet !== 'none' ? 1 : 2;
+											voterEligibleTotal += 2;
 											break;
 										case "Programming":
 										case "OPA":
