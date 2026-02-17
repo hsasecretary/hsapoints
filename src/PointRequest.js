@@ -19,16 +19,13 @@ function PointRequest() {
 
     const activityTypes = [
         { value: 'tabling', label: 'Tabling', defaultPoints: 1 },
-        { value: 'community_service', label: 'Community Service', defaultPoints: 2 },
-        { value: 'volunteer_work', label: 'Volunteer Work', defaultPoints: 2 },
-        { value: 'professional_development', label: 'Professional Development Event', defaultPoints: 1 },
-        { value: 'cultural_event', label: 'Cultural Event Attendance', defaultPoints: 1 },
-        { value: 'academic_achievement', label: 'Academic Achievement', defaultPoints: 3 },
-        { value: 'leadership_role', label: 'Leadership Role/Position', defaultPoints: 5 },
-        { value: 'conference_attendance', label: 'Conference/Workshop Attendance', defaultPoints: 2 },
-        { value: 'mentoring', label: 'Mentoring/Tutoring', defaultPoints: 2 },
+        { value: 'fundraiser', label: 'Fundraiser', defaultPoints: 2 },
+        { value: 'open_mlp_event', label: 'Open MLP Event', defaultPoints: 1 },
+        { value: 'affiliated_org_event', label: 'Affiliated Organization Event', defaultPoints: 1 },
+        { value: 'committee_meeting', label: 'Committee Meeting', defaultPoints: 1 },
         { value: 'other', label: 'Other (specify)', defaultPoints: 1 }
     ];
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
