@@ -300,8 +300,6 @@ function PointRequest() {
                     <li>All requests must include photo evidence</li>
                     <li>Photos should clearly show your participation in the activity</li>
                     <li>Requests will be reviewed by E-board members within 3-5 business days</li>
-                    <li>You will be notified via email once your request is processed</li>
-                    <li>Points will only be awarded for activities that align with HSA values and goals</li>
                 </ul>
             </div>
         </div>
