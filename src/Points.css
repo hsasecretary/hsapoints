@@ -2,3 +2,184 @@
 {
     display: none;
 }
+
+/* Points Dashboard Mobile Responsiveness */
+.user-points-lookup {
+    padding: 10px;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.user-points-lookup h2 {
+    font-size: 1.5em;
+    margin: 10px 0;
+}
+
+.user-info-card,
+.points-summary,
+.category-breakdown,
+.event-breakdown {
+    margin-bottom: 15px;
+    padding: 15px;
+    overflow-x: hidden;
+}
+
+.category-table,
+.events-table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.category-table th,
+.category-table td,
+.events-table th,
+.events-table td {
+    padding: 8px 4px;
+    text-align: center;
+    word-wrap: break-word;
+    border: 1px solid #ddd;
+}
+
+/* Mobile optimizations for tables */
+@media (max-width: 768px) {
+    .user-points-lookup {
+        padding: 5px;
+    }
+    
+    .user-info-card,
+    .points-summary,
+    .category-breakdown,
+    .event-breakdown {
+        margin-bottom: 10px;
+        padding: 10px;
+    }
+    
+    .user-info-grid {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+    }
+    
+    .points-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+    }
+    
+    /* Hide the original table on mobile and create card layout */
+    .events-table {
+        border: none;
+        width: 100%;
+    }
+    
+    .events-table thead {
+        display: none;
+    }
+    
+    .events-table tbody {
+        display: block;
+    }
+    
+    .events-table tr {
+        display: block;
+        margin-bottom: 15px;
+        padding: 15px;
+        background: #f9f9f9;
+        border: 2px solid #155776;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .events-table td {
+        display: block;
+        text-align: left;
+        border: none;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+        position: relative;
+    }
+    
+    .events-table td:last-child {
+        border-bottom: none;
+    }
+    
+    .events-table td:before {
+        content: attr(data-label) ": ";
+        font-weight: bold;
+        color: #155776;
+        display: inline-block;
+        min-width: 80px;
+        margin-right: 10px;
+    }
+    
+    .category-table {
+        font-size: 11px;
+    }
+    
+    .category-table th,
+    .category-table td {
+        padding: 6px 3px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-points-lookup {
+        padding: 3px;
+    }
+    
+    .user-points-lookup h2 {
+        font-size: 1.3em;
+    }
+    
+    .user-info-card,
+    .points-summary,
+    .category-breakdown,
+    .event-breakdown {
+        padding: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .points-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .events-table tr {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .events-table td {
+        padding: 6px 0;
+        font-size: 14px;
+    }
+    
+    .events-table td:before {
+        min-width: 70px;
+        font-size: 13px;
+    }
+    
+    .category-table {
+        font-size: 10px;
+    }
+    
+    .category-table th,
+    .category-table td {
+        padding: 4px 2px;
+        font-size: 10px;
+    }
+    
+    .user-info-card h3,
+    .points-summary h3,
+    .category-breakdown h3,
+    .event-breakdown h3 {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+    }
+    
+    .badge-yes,
+    .badge-no {
+        font-size: 12px;
+        padding: 3px 6px;
+    }
+}

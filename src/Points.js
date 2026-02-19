@@ -194,7 +194,7 @@ export default function Points() {
 					{userPoints.isVoterEligible && (
 						<div className="election-info">
 							<p style={{textAlign: 'center', color: '#28a745', fontWeight: 'bold', marginTop: '15px'}}>
-								🎉 Congratulations! You can vote and run in the upcoming Executive Board elections!
+								 🎉 Congratulations! You can vote and run in the upcoming Executive Board elections!
 							</p>
 						</div>
 					)}
@@ -287,17 +287,17 @@ export default function Points() {
 							<tbody>
 								{eventBreakdown.map((event, index) => (
 									<tr key={index}>
-										<td>{event.code}</td>
-										<td>{event.event}</td>
-										<td>{event.category}</td>
-										<td>{event.eventDate}</td>
-										<td>{event.points}</td>
-										<td>{event.semester === 'fallPoints' ? 'Fall' : 'Spring'}</td>
-										<td>
-											<span className={event.voterEligible ? 'badge-yes' : 'badge-no'}>
-												{event.voterEligible ? 'Yes' : 'No'}
-											</span>
-										</td>
+										 <td data-label="Code">{event.code}</td>
+										 <td data-label="Event">{event.event}</td>
+										 <td data-label="Category">{event.category}</td>
+										 <td data-label="Date">{event.eventDate}</td>
+										 <td data-label="Points">{event.points}</td>
+										 <td data-label="Semester">{event.semester === 'fallPoints' ? 'Fall' : 'Spring'}</td>
+										 <td data-label="Voter Eligible">
+											 <span className={event.voterEligible ? 'badge-yes' : 'badge-no'}>
+												 {event.voterEligible ? 'Yes' : 'No'}
+											 </span>
+										 </td>
 									</tr>
 								))}
 							</tbody>

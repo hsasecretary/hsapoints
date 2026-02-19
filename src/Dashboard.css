@@ -1,142 +1,212 @@
-/* .formDash
-{
-	background-color: #cbdfe8;
-	border-radius: 5px;
-	border: 2px solid #97c3d8;
-    max-width:1200px;
-    margin:auto;
-    margin-top: 25px;
-    width: 95%;
-    margin:auto;
-    margin-top: 25px;
-    display: flex;
-    flex-flow: wrap;
-    justify-content: flex-start;
-} */
-
-.formDash
-{
+.formDash {
 	background-color: #ffffff;
 	border-radius: 5px;
 	border: 2px solid #e3e8ea;
-    max-width:1200px;
-    margin:auto;
-    margin-top: 25px;
+    max-width: 1200px;
+    margin: 25px auto 30px;
     width: 95%;
-    margin:auto;
-    margin-top: 25px;
     display: flex;
     flex-flow: wrap;
     justify-content: flex-start;
-    margin-bottom: 30px;
 }
 
-h2
-{
+h2 {
 	text-align: center;
 	font-size: 2em;
 }
 
-form label
-{
+form label {
     font-size: 1.4em;
 }
 
-
-
-input[type="submit"]
-{
-	background-color:#f2f6f8;
+input[type="submit"] {
+	background-color: #f2f6f8;
     color: black;
 	min-width: 140px;
 }
-input[type="submit"]:hover
-{
-	background-color:#6db0cf;
+
+input[type="submit"]:hover {
+	background-color: #6db0cf;
 	border: 1px solid #155776;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-
 }
 
-input[type="submit"]:active
-{
-	background-color:#4892b4;
+input[type="submit"]:active {
+	background-color: #4892b4;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.5), 0 6px 20px 0 rgba(0,0,0,0.19);
-
 }
 
-.center
-{
-	text-align:center;
-	margin:auto;
+.center {
+	text-align: center;
+	margin: auto;
 }
 
-.errorMsg
-{
-	color:red;
+.errorMsg {
+	color: red;
 }
 
-#dash
-{
+#dash {
     width: 100%;
 }
 
-#pointsForm
-{
-    width:100%;
+#pointsForm {
+    width: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    gap: 15px;
 }
-.pointsSubForm
-{
+
+.pointsSubForm {
 	background-color: #80beda58;
 	border: 2px solid #155776;
     flex: 1 1 auto;
-    width:25%;
-    margin-left: 15px;
-    margin-right: 15px;
-    margin-bottom: 15px;
+    min-width: 280px;
+    margin: 0 7.5px 15px;
     border-radius: 5px;
-    word-wrap: break-word; /* Deprecated, but still supported */
+    word-wrap: break-word;
     word-break: break-word;
     overflow-wrap: break-word;
     white-space: normal;
-
 }
-.subForm h3, .pointsSubForm h3, #eboard h3
-{
+
+.subForm h3, .pointsSubForm h3, #eboard h3 {
 	font-size: 1.9em;
     text-align: center;
 }
+
 .attendanceForm {
-    display:block;
+    display: block;
     background-color: #80beda58;
     border: 2px solid #155776;
-    width: 100%;
-    margin: 15px 15px 15px 15px;
+    width: calc(100% - 30px);
+    margin: 15px;
     border-radius: 5px;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1), 0 6px 20px 0 rgba(0,0,0,0.19);
-
 }
 
-#attendanceInput
-{
+#attendanceInput {
     max-width: 800px;
-    margin:auto;
+    margin: auto;
+    padding: 10px;
 }
 
+/* Enhanced Mobile Responsiveness */
+@media only screen and (max-width: 768px) {
+    .formDash {
+        width: 98%;
+        margin: 15px auto 20px;
+        padding: 10px;
+    }
+    
+    #pointsForm {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .pointsSubForm {
+        width: calc(100% - 15px);
+        margin: 0 0 10px;
+        min-width: unset;
+    }
+    
+    .attendanceForm {
+        width: calc(100% - 20px);
+        margin: 10px;
+    }
+    
+    #attendanceInput {
+        padding: 5px;
+    }
+}
 
-@media only screen and (max-width:500px)
-{
-    .subForm h3, .pointsSubForm h3, #eboard h3
-    {
+@media only screen and (max-width: 500px) {
+    .formDash {
+        width: 99%;
+        margin: 10px auto 15px;
+        padding: 5px;
+        border-radius: 3px;
+    }
+    
+    .subForm h3, .pointsSubForm h3, #eboard h3 {
         font-size: 1.3em;
         text-align: center;
+        margin: 10px 0;
     }
-    .pointsSubForm h2
-    {
+    
+    .pointsSubForm h2 {
         font-size: 1.5em;
         text-align: center;
+        margin: 10px 0;
+    }
+    
+    h2 {
+        font-size: 1.8em;
+        margin: 10px 0;
+    }
+    
+    .pointsSubForm {
+        margin: 0 0 8px;
+        padding: 10px;
+    }
+    
+    .attendanceForm {
+        width: calc(100% - 10px);
+        margin: 8px 5px;
+        padding: 8px;
+    }
+    
+    #attendanceInput {
+        padding: 0;
+    }
+    
+    form label {
+        font-size: 1.2em;
+    }
+    
+    input[type="submit"] {
+        min-width: 120px;
+        padding: 8px 16px;
+        font-size: 0.9em;
+    }
+}
+
+@media only screen and (max-width: 360px) {
+    .formDash {
+        width: 100%;
+        margin: 5px auto 10px;
+        padding: 3px;
+        border-radius: 2px;
+    }
+    
+    .pointsSubForm {
+        padding: 8px;
+        margin: 0 0 5px;
+    }
+    
+    .attendanceForm {
+        width: calc(100% - 6px);
+        margin: 5px 3px;
+        padding: 5px;
+    }
+    
+    .subForm h3, .pointsSubForm h3, #eboard h3 {
+        font-size: 1.1em;
+        margin: 5px 0;
+    }
+    
+    h2 {
+        font-size: 1.5em;
+        margin: 8px 0;
+    }
+    
+    form label {
+        font-size: 1.1em;
+    }
+    
+    input[type="submit"] {
+        min-width: 100px;
+        padding: 6px 12px;
+        font-size: 0.85em;
     }
 }
