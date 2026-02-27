@@ -117,7 +117,6 @@ function UserPointsLookup() {
                             case "Tabling":
                             case "Affiliate Org GBM":
                             case "Affiliate Org Event":
-                            case "Other" :
                                 voterEligibleTotal += 1;
                                 break;
                             default:
@@ -127,6 +126,7 @@ function UserPointsLookup() {
                 }
             }
 
+            voterEligibleTotal += userData.otherPoints || 0;
             pointsBreakdown.voterEligiblePoints = voterEligibleTotal;
             pointsBreakdown.isVoterEligible = voterEligibleTotal >= 15;
 
