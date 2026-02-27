@@ -117,6 +117,7 @@ function UserPointsLookup() {
                             case "Tabling":
                             case "Affiliate Org GBM":
                             case "Affiliate Org Event":
+                            case "Other" :
                                 voterEligibleTotal += 1;
                                 break;
                             default:
