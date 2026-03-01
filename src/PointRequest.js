@@ -18,6 +18,7 @@ function PointRequest() {
     const [imagePreview, setImagePreview] = useState(null);
 
     const activityTypes = [
+        { value: 'gbm', label: 'GBM', defaultPoints: 2 },
         { value: 'tabling', label: 'Tabling', defaultPoints: 1 },
         { value: 'fundraiser', label: 'Fundraiser', defaultPoints: 2 },
         { value: 'open_mlp_event', label: 'Open MLP Event', defaultPoints: 1 },
