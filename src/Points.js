@@ -94,22 +94,8 @@ export default function Points() {
 								});
 
 								if (docData.voterEligible) {
-									switch (docData.category) {
-										case "GBM":
-											voterEligibleTotal += 2;
-											break;
-										case "Programming":
-										case "OPA":
-										case "MLP Fall":
-										case "MLP Spring":
-										case "Tabling":
-										case "Affiliate Org GBM":
-										case "Affiliate Org Event":
-											voterEligibleTotal += 1;
-											break;
-										default:
-											break;
-									}
+									// use the stored point value on the code document
+									voterEligibleTotal += docData.points || 0;
 								}
 							}
 						}

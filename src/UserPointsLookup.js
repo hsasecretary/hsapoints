@@ -106,22 +106,8 @@ function UserPointsLookup() {
                     });
 
                     if (docData.voterEligible) {
-                        switch (docData.category) {
-                            case "GBM":
-                                voterEligibleTotal += userData.isCabinetMember ? 1 : 2;
-                                break;
-                            case "Programming":
-                            case "OPA":
-                            case "MLP Fall":
-                            case "MLP Spring":
-                            case "Tabling":
-                            case "Affiliate Org GBM":
-                            case "Affiliate Org Event":
-                                voterEligibleTotal += 1;
-                                break;
-                            default:
-                                break;
-                        }
+                        // use the stored points value for voter eligibility
+                        voterEligibleTotal += docData.points || 0;
                     }
                 }
             }
