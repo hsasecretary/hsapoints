@@ -58,9 +58,9 @@ function PointRequest() {
             }
 
             // Validate file size (max 5MB)
-            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            const maxSize = 200 * 1024 * 1024; // 5MB in bytes
             if (file.size > maxSize) {
-                setMessage({ text: 'Image size must be less than 5MB', type: 'error' });
+                setMessage({ text: 'Image size must be less than 200MB', type: 'error' });
                 return;
             }
 
