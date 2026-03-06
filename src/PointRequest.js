@@ -47,45 +47,45 @@ function PointRequest() {
         }
     };
 
-    // const handleImageChange = (e) => {
-    //     const file = e.target.files[0];
-    //     if (file) {
-    //         // Validate file type
-    //         const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-    //         if (!validTypes.includes(file.type)) {
-    //             setMessage({ text: 'Please upload a valid image file (JPG, PNG, or GIF)', type: 'error' });
-    //             return;
-    //         }
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                setMessage({ text: 'Please upload a valid image file (JPG, PNG, or GIF)', type: 'error' });
+                return;
+            }
 
-    //         // // Validate file size (max 5MB)
-    //         // const maxSize = 200 * 1024 * 1024; // 5MB in bytes
-    //         // if (file.size > maxSize) {
-    //         //     setMessage({ text: 'Image size must be less than 200MB', type: 'error' });
-    //         //     return;
-    //         // }
+            // Validate file size (max 5MB)
+            const maxSize = 500 * 1024 * 1024; // 5MB in bytes
+            if (file.size > maxSize) {
+                setMessage({ text: 'Image size must be less than 500MB', type: 'error' });
+                return;
+            }
 
-    //         setFormData(prev => ({
-    //             ...prev,
-    //             image: file
-    //         }));
+            setFormData(prev => ({
+                ...prev,
+                image: file
+            }));
 
-    //         // // Create preview
-    //         // const reader = new FileReader();
-    //         // reader.onloadend = () => {
-    //         //     setImagePreview(reader.result);
-    //         // };
-    //         // reader.readAsDataURL(file);
-    //     }
-    // };
+            // Create preview
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
-    // const convertImageToBase64 = (file) => {
-    //     return new Promise((resolve, reject) => {
-    //         const reader = new FileReader();
-    //         reader.readAsDataURL(file);
-    //         reader.onload = () => resolve(reader.result);
-    //         reader.onerror = error => reject(error);
-    //     });
-    // };
+    const convertImageToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -109,17 +109,17 @@ function PointRequest() {
             if (!formData.pointsRequested || formData.pointsRequested <= 0) {
                 throw new Error('Please enter a valid number of points');
             }
-            // if (!formData.image) {
-            //     throw new Error('Please upload an image as proof');
-            // }
+            if (!formData.image) {
+                throw new Error('Please upload an image as proof');
+            }
 
             const user = auth.currentUser;
             if (!user) {
                 throw new Error('You must be logged in to submit a request');
             }
 
-            // // Convert image to base64
-            // const imageBase64 = await convertImageToBase64(formData.image);
+            // Convert image to base64
+            const imageBase64 = await convertImageToBase64(formData.image);
 
             // Prepare request data
             const requestData = {
@@ -130,9 +130,9 @@ function PointRequest() {
                 description: formData.description.trim(),
                 date: formData.date,
                 pointsRequested: parseInt(formData.pointsRequested),
-                // imageData: imageBase64,
-                // imageFileName: formData.image.name,
-                // imageSize: formData.image.size,
+                imageData: imageBase64,
+                imageFileName: formData.image.name,
+                imageSize: formData.image.size,
                 status: 'pending',
                 submittedAt: serverTimestamp(),
                 reviewedAt: null,
@@ -152,9 +152,9 @@ function PointRequest() {
                 description: '',
                 date: '',
                 pointsRequested: '',
-                //image: null
+                image: null
             });
-            //setImagePreview(null);
+            setImagePreview(null);
 
         } catch (error) {
             console.error('Error submitting request:', error);
@@ -164,13 +164,13 @@ function PointRequest() {
         }
     };
 
-    // const clearImage = () => {
-    //     setFormData(prev => ({ ...prev, image: null }));
-    //     setImagePreview(null);
-    //     // Clear the file input
-    //     const fileInput = document.getElementById('imageUpload');
-    //     if (fileInput) fileInput.value = '';
-    // };
+    const clearImage = () => {
+        setFormData(prev => ({ ...prev, image: null }));
+        setImagePreview(null);
+        // Clear the file input
+        const fileInput = document.getElementById('imageUpload');
+        if (fileInput) fileInput.value = '';
+    };
 
     return (
         <div className="point-request">
@@ -262,7 +262,7 @@ function PointRequest() {
                     </div>
                 </div>
 
-                {/* <div className="form-group">
+                <div className="form-group">
                     <label htmlFor="imageUpload">Photo Evidence * (Max 5MB)</label>
                     <input
                         type="file"
@@ -274,9 +274,9 @@ function PointRequest() {
                     <p className="help-text">
                         Upload a clear photo showing you at the activity/location as proof of participation
                     </p>
-                </div> */}
+                </div>
 
-                {/* {imagePreview && (
+                {imagePreview && (
                     <div className="image-preview">
                         <h4>Image Preview:</h4>
                         <div className="preview-container">
@@ -286,7 +286,7 @@ function PointRequest() {
                             </button>
                         </div>
                     </div>
-                )} */}
+                )}
 
                 <div className="form-actions">
                     <button type="submit" disabled={loading} className="submit-button">
