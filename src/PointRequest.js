@@ -263,7 +263,7 @@ function PointRequest() {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="imageUpload">Photo Evidence * (Max 5MB)</label>
+                    <label htmlFor="imageUpload">Photo Evidence * (Max 500MB)</label>
                     <input
                         type="file"
                         id="imageUpload"
