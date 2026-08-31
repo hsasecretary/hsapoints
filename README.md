@@ -1,73 +1,189 @@
-# Live Website: HSAUF.COM
+# 🐊 UF HSA Member Portal & Points Tracker
 
-# Getting Started with Create React App
+[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%7C%20Auth-orange.svg)](https://firebase.google.com/)
+[![Python](https://img.shields.io/badge/Python-Automation%20Scripts-green.svg)](https://www.python.org/)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The official internal web application and point management system for the **University of Florida Hispanic Student Association (UF HSA)**.
 
-## Available Scripts
+- 🌐 **Internal Portal:** [hsamemberportal.com](https://hsamemberportal.com)
+- 🌐 **Official Website:** [ufhsa.com](https://ufhsa.com)
+- 💻 **GitHub Repository:** [github.com/hsasecretary/hsapoints](https://github.com/hsasecretary/hsapoints)
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technologies |
+|---|---|
+| **Frontend** | React (SPA), JavaScript (ES6+), HTML5, CSS3 |
+| **Backend & Database** | Firebase Authentication (`@ufl.edu` sign-in), Cloud Firestore |
+| **Automation & Admin Tools** | Python 3 (data reconciliation, member exports, batch uploads) |
+| **Design & Management** | Figma, GitHub, ClickUp |
+
+---
+
+## 📋 Prerequisites & Tools to Install
+
+Before getting started, make sure you have the following installed on your machine:
+
+1. **[Node.js (LTS Version)](https://nodejs.org/)** — Installs `node` and `npm` (Node Package Manager) needed to run the React app.
+2. **[Git](https://git-scm.com/)** — For version control and GitHub collaboration.
+3. **[Visual Studio Code](https://code.visualstudio.com/)** — The recommended code editor.
+4. **[Python 3 (3.10+)](https://www.python.org/)** — Required for backend data automation and member extraction scripts.
+5. **[uv (Fast Python Package Manager)](https://github.com/astral-sh/uv)** *(optional but recommended)* or standard `pip`.
+6. **Firebase CLI** — For deploying rules and interacting with Firebase services:
+   ```bash
+   npm install -g firebase-tools
+   ```
+
+---
+
+## 🧩 Recommended VS Code Extensions
+
+Install these extensions for code formatting, linting, and syntax highlighting:
+
+| Extension | ID | Purpose |
+|---|---|---|
+| **Prettier** | `esbenp.prettier-vscode` | Automatically formats JS/JSX/CSS on save |
+| **ESLint** | `dbaeumer.vscode-eslint` | Catches syntax errors and style issues in React |
+| **Python + Pylance** | `ms-python.python`, `ms-python.vscode-pylance` | Language support and autocomplete for Python scripts |
+| **GitLens** | `eamodio.gitlens` | Visualizes Git branch history and code authorship |
+| **Auto Rename Tag** | `formulahendry.auto-rename-tag` | Keeps HTML/JSX tags synchronized |
+
+---
+
+## 🚀 Step-by-Step Setup Guide
+
+### 1. Clone the Repository
+
+Open your terminal (PowerShell, Command Prompt, or macOS/Linux Terminal) in your desired working folder (e.g., `Desktop/HSA WebDev`) and clone the repo:
+
+```bash
+git clone https://github.com/hsasecretary/hsapoints.git
+cd hsapoints
+```
+
+### 2. Open the Project in VS Code
+
+Open the `hsapoints` folder directly as the workspace root:
+
+```bash
+code .
+```
+
+### 3. Install React Dependencies
+
+Install all required Node modules:
+
+```bash
+npm install
+```
+
+### 4. Set Up Python Virtual Environment (For Admin Scripts)
+
+If you are working on data exports or Firestore administrative scripts:
+
+```bash
+# Using uv (fast)
+uv venv
+uv pip install firebase-admin pandas openpyxl
+
+# Or using standard python venv
+python -m venv .venv
+
+# On Windows:
+.venv\Scripts\activate
+# On macOS/Linux:
+source .venv/bin/activate
+
+pip install firebase-admin pandas openpyxl
+```
+
+In VS Code, press `Ctrl + Shift + P` (or `Cmd + Shift + P` on Mac) → **Python: Select Interpreter** → select `./.venv/Scripts/python.exe`.
+
+### 5. Configure Firebase Authentication & Keys
+
+- Create a `.env.local` file in the root directory if environment variables are required.
+- If running admin scripts locally, place your `serviceAccountKey.json` inside the repository root or `scripts/` directory.
+
+> ⚠️ **CRITICAL SECURITY RULE:** Never commit `serviceAccountKey.json`, `.env`, or `.xlsx` files to GitHub. Always ensure they are listed in `.gitignore`.
+
+---
+
+## 💻 Available Scripts
 
 In the project directory, you can run:
 
-### `npm start`
+| Command | Description |
+|---|---|
+| `npm start` | Runs the app in development mode. Open [http://localhost:3000](http://localhost:3000) to view it in your browser with live reloading. |
+| `npm test` | Launches the test runner in interactive watch mode. |
+| `npm run build` | Builds the app for production to the `build/` folder. Bundles React in production mode and optimizes the output for best performance. |
+| `python scripts/export_members.py` | Extracts active member profiles, point totals, and cabinet standings from Firestore into an Excel spreadsheet. |
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 📁 Project Structure
 
-### `npm test`
+```
+hsapoints/
+├── .gitignore               # Ignored files (node_modules, .venv, secrets, exports)
+├── package.json             # Frontend dependencies and npm scripts
+├── public/                  # Static assets and index.html
+├── scripts/                 # Python automation, cleanup, and extraction scripts
+│   ├── export_members.py
+│   └── serviceAccountKey.json (Git ignored)
+├── src/                     # React application source code
+│   ├── assets/              # Logos, icons, and image assets
+│   ├── components/          # Reusable UI components (Navbar, PointsCard, etc.)
+│   ├── pages/                # Main route views (Dashboard, Admin, Login, Events)
+│   ├── firebase.js          # Client-side Firebase App/Auth/Firestore initialization
+│   ├── App.js                # Root component and router
+│   └── index.js               # React entry point
+└── README.md                # Project documentation
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## 🌿 Git & Collaboration Workflow
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+**1. Always pull latest changes before starting work:**
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+git checkout main
+git pull origin main
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**2. Create a dedicated branch for your task:**
 
-### `npm run eject`
+```bash
+git checkout -b feature/voter-eligibility-ui
+# or
+git checkout -b fix/event-code-validation
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+**3. Commit with descriptive messages:**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+git add .
+git commit -m "Add circular progress bar for voter eligibility"
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+**4. Push your branch and open a Pull Request (PR):**
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+git push origin feature/voter-eligibility-ui
+```
 
-## Learn More
+> 📌 Tag the **Senior Software Developer** on GitHub / ClickUp for review before merging into `main`.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 📚 Helpful Resources & Documentation
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-# HSAPointTracker
+- [React Documentation](https://react.dev)
+- [Firebase Web SDK (v9/v10)](https://firebase.google.com/docs/web/setup)
+- [Cloud Firestore Documentation](https://firebase.google.com/docs/firestore)
+- [Firebase Admin Python SDK](https://firebase.google.com/docs/admin/setup)
+- [Git & GitHub Basics](https://docs.github.com/en/get-started)
