@@ -60,19 +60,19 @@ function App() {
 
     function isAdmin(email) {
 		const adminEmails = [
-			"einsuasti@ufl.edu",
-            "garibaldig@ufl.edu",
-            "ngarcialamboy@ufl.edu",
-            "ichoa@ufl.edu",
-            "msalvador@ufl.edu",
-            "i.seguinot@ufl.edu",
-            "Marcelasandino@ufl.edu",
-            "drodriguezgomez@ufl.edu",
-            "briannacastro@ufl.edu",
-            "lizetmejia@ufl.edu",
-         //ADD LESLY UFL EMAIL!!!!!!!!!
-            "isabelhernandez@ufl.edu"
-		];
+			"drodriguezgomez@ufl.edu",
+            "benavides.dc@ufl.edu",
+            "lopezmaya@ufl.edu",
+            "adrianalima@ufl.edu",
+            "madison.barbeito@ufl.edu",
+            "rodriguez.bryan@ufl.edu",
+            "eboutros@ufl.edu",
+            "jseguinot@ufl.edu",
+            "gabyurdaneta@ufl.edu",
+            "bello.kayla@ufl.edu",
+            "leslyrivero@ufl.edu",
+            
+        		];  
 		return adminEmails.includes(email);
 	}
 
