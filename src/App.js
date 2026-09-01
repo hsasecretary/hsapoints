@@ -71,6 +71,8 @@ function App() {
             "gabyurdaneta@ufl.edu",
             "bello.kayla@ufl.edu",
             "leslyrivero@ufl.edu",
+            "isabelhernandez@ufl.edu",
+            "carrascom@ufl.edu"
             
         		];  
 		return adminEmails.includes(email);
