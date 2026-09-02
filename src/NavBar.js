@@ -12,7 +12,7 @@ function NavBar({eboard, cabinet}) {
 					{cabinet && (
 						<li><a href="./Cabinet">Cabinet</a></li>
 					)}
-					<li><a href="https://calendar.google.com/calendar/embed?src=ae505ce1dedb0a52bddc341d9e8d65e996a61aac295d00d89af40640bdb51762%40group.calendar.google.com&ctz=America%2FNew_York">Calendar</a></li>
+					<li><a href="https://calendar.google.com/calendar/embed?src=ae59c0f6702553b609b32a2d3590df6a527b45a92069bbf28f9983f89aaab437%40group.calendar.google.com&ctz=America%2FNew_York">Calendar</a></li>
 					{eboard && (
 						<li><a href="./eboard">E-Board</a></li>	
 					)}
