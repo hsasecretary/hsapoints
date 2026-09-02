@@ -12,13 +12,14 @@ import Cabinet from './Cabinet';
 import React, { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, db} from './firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 function App() {
     const [userEmail, setUserEmail] = useState(null);
     const [isEboard, setIsEboard] = useState(false);
     const [isCabinetMember, setIsCabinetMember] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [rolesLoaded, setRolesLoaded] = useState(false);
 
 	useEffect(() => {
 		const listen = onAuthStateChanged(auth, (user) =>{
@@ -35,65 +36,42 @@ function App() {
             listen();
         }
     }, []);
-    
-    // Check if user is admin
-	useEffect(() => {
-        if (userEmail) {
-            setIsEboard(isAdmin(userEmail));
-        }
-    }, [userEmail]);
 
-    // Check if user is part of cabinet asynchronously
+    // Read the user's roles straight from their Firestore document.
+    // onSnapshot keeps this live, so flipping `eboard` in Firebase updates
+    // the site without the user having to sign out and back in.
     useEffect(() => {
-        const checkCabinetStatus = async (email) => {
-            if (email) {
-                const result = await isCabinet(email);
-                setIsCabinetMember(result);  // Set the state based on result
-            }
-        };
-        
-        if (userEmail) {
-            checkCabinetStatus(userEmail);
+        if (!userEmail) {
+            setIsEboard(false);
+            setIsCabinetMember(false);
+            setRolesLoaded(false);
+            return;
         }
+
+        setRolesLoaded(false);
+
+        const unsubscribe = onSnapshot(
+            doc(db, "users", userEmail),
+            (userDocSnap) => {
+                const data = userDocSnap.exists() ? userDocSnap.data() : null;
+                setIsEboard(data?.eboard === true);
+                setIsCabinetMember(data?.approved === true && data?.cabinet !== "none");
+                setRolesLoaded(true);
+            },
+            (error) => {
+                console.error("Failed to load user roles:", error);
+                setIsEboard(false);
+                setIsCabinetMember(false);
+                setRolesLoaded(true);
+            }
+        );
+
+        return () => unsubscribe();
     }, [userEmail]);
-    
 
-    function isAdmin(email) {
-		const adminEmails = [
-			"einsuasti@ufl.edu",
-            "garibaldig@ufl.edu",
-            "ngarcialamboy@ufl.edu",
-            "ichoa@ufl.edu",
-            "msalvador@ufl.edu",
-            "i.seguinot@ufl.edu",
-            "Marcelasandino@ufl.edu",
-            "drodriguezgomez@ufl.edu",
-            "briannacastro@ufl.edu",
-            "lizetmejia@ufl.edu",
-         //ADD LESLY UFL EMAIL!!!!!!!!!
-            "isabelhernandez@ufl.edu"
-		];
-		return adminEmails.includes(email);
-	}
-
-    async function isCabinet(email)
-    {
-        if(email=== null) {return false; }
-        const userDocRef = doc(db, "users", email);
-        const userDocSnap = await getDoc(userDocRef);
-        if(userDocSnap.exists())            
-        {
-            const data = userDocSnap.data();
-            if(data.approved && data.cabinet !== "none") 
-            {
-                return true;
-            }
-            return false; 
-        }
-        return false;
-    }
-
-    if (loading) {
+    // Wait for the roles before rendering routes, otherwise <Eboard> would
+    // bounce an e-board member to /dashboard before their flag arrives.
+    if (loading || (userEmail && !rolesLoaded)) {
         return <div>Loading...</div>;
     }
 
@@ -108,7 +86,7 @@ function App() {
                     <Route path="/login" element={userEmail ? <Navigate to="/dashboard"/> : <Login />} />
                     <Route path="/dashboard" element={userEmail ? <Dashboard cabinet ={isCabinetMember} email ={userEmail}/> : <Navigate to="/login"/>}/>
                     <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember}/> : <Navigate to="/login"/>}/>
-                    <Route path="/eboard" element={userEmail ? <Eboard eboard ={isAdmin(userEmail)}/> : <Navigate to="/login"/>}/>
+                    <Route path="/eboard" element={userEmail ? <Eboard eboard ={isEboard}/> : <Navigate to="/login"/>}/>
                     <Route path="/forgotPassword" element={<ForgotPassword/>} />
                 </Routes>
             </Router>
