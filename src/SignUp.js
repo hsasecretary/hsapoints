@@ -12,6 +12,7 @@ function SignUp() {
 		firstName: '',
 		lastName: '',
 		uflEmail: '',
+		graduationYear: 'select',
 		cabinet: 'select',
 		position: 'select',
 		password: '',
@@ -147,6 +148,10 @@ function SignUp() {
 			newErrors.uflEmail = "*Required: Input your UFL/SF email";
 		}
 
+		if (formData.graduationYear === 'select') {
+    		newErrors.graduationYear = "*Required: Select your graduation year";
+		}
+
 		if (formData.cabinet === 'select') {
 			newErrors.cabinet = "*Required: Select either your cabinet or no cabinet";
 		}
@@ -185,6 +190,7 @@ function SignUp() {
 			await setDoc(doc(db, "users", email), {
 				firstName: formData.firstName.trim(),
 				lastName: formData.lastName.trim(),
+				graduationYear: formData.graduationYear,
 				cabinet: formData.cabinet,
 				position: formData.position,
 				approved: approved,
@@ -266,6 +272,22 @@ function SignUp() {
 							onChange={(e) => handleInputChange('uflEmail', e.target.value)}
 						/>
 						
+						<p className='errorMsg'>{errors.graduationYear}</p>
+						<label htmlFor="graduationYear">Expected Graduation Year: </label><br/>
+						<select 
+							id="graduationYear" 
+							value={formData.graduationYear}
+							onChange={(e) => handleInputChange('graduationYear', e.target.value)}
+						>
+							<option value="select">Select</option>
+							<option value="2026">2026</option>
+							<option value="2027">2027</option>
+							<option value="2028">2028</option>
+							<option value="2029">2029</option>
+							<option value="2030">2030</option>
+							<option value="N/A">N/A</option>
+						</select>{/*Requires updating every year !!*/}
+
 						<p className='errorMsg'>{errors.cabinet}</p>
 						<label htmlFor="cabinet">Involvement in HSA Cabinet:</label> <br/>
 						<select 
