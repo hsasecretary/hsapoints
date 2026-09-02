@@ -6,6 +6,51 @@ import { setDoc, doc, arrayUnion, updateDoc } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 
+// E-Board positions. `cabinet` is the cabinet each position belongs to, so the
+// existing `cabinet` field on the user document keeps working downstream.
+const eboardPositions = [
+	{ value: 'president', label: 'President', cabinet: 'president' },
+	{ value: 'vp-operations', label: 'Vice President of Operations', cabinet: 'operations' },
+	{ value: 'vp-programming', label: 'Vice President of Programming', cabinet: 'programming' },
+	{ value: 'treasurer', label: 'Treasurer', cabinet: 'treasurey' },
+	{ value: 'secretary', label: 'Secretary', cabinet: 'secretary' },
+	{ value: 'mlp-fall-ed', label: 'MLP Fall Executive Director', cabinet: 'mlpFall' },
+	{ value: 'mlp-spring-ed', label: 'MLP Spring Executive Director', cabinet: 'mlpSpring' },
+	{ value: 'opa-ed-external', label: 'OPA External Executive Director', cabinet: 'opa' },
+	{ value: 'opa-ed-internal', label: 'OPA Internal Executive Director', cabinet: 'opa' },
+	{ value: 'chief-of-staff', label: 'Chief of Staff', cabinet: 'president' }
+];
+
+// Cabinet keys match the values already stored on existing user documents.
+const cabinets = [
+	{ value: 'president', label: 'Presidential' },
+	{ value: 'operations', label: 'Operations' },
+	{ value: 'programming', label: 'Programming' },
+	{ value: 'communications', label: 'Communications' },
+	{ value: 'treasurey', label: 'Treasury' },
+	{ value: 'secretary', label: 'Secretary' },
+	{ value: 'mlpFall', label: 'MLP Fall' },
+	{ value: 'mlpSpring', label: 'MLP Spring' },
+	{ value: 'opa', label: 'Office of Political Affairs' }
+];
+
+// Rolls forward on its own each year, so this never needs editing again.
+const graduationYears = Array.from({ length: 5 }, (_, i) => String(new Date().getFullYear() + i));
+
+// Which involvement choices open a second dropdown, and what it contains.
+const subRoleConfig = {
+	eboard: {
+		label: 'E-Board Position',
+		options: eboardPositions,
+		error: '*Required: Select your e-board position'
+	},
+	cabinet: {
+		label: 'Cabinet',
+		options: cabinets,
+		error: '*Required: Select your cabinet'
+	}
+};
+
 function SignUp() {
 	let navigate = useNavigate();
 	const [formData, setFormData] = useState({
@@ -13,101 +58,16 @@ function SignUp() {
 		lastName: '',
 		uflEmail: '',
 		graduationYear: 'select',
-		cabinet: 'select',
-		position: 'select',
+		involvement: 'select',
+		subRole: 'select',
 		password: '',
 		confirmPassword: ''
 	});
 	const [errors, setErrors] = useState({});
 	const [loading, setLoading] = useState(false);
 
-	// Position options based on cabinet selection
-	const positionOptions = {
-		none: [{ value: 'general', label: 'General Member' }],
-		president: [
-			{ value: 'president', label: 'President' },
-			{ value: 'press-secretary', label: 'Press Secretary' },
-			{ value: 'hlsa-ed', label: 'HLSA Executive Director' },
-			{ value: 'adelante-ed', label: 'Adelante Executive Director' },
-			{ value: 'hlhm-ed', label: 'HLHM Executive Director' }
-		],
-		operations: [
-			{ value: 'vp-operations', label: 'Vice President of Operations' },
-			{ value: 'assistant-operations-ed', label: 'Assistant Operations Executive Director' },
-			{ value: 'affiliated-org-liaison', label: 'Affiliated Organization Liaison' },
-			{ value: 'alumni-outreach-director', label: 'Alumni Outreach Director' }
-		],
-		programming: [
-			{ value: 'vp-programming', label: 'Vice President of Programming' },
-			{ value: 'assistant-executive-director', label: 'Assistant Executive Director' },
-			{ value: 'gbm-director', label: 'GBM Director' },
-			{ value: 'athletics-coordinator', label: 'Athletics Coordinator' },
-			{ value: 'service-director', label: 'Service Director' },
-			{ value: 'internal-socials-director', label: 'Internal Socials Director' },
-			{ value: 'external-socials-director', label: 'External Socials Director' },
-			{ value: 'keystone-event-director', label: 'Keystone Event Director' }
-		],
-		communications: [
-			{ value: 'vp-communications', label: 'Vice President of Communications' },
-			{ value: 'assistant-communications-ed', label: 'Assistant Communications Executive Director' },
-			{ value: 'graphics-director', label: 'Graphics Director' },
-			{ value: 'copywriting-director', label: 'Copywriting Director' },
-			{ value: 'engagement-director', label: 'Engagement Director' },
-			{ value: 'digital-content-director', label: 'Digital Content Director' },
-			{ value: 'merch-director', label: 'Merch Director' },
-			{ value: 'photographer', label: 'Photographer' },
-			{ value: 'videographer', label: 'Videographer' }
-		],
-		treasurey: [
-			{ value: 'treasurer', label: 'Treasurer' },
-			{ value: 'assistant-treasurer', label: 'Assistant Treasurer' },
-			{ value: 'internal-fundraising-director', label: 'Internal Fundraising Director' },
-			{ value: 'external-fundraising-director', label: 'External Fundraising Director' }
-		],
-		secretary: [
-			{ value: 'secretary', label: 'Secretary' },
-			{ value: 'assistant-secretary', label: 'Assistant Secretary' },
-			{ value: 'newsletter-director', label: 'Newsletter Director' },
-			{ value: 'webmaster', label: 'Webmaster' }
-		],
-		mlpFall: [
-			{ value: 'mlp-fall-ed', label: 'MLP Fall Executive Director' },
-			{ value: 'assistant-ed', label: 'Assistant Executive Director' },
-			{ value: 'finance-director', label: 'Finance Director' },
-			{ value: 'health-wellness-director', label: 'Health and Wellness Affairs Director' },
-			{ value: 'marketing-director', label: 'Marketing Director' },
-			{ value: 'membership-relations-director', label: 'Membership Relations Director' },
-			{ value: 'mentorship-director', label: 'Mentorship Director' },
-			{ value: 'inclusivity-multicultural-director', label: 'Inclusivity and Multicultural Affairs Director' },
-			{ value: 'professional-academic-director', label: 'Professional and Academic Development Director' },
-			{ value: 'servant-leadership-director', label: 'Servant Leadership Director' }
-		],
-		mlpSpring: [
-			{ value: 'mlp-spring-ed', label: 'MLP Spring Executive Director' },
-			{ value: 'assistant-ed', label: 'Assistant Executive Director' },
-			{ value: 'finance-director', label: 'Finance Director' },
-			{ value: 'health-wellness-director', label: 'Health and Wellness Affairs Director' },
-			{ value: 'marketing-director', label: 'Marketing Director' },
-			{ value: 'membership-relations-director', label: 'Membership Relations Director' },
-			{ value: 'mentorship-director', label: 'Mentorship Director' },
-			{ value: 'inclusivity-multicultural-director', label: 'Inclusivity and Multicultural Affairs Director' },
-			{ value: 'professional-academic-director', label: 'Professional and Academic Development Director' },
-			{ value: 'servant-leadership-director', label: 'Servant Leadership Director' }
-		],
-		opa: [
-			{ value: 'opa-ed-internal', label: 'OPA Executive Director - Internal' },
-			{ value: 'opa-ed-external', label: 'OPA Executive Director - External' },
-			{ value: 'internal-communications-director', label: 'Internal Communications Director' },
-			{ value: 'special-events-director', label: 'Special Events Director' },
-			{ value: 'research-education-director', label: 'Research and Education Director' },
-			{ value: 'internal-outreach-director', label: 'Internal Outreach Project Director' },
-			{ value: 'historian', label: 'Historian' },
-			{ value: 'external-communications-director', label: 'External Communications Director' },
-			{ value: 'civic-engagement-director', label: 'Civic Engagement Director' },
-			{ value: 'external-outreach-director', label: 'External Outreach Project Director' },
-			{ value: 'legislative-affairs', label: 'Legislative Affairs' }
-		]
-	};
+	// Null for MLP and General Member, which have no second dropdown.
+	const currentSubRole = subRoleConfig[formData.involvement] || null;
 
 	const handleInputChange = (field, value) => {
 		setFormData(prev => ({
@@ -123,13 +83,35 @@ function SignUp() {
 			}));
 		}
 
-		// Reset position when cabinet changes
-		if (field === 'cabinet') {
+		// Reset the second dropdown when involvement changes
+		if (field === 'involvement') {
 			setFormData(prev => ({
 				...prev,
-				position: 'select'
+				subRole: 'select'
+			}));
+			setErrors(prev => ({
+				...prev,
+				subRole: ''
 			}));
 		}
+	};
+
+	// Translate the two dropdowns back into the `cabinet` / `position` fields
+	// the rest of the app already reads.
+	const deriveRole = () => {
+		if (formData.involvement === 'eboard') {
+			const selected = eboardPositions.find(pos => pos.value === formData.subRole);
+			return { cabinet: selected.cabinet, position: selected.label };
+		}
+
+		if (formData.involvement === 'cabinet') {
+			const selected = cabinets.find(cab => cab.value === formData.subRole);
+			return { cabinet: selected.value, position: '' };
+		}
+
+		// MLP participants and general members are not cabinet, so they are
+		// auto-approved. `involvement` still records which of the two they are.
+		return { cabinet: 'none', position: '' };
 	};
 
 	const validateForm = () => {
@@ -149,15 +131,15 @@ function SignUp() {
 		}
 
 		if (formData.graduationYear === 'select') {
-    		newErrors.graduationYear = "*Required: Select your graduation year";
+			newErrors.graduationYear = "*Required: Select your graduation year";
 		}
 
-		if (formData.cabinet === 'select') {
-			newErrors.cabinet = "*Required: Select either your cabinet or no cabinet";
+		if (formData.involvement === 'select') {
+			newErrors.involvement = "*Required: Select your involvement in HSA";
 		}
 
-		if (formData.position === 'select') {
-			newErrors.position = "*Required: Select your position within cabinet";
+		if (currentSubRole && formData.subRole === 'select') {
+			newErrors.subRole = currentSubRole.error;
 		}
 
 		if (formData.password.length < 6) {
@@ -174,7 +156,7 @@ function SignUp() {
 
 	const handleSubmit = async (event) => {
 		event.preventDefault();
-		
+
 		if (!validateForm()) {
 			return;
 		}
@@ -182,18 +164,21 @@ function SignUp() {
 		setLoading(true);
 
 		try {
-			const approved = formData.cabinet === "none";
+			const { cabinet, position } = deriveRole();
+			const approved = cabinet === "none";
 			const email = formData.uflEmail.toLowerCase();
 
 			await createUserWithEmailAndPassword(auth, email, formData.password);
-			
+
 			await setDoc(doc(db, "users", email), {
 				firstName: formData.firstName.trim(),
 				lastName: formData.lastName.trim(),
 				graduationYear: formData.graduationYear,
-				cabinet: formData.cabinet,
-				position: formData.position,
+				involvement: formData.involvement,
+				cabinet: cabinet,
+				position: position,
 				approved: approved,
+				// Never granted at sign up. An admin flips this in Firestore.
 				eboard: false,
 				fallPoints: 0,
 				springPoints: 0,
@@ -232,8 +217,6 @@ function SignUp() {
 		}
 	};
 
-	const currentPositions = formData.cabinet !== 'select' ? positionOptions[formData.cabinet] || [] : [];
-
 	return (
 			<div>
 				<Header />
@@ -241,107 +224,103 @@ function SignUp() {
 					<h2>Sign Up</h2>
 					<form onSubmit={handleSubmit}>
 						{errors.general && <p className='errorMsg'>{errors.general}</p>}
-						
+
 						<p className='errorMsg'>{errors.firstName}</p>
 						<label htmlFor='firstName'>First Name/Nombre: </label><br/>
-						<input 
-							type="text" 
-							id='firstName' 
+						<input
+							type="text"
+							id='firstName'
 							placeholder='Albert'
 							value={formData.firstName}
 							onChange={(e) => handleInputChange('firstName', e.target.value)}
 						/>
-						
+
 						<p className='errorMsg'>{errors.lastName}</p>
 						<label htmlFor="lastName">Last Name/Apellido: </label><br/>
-						<input 
-							type="text" 
-							id="lastName" 
+						<input
+							type="text"
+							id="lastName"
 							placeholder='Gator'
 							value={formData.lastName}
 							onChange={(e) => handleInputChange('lastName', e.target.value)}
 						/>
-						
+
 						<p className='errorMsg'>{errors.uflEmail}</p>
 						<label htmlFor="uflEmail">UFL/SF Email: </label><br/>
-						<input 
-							type="email" 
-							id="uflEmail" 
+						<input
+							type="email"
+							id="uflEmail"
 							placeholder='albert@ufl.edu'
 							value={formData.uflEmail}
 							onChange={(e) => handleInputChange('uflEmail', e.target.value)}
 						/>
-						
+
 						<p className='errorMsg'>{errors.graduationYear}</p>
 						<label htmlFor="graduationYear">Expected Graduation Year: </label><br/>
-						<select 
-							id="graduationYear" 
+						<select
+							id="graduationYear"
 							value={formData.graduationYear}
 							onChange={(e) => handleInputChange('graduationYear', e.target.value)}
 						>
 							<option value="select">Select</option>
-							<option value="2026">2026</option>
-							<option value="2027">2027</option>
-							<option value="2028">2028</option>
-							<option value="2029">2029</option>
-							<option value="2030">2030</option>
-							<option value="N/A">N/A</option>
-						</select>{/*Requires updating every year !!*/}
-
-						<p className='errorMsg'>{errors.cabinet}</p>
-						<label htmlFor="cabinet">Involvement in HSA Cabinet:</label> <br/>
-						<select 
-							id="cabinet" 
-							value={formData.cabinet}
-							onChange={(e) => handleInputChange('cabinet', e.target.value)}
-						>
-							<option value="select">Select</option>
-							<option value="none">Not in Cabinet</option>
-							<option value="president">Presidential Cabinet</option>
-							<option value="operations">Operations Cabinet</option>
-							<option value="programming">Programming Cabinet</option>
-							<option value="communications">Communications Cabinet</option>
-							<option value="treasurey">Treasurer Cabinet</option>
-							<option value="secretary">Secretary Cabinet</option>
-							<option value="mlpFall">MLP Fall Cabinet</option>
-							<option value="mlpSpring">MLP Spring Cabinet</option>
-							<option value="opa">Office of Political Affairs</option>
-						</select>
-						
-						<p className='errorMsg'>{errors.position}</p>
-						<label htmlFor="position">Position:</label><br/>
-						<select 
-							id="position"
-							value={formData.position}
-							onChange={(e) => handleInputChange('position', e.target.value)}
-						>
-							<option value="select">Select</option>
-							{currentPositions.map(pos => (
-								<option key={pos.value} value={pos.value}>{pos.label}</option>
+							{graduationYears.map(year => (
+								<option key={year} value={year}>{year}</option>
 							))}
+							<option value="N/A">N/A</option>
 						</select>
-						
+
+						<p className='errorMsg'>{errors.involvement}</p>
+						<label htmlFor="involvement">Involvement in HSA Cabinet:</label> <br/>
+						<select
+							id="involvement"
+							value={formData.involvement}
+							onChange={(e) => handleInputChange('involvement', e.target.value)}
+						>
+							<option value="select">Select</option>
+							<option value="eboard">E-Board</option>
+							<option value="cabinet">Cabinet</option>
+							<option value="mlp">MLP</option>
+							<option value="general">General Member</option>
+						</select>
+
+						{currentSubRole && (
+							<>
+								<p className='errorMsg'>{errors.subRole}</p>
+								<label htmlFor="subRole">{currentSubRole.label}:</label><br/>
+								<select
+									id="subRole"
+									value={formData.subRole}
+									onChange={(e) => handleInputChange('subRole', e.target.value)}
+								>
+									<option value="select">Select</option>
+									{currentSubRole.options.map(option => (
+										<option key={option.value} value={option.value}>{option.label}</option>
+									))}
+								</select>
+							</>
+						)}
+
 						<p className='errorMsg'>{errors.password}</p>
 						<label htmlFor="password">Password: </label><br/>
-						<input 
-							type="password" 
+						<input
+							type="password"
 							id="password"
 							value={formData.password}
 							onChange={(e) => handleInputChange('password', e.target.value)}
 						/>
-						
+
 						<p className='errorMsg'>{errors.confirmPassword}</p>
 						<label htmlFor="confirmPassword">Confirm Password: </label><br/>
-						<input 
-							type="password" 
+						<input
+							type="password"
 							id="confirmPassword"
 							value={formData.confirmPassword}
 							onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
 						/>
-						
+
 						<div className="center">
-							<input 
-								type='submit' 
+							<input
+								type='submit'
 								value={loading ? 'Creating Account...' : 'Sign Up'}
 								disabled={loading}
 							/>
