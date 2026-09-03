@@ -12,6 +12,7 @@ const eboardPositions = [
 	{ value: 'president', label: 'President', cabinet: 'president' },
 	{ value: 'vp-operations', label: 'Vice President of Operations', cabinet: 'operations' },
 	{ value: 'vp-programming', label: 'Vice President of Programming', cabinet: 'programming' },
+	{ value: 'vp-communications', label: 'Vice President of Communications', cabinet: 'communications' },
 	{ value: 'treasurer', label: 'Treasurer', cabinet: 'treasurey' },
 	{ value: 'secretary', label: 'Secretary', cabinet: 'secretary' },
 	{ value: 'mlp-fall-ed', label: 'MLP Fall Executive Director', cabinet: 'mlpFall' },
