@@ -11,7 +11,7 @@ import Cabinet from './Cabinet';
 
 import React, { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth, db} from './firebase';
+import { auth, db } from './firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 
 function App() {
@@ -21,25 +21,20 @@ function App() {
     const [loading, setLoading] = useState(true);
     const [rolesLoaded, setRolesLoaded] = useState(false);
 
-	useEffect(() => {
-		const listen = onAuthStateChanged(auth, (user) =>{
-			if(!user)
-			{
-				setUserEmail(null);
-				signOut(auth);
-			} else {
-				setUserEmail(user.email);
-			}
-			setLoading(false);
-		});
+    useEffect(() => {
+        const listen = onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                setUserEmail(null);
+            } else {
+                setUserEmail(user.email);
+            }
+            setLoading(false);
+        });
         return () => {
             listen();
-        }
+        };
     }, []);
 
-    // Read the user's roles straight from their Firestore document.
-    // onSnapshot keeps this live, so flipping `eboard` in Firebase updates
-    // the site without the user having to sign out and back in.
     useEffect(() => {
         if (!userEmail) {
             setIsEboard(false);
@@ -69,29 +64,27 @@ function App() {
         return () => unsubscribe();
     }, [userEmail]);
 
-    // Wait for the roles before rendering routes, otherwise <Eboard> would
-    // bounce an e-board member to /dashboard before their flag arrives.
-    if (loading || (userEmail && !rolesLoaded)) {
-        return <div>Loading...</div>;
-    }
-
     return (
-        <div>
-            <Router>
-                {userEmail && <Header/>}
-                {userEmail && <NavBar eboard = {isEboard} cabinet = {isCabinetMember}/>}
-                <Routes>
-                    <Route path="/" element={<Navigate to="/login"/>} />
-                    <Route path="/signup" element={<SignUp />} />
-                    <Route path="/login" element={userEmail ? <Navigate to="/dashboard"/> : <Login />} />
-                    <Route path="/dashboard" element={userEmail ? <Dashboard cabinet ={isCabinetMember} email ={userEmail}/> : <Navigate to="/login"/>}/>
-                    <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember}/> : <Navigate to="/login"/>}/>
-                    <Route path="/eboard" element={userEmail ? <Eboard eboard ={isEboard}/> : <Navigate to="/login"/>}/>
-                    <Route path="/forgotPassword" element={<ForgotPassword/>} />
-                </Routes>
-            </Router>
-        </div>
-    )
+        <Router>
+            {loading || (userEmail && !rolesLoaded) ? (
+                <div>Loading...</div>
+            ) : (
+                <div>
+                    {userEmail && <Header />}
+                    {userEmail && <NavBar eboard={isEboard} cabinet={isCabinetMember} />}
+                    <Routes>
+                        <Route path="/" element={<Navigate to="/login" />} />
+                        <Route path="/signup" element={userEmail ? <Navigate to="/dashboard" replace /> : <SignUp />} />
+                        <Route path="/login" element={userEmail ? <Navigate to="/dashboard" replace /> : <Login />} />
+                        <Route path="/dashboard" element={userEmail ? <Dashboard cabinet={isCabinetMember} email={userEmail} /> : <Navigate to="/login" />} />
+                        <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember} /> : <Navigate to="/login" />} />
+                        <Route path="/eboard" element={userEmail ? <Eboard eboard={isEboard} /> : <Navigate to="/login" />} />
+                        <Route path="/forgotPassword" element={<ForgotPassword />} />
+                    </Routes>
+                </div>
+            )}
+        </Router>
+    );
 }
 
 export default App;
