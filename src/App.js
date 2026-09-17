@@ -10,7 +10,7 @@ import ForgotPassword from './ForgotPassword';
 import Cabinet from './Cabinet';
 
 import React, { useEffect, useState } from "react";
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged} from 'firebase/auth';
 import { auth, db } from './firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 
