@@ -8,7 +8,8 @@
 .loading-message {
     text-align: center;
     font-size: 18px;
-    color: #666;
+    color: #1e293b;
+    font-weight: 600;
     margin: 50px 0;
 }
 
@@ -19,30 +20,32 @@
     align-items: center;
     margin-bottom: 20px;
     padding: 20px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 2px solid #155776;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 2px solid #0f4c64;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
 .table-header h2 {
     margin: 0;
-    color: #155776;
+    color: #0f4c64;
+    font-weight: 700;
 }
 
 .table-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
+/* Buttons Base */
 .refresh-button, .add-button {
-    padding: 12px 20px;
-    border: 2px solid transparent;
+    padding: 12px 22px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.12);
     min-width: 140px;
     display: flex;
     align-items: center;
@@ -50,70 +53,73 @@
     gap: 8px;
 }
 
+/* Refresh Button - High Contrast Dark Slate Blue */
 .refresh-button {
-    background: #155776;
-    color: white;
-    border-color: #155776;
+    background: #0f4c64;
+    color: #ffffff;
+    border: 2px solid #0f4c64;
 }
 
 .refresh-button:hover:not(:disabled) {
-    background: #0d3f54;
-    border-color: #0d3f54;
-    transform: translateY(-2px);
+    background: #082f3f;
+    border-color: #082f3f;
+    transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-.refresh-button:disabled {
-    background: #ccc;
-    border-color: #ccc;
-    cursor: not-allowed;
-    opacity: 0.6;
-    transform: none;
-    box-shadow: none;
-}
-
+/* Force solid high-contrast green */
+.table-header .add-button,
+.table-actions .add-button,
 .add-button {
-    background: #28a745;
-    color: white;
-    border-color: #28a745;
+    background-color: #166534 !important;
+    background: #166534 !important;
+    color: #ffffff !important;
+    border: 2px solid #166534 !important;
+    font-weight: 700;
 }
 
-.add-button:hover {
-    background: #218838;
-    border-color: #1e7e34;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+.table-header .add-button:hover,
+.table-actions .add-button:hover,
+.add-button:hover:not(:disabled) {
+    background-color: #14532d !important;
+    background: #14532d !important;
+    border-color: #14532d !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
 }
 
-.add-button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* Disabled State: Dark text on light background (Never white on gray) */
+.refresh-button:disabled,
+.add-button:disabled {
+    background: #e2e8f0 !important;
+    color: #64748b !important;
+    border-color: #cbd5e1 !important;
+    cursor: not-allowed;
+    opacity: 0.85;
+    box-shadow: none;
+    transform: none;
 }
 
-.refresh-button:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* Enhanced focus states for better accessibility */
+/* Enhanced focus states for accessibility */
 .refresh-button:focus,
 .add-button:focus {
-    outline: 3px solid #ffd700;
+    outline: 3px solid #0284c7;
     outline-offset: 2px;
 }
 
 /* Add Form */
 .add-form {
-    background: white;
-    border: 2px solid #28a745;
-    border-radius: 8px;
-    padding: 20px;
+    background: #ffffff;
+    border: 2px solid #166534;
+    border-radius: 10px;
+    padding: 24px;
     margin-bottom: 30px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .add-form h3 {
-    color: #28a745;
+    color: #166534;
+    font-weight: 700;
     margin-top: 0;
     margin-bottom: 20px;
 }
@@ -136,120 +142,130 @@
 }
 
 .form-group label {
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 5px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
     font-size: 14px;
 }
 
 .form-group input,
 .form-group select {
-    padding: 10px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
+    padding: 10px 12px;
+    border: 1.5px solid #94a3b8;
+    border-radius: 6px;
     font-size: 14px;
-    transition: border-color 0.3s;
+    color: #0f172a;
+    background-color: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input::placeholder {
+    color: #64748b;
 }
 
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #155776;
+    border-color: #0f4c64;
+    box-shadow: 0 0 0 3px rgba(15, 76, 100, 0.2);
 }
 
 .checkboxes {
     flex-direction: row;
-    gap: 20px;
+    gap: 24px;
     align-items: center;
 }
 
 .checkbox-label {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-weight: 500;
+    gap: 8px;
+    font-weight: 600;
+    color: #1e293b;
     cursor: pointer;
 }
 
 .checkbox-label input[type="checkbox"] {
-    width: auto;
-    margin: 0;
+    width: 16px;
+    height: 16px;
+    accent-color: #0f4c64;
 }
 
 .voter-eligible-label {
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .checkbox-status {
-    font-weight: bold;
-    margin-left: 5px;
-    transition: color 0.3s ease;
+    font-weight: 700;
+    margin-left: 6px;
 }
 
 .checkbox-status.enabled {
-    color: #28a745;
+    color: #166534;
 }
 
 .checkbox-status.disabled {
-    color: #dc3545;
+    color: #b91c1c;
 }
 
 .form-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     justify-content: flex-end;
     margin-top: 20px;
 }
 
 .save-button, .cancel-button {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 5px;
+    padding: 10px 22px;
+    border-radius: 6px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.2s;
 }
 
 .save-button {
-    background: #28a745;
-    color: white;
+    background: #166534;
+    color: #ffffff;
+    border: 1.5px solid #166534;
 }
 
 .save-button:hover {
-    background: #218838;
+    background: #14532d;
 }
 
 .cancel-button {
-    background: #6c757d;
-    color: white;
+    background: #475569;
+    color: #ffffff;
+    border: 1.5px solid #475569;
 }
 
 .cancel-button:hover {
-    background: #5a6268;
+    background: #334155;
 }
 
 /* Table Container */
 .table-container {
-    background: white;
-    border-radius: 8px;
+    background: #ffffff;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    border: 2px solid #155776;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 2px solid #0f4c64;
 }
 
 .codes-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    color: #0f172a;
 }
 
 .codes-table th {
-    background: #155776;
-    color: white;
-    padding: 15px 10px;
+    background: #0f4c64;
+    color: #ffffff;
+    padding: 14px 12px;
     text-align: left;
-    font-weight: 600;
+    font-weight: 700;
     position: sticky;
     top: 0;
     z-index: 10;
@@ -257,252 +273,144 @@
 
 .codes-table td {
     padding: 12px 10px;
-    border-bottom: 1px solid #e1e5e9;
+    border-bottom: 1px solid #cbd5e1;
     vertical-align: middle;
 }
 
 .codes-table tr.even {
-    background-color: #f8f9fa;
+    background-color: #f8fafc;
 }
 
 .codes-table tr.odd {
-    background-color: white;
+    background-color: #ffffff;
 }
 
 .codes-table tr:hover {
-    background-color: #e3f2fd;
+    background-color: #f1f5f9;
 }
 
 .code-id {
     font-family: 'Monaco', 'Menlo', monospace;
-    font-weight: bold;
-    color: #155776;
+    font-weight: 700;
+    color: #0f4c64;
     min-width: 80px;
 }
 
-/* Edit Inputs */
+/* Edit Inputs in Table */
 .edit-input, .edit-select {
     padding: 6px 8px;
-    border: 2px solid #155776;
+    border: 1.5px solid #0f4c64;
     border-radius: 4px;
     font-size: 13px;
+    color: #0f172a;
     width: 100%;
     min-width: 100px;
 }
 
 .edit-input:focus, .edit-select:focus {
     outline: none;
-    border-color: #0d3f54;
+    border-color: #082f3f;
+    box-shadow: 0 0 0 2px rgba(15, 76, 100, 0.2);
 }
 
 .points-input {
     max-width: 80px;
 }
 
-/* Badges */
+/* Badges - Accessible High Contrast */
 .badge {
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 12px;
     font-size: 11px;
-    font-weight: bold;
+    font-weight: 700;
     text-align: center;
     display: inline-block;
-    min-width: 40px;
+    min-width: 44px;
 }
 
 .badge-yes {
-    background-color: #28a745;
-    color: white;
+    background-color: #dcfce7;
+    color: #14532d;
+    border: 1px solid #86efac;
 }
 
 .badge-no {
-    background-color: #dc3545;
-    color: white;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
 }
 
-/* Action Buttons */
+/* Action Buttons inside rows */
 .actions-cell {
     text-align: center;
     white-space: nowrap;
 }
 
 .edit-btn, .delete-btn, .save-btn, .cancel-btn {
-    padding: 6px 10px;
-    margin: 0 2px;
-    border: none;
+    padding: 6px 12px;
+    margin: 0 3px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 700;
     transition: all 0.2s;
 }
 
 .edit-btn {
-    background: #17a2b8;
-    color: white;
+    background: #0f5b7a;
+    color: #ffffff;
+    border: 1px solid #0f5b7a;
 }
 
 .edit-btn:hover {
-    background: #138496;
+    background: #0a3d52;
 }
 
 .delete-btn {
-    background: #dc3545;
-    color: white;
+    background: #b91c1c;
+    color: #ffffff;
+    border: 1px solid #b91c1c;
 }
 
 .delete-btn:hover {
-    background: #c82333;
-    transform: scale(1.1);
+    background: #991b1b;
 }
 
 .save-btn {
-    background: #28a745;
-    color: white;
-    font-weight: bold;
+    background: #166534;
+    color: #ffffff;
+    border: 1px solid #166534;
 }
 
 .save-btn:hover {
-    background: #218838;
+    background: #14532d;
 }
 
 .cancel-btn {
-    background: #6c757d;
-    color: white;
-    font-weight: bold;
+    background: #475569;
+    color: #ffffff;
+    border: 1px solid #475569;
 }
 
 .cancel-btn:hover {
-    background: #5a6268;
+    background: #334155;
 }
 
 /* No Codes Message */
 .no-codes {
     text-align: center;
     padding: 40px;
-    color: #666;
+    color: #334155;
+    font-weight: 600;
     font-size: 16px;
-    border-top: 2px solid #e1e5e9;
+    border-top: 2px solid #cbd5e1;
 }
 
-/* Responsive Design */
-@media (max-width: 1400px) {
-    .editable-codes-table {
-        padding: 15px;
-    }
-    
-    .table-container {
-        overflow-x: auto;
-    }
-}
-
-@media (max-width: 1024px) {
-    .table-header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: stretch;
-    }
-    
-    .table-actions {
-        justify-content: center;
-    }
-    
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-    
-    .codes-table {
-        font-size: 12px;
-    }
-    
-    .codes-table th,
-    .codes-table td {
-        padding: 8px 6px;
-    }
-}
-
-@media (max-width: 768px) {
-    .editable-codes-table {
-        padding: 10px;
-    }
-    
-    .checkboxes {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-    }
-    
-    .edit-input {
-        min-width: 80px;
-    }
-    
-    .codes-table {
-        font-size: 11px;
-    }
-    
-    .actions-cell {
-        white-space: normal;
-    }
-    
-    .edit-btn, .delete-btn, .save-btn, .cancel-btn {
-        padding: 4px 6px;
-        font-size: 12px;
-        margin: 1px;
-    }
-    
-    .refresh-button, .add-button {
-        padding: 10px 16px;
-        font-size: 13px;
-        min-width: 120px;
-    }
-    
-    .table-actions {
-        flex-direction: column;
-        gap: 10px;
-        width: 100%;
-    }
-    
-    .refresh-button, .add-button {
-        width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .table-header h2 {
-        font-size: 18px;
-    }
-    
-    .add-button, .refresh-button {
-        padding: 12px 16px;
-        font-size: 14px;
-        font-weight: 700;
-    }
-    
-    .codes-table th,
-    .codes-table td {
-        padding: 6px 4px;
-    }
-}
-
-/* Loading states */
-.refresh-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Hover effects */
-.codes-table tbody tr:hover .edit-btn,
-.codes-table tbody tr:hover .delete-btn {
-    transform: scale(1.05);
-}
-
-/* Focus states for accessibility */
+/* Accessibility Focus */
 .edit-btn:focus,
 .delete-btn:focus,
 .save-btn:focus,
 .cancel-btn:focus {
-    outline: 2px solid #155776;
+    outline: 2px solid #0f4c64;
     outline-offset: 2px;
 }
