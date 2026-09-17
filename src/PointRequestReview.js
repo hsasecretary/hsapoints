@@ -132,9 +132,24 @@ function PointRequestReview() {
         }
     };
 
-    const openImageModal = (imageData) => {
-        setSelectedImage(imageData);
-    };
+    const getImageSource = (request) => {
+    return request.imageData || 
+           request.imageUrl || 
+           request.photoUrl || 
+           request.photoURL || 
+           request.imageURL || 
+           request.image || 
+           null;
+};
+
+const openImageModal = (request) => {
+    const imgSrc = getImageSource(request);
+    if (!imgSrc) {
+        alert("No photo evidence was attached to this request.");
+        return;
+    }
+    setSelectedImage(imgSrc);
+};
 
     const closeImageModal = () => {
         setSelectedImage(null);
@@ -225,12 +240,29 @@ function PointRequestReview() {
                             </div>
 
                             <div className="request-image">
-                                <button 
-                                    onClick={() => openImageModal(request.imageData)}
-                                    className="view-image-button"
-                                >
-                                    📷 View Photo Evidence
-                                </button>
+                                {getImageSource(request) ? (
+                                    <button 
+                                        type="button"
+                                        onClick={() => openImageModal(request)}
+                                        className="view-image-button"
+                                    >
+                                        📷 View Photo Evidence
+                                    </button>
+                                ) : (
+                                    <button 
+                                        type="button"
+                                        disabled
+                                        className="view-image-button"
+                                        style={{ 
+                                            backgroundColor: '#e2e8f0', 
+                                            color: '#64748b', 
+                                            border: '1.5px solid #cbd5e1', 
+                                            cursor: 'not-allowed' 
+                                        }}
+                                    >
+                                        🚫 No Photo Attached
+                                    </button>
+                                )}
                             </div>
 
                             {request.status === 'pending' && (
