@@ -41,7 +41,6 @@ export default function PointsOverview({ refreshKey = 0, eventCodeForm }: Points
 							lastName: userData.lastName || 'N/A',
 							email: email,
 							cabinet: userData.cabinet || 'none',
-							position: userData.position || '',
 							approved: userData.approved || false,
 							eboard: userData.eboard || false,
 							generalMember: isGeneralMember(userData)
@@ -169,8 +168,6 @@ export default function PointsOverview({ refreshKey = 0, eventCodeForm }: Points
 							<strong>Account Type:</strong> {formatAccountType(userInfo.cabinet)}
 							{!userInfo.generalMember && ` (E-Board: ${userInfo.eboard ? 'Yes' : 'No'})`}
 						</div>
-						{/* Sign-up only asks e-board members for a position, so only show it when there is one */}
-						{userInfo.position && <div><strong>Position:</strong> {userInfo.position}</div>}
 						{/* <div><strong>Status:</strong> {userInfo.approved ? 'Approved' : 'Pending'}</div> */}
 					</div>
 				</div>
