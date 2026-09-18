@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { db } from '../../lib/firebase';
-import SectionTitle from '../../components/ui/SectionTitle';
+import { db } from '../../../lib/firebase';
+import SectionTitle from '../../../components/ui/SectionTitle';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { auth } from '../../lib/firebase';
+import { auth } from '../../../lib/firebase';
 
-function PointRequest() {
+function PointRequestForm() {
     const [formData, setFormData] = useState({
         activityType: '',
         customActivityName: '',
@@ -389,4 +389,4 @@ function PointRequest() {
     );
 }
 
-export default PointRequest;
+export default PointRequestForm;

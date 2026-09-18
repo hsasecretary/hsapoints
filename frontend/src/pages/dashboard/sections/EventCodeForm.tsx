@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { auth, db} from '../../lib/firebase';
-import SectionTitle from '../../components/ui/SectionTitle';
+import { auth, db} from '../../../lib/firebase';
+import SectionTitle from '../../../components/ui/SectionTitle';
 import { doc, getDoc, arrayUnion, updateDoc } from 'firebase/firestore';
 
-function Attendance({ onPointsUpdate }) {
+function EventCodeForm({ onPointsUpdate }) {
     const [code, setCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
@@ -422,4 +422,4 @@ function Attendance({ onPointsUpdate }) {
     );
 }
 
-export default Attendance;
+export default EventCodeForm;

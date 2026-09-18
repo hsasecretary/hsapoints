@@ -150,7 +150,8 @@ hsapoints/
         ├── App.tsx            # Router, auth state, page layout (header, nav, footer)
         ├── pages/             # One folder per area of the site
         │   ├── auth/          # Login, SignUp, ForgotPassword
-        │   ├── dashboard/     # Dashboard, Attendance, Points, PointRequest
+        │   ├── dashboard/     # Dashboard.tsx + sections/ (PointsOverview, EventCodeForm,
+        │   │                  #   EventsAttendedList, PointRequestForm)
         │   ├── cabinet/       # Cabinet, CabinetPoints
         │   ├── eboard/        # Eboard and its tools (codes, requests, lookups, approvals)
         │   └── NotFound.tsx   # 404 page

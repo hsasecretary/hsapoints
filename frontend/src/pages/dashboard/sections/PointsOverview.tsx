@@ -1,20 +1,20 @@
 import React, { useEffect, useState, type ReactNode } from "react";
-import { auth, db } from '../../lib/firebase';
-import { isGeneralMember } from '../../lib/members';
-import SectionTitle from '../../components/ui/SectionTitle';
+import { auth, db } from '../../../lib/firebase';
+import { isGeneralMember } from '../../../lib/members';
+import SectionTitle from '../../../components/ui/SectionTitle';
 import EventsAttendedList from './EventsAttendedList';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
-type PointsProps = {
+type PointsOverviewProps = {
 	/** Bump to re-fetch points (e.g. after an attendance code is accepted). */
 	refreshKey?: number;
-	/** Rendered between Points Summary and Points by Category (the attendance form). */
-	beforeCategories?: ReactNode;
+	/** The "Have an Event Code?" form, rendered between Points Summary and My Events Attended. */
+	eventCodeForm?: ReactNode;
 };
 
-export default function Points({ refreshKey = 0, beforeCategories }: PointsProps) {
+export default function PointsOverview({ refreshKey = 0, eventCodeForm }: PointsOverviewProps) {
 	const [userInfo, setUserInfo] = useState(null);
 	const [userPoints, setUserPoints] = useState(null);
 	const [eventBreakdown, setEventBreakdown] = useState([]);
@@ -136,7 +136,7 @@ export default function Points({ refreshKey = 0, beforeCategories }: PointsProps
 		return (
 			<div className="user-points-lookup">
 				<div className="loading-message">Loading your points...</div>
-				{beforeCategories}
+				{eventCodeForm}
 			</div>
 		);
 	}
@@ -145,7 +145,7 @@ export default function Points({ refreshKey = 0, beforeCategories }: PointsProps
 		return (
 			<div className="user-points-lookup">
 				<div className="loading-message">Unable to load your points data</div>
-				{beforeCategories}
+				{eventCodeForm}
 			</div>
 		);
 	}
@@ -211,7 +211,7 @@ export default function Points({ refreshKey = 0, beforeCategories }: PointsProps
 					)}
 				</div>
 
-				{beforeCategories}
+				{eventCodeForm}
 
 				<div className="event-breakdown">
 					<SectionTitle>My Events Attended ({eventBreakdown.length})</SectionTitle>
