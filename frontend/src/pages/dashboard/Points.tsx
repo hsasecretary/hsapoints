@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { auth, db } from '../../lib/firebase';
+import { isGeneralMember } from '../../lib/members';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -32,7 +33,8 @@ export default function Points() {
 							cabinet: userData.cabinet || 'none',
 							position: userData.position || 'N/A',
 							approved: userData.approved || false,
-							eboard: userData.eboard || false
+							eboard: userData.eboard || false,
+							generalMember: isGeneralMember(userData)
 						});
 
 						// Calculate points breakdown
@@ -146,9 +148,9 @@ export default function Points() {
 						<div><strong>Name:</strong> {userInfo.firstName} {userInfo.lastName}</div>
 						<div><strong>Email:</strong> {userInfo.email}</div>
 						<div><strong>Cabinet:</strong> {userInfo.cabinet === 'none' ? 'General Member' : userInfo.cabinet}</div>
-						<div><strong>Position:</strong> {userInfo.position}</div>
+						{!userInfo.generalMember && <div><strong>Position:</strong> {userInfo.position}</div>}
 						<div><strong>Status:</strong> {userInfo.approved ? 'Approved' : 'Pending'}</div>
-						<div><strong>E-Board:</strong> {userInfo.eboard ? 'Yes' : 'No'}</div>
+						{!userInfo.generalMember && <div><strong>E-Board:</strong> {userInfo.eboard ? 'Yes' : 'No'}</div>}
 					</div>
 				</div>
 
