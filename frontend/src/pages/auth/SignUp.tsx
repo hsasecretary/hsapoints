@@ -31,7 +31,7 @@ const cabinets = [
     { value: 'opa', label: 'Office of Political Affairs' }
 ];
 
-const graduationYears = Array.from({ length: 5 }, (_, i) => String(new Date().getFullYear() + i));
+const graduationYears = Array.from({ length: 6 }, (_, i) => String(new Date().getFullYear() + i));
 
 const subRoleConfig = {
     eboard: {
@@ -275,10 +275,10 @@ function SignUp() {
                         onChange={(e) => handleInputChange('involvement', e.target.value)}
                     >
                         <option value="select">Select</option>
+                        <option value="general">General member</option>
+                        <option value="mlp">MLP general member</option>
                         <option value="eboard">E-Board</option>
                         <option value="cabinet">Cabinet</option>
-                        <option value="mlp">MLP</option>
-                        <option value="general">General Member</option>
                     </select>
 
                     {currentSubRole && (

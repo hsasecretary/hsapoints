@@ -31,10 +31,18 @@ function ForgotPassword() {
 						<label htmlFor="uflEmail">UFL Email: </label><br/>
 						<input type="text" id="uflEmail" placeholder='albert@ufl.edu'></input>
 						<div className="center"><input type='submit' value='Reset'></input></div>
-						<div className="center"><a href="./SignUp">New? Create an account</a></div> 
-						<div className="center"><a href="/login">Remember Your Password? Login</a></div>
 						<br/>
 					</form>
+
+					{/* Same link block as the Login page */}
+					<div className="login-links">
+						<div className="link-item">
+							<a href="/signup" className="signup-link">New? Create an account</a>
+						</div>
+						<div className="link-item">
+							<a href="/login" className="forgot-link">Remember your password? Log in</a>
+						</div>
+					</div>
 				</div>
 			</div>
 	);
