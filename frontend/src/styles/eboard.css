@@ -2,6 +2,36 @@
    E-Board page (/eboard)
    ======================================================================== */
 
+/* ---- Shortcut buttons at the top of the page  (Eboard.tsx) -------------- */
+.eboard-shortcuts {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 24px auto 8px;
+    padding: 0 16px;
+}
+
+.eboard-shortcuts__button {
+    display: inline-block;
+    padding: 10px 22px;
+    border: 2px solid #0f4c64;
+    border-radius: 8px;
+    background: #0f4c64;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.eboard-shortcuts__button:hover {
+    background: #082f3f;
+    border-color: #082f3f;
+    transform: translateY(-1px);
+}
+
 /* ---- Create New Event Code  (CreateCode.tsx) --------------------------------------- */
 
 /* CreateCode Modern Styles */

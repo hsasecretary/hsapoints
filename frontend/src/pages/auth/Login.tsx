@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signInWithEmailAndPassword} from 'firebase/auth';
-import Header from '../../components/layout/Header';
 
 function Login() {
 	const auth = getAuth();
@@ -21,7 +20,6 @@ function Login() {
 	
 	return (
 		<div>
-			<Header />
 			<div className="form login-form">
 				<h2>Login</h2>
 				<form onSubmit={check} className="login-form-content">

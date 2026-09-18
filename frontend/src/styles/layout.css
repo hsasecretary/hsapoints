@@ -1,123 +1,187 @@
 /* ========================================================================
-   Page frame shown on every page — title banner, nav bar, logout
+   Page frame shown on every page — site header, footer, 404 page
    ======================================================================== */
 
-/* ---- Logout button  (Logout.tsx) ----------------------------------------------- */
-
-.logout-container {
-    display: flex;
-    justify-content: flex-end;
-    padding: 20px 25px 15px 25px;
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 10px;
-}
-
-.logout-button {
-    background-color: #f2f6f8;
-    border: 2px solid #155776;
-    border-radius: 8px;
-    padding: 12px 25px;
-    font-size: 1.2em;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    color: #155776;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    min-width: auto;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    letter-spacing: 0.5px;
-}
-
-.logout-button:hover {
-    background-color: #cf6d6d;
-    border-color: #bc0e0e;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.logout-button:active {
-    background-color: #bc0e0e;
-    transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-}
-
-/* ---- Title banner text (the blue bar itself is .brand-bar in base.css)  (Header.tsx) ---- */
-
-/* Title banner ("Hispanic-Latine Student Association"). The blue bar itself
-   is .brand-bar in index.css, shared with the NavBar. */
+/* ---- Site header (SiteHeader.tsx) ---------------------------------------
+   Logo + title on the left (links to /dashboard), nav links, Logout on the
+   right. Below 900px the links and Logout move into a dropdown menu. */
 .site-header {
-    overflow: hidden;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: linear-gradient(135deg, #0f4c64 0%, #155776 100%);
+    border-bottom: 3px solid #ffffff;
+    box-shadow: 0 4px 14px rgba(15, 76, 100, 0.25);
 }
 
-.site-header h1 {
-    font-size: 3.2em;
-    text-align: center;
-    color: white;
-    margin: 0;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    position: relative;
-    z-index: 1;
+.site-header__bar {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 10px 24px;
+    min-height: 68px;
 }
 
-@media (max-width: 768px) {
-    .site-header h1 {
-        font-size: 2.4em;
-        letter-spacing: 1px;
-        font-weight: 700;
+.site-header__brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #ffffff;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.site-header__brand img {
+    width: 52px;
+    height: auto;
+    display: block;
+}
+
+.site-header__title {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+}
+
+.site-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    flex: 1;
+}
+
+.site-header__link {
+    color: rgba(255, 255, 255, 0.82);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 4px 0;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.site-header__link:hover,
+.site-header__link.is-active {
+    color: #ffffff;
+    border-bottom-color: rgba(255, 255, 255, 0.85);
+}
+
+/* Boxed like the site's other secondary buttons, in white on the teal bar */
+.site-header__logout {
+    margin-left: auto;
+    min-width: 0;
+    min-height: 0;
+    padding: 8px 18px;
+    border: 2px solid #ffffff;
+    border-radius: 8px;
+    background: transparent;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.site-header__logout:hover {
+    background: #ffffff;
+    color: #0f4c64;
+    border-color: #ffffff;
+    box-shadow: none;
+    transform: translateY(-1px);
+}
+
+.site-header__logout:active {
+    background: #e2e8f0;
+    color: #0f4c64;
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.site-header__menu-toggle {
+    display: none;
+    margin-left: auto;
+    min-width: 0;
+    min-height: 0;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.site-header__menu-toggle:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: #ffffff;
+    box-shadow: none;
+}
+
+.site-header__menu-toggle svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+    margin: 0 auto;
+}
+
+.site-header__menu {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 16px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.site-header__menu-link {
+    padding: 12px 10px;
+    border-radius: 8px;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.site-header__menu-link:hover,
+.site-header__menu-link.is-active {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.site-header__logout--menu {
+    margin: 10px 0 0;
+    padding: 12px;
+    font-size: 15px;
+}
+
+@media (max-width: 900px) {
+    .site-header__nav,
+    .site-header__bar > .site-header__logout {
+        display: none;
+    }
+
+    .site-header__menu-toggle {
+        display: block;
     }
 }
 
 @media (max-width: 480px) {
-    .site-header h1 {
-        font-size: 1.9em;
-        line-height: 1.2;
-        letter-spacing: 0.5px;
-        font-weight: 600;
-    }
-}
-
-/* ---- Nav bar links  (NavBar.tsx) ----------------------------------------------- */
-
-.nav-bar {
-    display: flex;
-    justify-content: center;
-}
-
-.nav-bar ul {
-    list-style: none;
-    padding: 0 10px;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    row-gap: 8px;
-}
-
-.nav-bar li {
-    margin: 0 15px;
-}
-
-.nav-bar a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-}
-
-.nav-bar a:hover {
-    color: #ddd;
-}
-
-@media (max-width: 600px) {
-    .nav-bar li {
-        margin: 0 8px;
+    .site-header__bar {
+        padding: 8px 14px;
+        gap: 12px;
+        min-height: 60px;
     }
 
-    .nav-bar a {
-        font-size: 15px;
+    .site-header__brand img {
+        width: 42px;
+    }
+
+    .site-header__title {
+        font-size: 14px;
     }
 }
 

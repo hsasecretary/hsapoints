@@ -1,15 +1,14 @@
 import CreateCode from './CreateCode';
-import Logout from '../../components/layout/Logout';
 import ApprovedCabinet from './ApprovedCabinet';
 import ExcuseAbscense from './ExcuseAbscense';
 import UserPointsLookup from './UserPointsLookup';
 import PointRequestReview from './PointRequestReview';
 import EditableCodesTable from './EditableCodesTable';
 import scrapeCabinetRoles from '../../lib/admin/scrapeCabinetRoles';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 
-function Eboard({ eboard }) {
+function Eboard({ eboard, cabinet }) {
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -36,7 +35,12 @@ function Eboard({ eboard }) {
 
   return (
     <div>
-      <br /><Logout />
+      {/* Cabinet points used to be its own nav tab; for now it lives here. */}
+      {isEboard(eboard) && cabinet && (
+        <div className="eboard-shortcuts">
+          <Link to="/cabinet" className="eboard-shortcuts__button">View Cabinet Points</Link>
+        </div>
+      )}
       {isEboard(eboard) && <CreateCode />}
       <br />
       

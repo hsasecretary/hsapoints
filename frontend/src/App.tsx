@@ -3,8 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import SignUp from './pages/auth/SignUp';
 import Login from './pages/auth/Login';
 import Dashboard from './pages/dashboard/Dashboard';
-import Header from './components/layout/Header';
-import NavBar from './components/layout/NavBar';
+import SiteHeader from './components/layout/SiteHeader';
 import Footer from './components/layout/Footer';
 import NotFound from './pages/NotFound';
 import Eboard from './pages/eboard/Eboard';
@@ -72,19 +71,18 @@ function App() {
                 <div>Loading...</div>
             ) : (
                 <div className="app-shell">
-                    {userEmail && <Header />}
-                    {userEmail && <NavBar eboard={isEboard} cabinet={isCabinetMember} />}
+                    <SiteHeader signedIn={!!userEmail} eboard={isEboard} />
                     <Routes>
                         <Route path="/" element={<Navigate to="/login" />} />
                         <Route path="/signup" element={userEmail ? <Navigate to="/dashboard" replace /> : <SignUp />} />
                         <Route path="/login" element={userEmail ? <Navigate to="/dashboard" replace /> : <Login />} />
                         <Route path="/dashboard" element={userEmail ? <Dashboard cabinet={isCabinetMember} email={userEmail} /> : <Navigate to="/login" />} />
                         <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember} /> : <Navigate to="/login" />} />
-                        <Route path="/eboard" element={userEmail ? <Eboard eboard={isEboard} /> : <Navigate to="/login" />} />
+                        <Route path="/eboard" element={userEmail ? <Eboard eboard={isEboard} cabinet={isCabinetMember} /> : <Navigate to="/login" />} />
                         <Route path="/forgotPassword" element={<ForgotPassword />} />
-                        <Route path="*" element={<NotFound signedIn={!!userEmail} />} />
+                        <Route path="*" element={<NotFound />} />
                     </Routes>
-                    <Footer signedIn={!!userEmail} eboard={isEboard} cabinet={isCabinetMember} />
+                    <Footer signedIn={!!userEmail} eboard={isEboard} />
                 </div>
             )}
         </Router>

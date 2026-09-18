@@ -1,6 +1,5 @@
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
-import Header from '../../components/layout/Header';
 
 function ForgotPassword() {
 	function check(event) 
@@ -25,7 +24,6 @@ function ForgotPassword() {
     }
 	return (
 			<div>
-				<Header />
 				<div className="form">
 					<h2>Forgot Password</h2>
 					<form onSubmit={check}>
