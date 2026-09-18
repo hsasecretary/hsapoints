@@ -1,8 +1,15 @@
 import { useState } from 'react';
 import { db } from '../../lib/firebase';
+import ChoiceGroup from '../../components/ui/ChoiceGroup';
+import { currentSemester } from '../../lib/semester';
 import { setDoc, doc, collection, getDocs } from 'firebase/firestore';
 
-function CreateCode() {
+type CreateCodeProps = {
+    /** Called with the new code (e.g. "GOLAZO") after it's saved. */
+    onCreated?: (code: string) => void;
+};
+
+function CreateCode({ onCreated }: CreateCodeProps) {
     const [formData, setFormData] = useState({
         eventName: '',
         eventCode: '',
@@ -10,7 +17,7 @@ function CreateCode() {
         eventDate: '',
         graphicDate: '',
         points: '',
-        semester: 'springPoints',
+        semester: currentSemester(),
         voterEligible: true,  // Changed to true by default
         cabinetRequired: false,
         noGraphic: false
@@ -134,7 +141,7 @@ function CreateCode() {
                 eventDate: '',
                 graphicDate: '',
                 points: '',
-                semester: 'springPoints',
+                semester: currentSemester(),
                 voterEligible: true,  // Changed to true by default
                 cabinetRequired: false,
                 noGraphic: false
@@ -144,6 +151,8 @@ function CreateCode() {
                 text: `Event code "${formData.eventCode.toUpperCase()}" created successfully!`, 
                 type: 'success' 
             });
+
+            onCreated?.(formData.eventCode.trim().toUpperCase());
 
         } catch (error) {
             console.error('Error creating code:', error);
@@ -194,6 +203,16 @@ function CreateCode() {
 
                 <div className="form-row">
                     <div className="form-group">
+                        <label htmlFor="eventDate">Event Date</label>
+                        <input
+                            type="date"
+                            id="eventDate"
+                            value={formData.eventDate}
+                            onChange={(e) => handleInputChange('eventDate', e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
                         <label htmlFor="category">Category</label>
                         <select
                             id="category"
@@ -207,42 +226,6 @@ function CreateCode() {
                             ))}
                         </select>
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="points">Points</label>
-                        <input
-                            type="number"
-                            id="points"
-                            value={formData.points}
-                            onChange={(e) => handleInputChange('points', e.target.value)}
-                            min="0"
-                            max="10"
-                            required
-                        />
-                    </div>
-                </div>
-
-                <div className="form-row">
-                    <div className="form-group">
-                        <label htmlFor="eventDate">Event Date</label>
-                        <input
-                            type="date"
-                            id="eventDate"
-                            value={formData.eventDate}
-                            onChange={(e) => handleInputChange('eventDate', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="semester">Semester</label>
-                        <select
-                            id="semester"
-                            value={formData.semester}
-                            onChange={(e) => handleInputChange('semester', e.target.value)}
-                        >
-                            <option value="fallPoints">Fall</option>
-                            <option value="springPoints">Spring</option>
-                        </select>
-                    </div>
                 </div>
 
                 <div className="form-row">
@@ -254,6 +237,33 @@ function CreateCode() {
                             value={formData.graphicDate}
                             onChange={(e) => handleInputChange('graphicDate', e.target.value)}
                             disabled={formData.noGraphic}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="points-0" id="points-label">Points</label>
+                        <ChoiceGroup
+                            name="points"
+                            labelledBy="points-label"
+                            options={['0', '1', '2', '3'].map((n) => ({ value: n, label: n }))}
+                            value={formData.points}
+                            onChange={(value) => handleInputChange('points', value)}
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label htmlFor="semester-fallPoints" id="semester-label">Semester</label>
+                        <ChoiceGroup
+                            name="semester"
+                            labelledBy="semester-label"
+                            options={[
+                                { value: 'fallPoints', label: 'Fall' },
+                                { value: 'springPoints', label: 'Spring' },
+                            ]}
+                            value={formData.semester}
+                            onChange={(value) => handleInputChange('semester', value)}
                         />
                     </div>
                     <div className="form-group checkbox-group">
@@ -279,7 +289,7 @@ function CreateCode() {
                                 checked={formData.voterEligible}
                                 onChange={(e) => handleInputChange('voterEligible', e.target.checked)}
                             />
-                            Voter Eligible to Vote
+                            Voter Eligible?
                         </label>
                     </div>
                 </div>

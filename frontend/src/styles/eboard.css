@@ -2,36 +2,6 @@
    E-Board page (/eboard)
    ======================================================================== */
 
-/* ---- Shortcut buttons at the top of the page  (Eboard.tsx) -------------- */
-.eboard-shortcuts {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin: 24px auto 8px;
-    padding: 0 16px;
-}
-
-.eboard-shortcuts__button {
-    display: inline-block;
-    padding: 10px 22px;
-    border: 2px solid #0f4c64;
-    border-radius: 8px;
-    background: #0f4c64;
-    color: #ffffff;
-    font-size: 15px;
-    font-weight: 700;
-    text-decoration: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-    transition: background-color 0.2s, transform 0.2s;
-}
-
-.eboard-shortcuts__button:hover {
-    background: #082f3f;
-    border-color: #082f3f;
-    transform: translateY(-1px);
-}
-
 /* ---- Create New Event Code  (CreateCode.tsx) --------------------------------------- */
 
 /* CreateCode Modern Styles */
@@ -202,38 +172,220 @@
 
 /* ---- Pending cabinet approvals  (ApprovedCabinet.tsx) ----------------------------------- */
 
-#approvedCabinetContainer .head {
-    background-color: #155776;
+/* Same look as Manage Event Codes (EditableCodesTable). */
+#approvedCabinetContainer.approvals {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-#approvedCabinetContainer .even {
-    background-color: #c5e5f3;
+#approvedCabinetContainer .approvals__header {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #ffffff;
+    border: 2px solid #0f4c64;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    text-align: center;
 }
 
-#approvedCabinetContainer .odd {
-    background-color: #eef0ee;
+#approvedCabinetContainer .approvals__header h2 {
+    margin: 0 0 6px;
+    color: #0f4c64;
+    font-weight: 700;
 }
 
-#approvedCabinetContainer table {
-    margin:auto;
-    margin-top: 5%;
-    width:85%;
-    border-collapse:collapse;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1), 0 6px 20px 0 rgba(0,0,0,0.19);
+#approvedCabinetContainer .approvals__count {
+    margin: 0;
+    color: #475569;
+    font-weight: 600;
+}
+
+#approvedCabinetContainer .approvals__table-container {
+    background: #ffffff;
+    border: 2px solid #0f4c64;
+    border-radius: 10px;
     overflow-x: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+#approvedCabinetContainer .approvals__table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+    box-shadow: none;
+    font-size: 14px;
+    color: #0f172a;
+}
+
+#approvedCabinetContainer .approvals__table th {
+    padding: 14px 12px;
+    background: #0f4c64;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: left;
+    border: none;
+}
+
+#approvedCabinetContainer .approvals__table td {
+    padding: 12px 10px;
+    font-size: 14px;
+    border: none;
+    border-bottom: 1px solid #cbd5e1;
+    vertical-align: middle;
+}
+
+#approvedCabinetContainer .approvals__table tr.even {
+    background-color: #f8fafc;
+}
+
+#approvedCabinetContainer .approvals__table tr.odd {
+    background-color: #ffffff;
+}
+
+#approvedCabinetContainer .approvals__table tr:hover {
+    background-color: #f1f5f9;
+}
+
+#approvedCabinetContainer .approvals__email {
+    font-weight: 600;
+    word-break: break-all;
+}
+
+#approvedCabinetContainer .approvals__actions {
+    white-space: nowrap;
+    text-align: right;
+}
+
+#approvedCabinetContainer .approvals__approve,
+#approvedCabinetContainer .approvals__deny {
+    min-width: 0;
+    min-height: 0;
+    margin: 0 3px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#approvedCabinetContainer .approvals__approve {
+    background: #166534;
+    border: 1px solid #166534;
+}
+
+#approvedCabinetContainer .approvals__approve:hover {
+    background: #14532d;
+    border-color: #14532d;
+    box-shadow: none;
+}
+
+#approvedCabinetContainer .approvals__deny {
+    background: #b91c1c;
+    border: 1px solid #b91c1c;
+}
+
+#approvedCabinetContainer .approvals__deny:hover {
+    background: #991b1b;
+    border-color: #991b1b;
+    box-shadow: none;
+}
+
+/* Phones: one card per member with full-width Approve / Deny */
+@media (max-width: 768px) {
+    #approvedCabinetContainer.approvals {
+        padding: 12px 6px;
+    }
+
+    #approvedCabinetContainer .approvals__table-container {
+        overflow: visible;
+        border: none;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    #approvedCabinetContainer .approvals__table,
+    #approvedCabinetContainer .approvals__table tbody {
+        display: block;
+    }
+
+    #approvedCabinetContainer .approvals__table thead {
+        display: none;
+    }
+
+    #approvedCabinetContainer .approvals__table tr,
+    #approvedCabinetContainer .approvals__table tr.even,
+    #approvedCabinetContainer .approvals__table tr.odd {
+        display: block;
+        margin-bottom: 10px;
+        padding: 12px;
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 8px;
+    }
+
+    #approvedCabinetContainer .approvals__table td {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 6px 0;
+        border-bottom: 1px solid #eef2f6;
+    }
+
+    #approvedCabinetContainer .approvals__table td[data-label]::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #475569;
+        flex-shrink: 0;
+    }
+
+    #approvedCabinetContainer .approvals__email {
+        text-align: right;
+    }
+
+    #approvedCabinetContainer .approvals__table td.approvals__actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding-top: 12px;
+        border-bottom: none;
+        text-align: center;
+    }
+
+    #approvedCabinetContainer .approvals__approve,
+    #approvedCabinetContainer .approvals__deny {
+        margin: 0;
+        padding: 10px;
+        font-size: 14px;
+    }
 }
 
 /* ---- Excuse absence  (ExcuseAbscense.tsx) ---------------------------------------------- */
 
-.attendanceForm label {
-    margin-left: 10px;
+.excuse-absence .excuse-absence__form h3 {
+    margin-top: 0;
 }
 
-#backToUserEmail {
-    font-size: 1em;
-    min-width: 5em;
-    border-color: #155776;
-    margin-bottom: .5em;
+.excuse-absence .excuse-absence__form .user-info-grid {
+    margin-bottom: 16px;
+}
+
+.excuse-absence .excuse-absence__form .form-group {
+    margin-bottom: 12px;
+}
+
+.excuse-absence .excuse-absence__actions {
+    margin-top: 8px;
+}
+
+/* The step-2 card is a <form>; make it full width like the lookup's cards */
+.excuse-absence .excuse-absence__form {
+    width: auto;
+    margin: 0;
 }
 
 /* ---- Member points lookup (scoped to .user-points-lookup)  (UserPointsLookup.tsx) -------- */
@@ -944,7 +1096,6 @@
 }
 
 /* ---- Manage Event Codes table  (EditableCodesTable.tsx) ------------------------------------ */
-
 /* EditableCodesTable Styles */
 .editable-codes-table {
     max-width: 1600px;
@@ -952,65 +1103,8 @@
     padding: 20px;
 }
 
-/* Table Header */
-/* Title centered on top, buttons in an even row underneath */
-.editable-codes-table .table-header {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-    margin-bottom: 20px;
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 10px;
-    border: 2px solid #0f4c64;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-}
-
-.editable-codes-table .table-header h2 {
-    margin: 0;
-    text-align: center;
-    color: #0f4c64;
-    font-weight: 700;
-}
-
-.editable-codes-table .table-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    width: 100%;
-    max-width: 480px;
-    margin: 0 auto;
-}
-
-/* Fill their grid cell and allow shrinking below the 140px minimum below,
-   so the two buttons always fit side by side. */
-.editable-codes-table .table-actions .refresh-button,
-.editable-codes-table .table-actions .add-button {
-    width: 100%;
-    min-width: 0;
-}
-
-@media (max-width: 600px) {
-    .editable-codes-table .table-header {
-        padding: 16px 12px;
-    }
-
-    .editable-codes-table .table-actions {
-        gap: 8px;
-    }
-
-    .editable-codes-table .table-actions .refresh-button,
-    .editable-codes-table .table-actions .add-button {
-        padding: 10px 6px;
-        font-size: 15px;
-        gap: 6px;
-    }
-}
-
 /* Buttons Base */
-.editable-codes-table .refresh-button,
-.editable-codes-table .add-button {
+.editable-codes-table .refresh-button {
     padding: 12px 22px;
     border-radius: 8px;
     font-size: 14px;
@@ -1039,23 +1133,8 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* Add New Code - solid high-contrast green */
-.editable-codes-table .add-button {
-    background: #166534;
-    color: #ffffff;
-    border: 2px solid #166534;
-    font-weight: 700;
-}
-
-.editable-codes-table .add-button:hover:not(:disabled) {
-    background: #14532d;
-    border-color: #14532d;
-    transform: translateY(-1px);
-}
-
 /* Disabled State: Dark text on light background (Never white on gray) */
-.editable-codes-table .refresh-button:disabled,
-.editable-codes-table .add-button:disabled {
+.editable-codes-table .refresh-button:disabled {
     background: #e2e8f0;
     color: #64748b;
     border-color: #cbd5e1;
@@ -1066,103 +1145,13 @@
 }
 
 /* Enhanced focus states for accessibility */
-.editable-codes-table .refresh-button:focus,
-.editable-codes-table .add-button:focus {
+.editable-codes-table .refresh-button:focus {
     outline: 3px solid #0284c7;
     outline-offset: 2px;
 }
 
-/* Add Form */
-.editable-codes-table .add-form {
-    background: #ffffff;
-    border: 2px solid #166534;
-    border-radius: 10px;
-    padding: 24px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.editable-codes-table .add-form h3 {
-    color: #166534;
-    font-weight: 700;
-    margin-top: 0;
-    margin-bottom: 20px;
-}
-
-.editable-codes-table .new-code-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.editable-codes-table .checkboxes {
-    flex-direction: row;
-    gap: 24px;
-    align-items: center;
-}
-
-.editable-codes-table .checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-}
-
-.editable-codes-table .checkbox-label input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: #0f4c64;
-}
-
 .editable-codes-table .voter-eligible-label {
     font-weight: 700;
-}
-
-.editable-codes-table .checkbox-status {
-    font-weight: 700;
-    margin-left: 6px;
-}
-
-.editable-codes-table .checkbox-status.enabled {
-    color: #166534;
-}
-
-.editable-codes-table .checkbox-status.disabled {
-    color: #b91c1c;
-}
-
-.editable-codes-table .form-actions {
-    justify-content: flex-end;
-}
-
-.editable-codes-table .save-button,
-.editable-codes-table .cancel-button {
-    padding: 10px 22px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.editable-codes-table .save-button {
-    background: #166534;
-    color: #ffffff;
-    border: 1.5px solid #166534;
-}
-
-.editable-codes-table .save-button:hover {
-    background: #14532d;
-}
-
-.editable-codes-table .cancel-button {
-    background: #475569;
-    color: #ffffff;
-    border: 1.5px solid #475569;
-}
-
-.editable-codes-table .cancel-button:hover {
-    background: #334155;
 }
 
 /* Table Container */
@@ -1348,10 +1337,25 @@
 ------------------------------------------------------------------------ */
 .editable-codes-table .codes-filters {
     display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+    grid-template-areas:
+        "search category refresh"
+        "count count count";
     gap: 10px;
     align-items: center;
     margin-bottom: 12px;
+}
+
+.editable-codes-table .codes-filters .codes-search { grid-area: search; }
+.editable-codes-table .codes-filters .codes-category-filter { grid-area: category; }
+.editable-codes-table .codes-filters .codes-refresh { grid-area: refresh; }
+.editable-codes-table .codes-filters .codes-count { grid-area: count; }
+
+.editable-codes-table .codes-filters .codes-refresh {
+    min-width: 0;
+    height: 100%;
+    padding: 0 18px;
+    white-space: nowrap;
 }
 
 .editable-codes-table .codes-filters .codes-search,
@@ -1394,7 +1398,11 @@
 ------------------------------------------------------------------------ */
 @media (max-width: 768px) {
     .editable-codes-table .codes-filters {
-        grid-template-columns: minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "search refresh"
+            "category category"
+            "count count";
     }
 
     .editable-codes-table .table-container {
@@ -1594,6 +1602,8 @@
     }
 
     /* Full width, and drop the base input[type="text"] left margin (index.css) */
+    /* Full width,
+    and drop the base input[type="text"] left margin (index.css) */
     .editable-codes-table .codes-table .edit-input,
     .editable-codes-table .codes-table .edit-select {
         width: 100%;
@@ -1602,5 +1612,245 @@
         margin: 0;
         font-size: 15px;
         padding: 8px 10px;
+    }
+}
+
+/* ---- User lookup: cabinet points line above Cabinet Events  (UserPointsLookup.tsx) */
+.user-points-lookup .lookup-cabinet-points {
+    margin: 0 0 12px;
+    text-align: center;
+    color: #475569;
+}
+
+.user-points-lookup .lookup-cabinet-points strong {
+    color: #0f4c64;
+}
+
+/* ---- UFL/SF Email Lookup (EmailLookup.tsx, on the User Lookup page) ---- */
+.user-points-lookup .email-lookup {
+    margin-bottom: 30px;
+}
+
+.user-points-lookup .email-lookup h2 {
+    margin-bottom: 6px;
+}
+
+.user-points-lookup .email-lookup__subtitle {
+    margin: 0 0 16px;
+    text-align: center;
+    color: #666;
+}
+
+.user-points-lookup .email-lookup .search-form {
+    margin-bottom: 0;
+}
+
+/* It's a text input (a name), so undo the base input[type="text"] margin
+   and width to line up with the email box above. */
+.user-points-lookup .email-lookup .search-input {
+    width: auto;
+    max-width: none;
+    margin: 0;
+}
+
+.user-points-lookup .email-lookup__empty {
+    margin: 14px 0 0;
+    text-align: center;
+    color: #666;
+}
+
+.user-points-lookup .email-lookup__results {
+    list-style: none;
+    margin: 16px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.user-points-lookup .email-lookup__result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+}
+
+.user-points-lookup .email-lookup__who {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.user-points-lookup .email-lookup__name {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.user-points-lookup .email-lookup__email {
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 13px;
+    color: #0f4c64;
+    word-break: break-all;
+}
+
+.user-points-lookup .email-lookup__use {
+    flex-shrink: 0;
+    min-width: 0;
+    min-height: 0;
+    padding: 8px 14px;
+    border: 1.5px solid #155776;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #155776;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.user-points-lookup .email-lookup__use:hover {
+    background: #155776;
+    color: #ffffff;
+    border-color: #155776;
+    box-shadow: none;
+}
+
+@media (max-width: 480px) {
+    .user-points-lookup .email-lookup__result {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .user-points-lookup .email-lookup__use {
+        width: 100%;
+        padding: 10px;
+    }
+}
+
+/* ---- List of Codes card  (EditableCodesTable.tsx) ---------------------- */
+.editable-codes-table .codes-card {
+    padding: 20px;
+    background: #ffffff;
+    border: 2px solid #155776;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 600px) {
+    .editable-codes-table .codes-card {
+        padding: 14px 10px;
+    }
+}
+
+/* ---- Create New Event Code toggle  (EventCodesPage.tsx) ----------------- */
+.create-code-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 16px;
+}
+
+.create-code-toggle .create-code-toggle__button {
+    min-width: 0;
+    min-height: 0;
+    padding: 12px 26px;
+    border: 2px solid #166534;
+    border-radius: 8px;
+    background: #166534;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.create-code-toggle .create-code-toggle__button:hover {
+    background: #14532d;
+    border-color: #14532d;
+    transform: translateY(-1px);
+}
+
+.create-code-toggle .create-code-toggle__button[aria-expanded="true"] {
+    background: #475569;
+    border-color: #475569;
+}
+
+.create-code-toggle__done {
+    margin: 0;
+    color: #166534;
+    font-weight: 700;
+}
+
+/* Smooth open/close: animates the row height from 0 to the form's height */
+.collapsible {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+}
+
+.collapsible.is-open {
+    grid-template-rows: 1fr;
+    margin-bottom: 20px;
+}
+
+.collapsible__inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* ---- Event Codes page frame  (EventCodesPage.tsx) ---------------------- */
+.event-codes-page {
+    padding-top: 12px;
+}
+
+/* One-time admin export at the bottom of the page */
+.admin-tool-card {
+    max-width: 1100px;
+    margin: 10px auto 20px;
+    padding: 20px;
+    text-align: center;
+    background: #ffffff;
+    border: 2px solid #155776;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.admin-tool-card .admin-tool-card__button {
+    min-width: 0;
+    min-height: 0;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    background: #155776;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.admin-tool-card .admin-tool-card__button:hover {
+    background: #0d3f54;
+    border: none;
+    box-shadow: none;
+}
+
+.admin-tool-card__note {
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: #666;
+}
+
+@media (max-width: 600px) {
+    .admin-tool-card {
+        margin: 10px 10px 20px;
     }
 }

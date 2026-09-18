@@ -1,29 +1,22 @@
 import { useState, useEffect } from 'react';
 import { db } from '../../lib/firebase';
-import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import SectionTitle from '../../components/ui/SectionTitle';
 
-function EditableCodesTable() {
+type EditableCodesTableProps = {
+    /** Bump to reload the list (e.g. after a code is created). */
+    refreshKey?: number;
+};
+
+function EditableCodesTable({ refreshKey = 0 }: EditableCodesTableProps) {
     const [codes, setCodes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editingCode, setEditingCode] = useState(null);
     const [editData, setEditData] = useState<Record<string, any>>({});
-    const [showAddForm, setShowAddForm] = useState(false);
     // Phone layout: rows are collapsed to Code / Event / Points; tap to expand.
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('');
-    const [newCode, setNewCode] = useState({
-        id: '',
-        event: '',
-        category: '',
-        graphicDate: '',
-        eventDate: '',
-        points: '',
-        voterEligible: true,  // Changed from false to true to default to voter eligible
-        semester: 'springPoints',
-        cabinetRequired: false
-    });
-
     const categories = [
         'GBM',
         'Programming',
@@ -39,7 +32,7 @@ function EditableCodesTable() {
 
     useEffect(() => {
         fetchCodes();
-    }, []);
+    }, [refreshKey]);
 
     const searchTerm = search.trim().toLowerCase();
     const visibleCodes = codes.filter((code) =>
@@ -130,52 +123,6 @@ function EditableCodesTable() {
         }
     };
 
-    const handleAddNew = async (e) => {
-        e.preventDefault();
-        
-        // Validation
-        if (!newCode.id.trim() || !newCode.event.trim() || !newCode.category || 
-            !newCode.eventDate || !newCode.points) {
-            alert('Please fill in all required fields.');
-            return;
-        }
-
-        try {
-            // Check if code ID already exists
-            const existingCodes = codes.map(c => c.id.toLowerCase());
-            if (existingCodes.includes(newCode.id.toLowerCase())) {
-                alert('A code with this ID already exists. Please choose a different ID.');
-                return;
-            }
-
-            await addDoc(collection(db, 'codes'), {
-                ...newCode,
-                points: parseInt(newCode.points),
-                voterEligible: newCode.voterEligible,
-                cabinetRequired: newCode.cabinetRequired
-            });
-
-            // Reset form
-            setNewCode({
-                id: '',
-                event: '',
-                category: '',
-                graphicDate: '',
-                eventDate: '',
-                points: '',
-                voterEligible: true,  // Changed to true to match the default
-                semester: 'springPoints',
-                cabinetRequired: false
-            });
-            setShowAddForm(false);
-            await fetchCodes();
-            alert('New code added successfully!');
-        } catch (error) {
-            console.error('Error adding code:', error);
-            alert('Error adding code. Please try again.');
-        }
-    };
-
     const handleInputChange = (field, value) => {
         if (editingCode) {
             setEditData(prev => ({
@@ -185,14 +132,8 @@ function EditableCodesTable() {
         }
     };
 
-    const handleNewCodeChange = (field, value) => {
-        setNewCode(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
-
-    if (loading) {
+    // Only the first load shows the loading message; Refresh keeps the list up.
+    if (loading && codes.length === 0) {
         return (
             <div className="editable-codes-table">
                 <div className="loading-message">Loading codes...</div>
@@ -202,141 +143,10 @@ function EditableCodesTable() {
 
     return (
         <div className="editable-codes-table">
-            <div className="table-header">
-                <h2>Manage Event Codes</h2>
-                <div className="table-actions">
-                    <button 
-                        onClick={fetchCodes} 
-                        className="refresh-button"
-                        disabled={loading}
-                    >
-                        🔄 Refresh
-                    </button>
-                    <button 
-                        onClick={() => setShowAddForm(!showAddForm)} 
-                        className="add-button"
-                    >
-                        {showAddForm ? '✗ Cancel' : '+ Add New Code'}
-                    </button>
-                </div>
-            </div>
-
-            {/* Add New Code Form */}
-            {showAddForm && (
-                <div className="add-form">
-                    <h3>Add New Event Code</h3>
-                    <form onSubmit={handleAddNew} className="new-code-form">
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>Code ID *</label>
-                                <input
-                                    type="text"
-                                    value={newCode.id}
-                                    onChange={(e) => handleNewCodeChange('id', e.target.value)}
-                                    placeholder="e.g., GBM1, PROG5"
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Event Name *</label>
-                                <input
-                                    type="text"
-                                    value={newCode.event}
-                                    onChange={(e) => handleNewCodeChange('event', e.target.value)}
-                                    placeholder="Event name"
-                                    required
-                                />
-                            </div>
-                        </div>
-                        
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>Category *</label>
-                                <select
-                                    value={newCode.category}
-                                    onChange={(e) => handleNewCodeChange('category', e.target.value)}
-                                    required
-                                >
-                                    <option value="">Select category</option>
-                                    {categories.map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label>Points *</label>
-                                <input
-                                    type="number"
-                                    value={newCode.points}
-                                    onChange={(e) => handleNewCodeChange('points', e.target.value)}
-                                    min="0"
-                                    max="10"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>Event Date *</label>
-                                <input
-                                    type="date"
-                                    value={newCode.eventDate}
-                                    onChange={(e) => handleNewCodeChange('eventDate', e.target.value)}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Graphic Date</label>
-                                <input
-                                    type="text"
-                                    value={newCode.graphicDate}
-                                    onChange={(e) => handleNewCodeChange('graphicDate', e.target.value)}
-                                    placeholder="Date for graphics"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>Semester</label>
-                                <select
-                                    value={newCode.semester}
-                                    onChange={(e) => handleNewCodeChange('semester', e.target.value)}
-                                >
-                                    <option value="fallPoints">Fall</option>
-                                    <option value="springPoints">Spring</option>
-                                </select>
-                            </div>
-                            <div className="form-group checkboxes">
-                                <label className="checkbox-label">
-                                    <input
-                                        type="checkbox"
-                                        checked={newCode.voterEligible}
-                                        onChange={(e) => handleNewCodeChange('voterEligible', e.target.checked)}
-                                    />
-                                    Voter Eligible to Vote
-                                </label>
-                                <label className="checkbox-label">
-                                    <input
-                                        type="checkbox"
-                                        checked={newCode.cabinetRequired}
-                                        onChange={(e) => handleNewCodeChange('cabinetRequired', e.target.checked)}
-                                    />
-                                    Cabinet Required to Attend
-                                </label>
-                            </div>
-                        </div>
-
-                        <div className="form-actions">
-                            <button type="submit" className="save-button">Add Code</button>
-                            <button type="button" onClick={() => setShowAddForm(false)} className="cancel-button">
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            )}
+            {/* New codes are made with "Create New Event Code" above; this lists,
+                edits and deletes them. */}
+            <section className="codes-card">
+                <SectionTitle>List of Codes</SectionTitle>
 
             {/* Search / filter */}
             <div className="codes-filters">
@@ -348,6 +158,9 @@ function EditableCodesTable() {
                     onChange={(e) => setSearch(e.target.value)}
                     aria-label="Search codes by code or event name"
                 />
+                <button type="button" onClick={fetchCodes} className="refresh-button codes-refresh" disabled={loading}>
+                    {loading ? 'Refreshing...' : '🔄 Refresh'}
+                </button>
                 <select
                     className="codes-category-filter"
                     value={categoryFilter}
@@ -528,7 +341,7 @@ function EditableCodesTable() {
 
                 {codes.length === 0 && (
                     <div className="no-codes">
-                        No event codes found. Click "Add New Code" to create one.
+                        No event codes found. Create one with the form above.
                     </div>
                 )}
                 {codes.length > 0 && visibleCodes.length === 0 && (
@@ -537,6 +350,8 @@ function EditableCodesTable() {
                     </div>
                 )}
             </div>
+
+            </section>
         </div>
     );
 }

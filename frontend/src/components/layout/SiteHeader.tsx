@@ -16,11 +16,13 @@ type NavItem = { label: string; to?: string; href?: string };
 type SiteHeaderProps = {
     signedIn: boolean;
     eboard: boolean;
+    /** Cabinet members get the temporary Cabinet Points link. */
+    cabinet?: boolean;
 };
 
 // Top bar on every page: logo + title (links to /dashboard), the nav links
 // and Logout. Below 900px the links and Logout collapse into a menu button.
-function SiteHeader({ signedIn, eboard }: SiteHeaderProps) {
+function SiteHeader({ signedIn, eboard, cabinet = false }: SiteHeaderProps) {
     const [open, setOpen] = useState(false);
     const [eboardMenuOpen, setEboardMenuOpen] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
@@ -117,6 +119,16 @@ function SiteHeader({ signedIn, eboard }: SiteHeaderProps) {
                             )}
                         </nav>
 
+                        {/* TEMP: cabinet points until it gets a proper home */}
+                        {cabinet && (
+                            <NavLink
+                                to="/cabinet"
+                                className={({ isActive }) => `site-header__link site-header__temp${isActive ? ' is-active' : ''}`}
+                            >
+                                Temp-Cabinet Points
+                            </NavLink>
+                        )}
+
                         <button type="button" className="site-header__logout" onClick={logout}>
                             Logout
                         </button>
@@ -159,6 +171,14 @@ function SiteHeader({ signedIn, eboard }: SiteHeaderProps) {
                                 </NavLink>
                             ))}
                         </>
+                    )}
+                    {cabinet && (
+                        <NavLink
+                            to="/cabinet"
+                            className={({ isActive }) => `site-header__menu-link${isActive ? ' is-active' : ''}`}
+                        >
+                            Temp-Cabinet Points
+                        </NavLink>
                     )}
                     <button type="button" className="site-header__logout site-header__logout--menu" onClick={logout}>
                         Logout

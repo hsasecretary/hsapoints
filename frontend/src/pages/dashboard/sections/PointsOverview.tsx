@@ -3,7 +3,7 @@ import { auth, db } from '../../../lib/firebase';
 import { isGeneralMember } from '../../../lib/members';
 import { formatAccountType } from '../../../lib/roles';
 import SectionTitle from '../../../components/ui/SectionTitle';
-import EventsAttendedList from './EventsAttendedList';
+import EventsAttendedList from '../../../components/members/EventsAttendedList';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';

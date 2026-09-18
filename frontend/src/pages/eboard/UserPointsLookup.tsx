@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { isGeneralMember } from '../../lib/members';
+import EventsAttendedList from '../../components/members/EventsAttendedList';
+import EmailLookup from './EmailLookup';
 
 function UserPointsLookup() {
     const [searchEmail, setSearchEmail] = useState('');
@@ -11,9 +13,19 @@ function UserPointsLookup() {
     const [error, setError] = useState('');
     const [eventBreakdown, setEventBreakdown] = useState([]);
 
-    const handleSearch = async (e) => {
+    const handleSearch = (e) => {
         e.preventDefault();
-        
+        lookUp(searchEmail);
+    };
+
+    // From the UFL/SF Email Lookup: fill in the email and run the lookup.
+    const lookUpFromName = (email) => {
+        setSearchEmail(email);
+        lookUp(email);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const lookUp = async (searchEmail) => {
         if (!searchEmail.trim()) {
             setError('Please enter an email address');
             return;
@@ -135,6 +147,11 @@ function UserPointsLookup() {
         setEventBreakdown([]);
     };
 
+    // Cabinet-category events get their own section (like the Dashboard)
+    const cabinetEvents = eventBreakdown.filter((event) => event.category === 'Cabinet');
+    const generalEvents = eventBreakdown.filter((event) => event.category !== 'Cabinet');
+    const isCabinetMember = !!userInfo && userInfo.cabinet && userInfo.cabinet !== 'none';
+
     return (
         <div className="user-points-lookup">
             <h2>User Points Lookup</h2>
@@ -163,6 +180,8 @@ function UserPointsLookup() {
                 </div>
                 {error && <p className="error-message">{error}</p>}
             </form>
+
+            <EmailLookup onSelect={lookUpFromName} />
 
             {userInfo && userPoints && (
                 <div className="user-results">
@@ -261,42 +280,20 @@ function UserPointsLookup() {
                     </div>
 
                     <div className="event-breakdown">
-                        <h3>Events Attended ({eventBreakdown.length})</h3>
-                        {eventBreakdown.length > 0 ? (
-                            <table className="events-table">
-                                <thead>
-                                    <tr>
-                                        <th>Code</th>
-                                        <th>Event</th>
-                                        <th>Category</th>
-                                        <th>Date</th>
-                                        <th>Points</th>
-                                        <th>Semester</th>
-                                        <th>Voter Eligible</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {eventBreakdown.map((event, index) => (
-                                        <tr key={index}>
-                                            <td>{event.code}</td>
-                                            <td>{event.event}</td>
-                                            <td>{event.category}</td>
-                                            <td>{event.eventDate}</td>
-                                            <td>{event.points}</td>
-                                            <td>{event.semester === 'fallPoints' ? 'Fall' : 'Spring'}</td>
-                                            <td>
-                                                <span className={event.voterEligible ? 'badge-yes' : 'badge-no'}>
-                                                    {event.voterEligible ? 'Yes' : 'No'}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        ) : (
-                            <p style={{textAlign: 'center', color: '#666'}}>No events attended</p>
-                        )}
+                        <h3>Events Attended ({generalEvents.length})</h3>
+                        <EventsAttendedList events={generalEvents} />
                     </div>
+
+                    {/* Cabinet events are listed separately, with the member's cabinet points */}
+                    {(isCabinetMember || cabinetEvents.length > 0) && (
+                        <div className="event-breakdown">
+                            <h3>Cabinet Events ({cabinetEvents.length})</h3>
+                            <p className="lookup-cabinet-points">
+                                Cabinet points: <strong>{userPoints.cabinetPoints}</strong>
+                            </p>
+                            <EventsAttendedList events={cabinetEvents} />
+                        </div>
+                    )}
                 </div>
             )}
         </div>
