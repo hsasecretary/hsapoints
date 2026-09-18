@@ -237,7 +237,7 @@ function PointRequest() {
             <form onSubmit={handleSubmit} className="request-form">
 
                 <div className="form-group">
-                    <label htmlFor="activityType">Activity Type *</label>
+                    <label htmlFor="activityType">Activity Type</label>
 
                     <select
                         id="activityType"
@@ -257,7 +257,7 @@ function PointRequest() {
 
                 {formData.activityType === 'other' && (
                     <div className="form-group">
-                        <label htmlFor="customActivityName">Custom Activity Name *</label>
+                        <label htmlFor="customActivityName">Custom Activity Name</label>
 
                         <input
                             type="text"
@@ -272,7 +272,7 @@ function PointRequest() {
                 )}
 
                 <div className="form-group">
-                    <label htmlFor="description">Description *</label>
+                    <label htmlFor="description">Description</label>
 
                     <textarea
                         id="description"
@@ -287,7 +287,7 @@ function PointRequest() {
 
                 <div className="form-row">
                     <div className="form-group">
-                        <label htmlFor="date">Date *</label>
+                        <label htmlFor="date">Date</label>
 
                         <input
                             type="date"
@@ -301,7 +301,7 @@ function PointRequest() {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="pointsRequested">Points Requested *</label>
+                        <label htmlFor="pointsRequested">Points Requested</label>
 
                         <input
                             type="number"
@@ -318,7 +318,7 @@ function PointRequest() {
 
                 {/* Photo Evidence Upload Section */}
                 <div className="form-group">
-                    <label htmlFor="imageUpload">Photo Evidence *</label>
+                    <label htmlFor="imageUpload">Photo Evidence</label>
 
                     <input
                         type="file"

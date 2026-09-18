@@ -170,7 +170,7 @@ function CreateCode() {
             <form onSubmit={handleSubmit} className="create-code-form">
                 <div className="form-row">
                     <div className="form-group">
-                        <label htmlFor="eventName">Event Name *</label>
+                        <label htmlFor="eventName">Event Name</label>
                         <input
                             type="text"
                             id="eventName"
@@ -181,7 +181,7 @@ function CreateCode() {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="eventCode">Event Code *</label>
+                        <label htmlFor="eventCode">Event Code</label>
                         <input
                             type="text"
                             id="eventCode"
@@ -195,7 +195,7 @@ function CreateCode() {
 
                 <div className="form-row">
                     <div className="form-group">
-                        <label htmlFor="category">Category *</label>
+                        <label htmlFor="category">Category</label>
                         <select
                             id="category"
                             value={formData.category}
@@ -209,7 +209,7 @@ function CreateCode() {
                         </select>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="points">Points *</label>
+                        <label htmlFor="points">Points</label>
                         <input
                             type="number"
                             id="points"
@@ -224,7 +224,7 @@ function CreateCode() {
 
                 <div className="form-row">
                     <div className="form-group">
-                        <label htmlFor="eventDate">Event Date *</label>
+                        <label htmlFor="eventDate">Event Date</label>
                         <input
                             type="date"
                             id="eventDate"
