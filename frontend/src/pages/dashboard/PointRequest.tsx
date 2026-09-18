@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { db } from '../../lib/firebase';
+import SectionTitle from '../../components/ui/SectionTitle';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { auth } from '../../lib/firebase';
 
@@ -220,7 +221,7 @@ function PointRequest() {
 
     return (
         <div className="point-request">
-            <h2>Submit Point Request</h2>
+            <SectionTitle>Submit Point Request</SectionTitle>
 
             <p className="description">
                 Use this form to request points for activities like tabling, community service,
@@ -375,7 +376,7 @@ function PointRequest() {
             </form>
 
             <div className="info-section">
-                <h3>Important Information</h3>
+                <SectionTitle as="h3">Important Information</SectionTitle>
 
                 <ul>
                     <li>Requests should accurately describe the activity completed</li>

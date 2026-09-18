@@ -1,6 +1,7 @@
 import React, { useEffect, useState, type ReactNode } from "react";
 import { auth, db } from '../../lib/firebase';
 import { isGeneralMember } from '../../lib/members';
+import SectionTitle from '../../components/ui/SectionTitle';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -154,7 +155,7 @@ export default function Points({ refreshKey = 0, beforeCategories }: PointsProps
 			
 			<div className="user-results">
 				<div className="user-info-card">
-					<h3>My Information</h3>
+					<SectionTitle align="left">My Information</SectionTitle>
 					<div className="user-info-grid">
 						<div><strong>Name:</strong> {userInfo.firstName} {userInfo.lastName}</div>
 						<div><strong>Email:</strong> {userInfo.email}</div>
@@ -166,7 +167,7 @@ export default function Points({ refreshKey = 0, beforeCategories }: PointsProps
 				</div>
 
 				<div className="points-summary">
-					<h3>Points Summary</h3>
+					<SectionTitle>Points Summary</SectionTitle>
 					<div className="points-grid">
 						<div className="points-card total">
 							<h4>Total Points</h4>
@@ -212,7 +213,7 @@ export default function Points({ refreshKey = 0, beforeCategories }: PointsProps
 				{beforeCategories}
 
 				<div className="event-breakdown">
-					<h3>My Events Attended ({eventBreakdown.length})</h3>
+					<SectionTitle>My Events Attended ({eventBreakdown.length})</SectionTitle>
 					{eventBreakdown.length > 0 ? (
 						<table className="events-table">
 							<thead>
@@ -250,7 +251,7 @@ export default function Points({ refreshKey = 0, beforeCategories }: PointsProps
 				</div>
 
 				<div className="category-breakdown">
-					<h3>Points by Category</h3>
+					<SectionTitle>Points by Category</SectionTitle>
 					<table className="category-table">
 						<thead>
 							<tr>

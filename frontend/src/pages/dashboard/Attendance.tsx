@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { auth, db} from '../../lib/firebase';
+import SectionTitle from '../../components/ui/SectionTitle';
 import { doc, getDoc, arrayUnion, updateDoc } from 'firebase/firestore';
 
 function Attendance({ onPointsUpdate }) {
@@ -347,7 +348,7 @@ function Attendance({ onPointsUpdate }) {
 
     return (
         <div className="attendanceForm">
-            <h2>Have an Event Code?</h2>
+            <SectionTitle>Have an Event Code?</SectionTitle>
             <p style={{textAlign: 'center', color: '#666', marginBottom: '20px'}}>
                 Enter the code from the event to check in and earn your points.
             </p>

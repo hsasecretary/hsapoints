@@ -1,4 +1,5 @@
 import Points from './Points'
+import SectionTitle from '../../components/ui/SectionTitle';
 import Attendance from './Attendance';
 import PointRequest from './PointRequest';
 import React, { useState } from 'react';
@@ -13,7 +14,7 @@ function Dashboard({cabinet, email}) {
 
 	return (
 		<div className="formDash" >
-			<div id="dash"><h2>Dashboard</h2></div>
+			<div id="dash"><SectionTitle>Dashboard</SectionTitle></div>
 			<Points
 				refreshKey={pointsRefreshKey}
 				beforeCategories={<Attendance onPointsUpdate={handlePointsUpdate} />}

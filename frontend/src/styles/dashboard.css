@@ -193,10 +193,6 @@
     padding: 20px 20px 4px;
 }
 
-.user-points-lookup .attendanceForm h2 {
-    margin: 0 0 8px;
-}
-
 .user-points-lookup .user-info-card,
 .user-points-lookup .points-summary,
 .user-points-lookup .category-breakdown,
@@ -483,12 +479,6 @@
     background-color: #e3f2fd;
     border-radius: 8px;
     border-left: 4px solid #155776;
-}
-
-.point-request .info-section h3 {
-    color: #155776;
-    margin-top: 0;
-    margin-bottom: 15px;
 }
 
 .point-request .info-section ul {
