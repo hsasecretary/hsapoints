@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { isGeneralMember } from '../../lib/members';
 
 function UserPointsLookup() {
     const [searchEmail, setSearchEmail] = useState('');
@@ -43,9 +44,9 @@ function UserPointsLookup() {
                 lastName: userData.lastName || 'N/A',
                 email: searchEmail.toLowerCase().trim(),
                 cabinet: userData.cabinet || 'none',
-                position: userData.position || 'N/A',
                 approved: userData.approved || false,
-                eboard: userData.eboard || false
+                eboard: userData.eboard || false,
+                generalMember: isGeneralMember(userData)
             });
 
             // Calculate points breakdown
@@ -170,10 +171,9 @@ function UserPointsLookup() {
                         <div className="user-info-grid">
                             <div><strong>Name:</strong> {userInfo.firstName} {userInfo.lastName}</div>
                             <div><strong>Email:</strong> {userInfo.email}</div>
-                            <div><strong>Cabinet:</strong> {userInfo.cabinet}</div>
-                            <div><strong>Position:</strong> {userInfo.position}</div>
+                            <div><strong>Account Type:</strong> {userInfo.cabinet}</div>
                             <div><strong>Approved:</strong> {userInfo.approved ? 'Yes' : 'No'}</div>
-                            <div><strong>E-Board:</strong> {userInfo.eboard ? 'Yes' : 'No'}</div>
+                            {!userInfo.generalMember && <div><strong>E-Board:</strong> {userInfo.eboard ? 'Yes' : 'No'}</div>}
                         </div>
                     </div>
 

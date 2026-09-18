@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { db } from '../../lib/firebase';
+import { db } from '../../../lib/firebase';
+import SectionTitle from '../../../components/ui/SectionTitle';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { auth } from '../../lib/firebase';
+import { auth } from '../../../lib/firebase';
 
-function PointRequest() {
+function PointRequestForm() {
     const [formData, setFormData] = useState({
         activityType: '',
         customActivityName: '',
@@ -220,7 +221,7 @@ function PointRequest() {
 
     return (
         <div className="point-request">
-            <h2>Submit Point Request</h2>
+            <SectionTitle>Submit Point Request</SectionTitle>
 
             <p className="description">
                 Use this form to request points for activities like tabling, community service,
@@ -284,7 +285,9 @@ function PointRequest() {
                     />
                 </div>
 
-                <div className="form-row">
+                {/* Points are chosen by hand only for "Other"; every other activity
+                    uses its default (set when the activity type is picked). */}
+                <div className={`form-row${formData.activityType === 'other' ? '' : ' form-row--single'}`}>
                     <div className="form-group">
                         <label htmlFor="date">Date</label>
 
@@ -299,20 +302,33 @@ function PointRequest() {
                         />
                     </div>
 
+                    {formData.activityType === 'other' && (
                     <div className="form-group">
-                        <label htmlFor="pointsRequested">Points Requested</label>
+                        <label htmlFor="pointsRequested-1" id="pointsRequested-label">Points Requested</label>
 
-                        <input
-                            type="number"
-                            id="pointsRequested"
-                            name="pointsRequested"
-                            value={formData.pointsRequested}
-                            onChange={handleInputChange}
-                            min="1"
-                            max="10"
-                            required
-                        />
+                        {/* Requests are 1 or 2 points: two tap targets instead of a number box.
+                            The value is still saved as a number (parseInt on submit). */}
+                        <div className="points-choice" role="radiogroup" aria-labelledby="pointsRequested-label">
+                            {['1', '2'].map((value) => (
+                                <label
+                                    key={value}
+                                    className={`points-choice__option${formData.pointsRequested === value ? ' is-selected' : ''}`}
+                                >
+                                    <input
+                                        type="radio"
+                                        id={`pointsRequested-${value}`}
+                                        name="pointsRequested"
+                                        value={value}
+                                        checked={formData.pointsRequested === value}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    {value} {value === '1' ? 'point' : 'points'}
+                                </label>
+                            ))}
+                        </div>
                     </div>
+                    )}
                 </div>
 
                 {/* Photo Evidence Upload Section */}
@@ -360,7 +376,7 @@ function PointRequest() {
             </form>
 
             <div className="info-section">
-                <h3>Important Information</h3>
+                <SectionTitle as="h3">Important Information</SectionTitle>
 
                 <ul>
                     <li>Requests should accurately describe the activity completed</li>
@@ -373,4 +389,4 @@ function PointRequest() {
     );
 }
 
-export default PointRequest;
+export default PointRequestForm;

@@ -3,35 +3,10 @@ import { db, auth } from '../../lib/firebase';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { setDoc, doc, arrayUnion, updateDoc } from "firebase/firestore";
 import { useNavigate, Link } from 'react-router-dom';
+import { cabinets, eboardPositions } from '../../lib/roles';
 
 
-const eboardPositions = [
-    { value: 'president', label: 'President', cabinet: 'president' },
-    { value: 'vp-operations', label: 'Vice President of Operations', cabinet: 'operations' },
-    { value: 'vp-programming', label: 'Vice President of Programming', cabinet: 'programming' },
-	{ value: 'communications', label: 'Communications' },
-    { value: 'treasurer', label: 'Treasurer', cabinet: 'treasurey' },
-    { value: 'secretary', label: 'Secretary', cabinet: 'secretary' },
-    { value: 'mlp-fall-ed', label: 'MLP Fall Executive Director', cabinet: 'mlpFall' },
-    { value: 'mlp-spring-ed', label: 'MLP Spring Executive Director', cabinet: 'mlpSpring' },
-    { value: 'opa-ed-external', label: 'OPA External Executive Director', cabinet: 'opa' },
-    { value: 'opa-ed-internal', label: 'OPA Internal Executive Director', cabinet: 'opa' },
-    { value: 'chief-of-staff', label: 'Chief of Staff', cabinet: 'president' }
-];
-
-const cabinets = [
-    { value: 'president', label: 'Presidential' },
-    { value: 'operations', label: 'Operations' },
-    { value: 'programming', label: 'Programming' },
-    { value: 'communications', label: 'Communications' },
-    { value: 'treasurey', label: 'Treasury' },
-    { value: 'secretary', label: 'Secretary' },
-    { value: 'mlpFall', label: 'MLP Fall' },
-    { value: 'mlpSpring', label: 'MLP Spring' },
-    { value: 'opa', label: 'Office of Political Affairs' }
-];
-
-const graduationYears = Array.from({ length: 5 }, (_, i) => String(new Date().getFullYear() + i));
+const graduationYears = Array.from({ length: 6 }, (_, i) => String(new Date().getFullYear() + i));
 
 const subRoleConfig = {
     eboard: {
@@ -275,10 +250,10 @@ function SignUp() {
                         onChange={(e) => handleInputChange('involvement', e.target.value)}
                     >
                         <option value="select">Select</option>
+                        <option value="general">General member</option>
+                        <option value="mlp">MLP general member</option>
                         <option value="eboard">E-Board</option>
                         <option value="cabinet">Cabinet</option>
-                        <option value="mlp">MLP</option>
-                        <option value="general">General Member</option>
                     </select>
 
                     {currentSubRole && (

@@ -56,16 +56,14 @@ const SOCIALS = [
 type FooterProps = {
     signedIn: boolean;
     eboard: boolean;
-    cabinet: boolean;
 };
 
-// Site-wide footer. Portal links follow the same rules as the NavBar:
-// Cabinet / E-Board only show for members who can open them.
-function Footer({ signedIn, eboard, cabinet }: FooterProps) {
+// Site-wide footer. Portal links match the SiteHeader: E-Board only shows
+// for e-board members (Cabinet is reached from the E-Board page).
+function Footer({ signedIn, eboard }: FooterProps) {
     const portalLinks: [string, string][] = signedIn
         ? [
             ['Dashboard', '/dashboard'],
-            ...(cabinet ? [['Cabinet', '/cabinet'] as [string, string]] : []),
             ...(eboard ? [['E-Board', '/eboard'] as [string, string]] : []),
         ]
         : [

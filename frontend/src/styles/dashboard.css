@@ -5,15 +5,20 @@
 /* ---- Dashboard page shell, attendance box, points cards  (Dashboard.tsx, Attendance.tsx, CabinetPoints.tsx) ---------- */
 
 .formDash {
+    /* Full-width white page under the header: no grey gap or sides. Content
+       inside keeps its own max-width and stays centred. */
     background-color: #ffffff;
-    border-radius: 5px;
-    border: 2px solid #e3e8ea;
-    max-width: 1200px;
-    margin: 25px auto 30px;
-    width: 95%;
+    width: 100%;
+    margin: 0;
+    padding: 24px 16px 32px;
+    flex: 1 0 auto;
     display: flex;
     flex-flow: wrap;
     justify-content: flex-start;
+}
+
+.formDash > .user-points-lookup {
+    flex: 1 1 100%;
 }
 
 #dash {
@@ -72,9 +77,7 @@
 /* Enhanced Mobile Responsiveness */
 @media only screen and (max-width: 768px) {
     .formDash {
-        width: 98%;
-        margin: 15px auto 20px;
-        padding: 10px;
+        padding: 16px 10px 24px;
     }
 
     #pointsForm {
@@ -100,10 +103,7 @@
 
 @media only screen and (max-width: 500px) {
     .formDash {
-        width: 99%;
-        margin: 10px auto 15px;
-        padding: 5px;
-        border-radius: 3px;
+        padding: 12px 6px 20px;
     }
 
     .subForm h3,
@@ -138,10 +138,7 @@
 
 @media only screen and (max-width: 360px) {
     .formDash {
-        width: 100%;
-        margin: 5px auto 10px;
-        padding: 3px;
-        border-radius: 2px;
+        padding: 10px 4px 16px;
     }
 
     .pointsSubForm {
@@ -183,6 +180,14 @@
 .user-points-lookup h2 {
     font-size: 1.5em;
     margin: 10px 0;
+}
+
+/* The attendance form sits between Points Summary and Points by Category;
+   line it up with the cards around it. */
+.user-points-lookup .attendanceForm {
+    width: auto;
+    margin: 0;
+    padding: 20px 20px 4px;
 }
 
 .user-points-lookup .user-info-card,
@@ -228,7 +233,7 @@
 
     .user-points-lookup .user-info-grid {
         grid-template-columns: 1fr !important;
-        gap: 8px !important;
+        gap: 6px !important;
     }
 
     .user-points-lookup .points-grid {
@@ -364,6 +369,8 @@
     margin: 0 auto;
     padding: 20px;
     background: white;
+    /* Same blue outline as the dashboard's other cards */
+    border: 2px solid #155776;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
@@ -471,12 +478,6 @@
     border-left: 4px solid #155776;
 }
 
-.point-request .info-section h3 {
-    color: #155776;
-    margin-top: 0;
-    margin-bottom: 15px;
-}
-
 .point-request .info-section ul {
     margin: 0;
     padding-left: 20px;
@@ -490,7 +491,7 @@
 
 /* Browsers draw date inputs taller than number inputs with the same
    padding; pin Date and Points Requested to one height so they line up. */
-.point-request .request-form .form-row input {
+.point-request .request-form .form-row input[type="date"] {
     height: 48px;
 }
 
@@ -576,4 +577,177 @@
 
 .strike {
     color:red;
+}
+
+/* ---- Points Requested: 1 / 2 choice  (PointRequest.tsx) ----------------
+   Only shown for "Other"; without it the Date field spans the row. */
+.point-request .form-row--single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.point-request .points-choice {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.point-request .points-choice__option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    margin: 0;
+    border: 1.5px solid #94a3b8;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.point-request .points-choice__option:hover {
+    border-color: #0f4c64;
+}
+
+.point-request .points-choice__option.is-selected {
+    background: #0f4c64;
+    border-color: #0f4c64;
+    color: #ffffff;
+}
+
+/* The real radio stays in the page (keyboard + form validation) but is
+   drawn by its label instead. */
+.point-request .points-choice__option input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+}
+
+.point-request .points-choice__option:focus-within {
+    outline: 3px solid rgba(15, 76, 100, 0.35);
+    outline-offset: 2px;
+}
+
+/* ---- My Events Attended  (EventsAttendedList.tsx) ----------------------
+   Compact rows (code + points); tap one to show the event details. */
+.user-points-lookup .attended-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.user-points-lookup .attended-item {
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+
+.user-points-lookup .attended-item.is-open {
+    border-color: #0f4c64;
+}
+
+.user-points-lookup .attended-item__summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 12px 14px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: 15px;
+    color: #0f172a;
+    text-align: left;
+    cursor: pointer;
+}
+
+.user-points-lookup .attended-item__summary:hover {
+    background: #f8fafc;
+    border: none;
+    box-shadow: none;
+}
+
+.user-points-lookup .attended-item__summary:active {
+    background: #f1f5f9;
+    box-shadow: none;
+}
+
+.user-points-lookup .attended-item__code {
+    flex: 1;
+    min-width: 0;
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-weight: 700;
+    color: #0f4c64;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-points-lookup .attended-item__points {
+    font-weight: 700;
+    color: #0f4c64;
+    white-space: nowrap;
+}
+
+.user-points-lookup .attended-item__unit {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.user-points-lookup .attended-item__chevron {
+    font-size: 24px;
+    line-height: 1;
+    color: #0f4c64;
+    transition: transform 0.15s ease;
+}
+
+.user-points-lookup .attended-item.is-open .attended-item__chevron {
+    transform: rotate(90deg);
+}
+
+.user-points-lookup .attended-item__details {
+    margin: 0;
+    padding: 0 14px 6px;
+}
+
+.user-points-lookup .attended-item__details > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    border-top: 1px solid #eef2f6;
+    font-size: 14px;
+}
+
+.user-points-lookup .attended-item__details dt {
+    font-weight: 700;
+    color: #475569;
+}
+
+.user-points-lookup .attended-item__details dd {
+    margin: 0;
+    color: #0f172a;
+    text-align: right;
+}
+
+.user-points-lookup .attended-empty {
+    margin: 0;
+    text-align: center;
+    color: #666;
 }

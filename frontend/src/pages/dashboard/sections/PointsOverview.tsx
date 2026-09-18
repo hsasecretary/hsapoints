@@ -1,10 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { auth, db } from '../../lib/firebase';
+import React, { useEffect, useState, type ReactNode } from "react";
+import { auth, db } from '../../../lib/firebase';
+import { isGeneralMember } from '../../../lib/members';
+import { formatAccountType } from '../../../lib/roles';
+import SectionTitle from '../../../components/ui/SectionTitle';
+import EventsAttendedList from './EventsAttendedList';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
-export default function Points() {
+type PointsOverviewProps = {
+	/** Bump to re-fetch points (e.g. after an attendance code is accepted). */
+	refreshKey?: number;
+	/** The "Have an Event Code?" form, rendered between Points Summary and My Events Attended. */
+	eventCodeForm?: ReactNode;
+};
+
+export default function PointsOverview({ refreshKey = 0, eventCodeForm }: PointsOverviewProps) {
 	const [userInfo, setUserInfo] = useState(null);
 	const [userPoints, setUserPoints] = useState(null);
 	const [eventBreakdown, setEventBreakdown] = useState([]);
@@ -30,9 +41,9 @@ export default function Points() {
 							lastName: userData.lastName || 'N/A',
 							email: email,
 							cabinet: userData.cabinet || 'none',
-							position: userData.position || 'N/A',
 							approved: userData.approved || false,
-							eboard: userData.eboard || false
+							eboard: userData.eboard || false,
+							generalMember: isGeneralMember(userData)
 						});
 
 						// Calculate points breakdown
@@ -117,12 +128,15 @@ export default function Points() {
 		});
 
 		return unsubscribe;
-	}, [navigate]);
+	}, [navigate, refreshKey]);
 
-	if (loading) {
+	// Only the first load replaces the page with a message; refreshes keep the
+	// current numbers (and the attendance form's success message) on screen.
+	if (loading && !userPoints) {
 		return (
 			<div className="user-points-lookup">
 				<div className="loading-message">Loading your points...</div>
+				{eventCodeForm}
 			</div>
 		);
 	}
@@ -131,29 +145,35 @@ export default function Points() {
 		return (
 			<div className="user-points-lookup">
 				<div className="loading-message">Unable to load your points data</div>
+				{eventCodeForm}
 			</div>
 		);
 	}
 
+	// Cabinet events get their own section under My Events Attended
+	const cabinetEvents = eventBreakdown.filter((event) => event.category === 'Cabinet');
+	const generalEvents = eventBreakdown.filter((event) => event.category !== 'Cabinet');
+
 	return (
 		<div className="user-points-lookup">
-			<h2>My Points Dashboard</h2>
+		
 			
 			<div className="user-results">
 				<div className="user-info-card">
-					<h3>My Information</h3>
+					<SectionTitle align="left">My Information</SectionTitle>
 					<div className="user-info-grid">
 						<div><strong>Name:</strong> {userInfo.firstName} {userInfo.lastName}</div>
 						<div><strong>Email:</strong> {userInfo.email}</div>
-						<div><strong>Cabinet:</strong> {userInfo.cabinet === 'none' ? 'General Member' : userInfo.cabinet}</div>
-						<div><strong>Position:</strong> {userInfo.position}</div>
-						<div><strong>Status:</strong> {userInfo.approved ? 'Approved' : 'Pending'}</div>
-						<div><strong>E-Board:</strong> {userInfo.eboard ? 'Yes' : 'No'}</div>
+						<div>
+							<strong>Account Type:</strong> {formatAccountType(userInfo.cabinet)}
+							{!userInfo.generalMember && ` (E-Board: ${userInfo.eboard ? 'Yes' : 'No'})`}
+						</div>
+						{/* <div><strong>Status:</strong> {userInfo.approved ? 'Approved' : 'Pending'}</div> */}
 					</div>
 				</div>
 
 				<div className="points-summary">
-					<h3>Points Summary</h3>
+					<SectionTitle>Points Summary</SectionTitle>
 					<div className="points-grid">
 						<div className="points-card total">
 							<h4>Total Points</h4>
@@ -196,8 +216,22 @@ export default function Points() {
 					)}
 				</div>
 
+				{eventCodeForm}
+
+				<div className="event-breakdown">
+					<SectionTitle>My Events Attended ({generalEvents.length})</SectionTitle>
+					<EventsAttendedList events={generalEvents} />
+				</div>
+
+				{cabinetEvents.length > 0 && (
+					<div className="event-breakdown">
+						<SectionTitle>My Cabinet Events ({cabinetEvents.length})</SectionTitle>
+						<EventsAttendedList events={cabinetEvents} />
+					</div>
+				)}
+
 				<div className="category-breakdown">
-					<h3>Points by Category</h3>
+					<SectionTitle>Points by Category</SectionTitle>
 					<table className="category-table">
 						<thead>
 							<tr>
@@ -252,44 +286,6 @@ export default function Points() {
 							</tr>
 						</tbody>
 					</table>
-				</div>
-
-				<div className="event-breakdown">
-					<h3>My Events Attended ({eventBreakdown.length})</h3>
-					{eventBreakdown.length > 0 ? (
-						<table className="events-table">
-							<thead>
-								<tr>
-									<th>Code</th>
-									<th>Event</th>
-									<th>Category</th>
-									<th>Date</th>
-									<th>Points</th>
-									<th>Semester</th>
-									<th>Voter Eligible</th>
-								</tr>
-							</thead>
-							<tbody>
-								{eventBreakdown.map((event, index) => (
-									<tr key={index}>
-										 <td data-label="Code">{event.code}</td>
-										 <td data-label="Event">{event.event}</td>
-										 <td data-label="Category">{event.category}</td>
-										 <td data-label="Date">{event.eventDate}</td>
-										 <td data-label="Points">{event.points}</td>
-										 <td data-label="Semester">{event.semester === 'fallPoints' ? 'Fall' : 'Spring'}</td>
-										 <td data-label="Voter Eligible">
-											 <span className={event.voterEligible ? 'badge-yes' : 'badge-no'}>
-												 {event.voterEligible ? 'Yes' : 'No'}
-											 </span>
-										 </td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					) : (
-						<p style={{textAlign: 'center', color: '#666'}}>No events attended yet</p>
-					)}
 				</div>
 			</div>
 		</div>

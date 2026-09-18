@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { auth, db} from '../../lib/firebase';
+import { auth, db} from '../../../lib/firebase';
+import SectionTitle from '../../../components/ui/SectionTitle';
 import { doc, getDoc, arrayUnion, updateDoc } from 'firebase/firestore';
 
-function Attendance({ onPointsUpdate }) {
+function EventCodeForm({ onPointsUpdate }) {
     const [code, setCode] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
@@ -347,9 +348,9 @@ function Attendance({ onPointsUpdate }) {
 
     return (
         <div className="attendanceForm">
-            <h2>Event Attendance</h2>
+            <SectionTitle>Have an Event Code?</SectionTitle>
             <p style={{textAlign: 'center', color: '#666', marginBottom: '20px'}}>
-                Enter the code provided at the event to record your attendance and earn points
+                Enter the code from the event to check in and earn your points.
             </p>
             
             {message.text && (
@@ -368,19 +369,10 @@ function Attendance({ onPointsUpdate }) {
 
             <form onSubmit={checkCode} style={{width: '80%', margin: 'auto', paddingBottom: '20px'}}>
                 <div className="form-group" style={{marginBottom: '20px'}}>
-                    <label htmlFor="code" style={{
-                        display: 'block',
-                        fontSize: '1.2em',
-                        fontWeight: 'bold',
-                        marginBottom: '8px',
-                        color: '#155776',
-                        textAlign: 'center'
-                    }}>
-                        Attendance Code:
-                    </label>
                     <input 
                         type="text" 
                         id="code"
+                        aria-label="Event code"
                         value={code}
                         onChange={handleCodeChange}
                         placeholder="Enter Event Code"
@@ -430,4 +422,4 @@ function Attendance({ onPointsUpdate }) {
     );
 }
 
-export default Attendance;
+export default EventCodeForm;

@@ -1,7 +1,7 @@
 /* The whole site's CSS, imported once from main.tsx.
 
    base.css      site-wide defaults, shared form pieces, utilities
-   layout.css    title banner, nav bar, logout (every page)
+   layout.css    site header, footer, 404 page (every page)
    auth.css      login / sign up / forgot password
    dashboard.css member dashboard and cabinet page
    eboard.css    e-board tools
