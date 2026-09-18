@@ -24,6 +24,10 @@
     min-height: 68px;
 }
 
+.site-header__bar--centered {
+    justify-content: center;
+}
+
 .site-header__brand {
     display: flex;
     align-items: center;

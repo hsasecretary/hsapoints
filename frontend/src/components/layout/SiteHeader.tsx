@@ -66,7 +66,8 @@ function SiteHeader({ signedIn, eboard }: SiteHeaderProps) {
 
     return (
         <header ref={headerRef} className="site-header">
-            <div className="site-header__bar">
+            {/* Signed out there are no links, so the logo and title sit centred */}
+            <div className={`site-header__bar${signedIn ? '' : ' site-header__bar--centered'}`}>
                 <Link to="/dashboard" className="site-header__brand" aria-label="Hispanic-Latine Student Association — go to Dashboard">
                     <img src={HSA_LOGO_URL} alt="" width="52" height="43" />
                     <span className="site-header__title">
