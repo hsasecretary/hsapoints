@@ -1096,7 +1096,6 @@
 }
 
 /* ---- Manage Event Codes table  (EditableCodesTable.tsx) ------------------------------------ */
-
 /* EditableCodesTable Styles */
 .editable-codes-table {
     max-width: 1600px;
@@ -1104,65 +1103,8 @@
     padding: 20px;
 }
 
-/* Table Header */
-/* Title centered on top, buttons in an even row underneath */
-.editable-codes-table .table-header {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-    margin-bottom: 20px;
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 10px;
-    border: 2px solid #0f4c64;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-}
-
-.editable-codes-table .table-header h2 {
-    margin: 0;
-    text-align: center;
-    color: #0f4c64;
-    font-weight: 700;
-}
-
-.editable-codes-table .table-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    width: 100%;
-    max-width: 480px;
-    margin: 0 auto;
-}
-
-/* Fill their grid cell and allow shrinking below the 140px minimum below,
-   so the two buttons always fit side by side. */
-.editable-codes-table .table-actions .refresh-button,
-.editable-codes-table .table-actions .add-button {
-    width: 100%;
-    min-width: 0;
-}
-
-@media (max-width: 600px) {
-    .editable-codes-table .table-header {
-        padding: 16px 12px;
-    }
-
-    .editable-codes-table .table-actions {
-        gap: 8px;
-    }
-
-    .editable-codes-table .table-actions .refresh-button,
-    .editable-codes-table .table-actions .add-button {
-        padding: 10px 6px;
-        font-size: 15px;
-        gap: 6px;
-    }
-}
-
 /* Buttons Base */
-.editable-codes-table .refresh-button,
-.editable-codes-table .add-button {
+.editable-codes-table .refresh-button {
     padding: 12px 22px;
     border-radius: 8px;
     font-size: 14px;
@@ -1191,23 +1133,8 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* Add New Code - solid high-contrast green */
-.editable-codes-table .add-button {
-    background: #166534;
-    color: #ffffff;
-    border: 2px solid #166534;
-    font-weight: 700;
-}
-
-.editable-codes-table .add-button:hover:not(:disabled) {
-    background: #14532d;
-    border-color: #14532d;
-    transform: translateY(-1px);
-}
-
 /* Disabled State: Dark text on light background (Never white on gray) */
-.editable-codes-table .refresh-button:disabled,
-.editable-codes-table .add-button:disabled {
+.editable-codes-table .refresh-button:disabled {
     background: #e2e8f0;
     color: #64748b;
     border-color: #cbd5e1;
@@ -1218,103 +1145,13 @@
 }
 
 /* Enhanced focus states for accessibility */
-.editable-codes-table .refresh-button:focus,
-.editable-codes-table .add-button:focus {
+.editable-codes-table .refresh-button:focus {
     outline: 3px solid #0284c7;
     outline-offset: 2px;
 }
 
-/* Add Form */
-.editable-codes-table .add-form {
-    background: #ffffff;
-    border: 2px solid #166534;
-    border-radius: 10px;
-    padding: 24px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.editable-codes-table .add-form h3 {
-    color: #166534;
-    font-weight: 700;
-    margin-top: 0;
-    margin-bottom: 20px;
-}
-
-.editable-codes-table .new-code-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.editable-codes-table .checkboxes {
-    flex-direction: row;
-    gap: 24px;
-    align-items: center;
-}
-
-.editable-codes-table .checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-}
-
-.editable-codes-table .checkbox-label input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: #0f4c64;
-}
-
 .editable-codes-table .voter-eligible-label {
     font-weight: 700;
-}
-
-.editable-codes-table .checkbox-status {
-    font-weight: 700;
-    margin-left: 6px;
-}
-
-.editable-codes-table .checkbox-status.enabled {
-    color: #166534;
-}
-
-.editable-codes-table .checkbox-status.disabled {
-    color: #b91c1c;
-}
-
-.editable-codes-table .form-actions {
-    justify-content: flex-end;
-}
-
-.editable-codes-table .save-button,
-.editable-codes-table .cancel-button {
-    padding: 10px 22px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.editable-codes-table .save-button {
-    background: #166534;
-    color: #ffffff;
-    border: 1.5px solid #166534;
-}
-
-.editable-codes-table .save-button:hover {
-    background: #14532d;
-}
-
-.editable-codes-table .cancel-button {
-    background: #475569;
-    color: #ffffff;
-    border: 1.5px solid #475569;
-}
-
-.editable-codes-table .cancel-button:hover {
-    background: #334155;
 }
 
 /* Table Container */
@@ -1746,6 +1583,8 @@
     }
 
     /* Full width, and drop the base input[type="text"] left margin (index.css) */
+    /* Full width,
+    and drop the base input[type="text"] left margin (index.css) */
     .editable-codes-table .codes-table .edit-input,
     .editable-codes-table .codes-table .edit-select {
         width: 100%;
@@ -1871,5 +1710,30 @@
     .user-points-lookup .email-lookup__use {
         width: 100%;
         padding: 10px;
+    }
+}
+
+/* ---- List of Codes card  (EditableCodesTable.tsx) ---------------------- */
+.editable-codes-table .codes-card {
+    padding: 20px;
+    background: #ffffff;
+    border: 2px solid #155776;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.editable-codes-table .codes-card__footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.editable-codes-table .codes-card__footer .refresh-button {
+    min-width: 160px;
+}
+
+@media (max-width: 600px) {
+    .editable-codes-table .codes-card {
+        padding: 14px 10px;
     }
 }
