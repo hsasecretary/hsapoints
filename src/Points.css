@@ -18,27 +18,27 @@
     margin: 10px 0;
 }
 
-.user-info-card,
-.points-summary,
-.category-breakdown,
-.event-breakdown {
+.user-points-lookup .user-info-card,
+.user-points-lookup .points-summary,
+.user-points-lookup .category-breakdown,
+.user-points-lookup .event-breakdown {
     margin-bottom: 15px;
     padding: 15px;
     overflow-x: hidden;
 }
 
-.category-table,
-.events-table {
+.user-points-lookup .category-table,
+.user-points-lookup .events-table {
     width: 100%;
     font-size: 12px;
     border-collapse: collapse;
     table-layout: fixed;
 }
 
-.category-table th,
-.category-table td,
-.events-table th,
-.events-table td {
+.user-points-lookup .category-table th,
+.user-points-lookup .category-table td,
+.user-points-lookup .events-table th,
+.user-points-lookup .events-table td {
     padding: 8px 4px;
     text-align: center;
     word-wrap: break-word;
@@ -50,40 +50,40 @@
     .user-points-lookup {
         padding: 5px;
     }
-    
-    .user-info-card,
-    .points-summary,
-    .category-breakdown,
-    .event-breakdown {
+
+    .user-points-lookup .user-info-card,
+    .user-points-lookup .points-summary,
+    .user-points-lookup .category-breakdown,
+    .user-points-lookup .event-breakdown {
         margin-bottom: 10px;
         padding: 10px;
     }
-    
-    .user-info-grid {
+
+    .user-points-lookup .user-info-grid {
         grid-template-columns: 1fr !important;
         gap: 8px !important;
     }
-    
-    .points-grid {
+
+    .user-points-lookup .points-grid {
         grid-template-columns: 1fr 1fr !important;
         gap: 10px !important;
     }
-    
+
     /* Hide the original table on mobile and create card layout */
-    .events-table {
+    .user-points-lookup .events-table {
         border: none;
         width: 100%;
     }
-    
-    .events-table thead {
+
+    .user-points-lookup .events-table thead {
         display: none;
     }
-    
-    .events-table tbody {
+
+    .user-points-lookup .events-table tbody {
         display: block;
     }
-    
-    .events-table tr {
+
+    .user-points-lookup .events-table tr {
         display: block;
         margin-bottom: 15px;
         padding: 15px;
@@ -92,8 +92,8 @@
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    
-    .events-table td {
+
+    .user-points-lookup .events-table td {
         display: block;
         text-align: left;
         border: none;
@@ -101,12 +101,12 @@
         border-bottom: 1px solid #eee;
         position: relative;
     }
-    
-    .events-table td:last-child {
+
+    .user-points-lookup .events-table td:last-child {
         border-bottom: none;
     }
-    
-    .events-table td:before {
+
+    .user-points-lookup .events-table td:before {
         content: attr(data-label) ": ";
         font-weight: bold;
         color: #155776;
@@ -114,13 +114,13 @@
         min-width: 80px;
         margin-right: 10px;
     }
-    
-    .category-table {
+
+    .user-points-lookup .category-table {
         font-size: 11px;
     }
-    
-    .category-table th,
-    .category-table td {
+
+    .user-points-lookup .category-table th,
+    .user-points-lookup .category-table td {
         padding: 6px 3px;
         font-size: 11px;
     }
@@ -130,58 +130,58 @@
     .user-points-lookup {
         padding: 3px;
     }
-    
+
     .user-points-lookup h2 {
         font-size: 1.3em;
     }
-    
-    .user-info-card,
-    .points-summary,
-    .category-breakdown,
-    .event-breakdown {
+
+    .user-points-lookup .user-info-card,
+    .user-points-lookup .points-summary,
+    .user-points-lookup .category-breakdown,
+    .user-points-lookup .event-breakdown {
         padding: 8px;
         margin-bottom: 8px;
     }
-    
-    .points-grid {
+
+    .user-points-lookup .points-grid {
         grid-template-columns: 1fr !important;
     }
-    
-    .events-table tr {
+
+    .user-points-lookup .events-table tr {
         padding: 12px;
         margin-bottom: 12px;
     }
-    
-    .events-table td {
+
+    .user-points-lookup .events-table td {
         padding: 6px 0;
         font-size: 14px;
     }
-    
-    .events-table td:before {
+
+    .user-points-lookup .events-table td:before {
         min-width: 70px;
         font-size: 13px;
     }
-    
-    .category-table {
+
+    .user-points-lookup .category-table {
         font-size: 10px;
     }
-    
-    .category-table th,
-    .category-table td {
+
+    .user-points-lookup .category-table th,
+    .user-points-lookup .category-table td {
         padding: 4px 2px;
         font-size: 10px;
     }
-    
-    .user-info-card h3,
-    .points-summary h3,
-    .category-breakdown h3,
-    .event-breakdown h3 {
+
+    .user-points-lookup .user-info-card h3,
+    .user-points-lookup .points-summary h3,
+    .user-points-lookup .category-breakdown h3,
+    .user-points-lookup .event-breakdown h3 {
         font-size: 1.1em;
         margin-bottom: 10px;
     }
-    
-    .badge-yes,
-    .badge-no {
+
+    .user-points-lookup .badge-yes,
+    .user-points-lookup .badge-no {
         font-size: 12px;
         padding: 3px 6px;
     }

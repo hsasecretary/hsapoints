@@ -12,7 +12,7 @@
 }
 
 /* Search Form */
-.search-form {
+.user-points-lookup .search-form {
     background: #f8f9fa;
     padding: 20px;
     border-radius: 8px;
@@ -20,7 +20,7 @@
     border: 2px solid #155776;
 }
 
-.search-input-group {
+.user-points-lookup .search-input-group {
     display: flex;
     gap: 10px;
     align-items: center;
@@ -28,7 +28,7 @@
     justify-content: center;
 }
 
-.search-input {
+.user-points-lookup .search-input {
     flex: 1;
     min-width: 300px;
     padding: 12px;
@@ -37,12 +37,13 @@
     font-size: 16px;
 }
 
-.search-input:focus {
+.user-points-lookup .search-input:focus {
     outline: none;
     border-color: #155776;
 }
 
-.search-button, .clear-button {
+.user-points-lookup .search-button,
+.user-points-lookup .clear-button {
     padding: 12px 20px;
     border: none;
     border-radius: 5px;
@@ -51,30 +52,30 @@
     transition: background-color 0.3s;
 }
 
-.search-button {
+.user-points-lookup .search-button {
     background-color: #155776;
     color: white;
 }
 
-.search-button:hover:not(:disabled) {
+.user-points-lookup .search-button:hover:not(:disabled) {
     background-color: #0d3f54;
 }
 
-.search-button:disabled {
+.user-points-lookup .search-button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
 
-.clear-button {
+.user-points-lookup .clear-button {
     background-color: #dc3545;
     color: white;
 }
 
-.clear-button:hover {
+.user-points-lookup .clear-button:hover {
     background-color: #c82333;
 }
 
-.error-message {
+.user-points-lookup .error-message {
     color: #dc3545;
     text-align: center;
     margin-top: 10px;
@@ -82,14 +83,14 @@
 }
 
 /* User Results */
-.user-results {
+.user-points-lookup .user-results {
     display: flex;
     flex-direction: column;
     gap: 30px;
 }
 
 /* User Info Card */
-.user-info-card {
+.user-points-lookup .user-info-card {
     background: white;
     border: 2px solid #155776;
     border-radius: 8px;
@@ -97,20 +98,20 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.user-info-card h3 {
+.user-points-lookup .user-info-card h3 {
     color: #155776;
     margin-bottom: 15px;
     border-bottom: 2px solid #155776;
     padding-bottom: 10px;
 }
 
-.user-info-grid {
+.user-points-lookup .user-info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 15px;
 }
 
-.user-info-grid div {
+.user-points-lookup .user-info-grid div {
     padding: 10px;
     background: #f8f9fa;
     border-radius: 5px;
@@ -118,7 +119,7 @@
 }
 
 /* Points Summary */
-.points-summary {
+.user-points-lookup .points-summary {
     background: white;
     border: 2px solid #155776;
     border-radius: 8px;
@@ -126,19 +127,19 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.points-summary h3 {
+.user-points-lookup .points-summary h3 {
     color: #155776;
     margin-bottom: 20px;
     text-align: center;
 }
 
-.points-grid {
+.user-points-lookup .points-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
 }
 
-.points-card {
+.user-points-lookup .points-card {
     background: #f8f9fa;
     border: 2px solid #ddd;
     border-radius: 8px;
@@ -147,47 +148,47 @@
     transition: transform 0.2s;
 }
 
-.points-card:hover {
+.user-points-lookup .points-card:hover {
     transform: translateY(-2px);
 }
 
-.points-card.total {
+.user-points-lookup .points-card.total {
     border-color: #155776;
     background: linear-gradient(135deg, #155776, #1a6b8a);
     color: white;
 }
 
-.points-card.eligible {
+.user-points-lookup .points-card.eligible {
     border-color: #28a745;
     background: linear-gradient(135deg, #28a745, #34ce57);
     color: white;
 }
 
-.points-card.not-eligible {
+.user-points-lookup .points-card.not-eligible {
     border-color: #dc3545;
     background: linear-gradient(135deg, #dc3545, #e85563);
     color: white;
 }
 
-.points-card h4 {
+.user-points-lookup .points-card h4 {
     margin: 0 0 10px 0;
     font-size: 14px;
     font-weight: 600;
 }
 
-.points-value {
+.user-points-lookup .points-value {
     font-size: 2.5em;
     font-weight: bold;
     margin-bottom: 5px;
 }
 
-.eligibility-status {
+.user-points-lookup .eligibility-status {
     font-size: 12px;
     font-weight: 600;
 }
 
 /* Category Breakdown */
-.category-breakdown {
+.user-points-lookup .category-breakdown {
     background: white;
     border: 2px solid #155776;
     border-radius: 8px;
@@ -195,41 +196,41 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.category-breakdown h3 {
+.user-points-lookup .category-breakdown h3 {
     color: #155776;
     margin-bottom: 20px;
     text-align: center;
 }
 
-.category-table {
+.user-points-lookup .category-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
 }
 
-.category-table th,
-.category-table td {
+.user-points-lookup .category-table th,
+.user-points-lookup .category-table td {
     padding: 12px;
     text-align: center;
     border: 1px solid #ddd;
 }
 
-.category-table th {
+.user-points-lookup .category-table th {
     background-color: #155776;
     color: white;
     font-weight: bold;
 }
 
-.category-table tr:nth-child(even) {
+.user-points-lookup .category-table tr:nth-child(even) {
     background-color: #f8f9fa;
 }
 
-.category-table tr:hover {
+.user-points-lookup .category-table tr:hover {
     background-color: #e3f2fd;
 }
 
 /* Event Breakdown */
-.event-breakdown {
+.user-points-lookup .event-breakdown {
     background: white;
     border: 2px solid #155776;
     border-radius: 8px;
@@ -237,27 +238,27 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.event-breakdown h3 {
+.user-points-lookup .event-breakdown h3 {
     color: #155776;
     margin-bottom: 20px;
     text-align: center;
 }
 
-.events-table {
+.user-points-lookup .events-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
     font-size: 14px;
 }
 
-.events-table th,
-.events-table td {
+.user-points-lookup .events-table th,
+.user-points-lookup .events-table td {
     padding: 10px;
     text-align: left;
     border: 1px solid #ddd;
 }
 
-.events-table th {
+.user-points-lookup .events-table th {
     background-color: #155776;
     color: white;
     font-weight: bold;
@@ -265,15 +266,15 @@
     top: 0;
 }
 
-.events-table tr:nth-child(even) {
+.user-points-lookup .events-table tr:nth-child(even) {
     background-color: #f8f9fa;
 }
 
-.events-table tr:hover {
+.user-points-lookup .events-table tr:hover {
     background-color: #e3f2fd;
 }
 
-.badge-yes {
+.user-points-lookup .badge-yes {
     background-color: #28a745;
     color: white;
     padding: 4px 8px;
@@ -282,7 +283,7 @@
     font-weight: bold;
 }
 
-.badge-no {
+.user-points-lookup .badge-no {
     background-color: #dc3545;
     color: white;
     padding: 4px 8px;
@@ -296,40 +297,40 @@
     .user-points-lookup {
         padding: 10px;
     }
-    
-    .search-input-group {
+
+    .user-points-lookup .search-input-group {
         flex-direction: column;
         align-items: stretch;
     }
-    
-    .search-input {
+
+    .user-points-lookup .search-input {
         min-width: unset;
     }
-    
-    .points-grid {
+
+    .user-points-lookup .points-grid {
         grid-template-columns: 1fr;
     }
-    
-    .user-info-grid {
+
+    .user-points-lookup .user-info-grid {
         grid-template-columns: 1fr;
     }
-    
-    .events-table {
+
+    .user-points-lookup .events-table {
         font-size: 12px;
     }
-    
-    .events-table th,
-    .events-table td {
+
+    .user-points-lookup .events-table th,
+    .user-points-lookup .events-table td {
         padding: 8px 4px;
     }
 }
 
 @media (max-width: 480px) {
-    .points-value {
+    .user-points-lookup .points-value {
         font-size: 2em;
     }
-    
-    .events-table {
+
+    .user-points-lookup .events-table {
         font-size: 10px;
     }
 }

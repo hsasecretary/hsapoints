@@ -4,7 +4,7 @@ import './NavBar.css';
 function NavBar({eboard, cabinet}) {
 
 	return (
-		<div className="header nav-header">
+		<div className="brand-bar nav-header">
 			<nav className="nav-bar">
 				<ul>
 					<li><a href="https://ufhsa.com">UF HSA</a></li>

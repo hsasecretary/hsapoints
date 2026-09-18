@@ -1,4 +1,3 @@
-import './Eboard.css';
 import CreateCode from './CreateCode';
 import Logout from './Logout';
 import ApprovedCabinet from './ApprovedCabinet';
