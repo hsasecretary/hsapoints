@@ -590,7 +590,12 @@
     color:red;
 }
 
-/* ---- Points Requested: 1 / 2 choice  (PointRequest.tsx) ---------------- */
+/* ---- Points Requested: 1 / 2 choice  (PointRequest.tsx) ----------------
+   Only shown for "Other"; without it the Date field spans the row. */
+.point-request .form-row--single {
+    grid-template-columns: minmax(0, 1fr);
+}
+
 .point-request .points-choice {
     display: grid;
     grid-template-columns: 1fr 1fr;

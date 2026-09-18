@@ -284,7 +284,9 @@ function PointRequest() {
                     />
                 </div>
 
-                <div className="form-row">
+                {/* Points are chosen by hand only for "Other"; every other activity
+                    uses its default (set when the activity type is picked). */}
+                <div className={`form-row${formData.activityType === 'other' ? '' : ' form-row--single'}`}>
                     <div className="form-group">
                         <label htmlFor="date">Date</label>
 
@@ -299,6 +301,7 @@ function PointRequest() {
                         />
                     </div>
 
+                    {formData.activityType === 'other' && (
                     <div className="form-group">
                         <label htmlFor="pointsRequested-1" id="pointsRequested-label">Points Requested</label>
 
@@ -324,6 +327,7 @@ function PointRequest() {
                             ))}
                         </div>
                     </div>
+                    )}
                 </div>
 
                 {/* Photo Evidence Upload Section */}

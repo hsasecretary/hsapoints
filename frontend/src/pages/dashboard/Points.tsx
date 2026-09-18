@@ -150,7 +150,7 @@ export default function Points({ refreshKey = 0, beforeCategories }: PointsProps
 
 	return (
 		<div className="user-points-lookup">
-			<h2>My Points Dashboard</h2>
+		
 			
 			<div className="user-results">
 				<div className="user-info-card">
@@ -160,7 +160,7 @@ export default function Points({ refreshKey = 0, beforeCategories }: PointsProps
 						<div><strong>Email:</strong> {userInfo.email}</div>
 						<div><strong>Account Type:</strong> {userInfo.cabinet === 'none' ? 'General Member' : userInfo.cabinet}</div>
 						{!userInfo.generalMember && <div><strong>Position:</strong> {userInfo.position}</div>}
-						<div><strong>Status:</strong> {userInfo.approved ? 'Approved' : 'Pending'}</div>
+						{/* <div><strong>Status:</strong> {userInfo.approved ? 'Approved' : 'Pending'}</div> */}
 						{!userInfo.generalMember && <div><strong>E-Board:</strong> {userInfo.eboard ? 'Yes' : 'No'}</div>}
 					</div>
 				</div>
