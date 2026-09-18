@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import Header from './Header';
+import Header from '../components/layout/Header';
 
 // Shown for any address that doesn't match a route (see the "*" route in App.tsx).
 function NotFound({ signedIn }: { signedIn: boolean }) {

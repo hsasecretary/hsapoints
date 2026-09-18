@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signInWithEmailAndPassword} from 'firebase/auth';
-import Header from './Header';
+import Header from '../../components/layout/Header';
 
 function Login() {
 	const auth = getAuth();

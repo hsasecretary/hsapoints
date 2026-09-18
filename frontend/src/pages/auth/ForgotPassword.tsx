@@ -1,6 +1,6 @@
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from './firebase';
-import Header from './Header';
+import { auth } from '../../lib/firebase';
+import Header from '../../components/layout/Header';
 
 function ForgotPassword() {
 	function check(event) 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { db } from './firebase';
+import { db } from '../../lib/firebase';
 import { arrayRemove, arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 function ApprovedCabinet() {

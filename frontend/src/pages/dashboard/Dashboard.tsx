@@ -1,7 +1,7 @@
 import Points from './Points'
 import Attendance from './Attendance';
 import PointRequest from './PointRequest';
-import Logout from './Logout';
+import Logout from '../../components/layout/Logout';
 import React, { useState } from 'react';
 
 function Dashboard({cabinet, email}) {

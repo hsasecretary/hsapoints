@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { auth, db} from './firebase';
+import { auth, db} from '../../lib/firebase';
 import { doc, getDoc, arrayUnion, updateDoc } from 'firebase/firestore';
 
 function Attendance({ onPointsUpdate }) {

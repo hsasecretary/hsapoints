@@ -1,11 +1,11 @@
 import CreateCode from './CreateCode';
-import Logout from './Logout';
+import Logout from '../../components/layout/Logout';
 import ApprovedCabinet from './ApprovedCabinet';
 import ExcuseAbscense from './ExcuseAbscense';
 import UserPointsLookup from './UserPointsLookup';
 import PointRequestReview from './PointRequestReview';
 import EditableCodesTable from './EditableCodesTable';
-import scrapeCabinetRoles from './scrapeCabinetRoles';
+import scrapeCabinetRoles from '../../lib/admin/scrapeCabinetRoles';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 

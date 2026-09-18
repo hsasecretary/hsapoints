@@ -1,19 +1,19 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-import SignUp from './SignUp';
-import Login from './Login';
-import Dashboard from './Dashboard';
-import Header from './Header';
-import NavBar from './NavBar';
-import Footer from './Footer';
-import NotFound from './NotFound';
-import Eboard from './Eboard';
-import ForgotPassword from './ForgotPassword';
-import Cabinet from './Cabinet';
+import SignUp from './pages/auth/SignUp';
+import Login from './pages/auth/Login';
+import Dashboard from './pages/dashboard/Dashboard';
+import Header from './components/layout/Header';
+import NavBar from './components/layout/NavBar';
+import Footer from './components/layout/Footer';
+import NotFound from './pages/NotFound';
+import Eboard from './pages/eboard/Eboard';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import Cabinet from './pages/cabinet/Cabinet';
 
 import React, { useEffect, useState } from "react";
 import { onAuthStateChanged} from 'firebase/auth';
-import { auth, db } from './firebase';
+import { auth, db } from './lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 
 function App() {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
-import { db } from './firebase';
+import { db } from '../../lib/firebase';
 
 function UserPointsLookup() {
     const [searchEmail, setSearchEmail] = useState('');

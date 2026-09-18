@@ -1,4 +1,4 @@
-import { db } from './firebase';
+import { db } from '../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 // Flag to ensure script runs only once
