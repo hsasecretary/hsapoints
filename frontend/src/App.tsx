@@ -7,6 +7,11 @@ import SiteHeader from './components/layout/SiteHeader';
 import Footer from './components/layout/Footer';
 import NotFound from './pages/NotFound';
 import Eboard from './pages/eboard/Eboard';
+import EventCodesPage from './pages/eboard/EventCodesPage';
+import PointRequestReview from './pages/eboard/PointRequestReview';
+import UserPointsLookup from './pages/eboard/UserPointsLookup';
+import ExcuseAbscense from './pages/eboard/ExcuseAbscense';
+import ApprovedCabinet from './pages/eboard/ApprovedCabinet';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import Cabinet from './pages/cabinet/Cabinet';
 
@@ -78,7 +83,15 @@ function App() {
                         <Route path="/login" element={userEmail ? <Navigate to="/dashboard" replace /> : <Login />} />
                         <Route path="/dashboard" element={userEmail ? <Dashboard cabinet={isCabinetMember} email={userEmail} /> : <Navigate to="/login" />} />
                         <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember} /> : <Navigate to="/login" />} />
-                        <Route path="/eboard" element={userEmail ? <Eboard eboard={isEboard} cabinet={isCabinetMember} /> : <Navigate to="/login" />} />
+                        {/* E-Board tools, one page each (list in pages/eboard/eboardTools.ts) */}
+                        <Route path="/eboard" element={userEmail ? <Eboard eboard={isEboard} cabinet={isCabinetMember} /> : <Navigate to="/login" />}>
+                            <Route index element={<Navigate to="event-codes" replace />} />
+                            <Route path="event-codes" element={<EventCodesPage />} />
+                            <Route path="point-requests" element={<PointRequestReview />} />
+                            <Route path="user-lookup" element={<UserPointsLookup />} />
+                            <Route path="excuse-absence" element={<ExcuseAbscense />} />
+                            <Route path="approvals" element={<ApprovedCabinet />} />
+                        </Route>
                         <Route path="/forgotPassword" element={<ForgotPassword />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>

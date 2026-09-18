@@ -73,6 +73,89 @@
     border-bottom-color: rgba(255, 255, 255, 0.85);
 }
 
+/* E-Board dropdown (desktop) */
+.site-header__dropdown {
+    position: relative;
+}
+
+.site-header__dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    border-radius: 0;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    background: transparent;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.site-header__dropdown-toggle:hover,
+.site-header__dropdown-toggle:active {
+    background: transparent;
+    box-shadow: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+.site-header__caret {
+    font-size: 12px;
+}
+
+.site-header__dropdown-menu {
+    /* Same look as the phone menu: teal panel, white links */
+    position: absolute;
+    top: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px;
+    background: linear-gradient(135deg, #0f4c64 0%, #155776 100%);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.3);
+    z-index: 110;
+}
+
+.site-header__dropdown-link {
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.site-header__dropdown-link:hover,
+.site-header__dropdown-link.is-active {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* E-Board tools in the phone menu */
+.site-header__menu-heading {
+    margin: 8px 0 2px;
+    padding: 0 10px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.site-header__menu-link--sub {
+    padding-left: 22px;
+    font-size: 15px;
+}
+
 /* Boxed like the site's other secondary buttons, in white on the teal bar */
 .site-header__logout {
     margin-left: auto;

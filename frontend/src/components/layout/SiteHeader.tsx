@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
+import { EBOARD_TOOLS } from '../../pages/eboard/eboardTools';
 
 // White HSA logo, currently served from ufhsa.com (Wix).
 const HSA_LOGO_URL =
@@ -21,26 +22,34 @@ type SiteHeaderProps = {
 // and Logout. Below 900px the links and Logout collapse into a menu button.
 function SiteHeader({ signedIn, eboard }: SiteHeaderProps) {
     const [open, setOpen] = useState(false);
+    const [eboardMenuOpen, setEboardMenuOpen] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Close the mobile menu when the page changes or on a click outside it.
-    useEffect(() => setOpen(false), [location.pathname]);
+    // Close the menus when the page changes or on a click outside the header.
     useEffect(() => {
-        if (!open) return;
+        setOpen(false);
+        setEboardMenuOpen(false);
+    }, [location.pathname]);
+    useEffect(() => {
+        if (!open && !eboardMenuOpen) return;
         const onClick = (e: MouseEvent) => {
-            if (headerRef.current && !headerRef.current.contains(e.target as Node)) setOpen(false);
+            if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
+                setOpen(false);
+                setEboardMenuOpen(false);
+            }
         };
         document.addEventListener('mousedown', onClick);
         return () => document.removeEventListener('mousedown', onClick);
-    }, [open]);
+    }, [open, eboardMenuOpen]);
+
+    const onEboardPage = location.pathname.startsWith('/eboard');
 
     const nav: NavItem[] = [
         { label: 'UF HSA', href: UFHSA_URL },
         { label: 'Dashboard', to: '/dashboard' },
         { label: 'Calendar', href: CALENDAR_URL },
-        ...(eboard ? [{ label: 'E-Board', to: '/eboard' }] : []),
     ];
 
     const logout = async () => {
@@ -79,6 +88,33 @@ function SiteHeader({ signedIn, eboard }: SiteHeaderProps) {
                     <>
                         <nav className="site-header__nav" aria-label="Main">
                             {nav.map((item) => renderLink(item, 'site-header__link'))}
+
+                            {eboard && (
+                                <div className="site-header__dropdown">
+                                    <button
+                                        type="button"
+                                        className={`site-header__link site-header__dropdown-toggle${onEboardPage ? ' is-active' : ''}`}
+                                        onClick={() => setEboardMenuOpen((v) => !v)}
+                                        aria-expanded={eboardMenuOpen}
+                                        aria-controls="eboard-menu"
+                                    >
+                                        E-Board <span className="site-header__caret" aria-hidden="true">▾</span>
+                                    </button>
+                                    {eboardMenuOpen && (
+                                        <div id="eboard-menu" className="site-header__dropdown-menu">
+                                            {EBOARD_TOOLS.map((tool) => (
+                                                <NavLink
+                                                    key={tool.path}
+                                                    to={`/eboard/${tool.path}`}
+                                                    className={({ isActive }) => `site-header__dropdown-link${isActive ? ' is-active' : ''}`}
+                                                >
+                                                    {tool.label}
+                                                </NavLink>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </nav>
 
                         <button type="button" className="site-header__logout" onClick={logout}>
@@ -110,6 +146,20 @@ function SiteHeader({ signedIn, eboard }: SiteHeaderProps) {
             {signedIn && open && (
                 <nav id="site-header-menu" className="site-header__menu" aria-label="Main">
                     {nav.map((item) => renderLink(item, 'site-header__menu-link'))}
+                    {eboard && (
+                        <>
+                            <p className="site-header__menu-heading">E-Board</p>
+                            {EBOARD_TOOLS.map((tool) => (
+                                <NavLink
+                                    key={tool.path}
+                                    to={`/eboard/${tool.path}`}
+                                    className={({ isActive }) => `site-header__menu-link site-header__menu-link--sub${isActive ? ' is-active' : ''}`}
+                                >
+                                    {tool.label}
+                                </NavLink>
+                            ))}
+                        </>
+                    )}
                     <button type="button" className="site-header__logout site-header__logout--menu" onClick={logout}>
                         Logout
                     </button>

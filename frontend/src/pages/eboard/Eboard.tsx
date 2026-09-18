@@ -1,84 +1,22 @@
-import CreateCode from './CreateCode';
-import ApprovedCabinet from './ApprovedCabinet';
-import ExcuseAbscense from './ExcuseAbscense';
-import UserPointsLookup from './UserPointsLookup';
-import PointRequestReview from './PointRequestReview';
-import EditableCodesTable from './EditableCodesTable';
-import scrapeCabinetRoles from '../../lib/admin/scrapeCabinetRoles';
-import { Link, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { Link, Navigate, Outlet } from 'react-router-dom';
 
+// Frame for every /eboard/* page: e-board-only, plus shortcuts at the top.
+// The tool itself (event codes, point requests, ...) renders in <Outlet />;
+// the pages are listed in eboardTools.ts.
 function Eboard({ eboard, cabinet }) {
-  let navigate = useNavigate();
-
-  useEffect(() => {
-    // Effect can be removed since EditableCodesTable handles its own data fetching
-  }, []);
-
-  function isEboard(eboard) {
-    if (eboard) {
-      return true;
-    } else {
-      navigate("/dashboard");
-    }
+  if (!eboard) {
+    return <Navigate to="/dashboard" replace />;
   }
-
-  const handleScrapeCabinetRoles = async () => {
-    try {
-      await scrapeCabinetRoles();
-      alert('Cabinet roles scraping completed! Check the console for results and look for the downloaded JSON file.');
-    } catch (error) {
-      console.error('Error running cabinet scraping:', error);
-      alert('Error occurred while scraping cabinet roles. Check the console for details.');
-    }
-  };
 
   return (
     <div>
       {/* Cabinet points used to be its own nav tab; for now it lives here. */}
-      {isEboard(eboard) && cabinet && (
+      {cabinet && (
         <div className="eboard-shortcuts">
-          <Link to="/cabinet" className="eboard-shortcuts__button">View Cabinet Points</Link>
+          <Link to="/cabinet" className="eboard-shortcuts__button">TEMP - View Cabinet Points</Link>
         </div>
       )}
-      {isEboard(eboard) && <CreateCode />}
-      <br />
-      
-      {/* Cabinet Management Section */}
-      {isEboard(eboard) && (
-        <div style={{textAlign: 'center', margin: '20px'}}>
-          <button 
-            onClick={handleScrapeCabinetRoles}
-            style={{
-              backgroundColor: '#155776',
-              color: 'white',
-              padding: '10px 20px',
-              border: 'none',
-              borderRadius: '5px',
-              fontSize: '16px',
-              cursor: 'pointer',
-              marginBottom: '10px'
-            }}
-          >
-            Scrape Cabinet Roles (One-Time)
-          </button>
-          
-          <p style={{fontSize: '12px', color: '#666'}}>
-            Export cabinet roles to JSON
-          </p>
-        </div>
-      )}
-
-      {/* Replace the old table with the new editable one */}
-      {isEboard(eboard) && <EditableCodesTable />}
-      
-      <br /><br /><br />
-      {isEboard(eboard) && <PointRequestReview />}
-      <br /><br />
-      {isEboard(eboard) && <UserPointsLookup />}
-      <br /><br />
-      {isEboard(eboard) && <ExcuseAbscense />}
-      {isEboard(eboard) && <ApprovedCabinet />}
+      <Outlet />
     </div>
   );
 }
