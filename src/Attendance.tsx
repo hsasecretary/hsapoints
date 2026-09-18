@@ -373,7 +373,8 @@ function Attendance({ onPointsUpdate }) {
                         fontSize: '1.2em',
                         fontWeight: 'bold',
                         marginBottom: '8px',
-                        color: '#155776'
+                        color: '#155776',
+                        textAlign: 'center'
                     }}>
                         Attendance Code:
                     </label>
@@ -382,7 +383,7 @@ function Attendance({ onPointsUpdate }) {
                         id="code"
                         value={code}
                         onChange={handleCodeChange}
-                        placeholder="Enter event code (e.g., GBM1)"
+                        placeholder="Enter Event Code"
                         style={{
                             width: '100%',
                             fontSize: '1.3rem',
@@ -391,7 +392,8 @@ function Attendance({ onPointsUpdate }) {
                             border: '2px solid #155776',
                             boxSizing: 'border-box',
                             transition: 'border-color 0.3s ease',
-                            textTransform: 'uppercase'
+                            textTransform: 'uppercase',
+                            textAlign: 'center'
                         }}
                         onFocus={(e) => e.target.style.borderColor = '#6db0cf'}
                         onBlur={(e) => e.target.style.borderColor = '#155776'}

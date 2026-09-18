@@ -48,6 +48,11 @@
     text-align: center;
 }
 
+/* Typed codes show in capitals, but keep the placeholder in normal case */
+.attendanceForm #code::placeholder {
+    text-transform: none;
+}
+
 .attendanceForm {
     display: block;
     background-color: #80beda58;

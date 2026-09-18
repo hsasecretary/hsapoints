@@ -5,6 +5,8 @@ import Login from './Login';
 import Dashboard from './Dashboard';
 import Header from './Header';
 import NavBar from './NavBar';
+import Footer from './Footer';
+import NotFound from './NotFound';
 import Eboard from './Eboard';
 import ForgotPassword from './ForgotPassword';
 import Cabinet from './Cabinet';
@@ -69,7 +71,7 @@ function App() {
             {loading || (userEmail && !rolesLoaded) ? (
                 <div>Loading...</div>
             ) : (
-                <div>
+                <div className="app-shell">
                     {userEmail && <Header />}
                     {userEmail && <NavBar eboard={isEboard} cabinet={isCabinetMember} />}
                     <Routes>
@@ -80,7 +82,9 @@ function App() {
                         <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember} /> : <Navigate to="/login" />} />
                         <Route path="/eboard" element={userEmail ? <Eboard eboard={isEboard} /> : <Navigate to="/login" />} />
                         <Route path="/forgotPassword" element={<ForgotPassword />} />
+                        <Route path="*" element={<NotFound signedIn={!!userEmail} />} />
                     </Routes>
+                    <Footer signedIn={!!userEmail} eboard={isEboard} cabinet={isCabinetMember} />
                 </div>
             )}
         </Router>

@@ -120,3 +120,203 @@
         font-size: 15px;
     }
 }
+
+/* ---- Site footer (Footer.tsx) ------------------------------------------ */
+
+/* App.tsx wraps every page in .app-shell so the footer sits at the bottom
+   of the window even on short pages. */
+.app-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+.app-shell > .site-footer {
+    margin-top: auto;
+}
+
+.site-footer {
+    background: linear-gradient(135deg, #0f4c64 0%, #155776 100%);
+    color: rgba(255, 255, 255, 0.78);
+    border-top: 3px solid #ffffff;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.site-footer__inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 40px 24px 20px;
+}
+
+.site-footer__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: 40px;
+}
+
+.site-footer a {
+    color: rgba(255, 255, 255, 0.78);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.site-footer a:hover {
+    color: #ffffff;
+}
+
+.site-footer__name {
+    margin: 0;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.site-footer__tagline {
+    margin: 8px 0 0;
+    max-width: 36ch;
+}
+
+.site-footer__contact {
+    display: flex;
+    flex-direction: column;
+    margin-top: 14px;
+    font-style: normal;
+}
+
+.site-footer__contact a {
+    word-break: break-all;
+}
+
+.site-footer__socials {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.site-footer__socials a {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.site-footer__socials a:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.site-footer__socials svg {
+    width: 17px;
+    height: 17px;
+}
+
+.site-footer__heading {
+    margin: 0;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.site-footer__links {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.site-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin-top: 32px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 12px;
+}
+
+.site-footer__credit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.site-footer__credit img {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+}
+
+.site-footer__credit p,
+.site-footer__copyright {
+    margin: 0;
+}
+
+.site-footer__copyright {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 768px) {
+    .site-footer__grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 28px 24px;
+    }
+
+    .site-footer__brand {
+        grid-column: 1 / -1;
+    }
+}
+
+/* ---- Page not found (NotFound.tsx) ------------------------------------- */
+.not-found {
+    max-width: 560px;
+    margin: 60px auto;
+    padding: 40px 24px;
+    text-align: center;
+    background: #ffffff;
+    border: 2px solid #155776;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.not-found__code {
+    margin: 0;
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 1;
+    color: #155776;
+    opacity: 0.25;
+}
+
+.not-found h2 {
+    margin: 12px 0 8px;
+}
+
+.not-found__text {
+    margin: 0 0 28px;
+    color: #475569;
+    line-height: 1.5;
+}
+
+/* Reuses the shared .submit-button look on a link */
+.not-found__button {
+    display: inline-block;
+    text-decoration: none;
+}
+
+@media (max-width: 600px) {
+    .not-found {
+        margin: 30px 16px;
+        padding: 32px 18px;
+    }
+
+    .not-found__code {
+        font-size: 56px;
+    }
+}
