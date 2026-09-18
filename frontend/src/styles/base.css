@@ -358,9 +358,19 @@ input, select
   text-align: left;
 }
 
+/* Page title (size="page"), e.g. "Dashboard" — bigger than section titles */
+.section-title.section-title--page {
+  font-size: 30px;
+  margin-bottom: 16px;
+}
+
 @media (max-width: 480px) {
   .section-title.section-title--center,
   .section-title.section-title--left {
     font-size: 20px;
+  }
+
+  .section-title.section-title--page {
+    font-size: 26px;
   }
 }

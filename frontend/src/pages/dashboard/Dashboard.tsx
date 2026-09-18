@@ -14,7 +14,7 @@ function Dashboard({cabinet, email}) {
 
 	return (
 		<div className="formDash" >
-			<div id="dash"><SectionTitle>Dashboard</SectionTitle></div>
+			<div id="dash"><SectionTitle size="page">Dashboard</SectionTitle></div>
 			<Points
 				refreshKey={pointsRefreshKey}
 				beforeCategories={<Attendance onPointsUpdate={handlePointsUpdate} />}
