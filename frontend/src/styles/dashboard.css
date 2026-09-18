@@ -185,6 +185,18 @@
     margin: 10px 0;
 }
 
+/* The attendance form sits between Points Summary and Points by Category;
+   line it up with the cards around it. */
+.user-points-lookup .attendanceForm {
+    width: auto;
+    margin: 0;
+    padding: 20px 20px 4px;
+}
+
+.user-points-lookup .attendanceForm h2 {
+    margin: 0 0 8px;
+}
+
 .user-points-lookup .user-info-card,
 .user-points-lookup .points-summary,
 .user-points-lookup .category-breakdown,

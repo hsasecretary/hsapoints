@@ -347,9 +347,9 @@ function Attendance({ onPointsUpdate }) {
 
     return (
         <div className="attendanceForm">
-            <h2>Event Attendance</h2>
+            <h2>Have an Event Code?</h2>
             <p style={{textAlign: 'center', color: '#666', marginBottom: '20px'}}>
-                Enter the code provided at the event to record your attendance and earn points
+                Enter the code from the event to check in and earn your points.
             </p>
             
             {message.text && (
@@ -368,19 +368,10 @@ function Attendance({ onPointsUpdate }) {
 
             <form onSubmit={checkCode} style={{width: '80%', margin: 'auto', paddingBottom: '20px'}}>
                 <div className="form-group" style={{marginBottom: '20px'}}>
-                    <label htmlFor="code" style={{
-                        display: 'block',
-                        fontSize: '1.2em',
-                        fontWeight: 'bold',
-                        marginBottom: '8px',
-                        color: '#155776',
-                        textAlign: 'center'
-                    }}>
-                        Attendance Code:
-                    </label>
                     <input 
                         type="text" 
                         id="code"
+                        aria-label="Event code"
                         value={code}
                         onChange={handleCodeChange}
                         placeholder="Enter Event Code"

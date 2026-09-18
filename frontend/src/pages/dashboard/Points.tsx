@@ -1,11 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, type ReactNode } from "react";
 import { auth, db } from '../../lib/firebase';
 import { isGeneralMember } from '../../lib/members';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
-export default function Points() {
+type PointsProps = {
+	/** Bump to re-fetch points (e.g. after an attendance code is accepted). */
+	refreshKey?: number;
+	/** Rendered between Points Summary and Points by Category (the attendance form). */
+	beforeCategories?: ReactNode;
+};
+
+export default function Points({ refreshKey = 0, beforeCategories }: PointsProps) {
 	const [userInfo, setUserInfo] = useState(null);
 	const [userPoints, setUserPoints] = useState(null);
 	const [eventBreakdown, setEventBreakdown] = useState([]);
@@ -119,12 +126,15 @@ export default function Points() {
 		});
 
 		return unsubscribe;
-	}, [navigate]);
+	}, [navigate, refreshKey]);
 
-	if (loading) {
+	// Only the first load replaces the page with a message; refreshes keep the
+	// current numbers (and the attendance form's success message) on screen.
+	if (loading && !userPoints) {
 		return (
 			<div className="user-points-lookup">
 				<div className="loading-message">Loading your points...</div>
+				{beforeCategories}
 			</div>
 		);
 	}
@@ -133,6 +143,7 @@ export default function Points() {
 		return (
 			<div className="user-points-lookup">
 				<div className="loading-message">Unable to load your points data</div>
+				{beforeCategories}
 			</div>
 		);
 	}
@@ -197,6 +208,8 @@ export default function Points() {
 						</div>
 					)}
 				</div>
+
+				{beforeCategories}
 
 				<div className="category-breakdown">
 					<h3>Points by Category</h3>
