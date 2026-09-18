@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import './CreateCode.css';
 import { db } from './firebase';
 import { setDoc, doc, collection, getDocs } from 'firebase/firestore';
 

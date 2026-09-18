@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import './PointRequestReview.css';
 import { db } from './firebase';
 import { collection, getDocs, doc, updateDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 

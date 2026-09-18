@@ -1,5 +1,4 @@
 
-import './NavBar.css';
 
 function NavBar({eboard, cabinet}) {
 

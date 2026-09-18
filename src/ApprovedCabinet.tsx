@@ -1,4 +1,3 @@
-import './ApprovedCabinet.css'; 
 import React, { useEffect, useState } from "react";
 import { db } from './firebase';
 import { arrayRemove, arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';

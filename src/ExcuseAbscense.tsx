@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import './ExcuseAbscense.css';
 import { db } from './firebase';
 import { arrayRemove, arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
 

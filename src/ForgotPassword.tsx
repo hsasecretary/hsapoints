@@ -1,4 +1,3 @@
-import './Master.css';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from './firebase';
 import Header from './Header';

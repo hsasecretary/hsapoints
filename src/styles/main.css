@@ -1,0 +1,15 @@
+/* The whole site's CSS, imported once from main.tsx.
+
+   base.css      site-wide defaults, shared form pieces, utilities
+   layout.css    title banner, nav bar, logout (every page)
+   auth.css      login / sign up / forgot password
+   dashboard.css member dashboard and cabinet page
+   eboard.css    e-board tools
+
+   Rules in the area files are scoped to a component's root class/id, so
+   sections can't leak into each other. Put new shared pieces in base.css. */
+@import './base.css';
+@import './auth.css';
+@import './dashboard.css';
+@import './layout.css';
+@import './eboard.css';

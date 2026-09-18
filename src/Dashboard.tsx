@@ -1,4 +1,3 @@
-import './Dashboard.css';
 import Points from './Points'
 import Attendance from './Attendance';
 import PointRequest from './PointRequest';

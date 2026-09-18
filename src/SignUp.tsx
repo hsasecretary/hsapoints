@@ -1,4 +1,3 @@
-import './Master.css';
 import React, { useState } from "react";
 import { db, auth } from './firebase';
 import { createUserWithEmailAndPassword } from "firebase/auth";

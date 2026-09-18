@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import './UserPointsLookup.css';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
 

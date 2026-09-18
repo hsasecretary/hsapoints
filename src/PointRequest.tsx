@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import './PointRequest.css';
 import { db } from './firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { auth } from './firebase';

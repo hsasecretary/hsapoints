@@ -139,6 +139,7 @@ hsapoints/
 │   ├── export_members.py
 │   └── serviceAccountKey.json (Git ignored)
 ├── src/                     # React application source code
+│   └── styles/              # All CSS: main.css imports base, layout, auth, dashboard, eboard
 │   ├── assets/              # Logos, icons, and image assets
 │   ├── components/          # Reusable UI components (Navbar, PointsCard, etc.)
 │   ├── pages/                # Main route views (Dashboard, Admin, Login, Events)

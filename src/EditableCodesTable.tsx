@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import './EditableCodesTable.css';
 import { db } from './firebase';
 import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
 
