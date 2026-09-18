@@ -117,7 +117,7 @@ function ApprovedCabinet() {
     return (
         <div id='approvedCabinetContainer' className='approvals'>
             <div className='approvals__header'>
-                <h2>Pending E-Board Approval</h2>
+                <h2>E-Board Member Approval</h2>
                 <p className='approvals__count'>
                     {emails.length === 0
                         ? 'No members pending approval'

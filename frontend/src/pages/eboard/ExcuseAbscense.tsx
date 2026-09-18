@@ -116,37 +116,64 @@ function ExcuseAbscense() {
         document.getElementById("findUserForm").classList.toggle("hidden");
         document.getElementById("updateExcuseForm").classList.toggle("hidden");
     }
+    // Same look as the User Points Lookup page (reuses its classes). The two
+    // forms and the element ids below are driven by updateUsers / updateExcuse.
     return(
-        <div className="attendanceForm">
-            <h2>Excuse Abscense</h2>
-            <form className= "" id="findUserForm" onSubmit = {updateUsers}>
-                <p className='errorMsg' id="abscenseEmailError"></p>
-                <label htmlFor="searchName">User Email:</label><br/>
-                <input type="text" id="searchName" placeholder="John Doe"></input>
-                <div className='center'><input type="submit"></input></div>
+        <div className="user-points-lookup excuse-absence">
+            <h2>Excuse Absence</h2>
+            <p style={{textAlign: 'center', color: '#666', marginBottom: '20px'}}>
+                Enter a member's email to excuse one of their unexcused absences
+            </p>
+
+            <form className="search-form" id="findUserForm" onSubmit = {updateUsers}>
+                <div className="search-input-group">
+                    <input
+                        type="email"
+                        id="searchName"
+                        className="search-input"
+                        placeholder="Enter UFL/SF email (e.g., user@ufl.edu)"
+                        aria-label="Member email"
+                    />
+                    <button type="submit" className="search-button">Search</button>
+                </div>
+                <p className='error-message errorMsg' id="abscenseEmailError"></p>
             </form>
-            <form className = "hidden" id="updateExcuseForm" onSubmit = {updateExcuse}>
-                <p></p>
-                <p id="userFullName"></p>
-                <p id="userEmail"></p>
-                <p className='errorMsg' id='userUnexcusedAbsenseError'></p>
-                <label htmlFor="userUnexcusedAbsense">Unexcused Absense:</label>
-                <select id="userUnexcusedAbsense">
-                    <option value="select">Select</option>
-                </select>
-                <p className='errorMsg' id='reasonErrror'></p>
-                <label htmlFor="reason">Reason:</label>
-                <select id="reason">
-                    <option value = "select">Select</option>
-                    <option value = "validExcuse">Valid Excuse</option>
-                    <option value = "pointRecovery">Point Recovery</option>
-                </select>
-                
-                <p className="errorMsg" id="detailsError"></p>
-                <label htmlFor="details">Details:</label>
-                <input id="details" type="text" placeholder='Attended SHPE GBM 11/7'></input>
-                <div className='center'><input type="submit"></input></div>
-                <div className='center'><button id='backToUserEmail' onClick= {back}>Back</button></div>
+
+            <form className="hidden user-info-card excuse-absence__form" id="updateExcuseForm" onSubmit = {updateExcuse}>
+                <h3>Excuse an Absence</h3>
+                <div className="user-info-grid">
+                    <div id="userFullName"></div>
+                    <div id="userEmail"></div>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="userUnexcusedAbsense">Unexcused Absence</label>
+                    <select id="userUnexcusedAbsense">
+                        <option value="select">Select</option>
+                    </select>
+                    <p className='errorMsg' id='userUnexcusedAbsenseError'></p>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="reason">Reason</label>
+                    <select id="reason">
+                        <option value = "select">Select</option>
+                        <option value = "validExcuse">Valid Excuse</option>
+                        <option value = "pointRecovery">Point Recovery</option>
+                    </select>
+                    <p className='errorMsg' id='reasonErrror'></p>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="details">Details</label>
+                    <input id="details" type="text" placeholder='Attended SHPE GBM 11/7'></input>
+                    <p className="errorMsg" id="detailsError"></p>
+                </div>
+
+                <div className="search-input-group excuse-absence__actions">
+                    <button type="submit" className="search-button">Excuse Absence</button>
+                    <button type="button" id='backToUserEmail' className="clear-button" onClick= {back}>Back</button>
+                </div>
             </form>
         </div>
     )

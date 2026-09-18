@@ -366,15 +366,26 @@
 
 /* ---- Excuse absence  (ExcuseAbscense.tsx) ---------------------------------------------- */
 
-.attendanceForm label {
-    margin-left: 10px;
+.excuse-absence .excuse-absence__form h3 {
+    margin-top: 0;
 }
 
-#backToUserEmail {
-    font-size: 1em;
-    min-width: 5em;
-    border-color: #155776;
-    margin-bottom: .5em;
+.excuse-absence .excuse-absence__form .user-info-grid {
+    margin-bottom: 16px;
+}
+
+.excuse-absence .excuse-absence__form .form-group {
+    margin-bottom: 12px;
+}
+
+.excuse-absence .excuse-absence__actions {
+    margin-top: 8px;
+}
+
+/* The step-2 card is a <form>; make it full width like the lookup's cards */
+.excuse-absence .excuse-absence__form {
+    width: auto;
+    margin: 0;
 }
 
 /* ---- Member points lookup (scoped to .user-points-lookup)  (UserPointsLookup.tsx) -------- */
