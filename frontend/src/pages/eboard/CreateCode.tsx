@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { db } from '../../lib/firebase';
 import ChoiceGroup from '../../components/ui/ChoiceGroup';
+import { currentSemester } from '../../lib/semester';
 import { setDoc, doc, collection, getDocs } from 'firebase/firestore';
 
 type CreateCodeProps = {
@@ -16,7 +17,7 @@ function CreateCode({ onCreated }: CreateCodeProps) {
         eventDate: '',
         graphicDate: '',
         points: '',
-        semester: 'springPoints',
+        semester: currentSemester(),
         voterEligible: true,  // Changed to true by default
         cabinetRequired: false,
         noGraphic: false
@@ -140,7 +141,7 @@ function CreateCode({ onCreated }: CreateCodeProps) {
                 eventDate: '',
                 graphicDate: '',
                 points: '',
-                semester: 'springPoints',
+                semester: currentSemester(),
                 voterEligible: true,  // Changed to true by default
                 cabinetRequired: false,
                 noGraphic: false
@@ -202,6 +203,16 @@ function CreateCode({ onCreated }: CreateCodeProps) {
 
                 <div className="form-row">
                     <div className="form-group">
+                        <label htmlFor="eventDate">Event Date</label>
+                        <input
+                            type="date"
+                            id="eventDate"
+                            value={formData.eventDate}
+                            onChange={(e) => handleInputChange('eventDate', e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
                         <label htmlFor="category">Category</label>
                         <select
                             id="category"
@@ -214,6 +225,19 @@ function CreateCode({ onCreated }: CreateCodeProps) {
                                 <option key={cat} value={cat}>{cat}</option>
                             ))}
                         </select>
+                    </div>
+                </div>
+
+                <div className="form-row">
+                    <div className="form-group">
+                        <label htmlFor="graphicDate">Graphic Posted Date</label>
+                        <input
+                            type="date"
+                            id="graphicDate"
+                            value={formData.graphicDate}
+                            onChange={(e) => handleInputChange('graphicDate', e.target.value)}
+                            disabled={formData.noGraphic}
+                        />
                     </div>
                     <div className="form-group">
                         <label htmlFor="points-0" id="points-label">Points</label>
@@ -230,16 +254,6 @@ function CreateCode({ onCreated }: CreateCodeProps) {
 
                 <div className="form-row">
                     <div className="form-group">
-                        <label htmlFor="eventDate">Event Date</label>
-                        <input
-                            type="date"
-                            id="eventDate"
-                            value={formData.eventDate}
-                            onChange={(e) => handleInputChange('eventDate', e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
                         <label htmlFor="semester-fallPoints" id="semester-label">Semester</label>
                         <ChoiceGroup
                             name="semester"
@@ -250,19 +264,6 @@ function CreateCode({ onCreated }: CreateCodeProps) {
                             ]}
                             value={formData.semester}
                             onChange={(value) => handleInputChange('semester', value)}
-                        />
-                    </div>
-                </div>
-
-                <div className="form-row">
-                    <div className="form-group">
-                        <label htmlFor="graphicDate">Graphic Posted Date</label>
-                        <input
-                            type="date"
-                            id="graphicDate"
-                            value={formData.graphicDate}
-                            onChange={(e) => handleInputChange('graphicDate', e.target.value)}
-                            disabled={formData.noGraphic}
                         />
                     </div>
                     <div className="form-group checkbox-group">
