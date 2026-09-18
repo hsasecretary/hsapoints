@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { db } from '../../lib/firebase';
+import ChoiceGroup from '../../components/ui/ChoiceGroup';
 import { setDoc, doc, collection, getDocs } from 'firebase/firestore';
 
 type CreateCodeProps = {
@@ -215,14 +216,13 @@ function CreateCode({ onCreated }: CreateCodeProps) {
                         </select>
                     </div>
                     <div className="form-group">
-                        <label htmlFor="points">Points</label>
-                        <input
-                            type="number"
-                            id="points"
+                        <label htmlFor="points-0" id="points-label">Points</label>
+                        <ChoiceGroup
+                            name="points"
+                            labelledBy="points-label"
+                            options={['0', '1', '2', '3'].map((n) => ({ value: n, label: n }))}
                             value={formData.points}
-                            onChange={(e) => handleInputChange('points', e.target.value)}
-                            min="0"
-                            max="10"
+                            onChange={(value) => handleInputChange('points', value)}
                             required
                         />
                     </div>
@@ -240,15 +240,17 @@ function CreateCode({ onCreated }: CreateCodeProps) {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="semester">Semester</label>
-                        <select
-                            id="semester"
+                        <label htmlFor="semester-fallPoints" id="semester-label">Semester</label>
+                        <ChoiceGroup
+                            name="semester"
+                            labelledBy="semester-label"
+                            options={[
+                                { value: 'fallPoints', label: 'Fall' },
+                                { value: 'springPoints', label: 'Spring' },
+                            ]}
                             value={formData.semester}
-                            onChange={(e) => handleInputChange('semester', e.target.value)}
-                        >
-                            <option value="fallPoints">Fall</option>
-                            <option value="springPoints">Spring</option>
-                        </select>
+                            onChange={(value) => handleInputChange('semester', value)}
+                        />
                     </div>
                 </div>
 
@@ -286,7 +288,7 @@ function CreateCode({ onCreated }: CreateCodeProps) {
                                 checked={formData.voterEligible}
                                 onChange={(e) => handleInputChange('voterEligible', e.target.checked)}
                             />
-                            Voter Eligible to Vote
+                            Voter Eligible?
                         </label>
                     </div>
                 </div>

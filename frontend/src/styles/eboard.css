@@ -1805,3 +1805,52 @@
     overflow: hidden;
     min-height: 0;
 }
+
+/* ---- Event Codes page frame  (EventCodesPage.tsx) ---------------------- */
+.event-codes-page {
+    padding-top: 12px;
+}
+
+/* One-time admin export at the bottom of the page */
+.admin-tool-card {
+    max-width: 1100px;
+    margin: 10px auto 20px;
+    padding: 20px;
+    text-align: center;
+    background: #ffffff;
+    border: 2px solid #155776;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.admin-tool-card .admin-tool-card__button {
+    min-width: 0;
+    min-height: 0;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    background: #155776;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.admin-tool-card .admin-tool-card__button:hover {
+    background: #0d3f54;
+    border: none;
+    box-shadow: none;
+}
+
+.admin-tool-card__note {
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: #666;
+}
+
+@media (max-width: 600px) {
+    .admin-tool-card {
+        margin: 10px 10px 20px;
+    }
+}

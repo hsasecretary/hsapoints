@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import CreateCode from './CreateCode';
+import SectionTitle from '../../components/ui/SectionTitle';
 import EditableCodesTable from './EditableCodesTable';
 import scrapeCabinetRoles from '../../lib/admin/scrapeCabinetRoles';
 
@@ -28,7 +29,9 @@ function EventCodesPage() {
   };
 
   return (
-    <div>
+    <div className="event-codes-page">
+      <SectionTitle size="page">Event Codes</SectionTitle>
+
       <div className="create-code-toggle">
         <button
           type="button"
@@ -51,30 +54,15 @@ function EventCodesPage() {
         </div>
       </div>
 
-      {/* Cabinet Management Section */}
-      <div style={{textAlign: 'center', margin: '20px'}}>
-        <button 
-          onClick={handleScrapeCabinetRoles}
-          style={{
-            backgroundColor: '#155776',
-            color: 'white',
-            padding: '10px 20px',
-            border: 'none',
-            borderRadius: '5px',
-            fontSize: '16px',
-            cursor: 'pointer',
-            marginBottom: '10px'
-          }}
-        >
+      <EditableCodesTable refreshKey={codesRefreshKey} />
+
+      {/* One-time admin export, kept out of the way at the bottom */}
+      <section className="admin-tool-card">
+        <button type="button" className="admin-tool-card__button" onClick={handleScrapeCabinetRoles}>
           Scrape Cabinet Roles (One-Time)
         </button>
-        
-        <p style={{fontSize: '12px', color: '#666'}}>
-          Export cabinet roles to JSON
-        </p>
-      </div>
-
-      <EditableCodesTable refreshKey={codesRefreshKey} />
+        <p className="admin-tool-card__note">Export cabinet roles to JSON</p>
+      </section>
     </div>
   );
 }
