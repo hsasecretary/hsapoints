@@ -1,6 +1,10 @@
 /* PointRequest Styles */
 .point-request {
     max-width: 800px;
+    /* It's a flex item inside .formDash: fill the row, and allow shrinking
+       below the fields' built-in widths (min-width: auto would stop that). */
+    flex: 1 1 100%;
+    min-width: 0;
     margin: 0 auto;
     padding: 20px;
     background: white;
@@ -52,11 +56,14 @@
 .form-group {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .form-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* minmax(0, 1fr), not 1fr: a date input's built-in width would otherwise
+       force the column wider than the screen. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 20px;
 }
 
@@ -76,6 +83,9 @@
     font-size: 16px;
     font-family: 'Montserrat', sans-serif;
     transition: border-color 0.3s;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .form-group input:focus,
@@ -229,8 +239,23 @@
         padding: 15px;
     }
     
+    /* Date and Points Requested stack, one per row */
     .form-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* iOS Safari draws date inputs at their own size, ignoring width and
+       overlapping the next field. Dropping the native styling makes them
+       respect the box; tapping still opens the date picker. */
+    .form-group input[type="date"] {
+        -webkit-appearance: none;
+        appearance: none;
+        min-height: 48px;
+        background-color: #fff;
+    }
+
+    .form-group input[type="date"]::-webkit-date-and-time-value {
+        text-align: left;
     }
     
     .preview-container img {
