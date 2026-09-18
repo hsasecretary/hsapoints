@@ -1,0 +1,1574 @@
+/* ========================================================================
+   E-Board page (/eboard)
+   ======================================================================== */
+
+/* ---- Create New Event Code  (CreateCode.tsx) --------------------------------------- */
+
+/* CreateCode Modern Styles */
+.create-code-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border: 2px solid #155776;
+}
+
+.create-code-container .create-code-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.create-code-container .create-code-header h2 {
+    color: #155776;
+    margin-bottom: 10px;
+    font-size: 28px;
+}
+
+.create-code-container .create-code-header p {
+    color: #666;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Form Styles */
+.create-code-container .create-code-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.create-code-container .checkbox-group {
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+}
+
+.create-code-container .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+
+.create-code-container .checkbox-label:hover {
+    background-color: #f8f9fa;
+}
+
+.create-code-container .checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    transform: scale(1.2);
+}
+
+/* Checkboxes: start at the top, flush with the other fields' left edge,
+   one consistent size, text wrapping next to the box. */
+.create-code-container .create-code-form .checkbox-group {
+    justify-content: flex-start;
+    gap: 6px;
+    padding-top: 22px;
+}
+
+.create-code-container .create-code-form .checkbox-label {
+    align-items: flex-start;
+    padding: 6px 0;
+    line-height: 1.35;
+}
+
+.create-code-container .create-code-form .checkbox-label input[type="checkbox"] {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin: 1px 0 0;
+    transform: none;
+    accent-color: #155776;
+}
+
+/* Voter Eligibility Info */
+.create-code-container .voter-eligibility-info {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+    border-left: 4px solid #155776;
+}
+
+.create-code-container .eligibility-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.create-code-container .eligibility-badge.eligible {
+    background: #28a745;
+    color: white;
+}
+
+.create-code-container .eligibility-badge.not-eligible {
+    background: #dc3545;
+    color: white;
+}
+
+.create-code-container .eligibility-note {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+    font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .create-code-container {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .create-code-container .create-code-form .checkbox-group {
+        padding-top: 0;
+    }
+
+    .create-code-container .create-code-header h2 {
+        font-size: 24px;
+    }
+
+    .create-code-container .create-code-header p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .create-code-container {
+        padding: 10px;
+    }
+
+    .create-code-container .voter-eligibility-info {
+        padding: 15px;
+    }
+}
+.create-code-container .form-group label[for*="eventName"]:after,
+.create-code-container .form-group label[for*="eventCode"]:after,
+.create-code-container .form-group label[for*="category"]:after,
+.create-code-container .form-group label[for*="eventDate"]:after,
+.create-code-container .form-group label[for*="points"]:after {
+    content: ' *';
+    color: #dc3545;
+}
+
+/* Focus and hover states */
+.create-code-container .form-group input:hover,
+.create-code-container .form-group select:hover {
+    border-color: #155776;
+}
+
+/* Animation for loading state */
+
+/* ---- Pending cabinet approvals  (ApprovedCabinet.tsx) ----------------------------------- */
+
+#approvedCabinetContainer .head {
+    background-color: #155776;
+}
+
+#approvedCabinetContainer .even {
+    background-color: #c5e5f3;
+}
+
+#approvedCabinetContainer .odd {
+    background-color: #eef0ee;
+}
+
+#approvedCabinetContainer table {
+    margin:auto;
+    margin-top: 5%;
+    width:85%;
+    border-collapse:collapse;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1), 0 6px 20px 0 rgba(0,0,0,0.19);
+    overflow-x: auto;
+}
+
+/* ---- Excuse absence  (ExcuseAbscense.tsx) ---------------------------------------------- */
+
+.attendanceForm label {
+    margin-left: 10px;
+}
+
+#backToUserEmail {
+    font-size: 1em;
+    min-width: 5em;
+    border-color: #155776;
+    margin-bottom: .5em;
+}
+
+/* ---- Member points lookup (scoped to .user-points-lookup)  (UserPointsLookup.tsx) -------- */
+
+/* UserPointsLookup Styles */
+.user-points-lookup {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.user-points-lookup h2 {
+    text-align: center;
+    color: #155776;
+    margin-bottom: 10px;
+}
+
+/* Search Form */
+.user-points-lookup .search-form {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border: 2px solid #155776;
+}
+
+.user-points-lookup .search-input-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.user-points-lookup .search-input {
+    flex: 1;
+    min-width: 300px;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.user-points-lookup .search-input:focus {
+    outline: none;
+    border-color: #155776;
+}
+
+.user-points-lookup .search-button,
+.user-points-lookup .clear-button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.user-points-lookup .search-button {
+    background-color: #155776;
+    color: white;
+}
+
+.user-points-lookup .search-button:hover:not(:disabled) {
+    background-color: #0d3f54;
+}
+
+.user-points-lookup .search-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.user-points-lookup .clear-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.user-points-lookup .clear-button:hover {
+    background-color: #c82333;
+}
+
+.user-points-lookup .error-message {
+    color: #dc3545;
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* User Results */
+.user-points-lookup .user-results {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* User Info Card */
+.user-points-lookup .user-info-card {
+    background: white;
+    border: 2px solid #155776;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.user-points-lookup .user-info-card h3 {
+    color: #155776;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #155776;
+    padding-bottom: 10px;
+}
+
+.user-points-lookup .user-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.user-points-lookup .user-info-grid div {
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    border-left: 4px solid #155776;
+}
+
+/* Points Summary */
+.user-points-lookup .points-summary {
+    background: white;
+    border: 2px solid #155776;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.user-points-lookup .points-summary h3 {
+    color: #155776;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.user-points-lookup .points-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.user-points-lookup .points-card {
+    background: #f8f9fa;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.user-points-lookup .points-card:hover {
+    transform: translateY(-2px);
+}
+
+.user-points-lookup .points-card.total {
+    border-color: #155776;
+    background: linear-gradient(135deg, #155776, #1a6b8a);
+    color: white;
+}
+
+.user-points-lookup .points-card.eligible {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #28a745, #34ce57);
+    color: white;
+}
+
+.user-points-lookup .points-card.not-eligible {
+    border-color: #dc3545;
+    background: linear-gradient(135deg, #dc3545, #e85563);
+    color: white;
+}
+
+.user-points-lookup .points-card h4 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.user-points-lookup .points-value {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.user-points-lookup .eligibility-status {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Category Breakdown */
+.user-points-lookup .category-breakdown {
+    background: white;
+    border: 2px solid #155776;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.user-points-lookup .category-breakdown h3 {
+    color: #155776;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.user-points-lookup .category-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.user-points-lookup .category-table th,
+.user-points-lookup .category-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.user-points-lookup .category-table th {
+    background-color: #155776;
+    color: white;
+    font-weight: bold;
+}
+
+.user-points-lookup .category-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.user-points-lookup .category-table tr:hover {
+    background-color: #e3f2fd;
+}
+
+/* Event Breakdown */
+.user-points-lookup .event-breakdown {
+    background: white;
+    border: 2px solid #155776;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.user-points-lookup .event-breakdown h3 {
+    color: #155776;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.user-points-lookup .events-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.user-points-lookup .events-table th,
+.user-points-lookup .events-table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.user-points-lookup .events-table th {
+    background-color: #155776;
+    color: white;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+}
+
+.user-points-lookup .events-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.user-points-lookup .events-table tr:hover {
+    background-color: #e3f2fd;
+}
+
+.user-points-lookup .badge-yes {
+    background-color: #28a745;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.user-points-lookup .badge-no {
+    background-color: #dc3545;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .user-points-lookup {
+        padding: 10px;
+    }
+
+    .user-points-lookup .search-input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .user-points-lookup .search-input {
+        min-width: unset;
+    }
+
+    .user-points-lookup .points-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .user-points-lookup .user-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .user-points-lookup .events-table {
+        font-size: 12px;
+    }
+
+    .user-points-lookup .events-table th,
+    .user-points-lookup .events-table td {
+        padding: 8px 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-points-lookup .points-value {
+        font-size: 2em;
+    }
+
+    .user-points-lookup .events-table {
+        font-size: 10px;
+    }
+}
+
+/* ---- Review point requests  (PointRequestReview.tsx) --------------------------------------- */
+
+/* PointRequestReview Styles */
+.point-request-review {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.point-request-review h2 {
+    text-align: center;
+    color: #0f4c64;
+    font-weight: 800;
+    margin-bottom: 30px;
+}
+
+/* Filter Section */
+.point-request-review .filter-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 18px 24px;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 2px solid #0f4c64;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.point-request-review .filter-section label {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 15px;
+}
+
+.point-request-review .filter-section select {
+    padding: 8px 14px;
+    border: 1.5px solid #94a3b8;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    background: #ffffff;
+}
+
+.point-request-review .filter-section select:focus {
+    outline: none;
+    border-color: #0f4c64;
+    box-shadow: 0 0 0 2px rgba(15, 76, 100, 0.2);
+}
+
+/* Refresh Button */
+.point-request-review .filter-section .refresh-button,
+.point-request-review .refresh-button {
+    background: #0f4c64;
+    color: #ffffff;
+    border: 2px solid #0f4c64;
+    padding: 9px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    transition: background-color 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.point-request-review .filter-section .refresh-button:hover,
+.point-request-review .refresh-button:hover:not(:disabled) {
+    background: #082f3f;
+    border-color: #082f3f;
+}
+
+/* No Requests */
+.point-request-review .no-requests {
+    text-align: center;
+    font-size: 16px;
+    color: #334155;
+    font-weight: 600;
+    margin: 50px 0;
+    padding: 40px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+}
+
+/* Requests Grid */
+.point-request-review .requests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+}
+
+/* Request Card */
+.point-request-review .request-card {
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.point-request-review .request-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+    border-color: #94a3b8;
+}
+
+/* Request Header */
+.point-request-review .request-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.point-request-review .user-info h3 {
+    margin: 0 0 4px 0;
+    color: #0f4c64;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.point-request-review .user-info .email {
+    margin: 0;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Status Badges - Legible contrast */
+.point-request-review .status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-align: center;
+    min-width: 80px;
+}
+
+.point-request-review .status-badge.pending,
+.point-request-review .status-badge:not(.approved):not(.denied) {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #f59e0b;
+}
+
+.point-request-review .status-badge.approved {
+    background-color: #dcfce7;
+    color: #14532d;
+    border: 1px solid #86efac;
+}
+
+.point-request-review .status-badge.denied {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+/* Request Details */
+.point-request-review .request-details {
+    margin-bottom: 18px;
+}
+
+.point-request-review .detail-row {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #1e293b;
+}
+
+.point-request-review .detail-row strong {
+    color: #0f172a;
+    font-weight: 700;
+    margin-right: 6px;
+}
+
+.point-request-review .description {
+    margin-top: 14px;
+}
+
+.point-request-review .description strong {
+    color: #0f172a;
+}
+
+.point-request-review .description p {
+    margin: 6px 0 0 0;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border-left: 4px solid #0f4c64;
+    color: #0f172a;
+    font-style: italic;
+    line-height: 1.5;
+    font-size: 13.5px;
+}
+
+/* Request Image Button - Crisp Dark Teal */
+.point-request-review .request-image {
+    margin-bottom: 18px;
+}
+
+.point-request-review .view-image-button {
+    background: #0f5b7a;
+    color: #ffffff;
+    border: 1.5px solid #0f5b7a;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    transition: background-color 0.2s;
+    width: 100%;
+}
+
+.point-request-review .view-image-button:hover:not(:disabled) {
+    background: #0a3d52;
+}
+
+/* Request Action Buttons */
+.point-request-review .request-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.point-request-review .approve-button,
+.point-request-review .deny-button {
+    flex: 1;
+    padding: 11px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* Approve: Dark Forest Green */
+.point-request-review .approve-button {
+    background: #166534;
+    color: #ffffff;
+    border: 1.5px solid #166534;
+}
+
+.point-request-review .approve-button:hover:not(:disabled) {
+    background: #14532d;
+    border-color: #14532d;
+    transform: translateY(-1px);
+}
+
+/* Deny: High-Contrast Crimson */
+.point-request-review .deny-button {
+    background: #b91c1c;
+    color: #ffffff;
+    border: 1.5px solid #b91c1c;
+}
+
+.point-request-review .deny-button:hover:not(:disabled) {
+    background: #991b1b;
+    border-color: #991b1b;
+    transform: translateY(-1px);
+}
+
+/* CRITICAL FIX: Disabled/Processing State (Dark text on light gray) */
+.point-request-review .approve-button:disabled,
+.point-request-review .deny-button:disabled,
+.point-request-review .view-image-button:disabled {
+    background: #e2e8f0;
+    color: #64748b;
+    border: 1.5px solid #cbd5e1;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.9;
+}
+
+/* Review Info Box */
+.point-request-review .review-info {
+    margin-top: 18px;
+    padding: 14px;
+    background: #f1f5f9;
+    border-radius: 6px;
+    border-left: 4px solid #475569;
+    color: #1e293b;
+    font-size: 13.5px;
+}
+
+/* Image Modal */
+.point-request-review .image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.point-request-review .modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 24px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+}
+
+.point-request-review .modal-content img {
+    max-width: 100%;
+    max-height: 80vh;
+    width: auto;
+    height: auto;
+    border-radius: 6px;
+}
+
+.point-request-review .close-modal {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: #b91c1c;
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.point-request-review .close-modal:hover {
+    background: #991b1b;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .point-request-review .requests-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .point-request-review .filter-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .point-request-review .request-actions {
+        flex-direction: column;
+    }
+}
+
+/* ---- Manage Event Codes table  (EditableCodesTable.tsx) ------------------------------------ */
+
+/* EditableCodesTable Styles */
+.editable-codes-table {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Table Header */
+/* Title centered on top, buttons in an even row underneath */
+.editable-codes-table .table-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 2px solid #0f4c64;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.editable-codes-table .table-header h2 {
+    margin: 0;
+    text-align: center;
+    color: #0f4c64;
+    font-weight: 700;
+}
+
+.editable-codes-table .table-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* Fill their grid cell and allow shrinking below the 140px minimum below,
+   so the two buttons always fit side by side. */
+.editable-codes-table .table-actions .refresh-button,
+.editable-codes-table .table-actions .add-button {
+    width: 100%;
+    min-width: 0;
+}
+
+@media (max-width: 600px) {
+    .editable-codes-table .table-header {
+        padding: 16px 12px;
+    }
+
+    .editable-codes-table .table-actions {
+        gap: 8px;
+    }
+
+    .editable-codes-table .table-actions .refresh-button,
+    .editable-codes-table .table-actions .add-button {
+        padding: 10px 6px;
+        font-size: 15px;
+        gap: 6px;
+    }
+}
+
+/* Buttons Base */
+.editable-codes-table .refresh-button,
+.editable-codes-table .add-button {
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+    min-width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Refresh Button - High Contrast Dark Slate Blue */
+.editable-codes-table .refresh-button {
+    background: #0f4c64;
+    color: #ffffff;
+    border: 2px solid #0f4c64;
+}
+
+.editable-codes-table .refresh-button:hover:not(:disabled) {
+    background: #082f3f;
+    border-color: #082f3f;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Add New Code - solid high-contrast green */
+.editable-codes-table .add-button {
+    background: #166534;
+    color: #ffffff;
+    border: 2px solid #166534;
+    font-weight: 700;
+}
+
+.editable-codes-table .add-button:hover:not(:disabled) {
+    background: #14532d;
+    border-color: #14532d;
+    transform: translateY(-1px);
+}
+
+/* Disabled State: Dark text on light background (Never white on gray) */
+.editable-codes-table .refresh-button:disabled,
+.editable-codes-table .add-button:disabled {
+    background: #e2e8f0;
+    color: #64748b;
+    border-color: #cbd5e1;
+    cursor: not-allowed;
+    opacity: 0.85;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Enhanced focus states for accessibility */
+.editable-codes-table .refresh-button:focus,
+.editable-codes-table .add-button:focus {
+    outline: 3px solid #0284c7;
+    outline-offset: 2px;
+}
+
+/* Add Form */
+.editable-codes-table .add-form {
+    background: #ffffff;
+    border: 2px solid #166534;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.editable-codes-table .add-form h3 {
+    color: #166534;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.editable-codes-table .new-code-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.editable-codes-table .checkboxes {
+    flex-direction: row;
+    gap: 24px;
+    align-items: center;
+}
+
+.editable-codes-table .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.editable-codes-table .checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #0f4c64;
+}
+
+.editable-codes-table .voter-eligible-label {
+    font-weight: 700;
+}
+
+.editable-codes-table .checkbox-status {
+    font-weight: 700;
+    margin-left: 6px;
+}
+
+.editable-codes-table .checkbox-status.enabled {
+    color: #166534;
+}
+
+.editable-codes-table .checkbox-status.disabled {
+    color: #b91c1c;
+}
+
+.editable-codes-table .form-actions {
+    justify-content: flex-end;
+}
+
+.editable-codes-table .save-button,
+.editable-codes-table .cancel-button {
+    padding: 10px 22px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.editable-codes-table .save-button {
+    background: #166534;
+    color: #ffffff;
+    border: 1.5px solid #166534;
+}
+
+.editable-codes-table .save-button:hover {
+    background: #14532d;
+}
+
+.editable-codes-table .cancel-button {
+    background: #475569;
+    color: #ffffff;
+    border: 1.5px solid #475569;
+}
+
+.editable-codes-table .cancel-button:hover {
+    background: #334155;
+}
+
+/* Table Container */
+.editable-codes-table .table-container {
+    background: #ffffff;
+    border-radius: 10px;
+    overflow-x: auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 2px solid #0f4c64;
+}
+
+.editable-codes-table .codes-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    color: #0f172a;
+}
+
+.editable-codes-table .codes-table th {
+    background: #0f4c64;
+    color: #ffffff;
+    padding: 14px 12px;
+    text-align: left;
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.editable-codes-table .codes-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #cbd5e1;
+    vertical-align: middle;
+}
+
+.editable-codes-table .codes-table tr.even {
+    background-color: #f8fafc;
+}
+
+.editable-codes-table .codes-table tr.odd {
+    background-color: #ffffff;
+}
+
+.editable-codes-table .codes-table tr:hover {
+    background-color: #f1f5f9;
+}
+
+.editable-codes-table .code-id {
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-weight: 700;
+    color: #0f4c64;
+    min-width: 80px;
+}
+
+/* Edit Inputs in Table */
+.editable-codes-table .edit-input,
+.editable-codes-table .edit-select {
+    padding: 6px 8px;
+    border: 1.5px solid #0f4c64;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #0f172a;
+    width: 100%;
+    min-width: 100px;
+}
+
+.editable-codes-table .edit-input:focus,
+.editable-codes-table .edit-select:focus {
+    outline: none;
+    border-color: #082f3f;
+    box-shadow: 0 0 0 2px rgba(15, 76, 100, 0.2);
+}
+
+.editable-codes-table .points-input {
+    max-width: 80px;
+}
+
+/* Badges - Accessible High Contrast */
+.editable-codes-table .badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    display: inline-block;
+    min-width: 44px;
+}
+
+.editable-codes-table .badge-yes {
+    background-color: #dcfce7;
+    color: #14532d;
+    border: 1px solid #86efac;
+}
+
+.editable-codes-table .badge-no {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+/* Action Buttons inside rows */
+.editable-codes-table .actions-cell {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.editable-codes-table .edit-btn,
+.editable-codes-table .delete-btn,
+.editable-codes-table .save-btn,
+.editable-codes-table .cancel-btn {
+    padding: 6px 12px;
+    margin: 0 3px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 0;
+    min-height: 0;
+    transition: all 0.2s;
+}
+
+.editable-codes-table .edit-btn {
+    background: #0f5b7a;
+    color: #ffffff;
+    border: 1px solid #0f5b7a;
+}
+
+.editable-codes-table .edit-btn:hover {
+    background: #0a3d52;
+}
+
+.editable-codes-table .delete-btn {
+    background: #b91c1c;
+    color: #ffffff;
+    border: 1px solid #b91c1c;
+}
+
+.editable-codes-table .delete-btn:hover {
+    background: #991b1b;
+}
+
+.editable-codes-table .save-btn {
+    background: #166534;
+    color: #ffffff;
+    border: 1px solid #166534;
+}
+
+.editable-codes-table .save-btn:hover {
+    background: #14532d;
+}
+
+.editable-codes-table .cancel-btn {
+    background: #475569;
+    color: #ffffff;
+    border: 1px solid #475569;
+}
+
+.editable-codes-table .cancel-btn:hover {
+    background: #334155;
+}
+
+/* No Codes Message */
+.editable-codes-table .no-codes {
+    text-align: center;
+    padding: 40px;
+    color: #334155;
+    font-weight: 600;
+    font-size: 16px;
+    border-top: 2px solid #cbd5e1;
+}
+
+/* Accessibility Focus */
+.editable-codes-table .edit-btn:focus,
+.editable-codes-table .delete-btn:focus,
+.editable-codes-table .save-btn:focus,
+.editable-codes-table .cancel-btn:focus {
+    outline: 2px solid #0f4c64;
+    outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------------
+   Search / filter bar
+------------------------------------------------------------------------ */
+.editable-codes-table .codes-filters {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.editable-codes-table .codes-filters .codes-search,
+.editable-codes-table .codes-filters .codes-category-filter {
+    width: 100%;
+    margin: 0;
+    padding: 10px 12px;
+    border: 1.5px solid #94a3b8;
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: inherit;
+    color: #0f172a;
+    background-color: #ffffff;
+}
+
+.editable-codes-table .codes-filters .codes-search:focus,
+.editable-codes-table .codes-filters .codes-category-filter:focus {
+    outline: none;
+    border-color: #0f4c64;
+    box-shadow: 0 0 0 3px rgba(15, 76, 100, 0.2);
+}
+
+.editable-codes-table .codes-count {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+/* Phone-only pieces */
+.editable-codes-table .codes-table .cell-toggle,
+.editable-codes-table .codes-table .btn-label {
+    display: none;
+}
+
+/* ------------------------------------------------------------------------
+   Phones: each code is a compact row (Code / Event / Points / ▸).
+   Tap it to expand the rest of the fields and the Edit / Delete buttons.
+------------------------------------------------------------------------ */
+@media (max-width: 768px) {
+    .editable-codes-table .codes-filters {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .editable-codes-table .table-container {
+        overflow: visible;
+        border: none;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .editable-codes-table .codes-table,
+    .editable-codes-table .codes-table tbody {
+        display: block;
+    }
+
+    /* Eboard.css styles every <table> with a shadow and top margin */
+    .editable-codes-table .codes-table {
+        box-shadow: none;
+        margin-top: 0;
+    }
+
+    .editable-codes-table .codes-table thead {
+        display: none;
+    }
+
+    .editable-codes-table .codes-table tr,
+    .editable-codes-table .codes-table tr.even,
+    .editable-codes-table .codes-table tr.odd {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto auto;
+        align-items: center;
+        column-gap: 10px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .editable-codes-table .codes-table tr:hover {
+        background: #f8fafc;
+    }
+
+    .editable-codes-table .codes-table tr.expanded {
+        border-color: #0f4c64;
+    }
+
+    .editable-codes-table .codes-table td {
+        display: block;
+        padding: 0;
+        border: none;
+    }
+
+    /* Summary line */
+    .editable-codes-table .codes-table .code-id {
+        grid-row: 1;
+        grid-column: 1;
+        font-size: 13px;
+    }
+
+    .editable-codes-table .codes-table .cell-event {
+        grid-row: 1;
+        grid-column: 2;
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .editable-codes-table .codes-table tr.expanded .cell-event {
+        white-space: normal;
+    }
+
+    .editable-codes-table .codes-table .cell-points {
+        grid-row: 1;
+        grid-column: 3;
+        font-weight: 700;
+        color: #0f4c64;
+        white-space: nowrap;
+    }
+
+    .editable-codes-table .codes-table tr:not(.editing) .cell-points::after {
+        content: " pts";
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .editable-codes-table .codes-table .cell-toggle {
+        display: block;
+        grid-row: 1;
+        grid-column: 4;
+    }
+
+    .editable-codes-table .codes-table .toggle-btn,
+    .editable-codes-table .codes-table .toggle-btn:hover {
+        min-width: 0;
+        min-height: 0;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: none;
+        border-radius: 6px;
+        background: transparent;
+        box-shadow: none;
+        color: #0f4c64;
+        font-size: 28px;
+        line-height: 1;
+        transition: transform 0.15s ease;
+    }
+
+    .editable-codes-table .codes-table tr.expanded .toggle-btn {
+        transform: rotate(90deg);
+    }
+
+    .editable-codes-table .codes-table .toggle-btn:hover {
+        background: #e2e8f0;
+    }
+
+    /* Details: hidden until the row is expanded */
+    .editable-codes-table .codes-table .cell-detail {
+        display: none;
+        grid-column: 1 / -1;
+    }
+
+    .editable-codes-table .codes-table tr.expanded .cell-detail {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 0;
+        border-top: 1px solid #eef2f6;
+    }
+
+    .editable-codes-table .codes-table tr.expanded .cell-detail[data-label]::before {
+        content: attr(data-label);
+        font-size: 13px;
+        font-weight: 700;
+        color: #475569;
+    }
+
+    .editable-codes-table .codes-table tr.expanded .actions-cell {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding-top: 12px;
+    }
+
+    .editable-codes-table .codes-table .actions-cell button {
+        margin: 0;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .editable-codes-table .codes-table .btn-label {
+        display: inline;
+    }
+
+    /* Editing: every field full-width with its label above it */
+    .editable-codes-table .codes-table tr.expanded.editing {
+        cursor: default;
+    }
+
+    .editable-codes-table .codes-table tr.expanded.editing td {
+        grid-column: 1 / -1;
+        grid-row: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+        padding: 6px 0;
+        border-top: none;
+    }
+
+    .editable-codes-table .codes-table tr.expanded.editing td[data-label]::before {
+        content: attr(data-label);
+        font-size: 13px;
+        font-weight: 700;
+        color: #475569;
+    }
+
+    .editable-codes-table .codes-table tr.expanded.editing td input[type="checkbox"] {
+        align-self: flex-start;
+        width: 20px;
+        height: 20px;
+    }
+
+    .editable-codes-table .codes-table tr.expanded.editing td.actions-cell {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding-top: 12px;
+    }
+
+    .editable-codes-table .codes-table tr.expanded.editing td.cell-toggle {
+        display: none;
+    }
+
+    /* Full width, and drop the base input[type="text"] left margin (index.css) */
+    .editable-codes-table .codes-table .edit-input,
+    .editable-codes-table .codes-table .edit-select {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        margin: 0;
+        font-size: 15px;
+        padding: 8px 10px;
+    }
+}

@@ -1,0 +1,579 @@
+/* ========================================================================
+   Member dashboard (/dashboard) and Cabinet page (/cabinet)
+   ======================================================================== */
+
+/* ---- Dashboard page shell, attendance box, points cards  (Dashboard.tsx, Attendance.tsx, CabinetPoints.tsx) ---------- */
+
+.formDash {
+    background-color: #ffffff;
+    border-radius: 5px;
+    border: 2px solid #e3e8ea;
+    max-width: 1200px;
+    margin: 25px auto 30px;
+    width: 95%;
+    display: flex;
+    flex-flow: wrap;
+    justify-content: flex-start;
+}
+
+#dash {
+    width: 100%;
+}
+
+#pointsForm {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.pointsSubForm {
+    background-color: #80beda58;
+    border: 2px solid #155776;
+    flex: 1 1 auto;
+    min-width: 280px;
+    margin: 0 7.5px 15px;
+    border-radius: 5px;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.subForm h3,
+.pointsSubForm h3,
+#eboard h3 {
+    font-size: 1.9em;
+    text-align: center;
+}
+
+/* Typed codes show in capitals, but keep the placeholder in normal case */
+.attendanceForm #code::placeholder {
+    text-transform: none;
+}
+
+.attendanceForm {
+    display: block;
+    background-color: #80beda58;
+    border: 2px solid #155776;
+    width: calc(100% - 30px);
+    margin: 15px;
+    border-radius: 5px;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+#attendanceInput {
+    max-width: 800px;
+    margin: auto;
+    padding: 10px;
+}
+
+/* Enhanced Mobile Responsiveness */
+@media only screen and (max-width: 768px) {
+    .formDash {
+        width: 98%;
+        margin: 15px auto 20px;
+        padding: 10px;
+    }
+
+    #pointsForm {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .pointsSubForm {
+        width: calc(100% - 15px);
+        margin: 0 0 10px;
+        min-width: unset;
+    }
+
+    .attendanceForm {
+        width: calc(100% - 20px);
+        margin: 10px;
+    }
+
+    #attendanceInput {
+        padding: 5px;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    .formDash {
+        width: 99%;
+        margin: 10px auto 15px;
+        padding: 5px;
+        border-radius: 3px;
+    }
+
+    .subForm h3,
+    .pointsSubForm h3,
+    #eboard h3 {
+        font-size: 1.3em;
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .pointsSubForm h2 {
+        font-size: 1.5em;
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .pointsSubForm {
+        margin: 0 0 8px;
+        padding: 10px;
+    }
+
+    .attendanceForm {
+        width: calc(100% - 10px);
+        margin: 8px 5px;
+        padding: 8px;
+    }
+
+    #attendanceInput {
+        padding: 0;
+    }
+}
+
+@media only screen and (max-width: 360px) {
+    .formDash {
+        width: 100%;
+        margin: 5px auto 10px;
+        padding: 3px;
+        border-radius: 2px;
+    }
+
+    .pointsSubForm {
+        padding: 8px;
+        margin: 0 0 5px;
+    }
+
+    .attendanceForm {
+        width: calc(100% - 6px);
+        margin: 5px 3px;
+        padding: 5px;
+    }
+
+    .subForm h3,
+    .pointsSubForm h3,
+    #eboard h3 {
+        font-size: 1.1em;
+        margin: 5px 0;
+    }
+}
+
+/* ---- My Points (scoped to .user-points-lookup, shared with E-Board's member lookup)  (Points.tsx) ---- */
+
+/* Increases the width of 
+
+
+.hide 
+{
+    display: none;
+}
+
+/* Points Dashboard Mobile Responsiveness */
+.user-points-lookup {
+    padding: 10px;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.user-points-lookup h2 {
+    font-size: 1.5em;
+    margin: 10px 0;
+}
+
+.user-points-lookup .user-info-card,
+.user-points-lookup .points-summary,
+.user-points-lookup .category-breakdown,
+.user-points-lookup .event-breakdown {
+    margin-bottom: 15px;
+    padding: 15px;
+    overflow-x: hidden;
+}
+
+.user-points-lookup .category-table,
+.user-points-lookup .events-table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.user-points-lookup .category-table th,
+.user-points-lookup .category-table td,
+.user-points-lookup .events-table th,
+.user-points-lookup .events-table td {
+    padding: 8px 4px;
+    text-align: center;
+    word-wrap: break-word;
+    border: 1px solid #ddd;
+}
+
+/* Mobile optimizations for tables */
+@media (max-width: 768px) {
+    .user-points-lookup {
+        padding: 5px;
+    }
+
+    .user-points-lookup .user-info-card,
+    .user-points-lookup .points-summary,
+    .user-points-lookup .category-breakdown,
+    .user-points-lookup .event-breakdown {
+        margin-bottom: 10px;
+        padding: 10px;
+    }
+
+    .user-points-lookup .user-info-grid {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+    }
+
+    .user-points-lookup .points-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+    }
+
+    /* Hide the original table on mobile and create card layout */
+    .user-points-lookup .events-table {
+        border: none;
+        width: 100%;
+    }
+
+    .user-points-lookup .events-table thead {
+        display: none;
+    }
+
+    .user-points-lookup .events-table tbody {
+        display: block;
+    }
+
+    .user-points-lookup .events-table tr {
+        display: block;
+        margin-bottom: 15px;
+        padding: 15px;
+        background: #f9f9f9;
+        border: 2px solid #155776;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .user-points-lookup .events-table td {
+        display: block;
+        text-align: left;
+        border: none;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+        position: relative;
+    }
+
+    .user-points-lookup .events-table td:last-child {
+        border-bottom: none;
+    }
+
+    .user-points-lookup .events-table td:before {
+        content: attr(data-label) ": ";
+        font-weight: bold;
+        color: #155776;
+        display: inline-block;
+        min-width: 80px;
+        margin-right: 10px;
+    }
+
+    .user-points-lookup .category-table {
+        font-size: 11px;
+    }
+
+    .user-points-lookup .category-table th,
+    .user-points-lookup .category-table td {
+        padding: 6px 3px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-points-lookup {
+        padding: 3px;
+    }
+
+    .user-points-lookup h2 {
+        font-size: 1.3em;
+    }
+
+    .user-points-lookup .user-info-card,
+    .user-points-lookup .points-summary,
+    .user-points-lookup .category-breakdown,
+    .user-points-lookup .event-breakdown {
+        padding: 8px;
+        margin-bottom: 8px;
+    }
+
+    .user-points-lookup .points-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .user-points-lookup .events-table tr {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+
+    .user-points-lookup .events-table td {
+        padding: 6px 0;
+        font-size: 14px;
+    }
+
+    .user-points-lookup .events-table td:before {
+        min-width: 70px;
+        font-size: 13px;
+    }
+
+    .user-points-lookup .category-table {
+        font-size: 10px;
+    }
+
+    .user-points-lookup .category-table th,
+    .user-points-lookup .category-table td {
+        padding: 4px 2px;
+        font-size: 10px;
+    }
+
+    .user-points-lookup .user-info-card h3,
+    .user-points-lookup .points-summary h3,
+    .user-points-lookup .category-breakdown h3,
+    .user-points-lookup .event-breakdown h3 {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+    }
+
+    .user-points-lookup .badge-yes,
+    .user-points-lookup .badge-no {
+        font-size: 12px;
+        padding: 3px 6px;
+    }
+}
+
+/* ---- Submit Point Request form  (PointRequest.tsx) ----------------------------------- */
+
+/* PointRequest Styles */
+.point-request {
+    max-width: 800px;
+    flex: 1 1 100%;
+    min-width: 0;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.point-request h2 {
+    text-align: center;
+    color: #155776;
+    margin-bottom: 10px;
+}
+
+.point-request .description {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Form Styles */
+.point-request .request-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.point-request .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.point-request .help-text {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* Image Upload and Preview */
+.point-request .form-group input[type="file"] {
+    padding: 8px;
+    border: 2px dashed #ddd;
+    background-color: #f9f9f9;
+}
+
+.point-request .form-group input[type="file"]:hover {
+    border-color: #155776;
+    background-color: #f0f8ff;
+}
+
+.point-request .image-preview {
+    margin-top: 15px;
+    padding: 15px;
+    border: 2px solid #155776;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.point-request .image-preview h4 {
+    margin: 0 0 10px 0;
+    color: #155776;
+}
+
+.point-request .preview-container {
+    position: relative;
+    display: inline-block;
+}
+
+.point-request .preview-container img {
+    max-width: 300px;
+    max-height: 300px;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.point-request .clear-image {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.point-request .clear-image:hover {
+    background-color: #c82333;
+}
+
+/* Information Section */
+.point-request .info-section {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #e3f2fd;
+    border-radius: 8px;
+    border-left: 4px solid #155776;
+}
+
+.point-request .info-section h3 {
+    color: #155776;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.point-request .info-section ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.point-request .info-section li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+    color: #333;
+}
+
+/* Browsers draw date inputs taller than number inputs with the same
+   padding; pin Date and Points Requested to one height so they line up. */
+.point-request .request-form .form-row input {
+    height: 48px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .point-request {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    /* iOS Safari draws date inputs at their own size, ignoring width and
+       overlapping the next field. Dropping the native styling makes them
+       respect the box; tapping still opens the date picker. */
+    .point-request .form-group input[type="date"] {
+        -webkit-appearance: none;
+        appearance: none;
+        min-height: 48px;
+        background-color: #fff;
+    }
+
+    .point-request .form-group input[type="date"]::-webkit-date-and-time-value {
+        text-align: left;
+    }
+
+    .point-request .preview-container img {
+        max-width: 100%;
+        max-height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .point-request h2 {
+        font-size: 24px;
+    }
+
+    .point-request .description {
+        font-size: 14px;
+    }
+
+    .point-request .preview-container img {
+        max-height: 200px;
+    }
+}
+.point-request .form-group label[for*="activityType"]:after,
+.point-request .form-group label[for*="customActivityName"]:after,
+.point-request .form-group label[for*="description"]:after,
+.point-request .form-group label[for*="date"]:after,
+.point-request .form-group label[for*="pointsRequested"]:after,
+.point-request .form-group label[for*="imageUpload"]:after {
+    content: ' *';
+    color: #dc3545;
+}
+
+/* ---- Cabinet points breakdown  (CabinetPoints.tsx) ------------------------------------ */
+
+#cabinetPointsBreakdown {
+    background-color: #80beda58;
+    border-radius: 5px;
+    width: auto;
+    margin: 15px;
+    border-radius: 5px;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+#cabinetPointsBreakdown h2 {
+    text-align: center;
+    font-size: 2.1em;
+}
+
+#cabinetPointsBreakdown h3 {
+    text-align: center;
+    font-size: 1.8em;
+}
+
+#cabinetPointsBreakdown h4 {
+    text-align: center;
+    font-size: 1.5em;
+}
+
+#cabinetPointsDescription {
+    text-align: center;
+}
+
+.strike {
+    color:red;
+}

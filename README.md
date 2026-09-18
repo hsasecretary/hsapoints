@@ -74,9 +74,10 @@ code .
 
 ### 3. Install React Dependencies
 
-Install all required Node modules:
+The web app lives in the `frontend/` folder. Install its Node modules from there:
 
 ```bash
+cd frontend
 npm install
 ```
 
@@ -104,7 +105,7 @@ In VS Code, press `Ctrl + Shift + P` (or `Cmd + Shift + P` on Mac) → **Python:
 
 ### 5. Configure Firebase Authentication & Keys
 
-- Create a `.env.local` file in the root directory if environment variables are required.
+- Create a `.env.local` file in the `frontend/` directory if environment variables are required.
 - If running admin scripts locally, place your `serviceAccountKey.json` inside the repository root or `scripts/` directory.
 
 > ⚠️ **CRITICAL SECURITY RULE:** Never commit `serviceAccountKey.json`, `.env`, or `.xlsx` files to GitHub. Always ensure they are listed in `.gitignore`.
@@ -113,12 +114,12 @@ In VS Code, press `Ctrl + Shift + P` (or `Cmd + Shift + P` on Mac) → **Python:
 
 ## 💻 Available Scripts
 
-In the project directory, you can run:
+Run the `npm` commands from the `frontend/` folder (`cd frontend`). The Python scripts run from the repository root.
 
 | Command | Description |
 |---|---|
 | `npm run dev` (or `npm start`) | Runs the app with Vite in development mode at [http://localhost:5173](http://localhost:5173), with instant hot reloading. |
-| `npm run build` | Builds the app for production to the `build/` folder (the folder Firebase Hosting deploys). |
+| `npm run build` | Builds the app for production to `frontend/build/` (the folder Firebase Hosting deploys, see `firebase.json`). |
 | `npm run typecheck` | Checks the TypeScript types across `src/` without building. Run it before opening a PR. |
 | `npm run preview` | Serves the production build locally so you can check it before deploying. |
 | `python scripts/export_members.py` | Extracts active member profiles, point totals, and cabinet standings from Firestore into an Excel spreadsheet. |
@@ -129,23 +130,37 @@ In the project directory, you can run:
 
 ```
 hsapoints/
-├── .gitignore               # Ignored files (node_modules, .venv, secrets, exports)
-├── package.json             # Frontend dependencies and npm scripts
-├── index.html               # App entry page (Vite)
-├── vite.config.ts           # Vite build/dev-server config
-├── tsconfig.json            # TypeScript settings (lenient for now)
-├── public/                  # Static assets (favicon, manifest, 404 page)
-├── scripts/                 # Python automation, cleanup, and extraction scripts
+├── README.md                  # Project documentation
+├── .gitignore                 # Ignored files (node_modules, build, .venv, secrets, exports)
+├── firebase.json              # Firebase Hosting (serves frontend/build) + Firestore config
+├── firestore.rules            # Firestore security rules
+├── firestore.indexes.json     # Firestore indexes
+├── .github/workflows/         # Deploy to Firebase Hosting on merge / preview on PR
+├── scripts/                   # Python admin scripts (Firebase Admin SDK)
 │   ├── export_members.py
 │   └── serviceAccountKey.json (Git ignored)
-├── src/                     # React application source code
-│   ├── assets/              # Logos, icons, and image assets
-│   ├── components/          # Reusable UI components (Navbar, PointsCard, etc.)
-│   ├── pages/                # Main route views (Dashboard, Admin, Login, Events)
-│   ├── firebase.js          # Client-side Firebase App/Auth/Firestore initialization
-│   ├── App.js                # Root component and router
-│   └── index.js               # React entry point
-└── README.md                # Project documentation
+└── frontend/                  # The web app (React + TypeScript + Vite)
+    ├── index.html             # App entry page
+    ├── package.json           # Dependencies and npm scripts
+    ├── vite.config.ts         # Vite build/dev-server config
+    ├── tsconfig.json          # TypeScript settings (lenient for now)
+    ├── public/                # Static files copied as-is (favicon, manifest, 404 page)
+    └── src/
+        ├── main.tsx           # Entry point: loads styles and renders <App />
+        ├── App.tsx            # Router, auth state, page layout (header, nav, footer)
+        ├── pages/             # One folder per area of the site
+        │   ├── auth/          # Login, SignUp, ForgotPassword
+        │   ├── dashboard/     # Dashboard, Attendance, Points, PointRequest
+        │   ├── cabinet/       # Cabinet, CabinetPoints
+        │   ├── eboard/        # Eboard and its tools (codes, requests, lookups, approvals)
+        │   └── NotFound.tsx   # 404 page
+        ├── components/
+        │   └── layout/        # Header, NavBar, Footer, Logout (shared page frame)
+        ├── lib/
+        │   ├── firebase.ts    # Firebase App/Auth/Firestore initialization
+        │   ├── reportWebVitals.ts
+        │   └── admin/         # One-off cabinet-role scripts used from the E-Board page
+        └── styles/            # All CSS: main.css imports base, layout, auth, dashboard, eboard
 ```
 
 ---
