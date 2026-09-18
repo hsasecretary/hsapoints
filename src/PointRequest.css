@@ -232,6 +232,30 @@
     color: #333;
 }
 
+/* EditableCodesTable.css also defines .form-actions (right-aligned) and,
+   since CRA/Vite CSS is global, it overrides the centering above. */
+.request-form .form-actions {
+    justify-content: center;
+}
+
+/* Browsers draw date inputs taller than number inputs with the same
+   padding; pin Date and Points Requested to one height so they line up. */
+.request-form .form-row input {
+    height: 48px;
+}
+
+/* EditableCodesTable.css's global .form-row (1fr 1fr) would otherwise win
+   over the rules above and keep these side by side on phones. */
+.request-form .form-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+@media (max-width: 768px) {
+    .request-form .form-row {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .point-request {
