@@ -245,8 +245,18 @@
     font-size: 15px;
 }
 
+/* Temp-Cabinet Points sits just left of Logout */
+.site-header__temp {
+    white-space: nowrap;
+}
+
+.site-header__temp + .site-header__logout {
+    margin-left: 0;
+}
+
 @media (max-width: 900px) {
     .site-header__nav,
+    .site-header__bar > .site-header__temp,
     .site-header__bar > .site-header__logout {
         display: none;
     }

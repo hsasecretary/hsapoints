@@ -102,71 +102,63 @@ function ApprovedCabinet() {
 
     };
 
+    const approve = (email, cabinet) => handleSubmit(email, 'approve', cabinet);
+
+    // Deny removes them from the cabinet, so ask first (the old dropdown +
+    // Submit was a two-step action).
+    const deny = (email, cabinet) => {
+        if (window.confirm(`Deny ${email}? They will be removed from ${cabinet} and set as a general member.`)) {
+            handleSubmit(email, 'deny', cabinet);
+        }
+    };
+
+    // Same layout as Manage Event Codes: title card, then a table that turns
+    // into one card per member on phones.
     return (
-        <div id='approvedCabinetContainer'>
-            <h2>Pending E-board Approval</h2>
-            <div className='table-scroll'>
-                <table id='pendingApprovalTable'>
-                    <thead className='head'>
-                        <tr>
-                            <th>Name</th>
-                            <th>Cabinet</th>
-                            <th>Position</th>
-                            <th>Status</th>
-                            <th>Submit</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {emails.map((email, index) => (
-                        
-                            <TableRow 
-                                key={index} 
-                                className={index%2===0? "even":"odd"}
-                                email={email} 
-                                cabinet={cabinets[index] || 'Loading...'}
-                                position={positions[index] || 'Loading...'}
-                                onSubmit={handleSubmit} 
-                            />
-                        ))}
-                    </tbody>
-                </table>
+        <div id='approvedCabinetContainer' className='approvals'>
+            <div className='approvals__header'>
+                <h2>Pending E-Board Approval</h2>
+                <p className='approvals__count'>
+                    {emails.length === 0
+                        ? 'No members pending approval'
+                        : `${emails.length} member${emails.length === 1 ? '' : 's'} waiting for approval`}
+                </p>
             </div>
-            <p className='center'>{emails.length === 0 ? "No members pending approval" : "End of pending approval list"}</p>
-            <br/>
-            <br/>
+
+            {emails.length > 0 && (
+                <div className='approvals__table-container'>
+                    <table className='approvals__table'>
+                        <thead>
+                            <tr>
+                                <th>Member</th>
+                                <th>Cabinet</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {emails.map((email, index) => {
+                                const cabinet = cabinets[index] || 'Loading...';
+                                return (
+                                    <tr key={email} className={index % 2 === 0 ? 'even' : 'odd'}>
+                                        <td className='approvals__email' data-label='Member'>{email}</td>
+                                        <td data-label='Cabinet'>{cabinet}</td>
+                                        <td className='approvals__actions'>
+                                            <button type='button' className='approvals__approve' onClick={() => approve(email, cabinet)}>
+                                                ✓ Approve
+                                            </button>
+                                            <button type='button' className='approvals__deny' onClick={() => deny(email, cabinet)}>
+                                                ✗ Deny
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 }
-
-const TableRow = ({className, email,cabinet, position, onSubmit }) => {
-    const [status, setStatus] = useState('select');
-    const handleChange = (event) => {
-        setStatus(event.target.value);
-    };
-
-    return (        
-        <tr className = {className}>
-            <td>{email}</td>
-            <td>{cabinet}</td> 
-            <td>{position}</td>
-            <td>
-                <select value={status} onChange={handleChange}>
-                    <option value='select'>Select</option>
-                    <option value='approve'>Approve</option>
-                    <option value='deny'>Deny</option>
-                </select>
-            </td>
-            <td>
-                <button
-                    type='button'
-                    onClick={() => onSubmit(email, status, cabinet)}
-                    disabled={status === 'select'}
-                >
-                    Submit
-                </button>
-            </td>
-        </tr>
-    );
-};
 
 export default ApprovedCabinet;

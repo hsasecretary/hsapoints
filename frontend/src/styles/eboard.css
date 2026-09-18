@@ -2,36 +2,6 @@
    E-Board page (/eboard)
    ======================================================================== */
 
-/* ---- Shortcut buttons at the top of the page  (Eboard.tsx) -------------- */
-.eboard-shortcuts {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin: 24px auto 8px;
-    padding: 0 16px;
-}
-
-.eboard-shortcuts__button {
-    display: inline-block;
-    padding: 10px 22px;
-    border: 2px solid #0f4c64;
-    border-radius: 8px;
-    background: #0f4c64;
-    color: #ffffff;
-    font-size: 15px;
-    font-weight: 700;
-    text-decoration: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-    transition: background-color 0.2s, transform 0.2s;
-}
-
-.eboard-shortcuts__button:hover {
-    background: #082f3f;
-    border-color: #082f3f;
-    transform: translateY(-1px);
-}
-
 /* ---- Create New Event Code  (CreateCode.tsx) --------------------------------------- */
 
 /* CreateCode Modern Styles */
@@ -202,25 +172,196 @@
 
 /* ---- Pending cabinet approvals  (ApprovedCabinet.tsx) ----------------------------------- */
 
-#approvedCabinetContainer .head {
-    background-color: #155776;
+/* Same look as Manage Event Codes (EditableCodesTable). */
+#approvedCabinetContainer.approvals {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-#approvedCabinetContainer .even {
-    background-color: #c5e5f3;
+#approvedCabinetContainer .approvals__header {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #ffffff;
+    border: 2px solid #0f4c64;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    text-align: center;
 }
 
-#approvedCabinetContainer .odd {
-    background-color: #eef0ee;
+#approvedCabinetContainer .approvals__header h2 {
+    margin: 0 0 6px;
+    color: #0f4c64;
+    font-weight: 700;
 }
 
-#approvedCabinetContainer table {
-    margin:auto;
-    margin-top: 5%;
-    width:85%;
-    border-collapse:collapse;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1), 0 6px 20px 0 rgba(0,0,0,0.19);
+#approvedCabinetContainer .approvals__count {
+    margin: 0;
+    color: #475569;
+    font-weight: 600;
+}
+
+#approvedCabinetContainer .approvals__table-container {
+    background: #ffffff;
+    border: 2px solid #0f4c64;
+    border-radius: 10px;
     overflow-x: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+#approvedCabinetContainer .approvals__table {
+    width: 100%;
+    margin: 0;
+    border-collapse: collapse;
+    box-shadow: none;
+    font-size: 14px;
+    color: #0f172a;
+}
+
+#approvedCabinetContainer .approvals__table th {
+    padding: 14px 12px;
+    background: #0f4c64;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: left;
+    border: none;
+}
+
+#approvedCabinetContainer .approvals__table td {
+    padding: 12px 10px;
+    font-size: 14px;
+    border: none;
+    border-bottom: 1px solid #cbd5e1;
+    vertical-align: middle;
+}
+
+#approvedCabinetContainer .approvals__table tr.even {
+    background-color: #f8fafc;
+}
+
+#approvedCabinetContainer .approvals__table tr.odd {
+    background-color: #ffffff;
+}
+
+#approvedCabinetContainer .approvals__table tr:hover {
+    background-color: #f1f5f9;
+}
+
+#approvedCabinetContainer .approvals__email {
+    font-weight: 600;
+    word-break: break-all;
+}
+
+#approvedCabinetContainer .approvals__actions {
+    white-space: nowrap;
+    text-align: right;
+}
+
+#approvedCabinetContainer .approvals__approve,
+#approvedCabinetContainer .approvals__deny {
+    min-width: 0;
+    min-height: 0;
+    margin: 0 3px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#approvedCabinetContainer .approvals__approve {
+    background: #166534;
+    border: 1px solid #166534;
+}
+
+#approvedCabinetContainer .approvals__approve:hover {
+    background: #14532d;
+    border-color: #14532d;
+    box-shadow: none;
+}
+
+#approvedCabinetContainer .approvals__deny {
+    background: #b91c1c;
+    border: 1px solid #b91c1c;
+}
+
+#approvedCabinetContainer .approvals__deny:hover {
+    background: #991b1b;
+    border-color: #991b1b;
+    box-shadow: none;
+}
+
+/* Phones: one card per member with full-width Approve / Deny */
+@media (max-width: 768px) {
+    #approvedCabinetContainer.approvals {
+        padding: 12px 6px;
+    }
+
+    #approvedCabinetContainer .approvals__table-container {
+        overflow: visible;
+        border: none;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    #approvedCabinetContainer .approvals__table,
+    #approvedCabinetContainer .approvals__table tbody {
+        display: block;
+    }
+
+    #approvedCabinetContainer .approvals__table thead {
+        display: none;
+    }
+
+    #approvedCabinetContainer .approvals__table tr,
+    #approvedCabinetContainer .approvals__table tr.even,
+    #approvedCabinetContainer .approvals__table tr.odd {
+        display: block;
+        margin-bottom: 10px;
+        padding: 12px;
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 8px;
+    }
+
+    #approvedCabinetContainer .approvals__table td {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 6px 0;
+        border-bottom: 1px solid #eef2f6;
+    }
+
+    #approvedCabinetContainer .approvals__table td[data-label]::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #475569;
+        flex-shrink: 0;
+    }
+
+    #approvedCabinetContainer .approvals__email {
+        text-align: right;
+    }
+
+    #approvedCabinetContainer .approvals__table td.approvals__actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding-top: 12px;
+        border-bottom: none;
+        text-align: center;
+    }
+
+    #approvedCabinetContainer .approvals__approve,
+    #approvedCabinetContainer .approvals__deny {
+        margin: 0;
+        padding: 10px;
+        font-size: 14px;
+    }
 }
 
 /* ---- Excuse absence  (ExcuseAbscense.tsx) ---------------------------------------------- */

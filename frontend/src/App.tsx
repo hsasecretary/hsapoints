@@ -76,7 +76,7 @@ function App() {
                 <div>Loading...</div>
             ) : (
                 <div className="app-shell">
-                    <SiteHeader signedIn={!!userEmail} eboard={isEboard} />
+                    <SiteHeader signedIn={!!userEmail} eboard={isEboard} cabinet={isCabinetMember} />
                     <Routes>
                         <Route path="/" element={<Navigate to="/login" />} />
                         <Route path="/signup" element={userEmail ? <Navigate to="/dashboard" replace /> : <SignUp />} />
@@ -84,7 +84,7 @@ function App() {
                         <Route path="/dashboard" element={userEmail ? <Dashboard cabinet={isCabinetMember} email={userEmail} /> : <Navigate to="/login" />} />
                         <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember} /> : <Navigate to="/login" />} />
                         {/* E-Board tools, one page each (list in pages/eboard/eboardTools.ts) */}
-                        <Route path="/eboard" element={userEmail ? <Eboard eboard={isEboard} cabinet={isCabinetMember} /> : <Navigate to="/login" />}>
+                        <Route path="/eboard" element={userEmail ? <Eboard eboard={isEboard} /> : <Navigate to="/login" />}>
                             <Route index element={<Navigate to="event-codes" replace />} />
                             <Route path="event-codes" element={<EventCodesPage />} />
                             <Route path="point-requests" element={<PointRequestReview />} />
