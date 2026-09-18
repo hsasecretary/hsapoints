@@ -1,6 +1,7 @@
 import React, { useEffect, useState, type ReactNode } from "react";
 import { auth, db } from '../../../lib/firebase';
 import { isGeneralMember } from '../../../lib/members';
+import { formatAccountType } from '../../../lib/roles';
 import SectionTitle from '../../../components/ui/SectionTitle';
 import EventsAttendedList from './EventsAttendedList';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -165,7 +166,7 @@ export default function PointsOverview({ refreshKey = 0, eventCodeForm }: Points
 						<div><strong>Name:</strong> {userInfo.firstName} {userInfo.lastName}</div>
 						<div><strong>Email:</strong> {userInfo.email}</div>
 						<div>
-							<strong>Account Type:</strong> {userInfo.cabinet === 'none' ? 'General Member' : userInfo.cabinet}
+							<strong>Account Type:</strong> {formatAccountType(userInfo.cabinet)}
 							{!userInfo.generalMember && ` (E-Board: ${userInfo.eboard ? 'Yes' : 'No'})`}
 						</div>
 						{/* Sign-up only asks e-board members for a position, so only show it when there is one */}
