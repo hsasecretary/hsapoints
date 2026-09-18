@@ -117,7 +117,7 @@ In the project directory, you can run:
 
 | Command | Description |
 |---|---|
-| `npm run dev` (or `npm start`) | Runs the app with Vite in development mode at [http://localhost:3000](http://localhost:3000), with instant hot reloading. |
+| `npm run dev` (or `npm start`) | Runs the app with Vite in development mode at [http://localhost:5173](http://localhost:5173), with instant hot reloading. |
 | `npm run build` | Builds the app for production to the `build/` folder (the folder Firebase Hosting deploys). |
 | `npm run preview` | Serves the production build locally so you can check it before deploying. |
 | `python scripts/export_members.py` | Extracts active member profiles, point totals, and cabinet standings from Firestore into an Excel spreadsheet. |
