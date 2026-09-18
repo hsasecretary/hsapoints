@@ -3,6 +3,7 @@ import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { isGeneralMember } from '../../lib/members';
 import EventsAttendedList from '../../components/members/EventsAttendedList';
+import EmailLookup from './EmailLookup';
 
 function UserPointsLookup() {
     const [searchEmail, setSearchEmail] = useState('');
@@ -12,9 +13,19 @@ function UserPointsLookup() {
     const [error, setError] = useState('');
     const [eventBreakdown, setEventBreakdown] = useState([]);
 
-    const handleSearch = async (e) => {
+    const handleSearch = (e) => {
         e.preventDefault();
-        
+        lookUp(searchEmail);
+    };
+
+    // From the UFL/SF Email Lookup: fill in the email and run the lookup.
+    const lookUpFromName = (email) => {
+        setSearchEmail(email);
+        lookUp(email);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const lookUp = async (searchEmail) => {
         if (!searchEmail.trim()) {
             setError('Please enter an email address');
             return;
@@ -169,6 +180,8 @@ function UserPointsLookup() {
                 </div>
                 {error && <p className="error-message">{error}</p>}
             </form>
+
+            <EmailLookup onSelect={lookUpFromName} />
 
             {userInfo && userPoints && (
                 <div className="user-results">

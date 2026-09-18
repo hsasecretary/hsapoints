@@ -1767,3 +1767,109 @@
 .user-points-lookup .lookup-cabinet-points strong {
     color: #0f4c64;
 }
+
+/* ---- UFL/SF Email Lookup (EmailLookup.tsx, on the User Lookup page) ---- */
+.user-points-lookup .email-lookup {
+    margin-bottom: 30px;
+}
+
+.user-points-lookup .email-lookup h2 {
+    margin-bottom: 6px;
+}
+
+.user-points-lookup .email-lookup__subtitle {
+    margin: 0 0 16px;
+    text-align: center;
+    color: #666;
+}
+
+.user-points-lookup .email-lookup .search-form {
+    margin-bottom: 0;
+}
+
+/* It's a text input (a name), so undo the base input[type="text"] margin
+   and width to line up with the email box above. */
+.user-points-lookup .email-lookup .search-input {
+    width: auto;
+    max-width: none;
+    margin: 0;
+}
+
+.user-points-lookup .email-lookup__empty {
+    margin: 14px 0 0;
+    text-align: center;
+    color: #666;
+}
+
+.user-points-lookup .email-lookup__results {
+    list-style: none;
+    margin: 16px 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.user-points-lookup .email-lookup__result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+}
+
+.user-points-lookup .email-lookup__who {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.user-points-lookup .email-lookup__name {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.user-points-lookup .email-lookup__email {
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-size: 13px;
+    color: #0f4c64;
+    word-break: break-all;
+}
+
+.user-points-lookup .email-lookup__use {
+    flex-shrink: 0;
+    min-width: 0;
+    min-height: 0;
+    padding: 8px 14px;
+    border: 1.5px solid #155776;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #155776;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.user-points-lookup .email-lookup__use:hover {
+    background: #155776;
+    color: #ffffff;
+    border-color: #155776;
+    box-shadow: none;
+}
+
+@media (max-width: 480px) {
+    .user-points-lookup .email-lookup__result {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .user-points-lookup .email-lookup__use {
+        width: 100%;
+        padding: 10px;
+    }
+}
