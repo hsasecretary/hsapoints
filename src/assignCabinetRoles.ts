@@ -190,7 +190,7 @@ async function assignCabinetRoles() {
     // Update cabinet collections
     console.log('\nUpdating cabinet collections...');
     
-    const cabinetCollections = {};
+    const cabinetCollections: Record<string, string[]> = {};
     
     // Group emails by cabinet
     for (const [email, assignment] of Object.entries(cabinetAssignments)) {

@@ -7,7 +7,7 @@ function EditableCodesTable() {
     const [codes, setCodes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editingCode, setEditingCode] = useState(null);
-    const [editData, setEditData] = useState({});
+    const [editData, setEditData] = useState<Record<string, any>>({});
     const [showAddForm, setShowAddForm] = useState(false);
     const [newCode, setNewCode] = useState({
         id: '',
@@ -43,13 +43,13 @@ function EditableCodesTable() {
             setLoading(true);
             const codesCollection = collection(db, "codes");
             const codesSnapshot = await getDocs(codesCollection);
-            const codesData = codesSnapshot.docs.map(doc => ({
+            const codesData = codesSnapshot.docs.map((doc): Record<string, any> => ({
                 id: doc.id,
                 ...doc.data(),
             }));
             
             // Sort by event date (newest first)
-            codesData.sort((a, b) => new Date(b.eventDate || 0) - new Date(a.eventDate || 0));
+            codesData.sort((a, b) => new Date(b.eventDate || 0).getTime() - new Date(a.eventDate || 0).getTime());
             setCodes(codesData);
         } catch (error) {
             console.error('Error fetching codes:', error);

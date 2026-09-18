@@ -14,13 +14,17 @@
     "dev": "vite",
     "start": "vite",
     "build": "vite build",
+    "typecheck": "tsc",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
   "devDependencies": {
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.7.0",
     "gh-pages": "^6.3.0",
+    "typescript": "^5.9.3",
     "vite": "^6.4.3"
   },
   "type": "module"

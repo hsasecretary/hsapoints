@@ -4,14 +4,14 @@ import { db } from './firebase';
 import { arrayRemove, arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 function ExcuseAbscense() {
-    const[user, setUser] = useState();
-    const[userSnap, setUserSnap] = useState();
+    const[user, setUser] = useState<any>();
+    const[userSnap, setUserSnap] = useState<any>();
     async function updateUsers(event)
     {
         event.preventDefault();
         document.getElementById("abscenseEmailError").innerText = "";
         
-        let email = document.getElementById("searchName").value;
+        let email = (document.getElementById("searchName") as HTMLInputElement).value;
         if(email === "")
         {
             document.getElementById("abscenseEmailError").innerText = "*Required: Submit a UFL or SF email";
@@ -57,9 +57,9 @@ function ExcuseAbscense() {
         document.getElementById("detailsError").innerText = "";
 
         //Check for valid input
-        let unexcusedAbsense = document.getElementById("userUnexcusedAbsense").value;
-        let reason = document.getElementById("reason").value;
-        let detail = document.getElementById("details").value; 
+        let unexcusedAbsense = (document.getElementById("userUnexcusedAbsense") as HTMLSelectElement).value;
+        let reason = (document.getElementById("reason") as HTMLSelectElement).value;
+        let detail = (document.getElementById("details") as HTMLInputElement).value; 
 
         var ready = true; 
 
@@ -99,14 +99,14 @@ function ExcuseAbscense() {
                 excusedReason: addedExcuse, 
                 unexcusedEvents:arrayRemove(unexcusedAbsense)
 
-            })
+            });
             //Reset everything
-            document.getElementById("userUnexcusedAbsense").value = "select";
-            document.getElementById("reason").value = "select";
-            document.getElementById("details").value = ""; 
+            (document.getElementById("userUnexcusedAbsense") as HTMLSelectElement).value = "select";
+            (document.getElementById("reason") as HTMLSelectElement).value = "select";
+            (document.getElementById("details") as HTMLInputElement).value = ""; 
             document.getElementById("findUserForm").classList.toggle("hidden");
             document.getElementById("updateExcuseForm").classList.toggle("hidden");
-            document.getElementById("searchName").value = "";
+            (document.getElementById("searchName") as HTMLInputElement).value = "";
         } else {
             return false;
         }
@@ -144,7 +144,7 @@ function ExcuseAbscense() {
                 </select>
                 
                 <p className="errorMsg" id="detailsError"></p>
-                <label html="details">Details:</label>
+                <label htmlFor="details">Details:</label>
                 <input id="details" type="text" placeholder='Attended SHPE GBM 11/7'></input>
                 <div className='center'><input type="submit"></input></div>
                 <div className='center'><button id='backToUserEmail' onClick= {back}>Back</button></div>

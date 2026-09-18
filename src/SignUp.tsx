@@ -59,7 +59,7 @@ function SignUp() {
         password: '',
         confirmPassword: ''
     });
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(false);
 
     const currentSubRole = subRoleConfig[formData.involvement] || null;
@@ -104,7 +104,7 @@ function SignUp() {
     };
 
     const validateForm = () => {
-        const newErrors = {};
+        const newErrors: Record<string, string> = {};
 
         if (!formData.firstName.trim()) {
             newErrors.firstName = "*Required: Input your first name";

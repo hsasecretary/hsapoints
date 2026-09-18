@@ -55,7 +55,7 @@ function CreateCode() {
         if (!formData.eventDate) {
             errors.push('Event date is required');
         }
-        if (!formData.points || formData.points < 0) {
+        if (!formData.points || Number(formData.points) < 0) {
             errors.push('Valid points value is required');
         }
 

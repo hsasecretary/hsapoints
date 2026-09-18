@@ -40,12 +40,12 @@ function Attendance({ onPointsUpdate }) {
             var email = auth.currentUser.email;
             var codeToCheck = code.toUpperCase().trim(); // Changed to uppercase to match database
             
-            let date = new Date();
-            let day = date.getDate();
+            let date: any = new Date();
+            let day: any = date.getDate();
             if(day < 10) {
                 day = "0" + day;
             }
-            let month = date.getMonth()+1;
+            let month: any = date.getMonth()+1;
             if(month < 10) {
                 month = "0" + month;
             }
