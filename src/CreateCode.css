@@ -197,6 +197,53 @@ input[type="checkbox"]
     transform: scale(1.2);
 }
 
+/* ---- Alignment fixes -------------------------------------------------
+   Other components' CSS is global too: ExcuseAbscense.css gives every text
+   input width: 95% + margin-left: 10px, and EditableCodesTable.css
+   right-aligns .form-actions. Scope this form's rules so they win. */
+.create-code-form .form-group input:not([type="checkbox"]),
+.create-code-form .form-group select {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    margin: 0;
+}
+
+.create-code-form .form-group {
+    min-width: 0;
+}
+
+.create-code-form .form-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+/* Checkboxes: start at the top, flush with the other fields' left edge,
+   one consistent size, text wrapping next to the box. */
+.create-code-form .checkbox-group {
+    justify-content: flex-start;
+    gap: 6px;
+    padding-top: 22px; /* lines the first checkbox up with the date field */
+}
+
+.create-code-form .checkbox-label {
+    align-items: flex-start;
+    padding: 6px 0;
+    line-height: 1.35;
+}
+
+.create-code-form .checkbox-label input[type="checkbox"] {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin: 1px 0 0;
+    transform: none;
+    accent-color: #155776;
+}
+
+.create-code-form .form-actions {
+    justify-content: center;
+}
+
 /* Voter Eligibility Info */
 .voter-eligibility-info {
     background: #f8f9fa;
@@ -275,6 +322,14 @@ input[type="checkbox"]
     
     .form-row {
         grid-template-columns: 1fr;
+    }
+
+    .create-code-form .form-row {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .create-code-form .checkbox-group {
+        padding-top: 0;
     }
     
     .create-code-header h2 {
