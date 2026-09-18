@@ -106,30 +106,32 @@ function ApprovedCabinet() {
     return (
         <div id='approvedCabinetContainer'>
             <h2>Pending E-board Approval</h2>
-            <table id='pendingApprovalTable'>
-                <thead className='head'>
-                    <tr>
-                        <th>Name</th>
-                        <th>Cabinet</th>
-                        <th>Position</th>
-                        <th>Status</th>
-                        <th>Submit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {emails.map((email, index) => (
+            <div className='table-scroll'>
+                <table id='pendingApprovalTable'>
+                    <thead className='head'>
+                        <tr>
+                            <th>Name</th>
+                            <th>Cabinet</th>
+                            <th>Position</th>
+                            <th>Status</th>
+                            <th>Submit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {emails.map((email, index) => (
                         
-                        <TableRow 
-                            key={index} 
-                            className={index%2===0? "even":"odd"}
-                            email={email} 
-                            cabinet={cabinets[index] || 'Loading...'}
-                            position={positions[index] || 'Loading...'}
-                            onSubmit={handleSubmit} 
-                        />
-                    ))}
-                </tbody>
-            </table>
+                            <TableRow 
+                                key={index} 
+                                className={index%2===0? "even":"odd"}
+                                email={email} 
+                                cabinet={cabinets[index] || 'Loading...'}
+                                position={positions[index] || 'Loading...'}
+                                onSubmit={handleSubmit} 
+                            />
+                        ))}
+                    </tbody>
+                </table>
+            </div>
             <p className='center'>{emails.length === 0 ? "No members pending approval" : "End of pending approval list"}</p>
             <br/>
             <br/>

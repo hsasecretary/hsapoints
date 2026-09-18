@@ -1,6 +1,9 @@
 input[type="text"]
 {
     width: 95%;
+    /* This rule is global (CRA CSS isn't scoped), so keep the 10px offset
+       from pushing inputs past the edge of narrow containers. */
+    max-width: calc(100% - 10px);
     margin-left: 10px;
 }
 .attendanceForm label

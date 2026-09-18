@@ -248,7 +248,8 @@
 .table-container {
     background: #ffffff;
     border-radius: 10px;
-    overflow: hidden;
+    /* Scroll wide tables inside the box instead of clipping the columns. */
+    overflow-x: auto;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     border: 2px solid #0f4c64;
 }
