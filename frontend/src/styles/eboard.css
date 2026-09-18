@@ -340,7 +340,9 @@
 
 .user-points-lookup .user-info-card h3 {
     color: #155776;
-    margin-bottom: 15px;
+    text-align: left;
+    margin-top: 0;
+    margin-bottom: 10px;
     border-bottom: 2px solid #155776;
     padding-bottom: 10px;
 }
@@ -348,11 +350,11 @@
 .user-points-lookup .user-info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
+    gap: 6px;
 }
 
 .user-points-lookup .user-info-grid div {
-    padding: 10px;
+    padding: 7px 10px;
     background: #f8f9fa;
     border-radius: 5px;
     border-left: 4px solid #155776;

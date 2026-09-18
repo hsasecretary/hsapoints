@@ -240,7 +240,7 @@
 
     .user-points-lookup .user-info-grid {
         grid-template-columns: 1fr !important;
-        gap: 8px !important;
+        gap: 6px !important;
     }
 
     .user-points-lookup .points-grid {
