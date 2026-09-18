@@ -10,8 +10,8 @@ function Login() {
 	function check(event) {
 		event.preventDefault();
 		document.getElementById("loginError").innerText = "";
-		var email = document.getElementById("uflEmail").value;
-		var pass = document.getElementById("password").value;
+		var email = (document.getElementById("uflEmail") as HTMLInputElement).value;
+		var pass = (document.getElementById("password") as HTMLInputElement).value;
 		signInWithEmailAndPassword(auth, email, pass).then((userCredential) => {
 			navigate('/dashboard');
 		})

@@ -1,16 +1,14 @@
 import CabinetPoints from "./CabinetPoints";
 import Logout from './Logout';
-import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 function Cabinet({ cabinet }) {
-    let navigate = useNavigate();
-    
     return (
         <div>
             <br/>
             <Logout/>
             {cabinet && <CabinetPoints />}
-            {!cabinet && navigate("/dashboard")}
+            {!cabinet && <Navigate to="/dashboard" replace />}
         </div>
     )
 }

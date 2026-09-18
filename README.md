@@ -16,7 +16,7 @@ The official internal web application and point management system for the **Univ
 
 | Layer | Technologies |
 |---|---|
-| **Frontend** | React (SPA), JavaScript (ES6+), HTML5, CSS3 |
+| **Frontend** | React (SPA), TypeScript, Vite, HTML5, CSS3 |
 | **Backend & Database** | Firebase Authentication (`@ufl.edu` sign-in), Cloud Firestore |
 | **Automation & Admin Tools** | Python 3 (data reconciliation, member exports, batch uploads) |
 | **Design & Management** | Figma, GitHub, ClickUp |
@@ -117,9 +117,10 @@ In the project directory, you can run:
 
 | Command | Description |
 |---|---|
-| `npm start` | Runs the app in development mode. Open [http://localhost:3000](http://localhost:3000) to view it in your browser with live reloading. |
-| `npm test` | Launches the test runner in interactive watch mode. |
-| `npm run build` | Builds the app for production to the `build/` folder. Bundles React in production mode and optimizes the output for best performance. |
+| `npm run dev` (or `npm start`) | Runs the app with Vite in development mode at [http://localhost:5173](http://localhost:5173), with instant hot reloading. |
+| `npm run build` | Builds the app for production to the `build/` folder (the folder Firebase Hosting deploys). |
+| `npm run typecheck` | Checks the TypeScript types across `src/` without building. Run it before opening a PR. |
+| `npm run preview` | Serves the production build locally so you can check it before deploying. |
 | `python scripts/export_members.py` | Extracts active member profiles, point totals, and cabinet standings from Firestore into an Excel spreadsheet. |
 
 ---
@@ -130,7 +131,10 @@ In the project directory, you can run:
 hsapoints/
 ├── .gitignore               # Ignored files (node_modules, .venv, secrets, exports)
 ├── package.json             # Frontend dependencies and npm scripts
-├── public/                  # Static assets and index.html
+├── index.html               # App entry page (Vite)
+├── vite.config.ts           # Vite build/dev-server config
+├── tsconfig.json            # TypeScript settings (lenient for now)
+├── public/                  # Static assets (favicon, manifest, 404 page)
 ├── scripts/                 # Python automation, cleanup, and extraction scripts
 │   ├── export_members.py
 │   └── serviceAccountKey.json (Git ignored)

@@ -7,8 +7,12 @@ function EditableCodesTable() {
     const [codes, setCodes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editingCode, setEditingCode] = useState(null);
-    const [editData, setEditData] = useState({});
+    const [editData, setEditData] = useState<Record<string, any>>({});
     const [showAddForm, setShowAddForm] = useState(false);
+    // Phone layout: rows are collapsed to Code / Event / Points; tap to expand.
+    const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [search, setSearch] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState('');
     const [newCode, setNewCode] = useState({
         id: '',
         event: '',
@@ -38,18 +42,38 @@ function EditableCodesTable() {
         fetchCodes();
     }, []);
 
+    const searchTerm = search.trim().toLowerCase();
+    const visibleCodes = codes.filter((code) =>
+        (!categoryFilter || code.category === categoryFilter) &&
+        (!searchTerm ||
+            code.id.toLowerCase().includes(searchTerm) ||
+            (code.event || '').toLowerCase().includes(searchTerm))
+    );
+
+    const toggleExpanded = (codeId) => {
+        setExpandedId((prev) => (prev === codeId ? null : codeId));
+    };
+
+    // Tapping anywhere on a collapsed row expands it — except on its buttons
+    // and inputs, which keep their own behaviour.
+    const handleRowClick = (e, codeId) => {
+        if (editingCode === codeId) return;
+        if ((e.target as HTMLElement).closest('button, input, select, a')) return;
+        toggleExpanded(codeId);
+    };
+
     const fetchCodes = async () => {
         try {
             setLoading(true);
             const codesCollection = collection(db, "codes");
             const codesSnapshot = await getDocs(codesCollection);
-            const codesData = codesSnapshot.docs.map(doc => ({
+            const codesData = codesSnapshot.docs.map((doc): Record<string, any> => ({
                 id: doc.id,
                 ...doc.data(),
             }));
             
             // Sort by event date (newest first)
-            codesData.sort((a, b) => new Date(b.eventDate || 0) - new Date(a.eventDate || 0));
+            codesData.sort((a, b) => new Date(b.eventDate || 0).getTime() - new Date(a.eventDate || 0).getTime());
             setCodes(codesData);
         } catch (error) {
             console.error('Error fetching codes:', error);
@@ -315,7 +339,33 @@ function EditableCodesTable() {
                 </div>
             )}
 
-            {/* Codes Table */}
+            {/* Search / filter */}
+            <div className="codes-filters">
+                <input
+                    type="search"
+                    className="codes-search"
+                    placeholder="Search code or event..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    aria-label="Search codes by code or event name"
+                />
+                <select
+                    className="codes-category-filter"
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    aria-label="Filter by category"
+                >
+                    <option value="">All categories</option>
+                    {categories.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                </select>
+                <p className="codes-count">
+                    Showing {visibleCodes.length} of {codes.length} codes
+                </p>
+            </div>
+
+            {/* Codes Table (collapses to expandable rows on phones) */}
             <div className="table-container">
                 <table className="codes-table">
                     <thead>
@@ -330,16 +380,30 @@ function EditableCodesTable() {
                             <th>Voter Eligible</th>
                             <th>Cabinet Required</th>
                             <th>Actions</th>
+                            <th className="cell-toggle" aria-hidden="true"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {codes.map((code, index) => (
-                            <tr key={code.id} className={index % 2 === 0 ? 'even' : 'odd'}>
-                                {editingCode === code.id ? (
+                        {visibleCodes.map((code, index) => {
+                            const isEditing = editingCode === code.id;
+                            const isExpanded = isEditing || expandedId === code.id;
+                            const rowClass = [
+                                index % 2 === 0 ? 'even' : 'odd',
+                                isExpanded ? 'expanded' : '',
+                                isEditing ? 'editing' : '',
+                            ].filter(Boolean).join(' ');
+
+                            return (
+                            <tr
+                                key={code.id}
+                                className={rowClass}
+                                onClick={(e) => handleRowClick(e, code.id)}
+                            >
+                                {isEditing ? (
                                     // Edit mode
                                     <>
-                                        <td className="code-id">{code.id}</td>
-                                        <td>
+                                        <td className="code-id" data-label="Code">{code.id}</td>
+                                        <td className="cell-event" data-label="Event">
                                             <input
                                                 type="text"
                                                 value={editData.event || ''}
@@ -347,7 +411,7 @@ function EditableCodesTable() {
                                                 className="edit-input"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="cell-detail" data-label="Category">
                                             <select
                                                 value={editData.category || ''}
                                                 onChange={(e) => handleInputChange('category', e.target.value)}
@@ -358,7 +422,7 @@ function EditableCodesTable() {
                                                 ))}
                                             </select>
                                         </td>
-                                        <td>
+                                        <td className="cell-detail" data-label="Event Date">
                                             <input
                                                 type="date"
                                                 value={editData.eventDate || ''}
@@ -366,7 +430,7 @@ function EditableCodesTable() {
                                                 className="edit-input"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="cell-detail" data-label="Graphic Date">
                                             <input
                                                 type="text"
                                                 value={editData.graphicDate || ''}
@@ -374,7 +438,7 @@ function EditableCodesTable() {
                                                 className="edit-input"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="cell-points" data-label="Points">
                                             <input
                                                 type="number"
                                                 value={editData.points || ''}
@@ -384,7 +448,7 @@ function EditableCodesTable() {
                                                 max="10"
                                             />
                                         </td>
-                                        <td>
+                                        <td className="cell-detail" data-label="Semester">
                                             <select
                                                 value={editData.semester || ''}
                                                 onChange={(e) => handleInputChange('semester', e.target.value)}
@@ -394,65 +458,83 @@ function EditableCodesTable() {
                                                 <option value="springPoints">Spring</option>
                                             </select>
                                         </td>
-                                        <td>
+                                        <td className="cell-detail" data-label="Voter Eligible">
                                             <input
                                                 type="checkbox"
                                                 checked={editData.voterEligible || false}
                                                 onChange={(e) => handleInputChange('voterEligible', e.target.checked)}
                                             />
                                         </td>
-                                        <td>
+                                        <td className="cell-detail" data-label="Cabinet Required">
                                             <input
                                                 type="checkbox"
                                                 checked={editData.cabinetRequired || false}
                                                 onChange={(e) => handleInputChange('cabinetRequired', e.target.checked)}
                                             />
                                         </td>
-                                        <td className="actions-cell">
-                                            <button onClick={handleSaveEdit} className="save-btn">✓</button>
-                                            <button onClick={handleCancelEdit} className="cancel-btn">✗</button>
+                                        <td className="actions-cell cell-detail">
+                                            <button onClick={handleSaveEdit} className="save-btn">✓<span className="btn-label"> Save</span></button>
+                                            <button onClick={handleCancelEdit} className="cancel-btn">✗<span className="btn-label"> Cancel</span></button>
                                         </td>
+                                        <td className="cell-toggle"></td>
                                     </>
                                 ) : (
                                     // View mode
                                     <>
-                                        <td className="code-id">{code.id.toUpperCase()}</td>
-                                        <td>{code.event}</td>
-                                        <td>{code.category}</td>
-                                        <td>{code.eventDate}</td>
-                                        <td>{code.graphicDate}</td>
-                                        <td>{code.points}</td>
-                                        <td>{code.semester === 'fallPoints' ? 'Fall' : 'Spring'}</td>
-                                        <td>
+                                        <td className="code-id" data-label="Code">{code.id.toUpperCase()}</td>
+                                        <td className="cell-event" data-label="Event">{code.event}</td>
+                                        <td className="cell-detail" data-label="Category">{code.category}</td>
+                                        <td className="cell-detail" data-label="Event Date">{code.eventDate}</td>
+                                        <td className="cell-detail" data-label="Graphic Date">{code.graphicDate}</td>
+                                        <td className="cell-points" data-label="Points">{code.points}</td>
+                                        <td className="cell-detail" data-label="Semester">{code.semester === 'fallPoints' ? 'Fall' : 'Spring'}</td>
+                                        <td className="cell-detail" data-label="Voter Eligible">
                                             <span className={`badge ${code.voterEligible ? 'badge-yes' : 'badge-no'}`}>
                                                 {code.voterEligible ? 'Yes' : 'No'}
                                             </span>
                                         </td>
-                                        <td>
+                                        <td className="cell-detail" data-label="Cabinet Required">
                                             <span className={`badge ${code.cabinetRequired ? 'badge-yes' : 'badge-no'}`}>
                                                 {code.cabinetRequired ? 'Yes' : 'No'}
                                             </span>
                                         </td>
-                                        <td className="actions-cell">
-                                            <button onClick={() => handleEdit(code)} className="edit-btn">✏️</button>
-                                            <button 
-                                                onClick={() => handleDelete(code.id)} 
+                                        <td className="actions-cell cell-detail">
+                                            <button onClick={() => handleEdit(code)} className="edit-btn">✏️<span className="btn-label"> Edit</span></button>
+                                            <button
+                                                onClick={() => handleDelete(code.id)}
                                                 className="delete-btn"
                                                 title="Delete code"
                                             >
-                                                🗑️
+                                                🗑️<span className="btn-label"> Delete</span>
+                                            </button>
+                                        </td>
+                                        <td className="cell-toggle">
+                                            <button
+                                                type="button"
+                                                className="toggle-btn"
+                                                onClick={() => toggleExpanded(code.id)}
+                                                aria-expanded={isExpanded}
+                                                aria-label={`${isExpanded ? 'Hide' : 'Show'} details for ${code.id.toUpperCase()}`}
+                                            >
+                                                ›
                                             </button>
                                         </td>
                                     </>
                                 )}
                             </tr>
-                        ))}
+                            );
+                        })}
                     </tbody>
                 </table>
 
                 {codes.length === 0 && (
                     <div className="no-codes">
                         No event codes found. Click "Add New Code" to create one.
+                    </div>
+                )}
+                {codes.length > 0 && visibleCodes.length === 0 && (
+                    <div className="no-codes">
+                        No codes match your search.
                     </div>
                 )}
             </div>

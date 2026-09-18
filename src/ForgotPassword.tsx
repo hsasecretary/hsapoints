@@ -8,7 +8,7 @@ function ForgotPassword() {
     {
         event.preventDefault();
         document.getElementById("emailError").innerText = "";
-        var uflEmail = document.getElementById("uflEmail").value;
+        var uflEmail = (document.getElementById("uflEmail") as HTMLInputElement).value;
         if(uflEmail.length <= 8 || uflEmail.substring(uflEmail.length-8) !== "@ufl.edu")
         {
             document.getElementById("emailError").innerText = "*Required: Input your UFL email";

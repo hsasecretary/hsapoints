@@ -14,10 +14,12 @@
 }
 
 /* Table Header */
+/* Title centered on top, buttons in an even row underneath */
 .table-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
     margin-bottom: 20px;
     padding: 20px;
     background: #ffffff;
@@ -28,13 +30,50 @@
 
 .table-header h2 {
     margin: 0;
+    text-align: center;
     color: #0f4c64;
     font-weight: 700;
 }
 
 .table-actions {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* Beats the global `button:not(.logout-button) { min-width: 10em }` in
+   Logout.css, which otherwise stops these buttons shrinking to fit. */
+.table-actions .refresh-button,
+.table-actions .add-button {
+    width: 100%;
+    min-width: 0;
+}
+
+/* Same global rule also sets a light background, leaving Refresh's white
+   text unreadable. */
+.table-actions .refresh-button:not(:disabled) {
+    background: #0f4c64;
+    color: #ffffff;
+}
+
+@media (max-width: 600px) {
+    .table-header {
+        padding: 16px 12px;
+    }
+
+    .table-actions {
+        gap: 8px;
+    }
+
+    .table-actions .refresh-button,
+    .table-actions .add-button {
+        padding: 10px 6px;
+        font-size: 15px;
+        gap: 6px;
+    }
 }
 
 /* Buttons Base */
@@ -414,4 +453,285 @@
 .cancel-btn:focus {
     outline: 2px solid #0f4c64;
     outline-offset: 2px;
+}
+/* ------------------------------------------------------------------------
+   Search / filter bar
+------------------------------------------------------------------------ */
+.codes-filters {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.codes-filters .codes-search,
+.codes-filters .codes-category-filter {
+    width: 100%;
+    margin: 0;
+    padding: 10px 12px;
+    border: 1.5px solid #94a3b8;
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: inherit;
+    color: #0f172a;
+    background-color: #ffffff;
+}
+
+.codes-filters .codes-search:focus,
+.codes-filters .codes-category-filter:focus {
+    outline: none;
+    border-color: #0f4c64;
+    box-shadow: 0 0 0 3px rgba(15, 76, 100, 0.2);
+}
+
+.codes-count {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+/* Row buttons: the global `button:not(.logout-button)` rule in Logout.css
+   outranks the single-class rules above, forcing a 10em min-width and a
+   light background under white text. Restore the intended look. */
+.codes-table .edit-btn,
+.codes-table .delete-btn,
+.codes-table .save-btn,
+.codes-table .cancel-btn {
+    min-width: 0;
+    min-height: 0;
+    font-size: 13px;
+}
+.codes-table .edit-btn { background: #0f5b7a; }
+.codes-table .delete-btn { background: #b91c1c; }
+.codes-table .save-btn { background: #166534; }
+.codes-table .cancel-btn { background: #475569; }
+.codes-table .edit-btn:hover { background: #0a3d52; }
+.codes-table .delete-btn:hover { background: #991b1b; }
+.codes-table .save-btn:hover { background: #14532d; }
+.codes-table .cancel-btn:hover { background: #334155; }
+
+/* Phone-only pieces */
+.codes-table .cell-toggle,
+.codes-table .btn-label {
+    display: none;
+}
+
+/* ------------------------------------------------------------------------
+   Phones: each code is a compact row (Code / Event / Points / ▸).
+   Tap it to expand the rest of the fields and the Edit / Delete buttons.
+------------------------------------------------------------------------ */
+@media (max-width: 768px) {
+    .codes-filters {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .table-container {
+        overflow: visible;
+        border: none;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .codes-table,
+    .codes-table tbody {
+        display: block;
+    }
+
+    /* Eboard.css styles every <table> with a shadow and top margin */
+    .codes-table {
+        box-shadow: none;
+        margin-top: 0;
+    }
+
+    .codes-table thead {
+        display: none;
+    }
+
+    .codes-table tr,
+    .codes-table tr.even,
+    .codes-table tr.odd {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto auto;
+        align-items: center;
+        column-gap: 10px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .codes-table tr:hover {
+        background: #f8fafc;
+    }
+
+    .codes-table tr.expanded {
+        border-color: #0f4c64;
+    }
+
+    .codes-table td {
+        display: block;
+        padding: 0;
+        border: none;
+    }
+
+    /* Summary line */
+    .codes-table .code-id {
+        grid-row: 1;
+        grid-column: 1;
+        font-size: 13px;
+    }
+
+    .codes-table .cell-event {
+        grid-row: 1;
+        grid-column: 2;
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .codes-table tr.expanded .cell-event {
+        white-space: normal;
+    }
+
+    .codes-table .cell-points {
+        grid-row: 1;
+        grid-column: 3;
+        font-weight: 700;
+        color: #0f4c64;
+        white-space: nowrap;
+    }
+
+    .codes-table tr:not(.editing) .cell-points::after {
+        content: " pts";
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+    }
+
+    .codes-table .cell-toggle {
+        display: block;
+        grid-row: 1;
+        grid-column: 4;
+    }
+
+    .codes-table .toggle-btn,
+    .codes-table .toggle-btn:hover {
+        min-width: 0;
+        min-height: 0;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: none;
+        border-radius: 6px;
+        background: transparent;
+        box-shadow: none;
+        color: #0f4c64;
+        font-size: 28px;
+        line-height: 1;
+        transition: transform 0.15s ease;
+    }
+
+    .codes-table tr.expanded .toggle-btn {
+        transform: rotate(90deg);
+    }
+
+    .codes-table .toggle-btn:hover {
+        background: #e2e8f0;
+    }
+
+    /* Details: hidden until the row is expanded */
+    .codes-table .cell-detail {
+        display: none;
+        grid-column: 1 / -1;
+    }
+
+    .codes-table tr.expanded .cell-detail {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 0;
+        border-top: 1px solid #eef2f6;
+    }
+
+    .codes-table tr.expanded .cell-detail[data-label]::before {
+        content: attr(data-label);
+        font-size: 13px;
+        font-weight: 700;
+        color: #475569;
+    }
+
+    .codes-table tr.expanded .actions-cell {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding-top: 12px;
+    }
+
+    .codes-table .actions-cell button {
+        margin: 0;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .codes-table .btn-label {
+        display: inline;
+    }
+
+    /* Editing: every field full-width with its label above it */
+    .codes-table tr.expanded.editing {
+        cursor: default;
+    }
+
+    .codes-table tr.expanded.editing td {
+        grid-column: 1 / -1;
+        grid-row: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+        padding: 6px 0;
+        border-top: none;
+    }
+
+    .codes-table tr.expanded.editing td[data-label]::before {
+        content: attr(data-label);
+        font-size: 13px;
+        font-weight: 700;
+        color: #475569;
+    }
+
+    .codes-table tr.expanded.editing td input[type="checkbox"] {
+        align-self: flex-start;
+        width: 20px;
+        height: 20px;
+    }
+
+    .codes-table tr.expanded.editing td.actions-cell {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding-top: 12px;
+    }
+
+    .codes-table tr.expanded.editing td.cell-toggle {
+        display: none;
+    }
+
+    /* Beat the global input[type="text"] { width: 95%; margin-left: 10px } */
+    .codes-table .edit-input,
+    .codes-table .edit-select {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+        margin: 0;
+        font-size: 15px;
+        padding: 8px 10px;
+    }
 }

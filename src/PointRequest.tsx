@@ -30,12 +30,12 @@ function PointRequest() {
 
     // Compresses photos client-side to ~100KB so the website stays fast and within Firestore's 1MB limit
     const compressImage = (file) => {
-        return new Promise((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = (event) => {
                 const img = new Image();
-                img.src = event.target.result;
+                img.src = event.target.result as string;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const MAX_WIDTH = 1200;
@@ -133,7 +133,7 @@ function PointRequest() {
     const handleClearImage = () => {
         setImageData('');
         setImagePreview('');
-        const fileInput = document.getElementById('imageUpload');
+        const fileInput = document.getElementById('imageUpload') as HTMLInputElement | null;
         if (fileInput) fileInput.value = '';
     };
 
@@ -159,7 +159,7 @@ function PointRequest() {
                 throw new Error('Please select a date');
             }
 
-            if (!formData.pointsRequested || formData.pointsRequested <= 0) {
+            if (!formData.pointsRequested || Number(formData.pointsRequested) <= 0) {
                 throw new Error('Please enter a valid number of points');
             }
 
@@ -237,7 +237,7 @@ function PointRequest() {
             <form onSubmit={handleSubmit} className="request-form">
 
                 <div className="form-group">
-                    <label htmlFor="activityType">Activity Type *</label>
+                    <label htmlFor="activityType">Activity Type</label>
 
                     <select
                         id="activityType"
@@ -257,7 +257,7 @@ function PointRequest() {
 
                 {formData.activityType === 'other' && (
                     <div className="form-group">
-                        <label htmlFor="customActivityName">Custom Activity Name *</label>
+                        <label htmlFor="customActivityName">Custom Activity Name</label>
 
                         <input
                             type="text"
@@ -272,7 +272,7 @@ function PointRequest() {
                 )}
 
                 <div className="form-group">
-                    <label htmlFor="description">Description *</label>
+                    <label htmlFor="description">Description</label>
 
                     <textarea
                         id="description"
@@ -280,14 +280,14 @@ function PointRequest() {
                         value={formData.description}
                         onChange={handleInputChange}
                         placeholder="Describe the activity, location, duration, and any other relevant details"
-                        rows="4"
+                        rows={4}
                         required
                     />
                 </div>
 
                 <div className="form-row">
                     <div className="form-group">
-                        <label htmlFor="date">Date *</label>
+                        <label htmlFor="date">Date</label>
 
                         <input
                             type="date"
@@ -301,7 +301,7 @@ function PointRequest() {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="pointsRequested">Points Requested *</label>
+                        <label htmlFor="pointsRequested">Points Requested</label>
 
                         <input
                             type="number"
@@ -318,7 +318,7 @@ function PointRequest() {
 
                 {/* Photo Evidence Upload Section */}
                 <div className="form-group">
-                    <label htmlFor="imageUpload">Photo Evidence *</label>
+                    <label htmlFor="imageUpload">Photo Evidence</label>
 
                     <input
                         type="file"

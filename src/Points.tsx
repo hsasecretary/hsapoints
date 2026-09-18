@@ -38,7 +38,7 @@ export default function Points() {
 						});
 
 						// Calculate points breakdown
-						const pointsBreakdown = {
+						const pointsBreakdown: Record<string, any> = {
 							fallPoints: userData.fallPoints || 0,
 							springPoints: userData.springPoints || 0,
 							totalPoints: (userData.fallPoints || 0) + (userData.springPoints || 0),
@@ -77,7 +77,7 @@ export default function Points() {
 						const codesSnapshot = await getDocs(codesCollection);
 						
 						let voterEligibleTotal = 0;
-						const eventDetails = [];
+						const eventDetails: any[] = [];
 
 						for (const docSnap of codesSnapshot.docs) {
 							const docData = docSnap.data();
@@ -105,7 +105,7 @@ export default function Points() {
 						pointsBreakdown.isVoterEligible = voterEligibleTotal >= 15;
 
 						setUserPoints(pointsBreakdown);
-						setEventBreakdown(eventDetails.sort((a, b) => new Date(b.eventDate) - new Date(a.eventDate)));
+						setEventBreakdown(eventDetails.sort((a, b) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime()));
 					}
 				} catch (error) {
 					console.error("Error fetching user data:", error);
