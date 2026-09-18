@@ -300,18 +300,29 @@ function PointRequest() {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="pointsRequested">Points Requested</label>
+                        <label htmlFor="pointsRequested-1" id="pointsRequested-label">Points Requested</label>
 
-                        <input
-                            type="number"
-                            id="pointsRequested"
-                            name="pointsRequested"
-                            value={formData.pointsRequested}
-                            onChange={handleInputChange}
-                            min="1"
-                            max="10"
-                            required
-                        />
+                        {/* Requests are 1 or 2 points: two tap targets instead of a number box.
+                            The value is still saved as a number (parseInt on submit). */}
+                        <div className="points-choice" role="radiogroup" aria-labelledby="pointsRequested-label">
+                            {['1', '2'].map((value) => (
+                                <label
+                                    key={value}
+                                    className={`points-choice__option${formData.pointsRequested === value ? ' is-selected' : ''}`}
+                                >
+                                    <input
+                                        type="radio"
+                                        id={`pointsRequested-${value}`}
+                                        name="pointsRequested"
+                                        value={value}
+                                        checked={formData.pointsRequested === value}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    {value} {value === '1' ? 'point' : 'points'}
+                                </label>
+                            ))}
+                        </div>
                     </div>
                 </div>
 

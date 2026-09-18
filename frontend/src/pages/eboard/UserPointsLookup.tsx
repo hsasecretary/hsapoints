@@ -172,7 +172,7 @@ function UserPointsLookup() {
                         <div className="user-info-grid">
                             <div><strong>Name:</strong> {userInfo.firstName} {userInfo.lastName}</div>
                             <div><strong>Email:</strong> {userInfo.email}</div>
-                            <div><strong>Cabinet:</strong> {userInfo.cabinet}</div>
+                            <div><strong>Account Type:</strong> {userInfo.cabinet}</div>
                             {!userInfo.generalMember && <div><strong>Position:</strong> {userInfo.position}</div>}
                             <div><strong>Approved:</strong> {userInfo.approved ? 'Yes' : 'No'}</div>
                             {!userInfo.generalMember && <div><strong>E-Board:</strong> {userInfo.eboard ? 'Yes' : 'No'}</div>}

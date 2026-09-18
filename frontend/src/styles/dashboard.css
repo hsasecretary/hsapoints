@@ -502,7 +502,7 @@
 
 /* Browsers draw date inputs taller than number inputs with the same
    padding; pin Date and Points Requested to one height so they line up. */
-.point-request .request-form .form-row input {
+.point-request .request-form .form-row input[type="date"] {
     height: 48px;
 }
 
@@ -588,4 +588,53 @@
 
 .strike {
     color:red;
+}
+
+/* ---- Points Requested: 1 / 2 choice  (PointRequest.tsx) ---------------- */
+.point-request .points-choice {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.point-request .points-choice__option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    margin: 0;
+    border: 1.5px solid #94a3b8;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.point-request .points-choice__option:hover {
+    border-color: #0f4c64;
+}
+
+.point-request .points-choice__option.is-selected {
+    background: #0f4c64;
+    border-color: #0f4c64;
+    color: #ffffff;
+}
+
+/* The real radio stays in the page (keyboard + form validation) but is
+   drawn by its label instead. */
+.point-request .points-choice__option input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+}
+
+.point-request .points-choice__option:focus-within {
+    outline: 3px solid rgba(15, 76, 100, 0.35);
+    outline-offset: 2px;
 }

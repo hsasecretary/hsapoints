@@ -158,7 +158,7 @@ export default function Points({ refreshKey = 0, beforeCategories }: PointsProps
 					<div className="user-info-grid">
 						<div><strong>Name:</strong> {userInfo.firstName} {userInfo.lastName}</div>
 						<div><strong>Email:</strong> {userInfo.email}</div>
-						<div><strong>Cabinet:</strong> {userInfo.cabinet === 'none' ? 'General Member' : userInfo.cabinet}</div>
+						<div><strong>Account Type:</strong> {userInfo.cabinet === 'none' ? 'General Member' : userInfo.cabinet}</div>
 						{!userInfo.generalMember && <div><strong>Position:</strong> {userInfo.position}</div>}
 						<div><strong>Status:</strong> {userInfo.approved ? 'Approved' : 'Pending'}</div>
 						{!userInfo.generalMember && <div><strong>E-Board:</strong> {userInfo.eboard ? 'Yes' : 'No'}</div>}
@@ -210,6 +210,44 @@ export default function Points({ refreshKey = 0, beforeCategories }: PointsProps
 				</div>
 
 				{beforeCategories}
+
+				<div className="event-breakdown">
+					<h3>My Events Attended ({eventBreakdown.length})</h3>
+					{eventBreakdown.length > 0 ? (
+						<table className="events-table">
+							<thead>
+								<tr>
+									<th>Code</th>
+									<th>Event</th>
+									<th>Category</th>
+									<th>Date</th>
+									<th>Points</th>
+									<th>Semester</th>
+									<th>Voter Eligible</th>
+								</tr>
+							</thead>
+							<tbody>
+								{eventBreakdown.map((event, index) => (
+									<tr key={index}>
+										 <td data-label="Code">{event.code}</td>
+										 <td data-label="Event">{event.event}</td>
+										 <td data-label="Category">{event.category}</td>
+										 <td data-label="Date">{event.eventDate}</td>
+										 <td data-label="Points">{event.points}</td>
+										 <td data-label="Semester">{event.semester === 'fallPoints' ? 'Fall' : 'Spring'}</td>
+										 <td data-label="Voter Eligible">
+											 <span className={event.voterEligible ? 'badge-yes' : 'badge-no'}>
+												 {event.voterEligible ? 'Yes' : 'No'}
+											 </span>
+										 </td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					) : (
+						<p style={{textAlign: 'center', color: '#666'}}>No events attended yet</p>
+					)}
+				</div>
 
 				<div className="category-breakdown">
 					<h3>Points by Category</h3>
@@ -267,44 +305,6 @@ export default function Points({ refreshKey = 0, beforeCategories }: PointsProps
 							</tr>
 						</tbody>
 					</table>
-				</div>
-
-				<div className="event-breakdown">
-					<h3>My Events Attended ({eventBreakdown.length})</h3>
-					{eventBreakdown.length > 0 ? (
-						<table className="events-table">
-							<thead>
-								<tr>
-									<th>Code</th>
-									<th>Event</th>
-									<th>Category</th>
-									<th>Date</th>
-									<th>Points</th>
-									<th>Semester</th>
-									<th>Voter Eligible</th>
-								</tr>
-							</thead>
-							<tbody>
-								{eventBreakdown.map((event, index) => (
-									<tr key={index}>
-										 <td data-label="Code">{event.code}</td>
-										 <td data-label="Event">{event.event}</td>
-										 <td data-label="Category">{event.category}</td>
-										 <td data-label="Date">{event.eventDate}</td>
-										 <td data-label="Points">{event.points}</td>
-										 <td data-label="Semester">{event.semester === 'fallPoints' ? 'Fall' : 'Spring'}</td>
-										 <td data-label="Voter Eligible">
-											 <span className={event.voterEligible ? 'badge-yes' : 'badge-no'}>
-												 {event.voterEligible ? 'Yes' : 'No'}
-											 </span>
-										 </td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					) : (
-						<p style={{textAlign: 'center', color: '#666'}}>No events attended yet</p>
-					)}
 				</div>
 			</div>
 		</div>
