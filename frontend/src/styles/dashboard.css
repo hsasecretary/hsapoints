@@ -376,6 +376,8 @@
     margin: 0 auto;
     padding: 20px;
     background: white;
+    /* Same blue outline as the dashboard's other cards */
+    border: 2px solid #155776;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
