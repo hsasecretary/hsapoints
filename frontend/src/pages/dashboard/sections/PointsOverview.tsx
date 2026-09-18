@@ -40,7 +40,7 @@ export default function PointsOverview({ refreshKey = 0, eventCodeForm }: Points
 							lastName: userData.lastName || 'N/A',
 							email: email,
 							cabinet: userData.cabinet || 'none',
-							position: userData.position || 'N/A',
+							position: userData.position || '',
 							approved: userData.approved || false,
 							eboard: userData.eboard || false,
 							generalMember: isGeneralMember(userData)
@@ -150,6 +150,10 @@ export default function PointsOverview({ refreshKey = 0, eventCodeForm }: Points
 		);
 	}
 
+	// Cabinet events get their own section under My Events Attended
+	const cabinetEvents = eventBreakdown.filter((event) => event.category === 'Cabinet');
+	const generalEvents = eventBreakdown.filter((event) => event.category !== 'Cabinet');
+
 	return (
 		<div className="user-points-lookup">
 		
@@ -160,10 +164,13 @@ export default function PointsOverview({ refreshKey = 0, eventCodeForm }: Points
 					<div className="user-info-grid">
 						<div><strong>Name:</strong> {userInfo.firstName} {userInfo.lastName}</div>
 						<div><strong>Email:</strong> {userInfo.email}</div>
-						<div><strong>Account Type:</strong> {userInfo.cabinet === 'none' ? 'General Member' : userInfo.cabinet}</div>
-						{!userInfo.generalMember && <div><strong>Position:</strong> {userInfo.position}</div>}
+						<div>
+							<strong>Account Type:</strong> {userInfo.cabinet === 'none' ? 'General Member' : userInfo.cabinet}
+							{!userInfo.generalMember && ` (E-Board: ${userInfo.eboard ? 'Yes' : 'No'})`}
+						</div>
+						{/* Sign-up only asks e-board members for a position, so only show it when there is one */}
+						{userInfo.position && <div><strong>Position:</strong> {userInfo.position}</div>}
 						{/* <div><strong>Status:</strong> {userInfo.approved ? 'Approved' : 'Pending'}</div> */}
-						{!userInfo.generalMember && <div><strong>E-Board:</strong> {userInfo.eboard ? 'Yes' : 'No'}</div>}
 					</div>
 				</div>
 
@@ -214,9 +221,16 @@ export default function PointsOverview({ refreshKey = 0, eventCodeForm }: Points
 				{eventCodeForm}
 
 				<div className="event-breakdown">
-					<SectionTitle>My Events Attended ({eventBreakdown.length})</SectionTitle>
-					<EventsAttendedList events={eventBreakdown} />
+					<SectionTitle>My Events Attended ({generalEvents.length})</SectionTitle>
+					<EventsAttendedList events={generalEvents} />
 				</div>
+
+				{cabinetEvents.length > 0 && (
+					<div className="event-breakdown">
+						<SectionTitle>My Cabinet Events ({cabinetEvents.length})</SectionTitle>
+						<EventsAttendedList events={cabinetEvents} />
+					</div>
+				)}
 
 				<div className="category-breakdown">
 					<SectionTitle>Points by Category</SectionTitle>
