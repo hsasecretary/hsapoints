@@ -8,7 +8,7 @@ function NavBar({eboard, cabinet}) {
 			<nav className="nav-bar">
 				<ul>
 					<li><a href="https://ufhsa.com">UF HSA</a></li>
-					<li><a href="./dashboard">Attendance</a></li>
+					<li><a href="./dashboard">Dashboard</a></li>
 					{cabinet && (
 						<li><a href="./Cabinet">Cabinet</a></li>
 					)}
