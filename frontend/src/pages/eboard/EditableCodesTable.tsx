@@ -3,7 +3,12 @@ import { db } from '../../lib/firebase';
 import { collection, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import SectionTitle from '../../components/ui/SectionTitle';
 
-function EditableCodesTable() {
+type EditableCodesTableProps = {
+    /** Bump to reload the list (e.g. after a code is created). */
+    refreshKey?: number;
+};
+
+function EditableCodesTable({ refreshKey = 0 }: EditableCodesTableProps) {
     const [codes, setCodes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editingCode, setEditingCode] = useState(null);
@@ -27,7 +32,7 @@ function EditableCodesTable() {
 
     useEffect(() => {
         fetchCodes();
-    }, []);
+    }, [refreshKey]);
 
     const searchTerm = search.trim().toLowerCase();
     const visibleCodes = codes.filter((code) =>
@@ -153,6 +158,9 @@ function EditableCodesTable() {
                     onChange={(e) => setSearch(e.target.value)}
                     aria-label="Search codes by code or event name"
                 />
+                <button type="button" onClick={fetchCodes} className="refresh-button codes-refresh" disabled={loading}>
+                    {loading ? 'Refreshing...' : '🔄 Refresh'}
+                </button>
                 <select
                     className="codes-category-filter"
                     value={categoryFilter}
@@ -343,11 +351,6 @@ function EditableCodesTable() {
                 )}
             </div>
 
-                <div className="codes-card__footer">
-                    <button type="button" onClick={fetchCodes} className="refresh-button" disabled={loading}>
-                        {loading ? 'Refreshing...' : '🔄 Refresh'}
-                    </button>
-                </div>
             </section>
         </div>
     );

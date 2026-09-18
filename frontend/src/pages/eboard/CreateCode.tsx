@@ -2,7 +2,12 @@ import { useState } from 'react';
 import { db } from '../../lib/firebase';
 import { setDoc, doc, collection, getDocs } from 'firebase/firestore';
 
-function CreateCode() {
+type CreateCodeProps = {
+    /** Called with the new code (e.g. "GOLAZO") after it's saved. */
+    onCreated?: (code: string) => void;
+};
+
+function CreateCode({ onCreated }: CreateCodeProps) {
     const [formData, setFormData] = useState({
         eventName: '',
         eventCode: '',
@@ -144,6 +149,8 @@ function CreateCode() {
                 text: `Event code "${formData.eventCode.toUpperCase()}" created successfully!`, 
                 type: 'success' 
             });
+
+            onCreated?.(formData.eventCode.trim().toUpperCase());
 
         } catch (error) {
             console.error('Error creating code:', error);
