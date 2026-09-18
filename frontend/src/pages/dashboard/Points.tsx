@@ -2,6 +2,7 @@ import React, { useEffect, useState, type ReactNode } from "react";
 import { auth, db } from '../../lib/firebase';
 import { isGeneralMember } from '../../lib/members';
 import SectionTitle from '../../components/ui/SectionTitle';
+import EventsAttendedList from './EventsAttendedList';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -214,40 +215,7 @@ export default function Points({ refreshKey = 0, beforeCategories }: PointsProps
 
 				<div className="event-breakdown">
 					<SectionTitle>My Events Attended ({eventBreakdown.length})</SectionTitle>
-					{eventBreakdown.length > 0 ? (
-						<table className="events-table">
-							<thead>
-								<tr>
-									<th>Code</th>
-									<th>Event</th>
-									<th>Category</th>
-									<th>Date</th>
-									<th>Points</th>
-									<th>Semester</th>
-									<th>Voter Eligible</th>
-								</tr>
-							</thead>
-							<tbody>
-								{eventBreakdown.map((event, index) => (
-									<tr key={index}>
-										 <td data-label="Code">{event.code}</td>
-										 <td data-label="Event">{event.event}</td>
-										 <td data-label="Category">{event.category}</td>
-										 <td data-label="Date">{event.eventDate}</td>
-										 <td data-label="Points">{event.points}</td>
-										 <td data-label="Semester">{event.semester === 'fallPoints' ? 'Fall' : 'Spring'}</td>
-										 <td data-label="Voter Eligible">
-											 <span className={event.voterEligible ? 'badge-yes' : 'badge-no'}>
-												 {event.voterEligible ? 'Yes' : 'No'}
-											 </span>
-										 </td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					) : (
-						<p style={{textAlign: 'center', color: '#666'}}>No events attended yet</p>
-					)}
+					<EventsAttendedList events={eventBreakdown} />
 				</div>
 
 				<div className="category-breakdown">
