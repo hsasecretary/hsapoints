@@ -1604,3 +1604,14 @@
         padding: 8px 10px;
     }
 }
+
+/* ---- User lookup: cabinet points line above Cabinet Events  (UserPointsLookup.tsx) */
+.user-points-lookup .lookup-cabinet-points {
+    margin: 0 0 12px;
+    text-align: center;
+    color: #475569;
+}
+
+.user-points-lookup .lookup-cabinet-points strong {
+    color: #0f4c64;
+}

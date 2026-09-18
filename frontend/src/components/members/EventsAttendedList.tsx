@@ -10,8 +10,8 @@ export type AttendedEvent = {
     voterEligible: boolean;
 };
 
-// "My Events Attended": one compact row per event (code + points), tap a row
-// to see the rest. Same look as the E-Board codes list on phones.
+// Events a member attended: one compact row per event (code + points), tap a
+// row to see the rest. Used on the Dashboard and the E-Board user lookup.
 function EventsAttendedList({ events }: { events: AttendedEvent[] }) {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
 
