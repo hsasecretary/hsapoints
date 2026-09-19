@@ -240,7 +240,7 @@ function CreateCode({ onCreated }: CreateCodeProps) {
                         />
                     </div>
                     <div className="form-group">
-                        <label htmlFor="points-0" id="points-label">Points</label>
+                        <label id="points-label">Points</label>
                         <ChoiceGroup
                             name="points"
                             labelledBy="points-label"

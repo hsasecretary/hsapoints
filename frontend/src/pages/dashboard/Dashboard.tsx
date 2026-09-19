@@ -2,13 +2,13 @@ import { useState } from 'react';
 import SectionTitle from '../../components/ui/SectionTitle';
 import PointsOverview from './sections/PointsOverview';
 import EventCodeForm from './sections/EventCodeForm';
-import PointRequestForm from './sections/PointRequestForm';
+import PointTabs from './sections/PointTabs';
 
 // /dashboard, top to bottom:
-//   PointsOverview   — My Information, Points Summary,
-//                      [EventCodeForm: "Have an Event Code?"],
-//                      My Events Attended (EventsAttendedList), Points by Category
-//   PointRequestForm — Submit Point Request
+//   PointsOverview — My Information, Points Summary,
+//                    [EventCodeForm: "Have an Event Code?"],
+//                    My Events Attended (EventsAttendedList), Points by Category
+//   PointTabs      — Submit Point Request / My Requests (tabbed)
 function Dashboard({cabinet, email}) {
 	const [pointsRefreshKey, setPointsRefreshKey] = useState(0);
 
@@ -25,7 +25,7 @@ function Dashboard({cabinet, email}) {
 				eventCodeForm={<EventCodeForm onPointsUpdate={handlePointsUpdate} />}
 			/>
 			<br/>
-			<PointRequestForm />
+			<PointTabs />
 			<br/>
 		</div>
 	);

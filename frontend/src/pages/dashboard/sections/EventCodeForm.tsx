@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { auth, db} from '../../../lib/firebase';
+import { auth, db } from '../../../lib/firebase';
 import SectionTitle from '../../../components/ui/SectionTitle';
-import { doc, getDoc, arrayUnion, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, arrayUnion, writeBatch, increment } from 'firebase/firestore';
 
 function EventCodeForm({ onPointsUpdate }) {
     const [code, setCode] = useState('');
@@ -81,6 +81,8 @@ function EventCodeForm({ onPointsUpdate }) {
                     }
                     
                     added = true;
+                    const batch = writeBatch(db);
+
                     var semester = codeDocSnap.data().semester;
                     var addPoints = codeDocSnap.data().points;
                     var currentPoints;
@@ -94,7 +96,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             if(category === "GBM") {
                                 var gbmNVE = data.gbmPointsNVE;
                                 gbmNVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "fallPoints": currentPoints, 
                                     "gbmPointsNVE": gbmNVE
@@ -102,7 +104,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "MLP Fall") {
                                 var mlpFallNVE = data.mlpFallPointsNVE;
                                 mlpFallNVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "fallPoints": currentPoints, 
                                     "mlpFallPointsNVE": mlpFallNVE
@@ -110,7 +112,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "MLP Spring") {
                                 var mlpSpringNVE = data.mlpSpringPointsNVE;
                                 mlpSpringNVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "fallPoints": currentPoints, 
                                     "mlpSpringPointsNVE": mlpSpringNVE
@@ -118,7 +120,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "OPA") {
                                 var opa = data.opaPointsNVE;
                                 opa += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "fallPoints": currentPoints,
                                     "opaPointsNVE": opa
@@ -126,7 +128,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "Programming") {
                                 var prgmNVE = data.programmingPointsNVE;
                                 prgmNVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "fallPoints": currentPoints,
                                     "programmingPointsNVE": prgmNVE
@@ -134,7 +136,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "Cabinet") {
                                 var cabinet = data.cabinetPoints;
                                 cabinet += addPoints;
-                                await updateDoc(userDocRef, { 
+                                batch.update(userDocRef, { 
                                     "eventCodes":arrayUnion(codeToCheck), 
                                     "fallPoints":currentPoints,
                                     "cabinetPoints":cabinet
@@ -142,7 +144,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else {
                                 var other = data.otherPoints;
                                 other += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "fallPoints": currentPoints,
                                     "otherPoints": other
@@ -152,7 +154,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             if(category === "Programming") {
                                 var prgmVE = data.programmingPointsVE;
                                 prgmVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "fallPoints": currentPoints,
                                     "programmingPointsVE": prgmVE
@@ -160,7 +162,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "GBM") {
                                 var gbmVE = data.gbmPointsVE;
                                 gbmVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "fallPoints": currentPoints, 
                                     "gbmPointsVE": gbmVE
@@ -168,7 +170,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "MLP Fall") {
                                 var mlpFallVE = data.mlpFallPointsVE;
                                 mlpFallVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "fallPoints": currentPoints, 
                                     "mlpFallPointsVE": mlpFallVE
@@ -176,7 +178,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "MLP Spring") {
                                 var mlpSpringVE = data.mlpSpringPointsVE;
                                 mlpSpringVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "fallPoints": currentPoints, 
                                     "mlpSpringPointsVE": mlpSpringVE
@@ -185,7 +187,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "OPA") {
                                 var opaVE = data.opaPointsVE;
                                 opaVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "fallPoints": currentPoints, 
                                     "opaPointsVE": opaVE
@@ -193,7 +195,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "Cabinet") {
                                 cabinet = data.cabinetPoints;
                                 cabinet += addPoints;
-                                await updateDoc(userDocRef, { 
+                                batch.update(userDocRef, { 
                                     "eventCodes":arrayUnion(codeToCheck), 
                                     "fallPoints":currentPoints,
                                     "cabinetPoints":cabinet
@@ -208,7 +210,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             if(category === "GBM") {
                                 gbmNVE = data.gbmPointsNVE;
                                 gbmNVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "springPoints": currentPoints, 
                                     "gbmPointsNVE": gbmNVE
@@ -216,7 +218,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "MLP Fall") {
                                 mlpFallNVE = data.mlpFallPointsNVE;
                                 mlpFallNVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "springPoints": currentPoints, 
                                     "mlpFallPointsNVE": mlpFallNVE
@@ -224,7 +226,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "MLP Spring") {
                                 mlpSpringNVE = data.mlpSpringPointsNVE;
                                 mlpSpringNVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "springPoints": currentPoints, 
                                     "mlpSpringPointsNVE": mlpSpringNVE
@@ -232,7 +234,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "OPA") {
                                 opa = data.opaPointsNVE;
                                 opa += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "springPoints": currentPoints,
                                     "opaPointsNVE": opa
@@ -240,7 +242,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "Programming") {
                                 prgmNVE = data.programmingPointsNVE;
                                 prgmNVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "springPoints": currentPoints,
                                     "programmingPointsNVE": prgmNVE
@@ -248,7 +250,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "Cabinet") {
                                 cabinet = data.cabinetPoints;
                                 cabinet += addPoints;
-                                await updateDoc(userDocRef, { 
+                                batch.update(userDocRef, { 
                                     "eventCodes":arrayUnion(codeToCheck), 
                                     "springPoints":currentPoints,
                                     "cabinetPoints":cabinet
@@ -256,7 +258,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else {
                                 other = data.otherPoints;
                                 other += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "springPoints": currentPoints,
                                     "otherPoints": other
@@ -266,7 +268,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             if(category === "Programming") {
                                 prgmVE = data.programmingPointsVE;
                                 prgmVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "springPoints": currentPoints,
                                     "programmingPointsVE": prgmVE
@@ -274,7 +276,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "GBM") {
                                 gbmVE = data.gbmPointsVE;
                                 gbmVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "springPoints": currentPoints, 
                                     "gbmPointsVE": gbmVE
@@ -282,7 +284,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "MLP Fall") {
                                 mlpFallVE = data.mlpFallPointsVE;
                                 mlpFallVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "springPoints": currentPoints, 
                                     "mlpFallPointsVE": mlpFallVE
@@ -290,7 +292,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "MLP Spring") {
                                 mlpSpringVE = data.mlpSpringPointsVE;
                                 mlpSpringVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "springPoints": currentPoints, 
                                     "mlpSpringPointsVE": mlpSpringVE
@@ -298,7 +300,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "OPA") {
                                 opaVE = data.opaPointsVE;
                                 opaVE += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "springPoints": currentPoints, 
                                     "opaPointsVE": opaVE
@@ -306,7 +308,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else if(category === "Cabinet") {
                                 cabinet = data.cabinetPoints;
                                 cabinet += addPoints;
-                                await updateDoc(userDocRef, { 
+                                batch.update(userDocRef, { 
                                     "eventCodes":arrayUnion(codeToCheck), 
                                     "springPoints":currentPoints,
                                     "cabinetPoints":cabinet
@@ -314,7 +316,7 @@ function EventCodeForm({ onPointsUpdate }) {
                             } else {
                                 other = data.otherPoints;
                                 other += addPoints;
-                                await updateDoc(userDocRef, {
+                                batch.update(userDocRef, {
                                     "eventCodes": arrayUnion(codeToCheck),
                                     "springPoints": currentPoints,
                                     "otherPoints": other
@@ -322,6 +324,15 @@ function EventCodeForm({ onPointsUpdate }) {
                             }
                         }
                     }
+
+                    // Implemented the attendee counter to increment on our
+                    // end in order to reflect how many people attended
+                    batch.update(codeDocRef, {
+                        attendeeCount: increment(1),
+                        ateendecode: true
+                    });
+
+                    await batch.commit();
                 }
 
                 if(added) {

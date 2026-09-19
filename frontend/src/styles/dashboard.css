@@ -751,3 +751,178 @@
     text-align: center;
     color: #666;
 }
+
+/* ---- Down here's the added css styling for the new point request tab system along
+with the my requests tab. ---------- */
+
+.point-request-section {
+    flex: 1 1 100%;
+    max-width: 800px;
+    min-width: 0;
+    margin: 0 auto;
+}
+
+.point-request-section__tabs {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 20px;
+}
+
+.point-request-section .tab-button {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 48px;
+    margin: 0;
+    border: 1.5px solid #94a3b8;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s, color 0.2s;
+}
+
+.point-request-section .tab-button:hover {
+    border-color: #0f4c64;
+}
+
+.point-request-section .tab-button.is-active {
+    background: #0f4c64;
+    border-color: #0f4c64;
+    color: #ffffff;
+}
+
+.point-request-section .tab-button:focus-visible {
+    outline: 3px solid rgba(15, 76, 100, 0.35);
+    outline-offset: 2px;
+}
+
+/* Same card look as .point-request, so the box doesn't change shape when
+   switching tabs */
+.my-requests {
+    padding: 20px;
+    background: white;
+    border: 2px solid #155776;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.my-requests .section-title {
+    margin-bottom: 20px;
+}
+
+.my-requests__empty {
+    padding: 30px 20px;
+    text-align: center;
+    color: #666;
+}
+
+.my-requests__list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.request-card {
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 14px 16px;
+}
+
+.request-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.request-card__activity {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 15px;
+}
+
+.request-card__points {
+    font-weight: 700;
+    color: #0f4c64;
+    font-size: 15px;
+    white-space: nowrap;
+}
+
+.request-card__status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.request-card__submitted {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.request-card__notes {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eef2f6;
+    font-size: 13px;
+    color: #0f172a;
+}
+
+/* Same success/error palette as .message.success / .message.error above */
+.request-card.status-pending .status-badge {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.request-card.status-approved .status-badge {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.request-card.status-denied .status-badge {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Loading skeleton, reusing @keyframes pulse defined above for .submit-button:disabled */
+.request-card--skeleton {
+    height: 76px;
+    background: #f1f5f9;
+    border: none;
+    animation: pulse 1.5s infinite;
+}
+
+@media (max-width: 768px) {
+    .my-requests {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .request-card {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .point-request-section .tab-button {
+        font-size: 14px;
+    }
+}
