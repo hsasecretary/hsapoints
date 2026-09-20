@@ -6,9 +6,9 @@ const LINKEDIN_URL = 'https://www.linkedin.com/company/hsauf/';
 const CALENDAR_URL =
     'https://calendar.google.com/calendar/embed?src=ae59c0f6702553b609b32a2d3590df6a527b45a92069bbf28f9983f89aaab437%40group.calendar.google.com&ctz=America%2FNew_York';
 const CONTACT_EMAIL = 'hsapresidentuf@gmail.com';
-// Student Government seal, currently served from ufhsa.com (Wix).
-const SG_LOGO_URL =
-    'https://static.wixstatic.com/media/fd581a_bfe406e2559a4721a4744604f5d83fd7~mv2_d_1912_1894_s_2.png/v1/fill/w_106,h_104,al_c,q_85,enc_auto/fd581a_bfe406e2559a4721a4744604f5d83fd7~mv2_d_1912_1894_s_2.png';
+// Student Government seal, self-hosted for the same reason as the header
+// logo. 106x104 source, drawn at 36x36.
+const SG_LOGO_URL = '/uf-student-government.png';
 
 function InstagramIcon() {
     return (
@@ -131,7 +131,7 @@ function Footer({ signedIn, eboard }: FooterProps) {
 
                 <div className="site-footer__bottom">
                     <div className="site-footer__credit">
-                        <img src={SG_LOGO_URL} alt="UF Student Government" width="36" height="36" />
+                        <img src={SG_LOGO_URL} alt="UF Student Government" width="36" height="36" loading="lazy" decoding="async" />
                         <p>
                             Developed by Secretary Team<br />
                             Funded by Student Government.

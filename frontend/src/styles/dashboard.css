@@ -11,7 +11,7 @@
        wrap-into-columns flex layout this used to have let "My Information"/
        "Points Summary" and "Submit Point Request" end up side by side once
        both had their own centred max-width. */
-    background-color: #ffffff;
+    background-color: var(--hsa-surface);
     width: 100%;
     margin: 0;
     padding: 24px 16px 32px;
@@ -33,7 +33,7 @@
 
 .pointsSubForm {
     background-color: #80beda58;
-    border: 2px solid #155776;
+    border: 2px solid var(--hsa-teal-600);
     flex: 1 1 auto;
     min-width: 280px;
     margin: 0 7.5px 15px;
@@ -59,7 +59,7 @@
 .attendanceForm {
     display: block;
     background-color: #80beda58;
-    border: 2px solid #155776;
+    border: 2px solid var(--hsa-teal-600);
     width: calc(100% - 30px);
     margin: 15px;
     border-radius: 5px;
@@ -356,7 +356,7 @@
         margin-bottom: 15px;
         padding: 15px;
         background: #f9f9f9;
-        border: 2px solid #155776;
+        border: 2px solid var(--hsa-teal-600);
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
@@ -377,7 +377,7 @@
     .user-points-lookup .events-table td:before {
         content: attr(data-label) ": ";
         font-weight: bold;
-        color: #155776;
+        color: var(--hsa-teal-600);
         display: inline-block;
         min-width: 80px;
         margin-right: 10px;
@@ -488,14 +488,14 @@
     padding: 20px;
     background: white;
     /* Same blue outline as the dashboard's other cards */
-    border: 2px solid #155776;
+    border: 2px solid var(--hsa-teal-600);
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .point-request h2 {
     text-align: center;
-    color: #155776;
+    color: var(--hsa-teal-600);
     margin-bottom: 10px;
 }
 
@@ -534,21 +534,21 @@
 }
 
 .point-request .form-group input[type="file"]:hover {
-    border-color: #155776;
+    border-color: var(--hsa-teal-600);
     background-color: #f0f8ff;
 }
 
 .point-request .image-preview {
     margin-top: 15px;
     padding: 15px;
-    border: 2px solid #155776;
+    border: 2px solid var(--hsa-teal-600);
     border-radius: 8px;
-    background-color: #f8f9fa;
+    background-color: var(--hsa-surface-subtle);
 }
 
 .point-request .image-preview h4 {
     margin: 0 0 10px 0;
-    color: #155776;
+    color: var(--hsa-teal-600);
 }
 
 .point-request .preview-container {
@@ -591,9 +591,9 @@
 .point-request .info-section {
     margin-top: 40px;
     padding: 20px;
-    background-color: #e3f2fd;
+    background-color: var(--hsa-teal-100);
     border-radius: 8px;
-    border-left: 4px solid #155776;
+    border-left: 4px solid var(--hsa-teal-600);
 }
 
 .point-request .info-section ul {
@@ -718,8 +718,8 @@
     margin: 0;
     border: 1.5px solid #94a3b8;
     border-radius: 6px;
-    background: #ffffff;
-    color: #0f172a;
+    background: var(--hsa-surface);
+    color: var(--hsa-ink);
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
@@ -727,12 +727,12 @@
 }
 
 .point-request .points-choice__option:hover {
-    border-color: #0f4c64;
+    border-color: var(--hsa-teal-700);
 }
 
 .point-request .points-choice__option.is-selected {
-    background: #0f4c64;
-    border-color: #0f4c64;
+    background: var(--hsa-teal-700);
+    border-color: var(--hsa-teal-700);
     color: #ffffff;
 }
 
@@ -763,15 +763,15 @@
 }
 
 .user-points-lookup .attended-item {
-    border: 1.5px solid #cbd5e1;
+    border: 1.5px solid var(--hsa-border);
     border-radius: 8px;
-    background: #ffffff;
+    background: var(--hsa-surface);
     overflow: hidden;
     transition: border-color 0.2s;
 }
 
 .user-points-lookup .attended-item.is-open {
-    border-color: #0f4c64;
+    border-color: var(--hsa-teal-700);
 }
 
 .user-points-lookup .attended-item__summary {
@@ -788,28 +788,28 @@
     background: transparent;
     font-family: inherit;
     font-size: 15px;
-    color: #0f172a;
+    color: var(--hsa-ink);
     text-align: left;
     cursor: pointer;
 }
 
 .user-points-lookup .attended-item__summary:hover {
-    background: #f8fafc;
+    background: var(--hsa-surface-subtle);
     border: none;
     box-shadow: none;
 }
 
 .user-points-lookup .attended-item__summary:active {
-    background: #f1f5f9;
+    background: var(--hsa-surface-sunken);
     box-shadow: none;
 }
 
 .user-points-lookup .attended-item__code {
     flex: 1;
     min-width: 0;
-    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-family: var(--hsa-font-mono);
     font-weight: 700;
-    color: #0f4c64;
+    color: var(--hsa-teal-700);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -817,20 +817,20 @@
 
 .user-points-lookup .attended-item__points {
     font-weight: 700;
-    color: #0f4c64;
+    color: var(--hsa-teal-700);
     white-space: nowrap;
 }
 
 .user-points-lookup .attended-item__unit {
     font-size: 12px;
     font-weight: 600;
-    color: #64748b;
+    color: var(--hsa-muted-light);
 }
 
 .user-points-lookup .attended-item__chevron {
     font-size: 24px;
     line-height: 1;
-    color: #0f4c64;
+    color: var(--hsa-teal-700);
     transition: transform 0.15s ease;
 }
 
@@ -855,12 +855,12 @@
 
 .user-points-lookup .attended-item__details dt {
     font-weight: 700;
-    color: #475569;
+    color: var(--hsa-muted);
 }
 
 .user-points-lookup .attended-item__details dd {
     margin: 0;
-    color: #0f172a;
+    color: var(--hsa-ink);
     text-align: right;
 }
 
@@ -893,22 +893,22 @@ with the my requests tab. ---------- */
     margin: 0;
     border: 1.5px solid #94a3b8;
     border-radius: 6px;
-    background: #ffffff;
-    color: #0f172a;
+    background: var(--hsa-surface);
+    color: var(--hsa-ink);
     font-size: 15px;
     font-weight: 600;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--hsa-font-body);
     cursor: pointer;
     transition: border-color 0.2s, background-color 0.2s, color 0.2s;
 }
 
 .point-request-section .tab-button:hover {
-    border-color: #0f4c64;
+    border-color: var(--hsa-teal-700);
 }
 
 .point-request-section .tab-button.is-active {
-    background: #0f4c64;
-    border-color: #0f4c64;
+    background: var(--hsa-teal-700);
+    border-color: var(--hsa-teal-700);
     color: #ffffff;
 }
 
@@ -922,7 +922,7 @@ with the my requests tab. ---------- */
 .my-requests {
     padding: 20px;
     background: white;
-    border: 2px solid #155776;
+    border: 2px solid var(--hsa-teal-600);
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
@@ -944,9 +944,9 @@ with the my requests tab. ---------- */
 }
 
 .request-card {
-    border: 1.5px solid #cbd5e1;
+    border: 1.5px solid var(--hsa-border);
     border-radius: 8px;
-    background: #ffffff;
+    background: var(--hsa-surface);
     padding: 14px 16px;
 }
 
@@ -960,13 +960,13 @@ with the my requests tab. ---------- */
 
 .request-card__activity {
     font-weight: 700;
-    color: #0f172a;
+    color: var(--hsa-ink);
     font-size: 15px;
 }
 
 .request-card__points {
     font-weight: 700;
-    color: #0f4c64;
+    color: var(--hsa-teal-700);
     font-size: 15px;
     white-space: nowrap;
 }
@@ -990,7 +990,7 @@ with the my requests tab. ---------- */
 
 .request-card__submitted {
     font-size: 12px;
-    color: #64748b;
+    color: var(--hsa-muted-light);
 }
 
 .request-card__notes {
@@ -998,7 +998,7 @@ with the my requests tab. ---------- */
     padding-top: 10px;
     border-top: 1px solid #eef2f6;
     font-size: 13px;
-    color: #0f172a;
+    color: var(--hsa-ink);
 }
 
 /* Same success/error palette as .message.success / .message.error above */
@@ -1023,7 +1023,7 @@ with the my requests tab. ---------- */
 /* Loading skeleton, reusing @keyframes pulse defined above for .submit-button:disabled */
 .request-card--skeleton {
     height: 76px;
-    background: #f1f5f9;
+    background: var(--hsa-surface-sunken);
     border: none;
     animation: pulse 1.5s infinite;
 }

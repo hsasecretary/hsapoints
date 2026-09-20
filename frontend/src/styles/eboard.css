@@ -12,7 +12,7 @@
     background: white;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    border: 2px solid #155776;
+    border: 2px solid var(--hsa-teal-600);
 }
 
 .create-code-container .create-code-header {
@@ -21,7 +21,7 @@
 }
 
 .create-code-container .create-code-header h2 {
-    color: #155776;
+    color: var(--hsa-teal-600);
     margin-bottom: 10px;
     font-size: 28px;
 }
@@ -56,7 +56,7 @@
 }
 
 .create-code-container .checkbox-label:hover {
-    background-color: #f8f9fa;
+    background-color: var(--hsa-surface-subtle);
 }
 
 .create-code-container .checkbox-label input[type="checkbox"] {
@@ -85,17 +85,17 @@
     height: 18px;
     margin: 1px 0 0;
     transform: none;
-    accent-color: #155776;
+    accent-color: var(--hsa-teal-600);
 }
 
 /* Voter Eligibility Info */
 .create-code-container .voter-eligibility-info {
-    background: #f8f9fa;
+    background: var(--hsa-surface-subtle);
     border-radius: 8px;
     padding: 20px;
     margin: 20px 0;
     text-align: center;
-    border-left: 4px solid #155776;
+    border-left: 4px solid var(--hsa-teal-600);
 }
 
 .create-code-container .eligibility-badge {
@@ -165,7 +165,7 @@
 /* Focus and hover states */
 .create-code-container .form-group input:hover,
 .create-code-container .form-group select:hover {
-    border-color: #155776;
+    border-color: var(--hsa-teal-600);
 }
 
 /* Animation for loading state */
@@ -182,8 +182,8 @@
 #approvedCabinetContainer .approvals__header {
     margin-bottom: 20px;
     padding: 20px;
-    background: #ffffff;
-    border: 2px solid #0f4c64;
+    background: var(--hsa-surface);
+    border: 2px solid var(--hsa-teal-700);
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     text-align: center;
@@ -191,19 +191,19 @@
 
 #approvedCabinetContainer .approvals__header h2 {
     margin: 0 0 6px;
-    color: #0f4c64;
+    color: var(--hsa-teal-700);
     font-weight: 700;
 }
 
 #approvedCabinetContainer .approvals__count {
     margin: 0;
-    color: #475569;
+    color: var(--hsa-muted);
     font-weight: 600;
 }
 
 #approvedCabinetContainer .approvals__table-container {
-    background: #ffffff;
-    border: 2px solid #0f4c64;
+    background: var(--hsa-surface);
+    border: 2px solid var(--hsa-teal-700);
     border-radius: 10px;
     overflow-x: auto;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -215,12 +215,12 @@
     border-collapse: collapse;
     box-shadow: none;
     font-size: 14px;
-    color: #0f172a;
+    color: var(--hsa-ink);
 }
 
 #approvedCabinetContainer .approvals__table th {
     padding: 14px 12px;
-    background: #0f4c64;
+    background: var(--hsa-teal-700);
     color: #ffffff;
     font-size: 14px;
     font-weight: 700;
@@ -232,20 +232,20 @@
     padding: 12px 10px;
     font-size: 14px;
     border: none;
-    border-bottom: 1px solid #cbd5e1;
+    border-bottom: 1px solid var(--hsa-border);
     vertical-align: middle;
 }
 
 #approvedCabinetContainer .approvals__table tr.even {
-    background-color: #f8fafc;
+    background-color: var(--hsa-surface-subtle);
 }
 
 #approvedCabinetContainer .approvals__table tr.odd {
-    background-color: #ffffff;
+    background-color: var(--hsa-surface);
 }
 
 #approvedCabinetContainer .approvals__table tr:hover {
-    background-color: #f1f5f9;
+    background-color: var(--hsa-surface-sunken);
 }
 
 #approvedCabinetContainer .approvals__email {
@@ -274,24 +274,24 @@
 }
 
 #approvedCabinetContainer .approvals__approve {
-    background: #166534;
-    border: 1px solid #166534;
+    background: var(--hsa-success);
+    border: 1px solid var(--hsa-success);
 }
 
 #approvedCabinetContainer .approvals__approve:hover {
-    background: #14532d;
-    border-color: #14532d;
+    background: var(--hsa-success-strong);
+    border-color: var(--hsa-success-strong);
     box-shadow: none;
 }
 
 #approvedCabinetContainer .approvals__deny {
-    background: #b91c1c;
-    border: 1px solid #b91c1c;
+    background: var(--hsa-danger);
+    border: 1px solid var(--hsa-danger);
 }
 
 #approvedCabinetContainer .approvals__deny:hover {
-    background: #991b1b;
-    border-color: #991b1b;
+    background: var(--hsa-danger-strong);
+    border-color: var(--hsa-danger-strong);
     box-shadow: none;
 }
 
@@ -323,8 +323,8 @@
         display: block;
         margin-bottom: 10px;
         padding: 12px;
-        background: #ffffff;
-        border: 1.5px solid #cbd5e1;
+        background: var(--hsa-surface);
+        border: 1.5px solid var(--hsa-border);
         border-radius: 8px;
     }
 
@@ -339,7 +339,7 @@
     #approvedCabinetContainer .approvals__table td[data-label]::before {
         content: attr(data-label);
         font-weight: 700;
-        color: #475569;
+        color: var(--hsa-muted);
         flex-shrink: 0;
     }
 
@@ -399,17 +399,17 @@
 
 .user-points-lookup h2 {
     text-align: center;
-    color: #155776;
+    color: var(--hsa-teal-600);
     margin-bottom: 10px;
 }
 
 /* Search Form */
 .user-points-lookup .search-form {
-    background: #f8f9fa;
+    background: var(--hsa-surface-subtle);
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 30px;
-    border: 2px solid #155776;
+    border: 2px solid var(--hsa-teal-600);
 }
 
 .user-points-lookup .search-input-group {
@@ -431,7 +431,7 @@
 
 .user-points-lookup .search-input:focus {
     outline: none;
-    border-color: #155776;
+    border-color: var(--hsa-teal-600);
 }
 
 .user-points-lookup .search-button,
@@ -445,12 +445,12 @@
 }
 
 .user-points-lookup .search-button {
-    background-color: #155776;
+    background-color: var(--hsa-teal-600);
     color: white;
 }
 
 .user-points-lookup .search-button:hover:not(:disabled) {
-    background-color: #0d3f54;
+    background-color: var(--hsa-teal-800);
 }
 
 .user-points-lookup .search-button:disabled {
@@ -484,18 +484,18 @@
 /* User Info Card */
 .user-points-lookup .user-info-card {
     background: white;
-    border: 2px solid #155776;
+    border: 2px solid var(--hsa-teal-600);
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .user-points-lookup .user-info-card h3 {
-    color: #155776;
+    color: var(--hsa-teal-600);
     text-align: left;
     margin-top: 0;
     margin-bottom: 10px;
-    border-bottom: 2px solid #155776;
+    border-bottom: 2px solid var(--hsa-teal-600);
     padding-bottom: 10px;
 }
 
@@ -507,22 +507,22 @@
 
 .user-points-lookup .user-info-grid div {
     padding: 7px 10px;
-    background: #f8f9fa;
+    background: var(--hsa-surface-subtle);
     border-radius: 5px;
-    border-left: 4px solid #155776;
+    border-left: 4px solid var(--hsa-teal-600);
 }
 
 /* Points Summary */
 .user-points-lookup .points-summary {
     background: white;
-    border: 2px solid #155776;
+    border: 2px solid var(--hsa-teal-600);
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .user-points-lookup .points-summary h3 {
-    color: #155776;
+    color: var(--hsa-teal-600);
     margin-bottom: 20px;
     text-align: center;
 }
@@ -534,7 +534,7 @@
 }
 
 .user-points-lookup .points-card {
-    background: #f8f9fa;
+    background: var(--hsa-surface-subtle);
     border: 2px solid #ddd;
     border-radius: 8px;
     padding: 20px;
@@ -547,8 +547,8 @@
 }
 
 .user-points-lookup .points-card.total {
-    border-color: #155776;
-    background: linear-gradient(135deg, #155776, #1a6b8a);
+    border-color: var(--hsa-teal-600);
+    background: linear-gradient(135deg, var(--hsa-teal-600), #1a6b8a);
     color: white;
 }
 
@@ -584,14 +584,14 @@
 /* Category Breakdown */
 .user-points-lookup .category-breakdown {
     background: white;
-    border: 2px solid #155776;
+    border: 2px solid var(--hsa-teal-600);
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .user-points-lookup .category-breakdown h3 {
-    color: #155776;
+    color: var(--hsa-teal-600);
     margin-bottom: 20px;
     text-align: center;
 }
@@ -610,30 +610,30 @@
 }
 
 .user-points-lookup .category-table th {
-    background-color: #155776;
+    background-color: var(--hsa-teal-600);
     color: white;
     font-weight: bold;
 }
 
 .user-points-lookup .category-table tr:nth-child(even) {
-    background-color: #f8f9fa;
+    background-color: var(--hsa-surface-subtle);
 }
 
 .user-points-lookup .category-table tr:hover {
-    background-color: #e3f2fd;
+    background-color: var(--hsa-teal-100);
 }
 
 /* Event Breakdown */
 .user-points-lookup .event-breakdown {
     background: white;
-    border: 2px solid #155776;
+    border: 2px solid var(--hsa-teal-600);
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .user-points-lookup .event-breakdown h3 {
-    color: #155776;
+    color: var(--hsa-teal-600);
     margin-bottom: 20px;
     text-align: center;
 }
@@ -653,7 +653,7 @@
 }
 
 .user-points-lookup .events-table th {
-    background-color: #155776;
+    background-color: var(--hsa-teal-600);
     color: white;
     font-weight: bold;
     position: sticky;
@@ -661,11 +661,11 @@
 }
 
 .user-points-lookup .events-table tr:nth-child(even) {
-    background-color: #f8f9fa;
+    background-color: var(--hsa-surface-subtle);
 }
 
 .user-points-lookup .events-table tr:hover {
-    background-color: #e3f2fd;
+    background-color: var(--hsa-teal-100);
 }
 
 .user-points-lookup .badge-yes {
@@ -740,7 +740,7 @@
 
 .point-request-review h2 {
     text-align: center;
-    color: #0f4c64;
+    color: var(--hsa-teal-700);
     font-weight: 800;
     margin-bottom: 30px;
 }
@@ -753,15 +753,15 @@
     gap: 15px;
     margin-bottom: 30px;
     padding: 18px 24px;
-    background: #ffffff;
+    background: var(--hsa-surface);
     border-radius: 10px;
-    border: 2px solid #0f4c64;
+    border: 2px solid var(--hsa-teal-700);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
 .point-request-review .filter-section label {
     font-weight: 700;
-    color: #0f172a;
+    color: var(--hsa-ink);
     font-size: 15px;
 }
 
@@ -771,22 +771,22 @@
     border-radius: 6px;
     font-size: 14px;
     font-weight: 600;
-    color: #0f172a;
-    background: #ffffff;
+    color: var(--hsa-ink);
+    background: var(--hsa-surface);
 }
 
 .point-request-review .filter-section select:focus {
     outline: none;
-    border-color: #0f4c64;
+    border-color: var(--hsa-teal-700);
     box-shadow: 0 0 0 2px rgba(15, 76, 100, 0.2);
 }
 
 /* Refresh Button */
 .point-request-review .filter-section .refresh-button,
 .point-request-review .refresh-button {
-    background: #0f4c64;
+    background: var(--hsa-teal-700);
     color: #ffffff;
-    border: 2px solid #0f4c64;
+    border: 2px solid var(--hsa-teal-700);
     padding: 9px 20px;
     border-radius: 6px;
     cursor: pointer;
@@ -798,20 +798,20 @@
 
 .point-request-review .filter-section .refresh-button:hover,
 .point-request-review .refresh-button:hover:not(:disabled) {
-    background: #082f3f;
-    border-color: #082f3f;
+    background: var(--hsa-teal-900);
+    border-color: var(--hsa-teal-900);
 }
 
 /* No Requests */
 .point-request-review .no-requests {
     text-align: center;
     font-size: 16px;
-    color: #334155;
+    color: var(--hsa-ink-soft);
     font-weight: 600;
     margin: 50px 0;
     padding: 40px;
-    background: #ffffff;
-    border: 1.5px solid #cbd5e1;
+    background: var(--hsa-surface);
+    border: 1.5px solid var(--hsa-border);
     border-radius: 10px;
 }
 
@@ -828,8 +828,8 @@
 
 /* Request Card */
 .point-request-review .request-card {
-    background: #ffffff;
-    border: 1.5px solid #cbd5e1;
+    background: var(--hsa-surface);
+    border: 1.5px solid var(--hsa-border);
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
@@ -849,19 +849,19 @@
     align-items: flex-start;
     margin-bottom: 18px;
     padding-bottom: 14px;
-    border-bottom: 2px solid #f1f5f9;
+    border-bottom: 2px solid var(--hsa-surface-sunken);
 }
 
 .point-request-review .user-info h3 {
     margin: 0 0 4px 0;
-    color: #0f4c64;
+    color: var(--hsa-teal-700);
     font-size: 18px;
     font-weight: 800;
 }
 
 .point-request-review .user-info .email {
     margin: 0;
-    color: #475569;
+    color: var(--hsa-muted);
     font-size: 14px;
     font-weight: 500;
 }
@@ -885,15 +885,15 @@
 }
 
 .point-request-review .status-badge.approved {
-    background-color: #dcfce7;
-    color: #14532d;
-    border: 1px solid #86efac;
+    background-color: var(--hsa-success-bg);
+    color: var(--hsa-success-strong);
+    border: 1px solid var(--hsa-success-border);
 }
 
 .point-request-review .status-badge.denied {
-    background-color: #fee2e2;
-    color: #991b1b;
-    border: 1px solid #fca5a5;
+    background-color: var(--hsa-danger-bg);
+    color: var(--hsa-danger-strong);
+    border: 1px solid var(--hsa-danger-border);
 }
 
 /* Request Details */
@@ -908,7 +908,7 @@
 }
 
 .point-request-review .detail-row strong {
-    color: #0f172a;
+    color: var(--hsa-ink);
     font-weight: 700;
     margin-right: 6px;
 }
@@ -918,16 +918,16 @@
 }
 
 .point-request-review .description strong {
-    color: #0f172a;
+    color: var(--hsa-ink);
 }
 
 .point-request-review .description p {
     margin: 6px 0 0 0;
     padding: 12px;
-    background: #f8fafc;
+    background: var(--hsa-surface-subtle);
     border-radius: 6px;
-    border-left: 4px solid #0f4c64;
-    color: #0f172a;
+    border-left: 4px solid var(--hsa-teal-700);
+    color: var(--hsa-ink);
     font-style: italic;
     line-height: 1.5;
     font-size: 13.5px;
@@ -979,27 +979,27 @@
 
 /* Approve: Dark Forest Green */
 .point-request-review .approve-button {
-    background: #166534;
+    background: var(--hsa-success);
     color: #ffffff;
-    border: 1.5px solid #166534;
+    border: 1.5px solid var(--hsa-success);
 }
 
 .point-request-review .approve-button:hover:not(:disabled) {
-    background: #14532d;
-    border-color: #14532d;
+    background: var(--hsa-success-strong);
+    border-color: var(--hsa-success-strong);
     transform: translateY(-1px);
 }
 
 /* Deny: High-Contrast Crimson */
 .point-request-review .deny-button {
-    background: #b91c1c;
+    background: var(--hsa-danger);
     color: #ffffff;
-    border: 1.5px solid #b91c1c;
+    border: 1.5px solid var(--hsa-danger);
 }
 
 .point-request-review .deny-button:hover:not(:disabled) {
-    background: #991b1b;
-    border-color: #991b1b;
+    background: var(--hsa-danger-strong);
+    border-color: var(--hsa-danger-strong);
     transform: translateY(-1px);
 }
 
@@ -1007,9 +1007,9 @@
 .point-request-review .approve-button:disabled,
 .point-request-review .deny-button:disabled,
 .point-request-review .view-image-button:disabled {
-    background: #e2e8f0;
-    color: #64748b;
-    border: 1.5px solid #cbd5e1;
+    background: var(--hsa-border-light);
+    color: var(--hsa-muted-light);
+    border: 1.5px solid var(--hsa-border);
     cursor: not-allowed;
     transform: none;
     opacity: 0.9;
@@ -1019,9 +1019,9 @@
 .point-request-review .review-info {
     margin-top: 18px;
     padding: 14px;
-    background: #f1f5f9;
+    background: var(--hsa-surface-sunken);
     border-radius: 6px;
-    border-left: 4px solid #475569;
+    border-left: 4px solid var(--hsa-muted);
     color: #1e293b;
     font-size: 13.5px;
 }
@@ -1045,7 +1045,7 @@
     position: relative;
     max-width: 90%;
     max-height: 90%;
-    background: #ffffff;
+    background: var(--hsa-surface);
     border-radius: 16px;
     padding: 6px;
     box-shadow: 0 20px 48px rgba(15, 23, 42, 0.45);
@@ -1073,7 +1073,7 @@
     width: 40px;
     height: 40px;
     padding: 0;
-    background: #155776;
+    background: var(--hsa-teal-600);
     color: #ffffff;
     border: 1px solid #ffffff;
     border-radius: 50%;
@@ -1089,7 +1089,7 @@
 }
 
 .point-request-review .close-modal:hover {
-    background: #0f4c64;
+    background: var(--hsa-teal-700);
     transform: scale(1.08);
 }
 
@@ -1136,23 +1136,23 @@
 
 /* Refresh Button - High Contrast Dark Slate Blue */
 .editable-codes-table .refresh-button {
-    background: #0f4c64;
+    background: var(--hsa-teal-700);
     color: #ffffff;
-    border: 2px solid #0f4c64;
+    border: 2px solid var(--hsa-teal-700);
 }
 
 .editable-codes-table .refresh-button:hover:not(:disabled) {
-    background: #082f3f;
-    border-color: #082f3f;
+    background: var(--hsa-teal-900);
+    border-color: var(--hsa-teal-900);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 /* Disabled State: Dark text on light background (Never white on gray) */
 .editable-codes-table .refresh-button:disabled {
-    background: #e2e8f0;
-    color: #64748b;
-    border-color: #cbd5e1;
+    background: var(--hsa-border-light);
+    color: var(--hsa-muted-light);
+    border-color: var(--hsa-border);
     cursor: not-allowed;
     opacity: 0.85;
     box-shadow: none;
@@ -1171,22 +1171,22 @@
 
 /* Table Container */
 .editable-codes-table .table-container {
-    background: #ffffff;
+    background: var(--hsa-surface);
     border-radius: 10px;
     overflow-x: auto;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    border: 2px solid #0f4c64;
+    border: 2px solid var(--hsa-teal-700);
 }
 
 .editable-codes-table .codes-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
-    color: #0f172a;
+    color: var(--hsa-ink);
 }
 
 .editable-codes-table .codes-table th {
-    background: #0f4c64;
+    background: var(--hsa-teal-700);
     color: #ffffff;
     padding: 14px 12px;
     text-align: left;
@@ -1198,26 +1198,26 @@
 
 .editable-codes-table .codes-table td {
     padding: 12px 10px;
-    border-bottom: 1px solid #cbd5e1;
+    border-bottom: 1px solid var(--hsa-border);
     vertical-align: middle;
 }
 
 .editable-codes-table .codes-table tr.even {
-    background-color: #f8fafc;
+    background-color: var(--hsa-surface-subtle);
 }
 
 .editable-codes-table .codes-table tr.odd {
-    background-color: #ffffff;
+    background-color: var(--hsa-surface);
 }
 
 .editable-codes-table .codes-table tr:hover {
-    background-color: #f1f5f9;
+    background-color: var(--hsa-surface-sunken);
 }
 
 .editable-codes-table .code-id {
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--hsa-font-mono);
     font-weight: 700;
-    color: #0f4c64;
+    color: var(--hsa-teal-700);
     min-width: 80px;
 }
 
@@ -1225,10 +1225,10 @@
 .editable-codes-table .edit-input,
 .editable-codes-table .edit-select {
     padding: 6px 8px;
-    border: 1.5px solid #0f4c64;
+    border: 1.5px solid var(--hsa-teal-700);
     border-radius: 4px;
     font-size: 13px;
-    color: #0f172a;
+    color: var(--hsa-ink);
     width: 100%;
     min-width: 100px;
 }
@@ -1236,7 +1236,7 @@
 .editable-codes-table .edit-input:focus,
 .editable-codes-table .edit-select:focus {
     outline: none;
-    border-color: #082f3f;
+    border-color: var(--hsa-teal-900);
     box-shadow: 0 0 0 2px rgba(15, 76, 100, 0.2);
 }
 
@@ -1256,15 +1256,15 @@
 }
 
 .editable-codes-table .badge-yes {
-    background-color: #dcfce7;
-    color: #14532d;
-    border: 1px solid #86efac;
+    background-color: var(--hsa-success-bg);
+    color: var(--hsa-success-strong);
+    border: 1px solid var(--hsa-success-border);
 }
 
 .editable-codes-table .badge-no {
-    background-color: #fee2e2;
-    color: #991b1b;
-    border: 1px solid #fca5a5;
+    background-color: var(--hsa-danger-bg);
+    color: var(--hsa-danger-strong);
+    border: 1px solid var(--hsa-danger-border);
 }
 
 /* Action Buttons inside rows */
@@ -1299,43 +1299,43 @@
 }
 
 .editable-codes-table .delete-btn {
-    background: #b91c1c;
+    background: var(--hsa-danger);
     color: #ffffff;
-    border: 1px solid #b91c1c;
+    border: 1px solid var(--hsa-danger);
 }
 
 .editable-codes-table .delete-btn:hover {
-    background: #991b1b;
+    background: var(--hsa-danger-strong);
 }
 
 .editable-codes-table .save-btn {
-    background: #166534;
+    background: var(--hsa-success);
     color: #ffffff;
-    border: 1px solid #166534;
+    border: 1px solid var(--hsa-success);
 }
 
 .editable-codes-table .save-btn:hover {
-    background: #14532d;
+    background: var(--hsa-success-strong);
 }
 
 .editable-codes-table .cancel-btn {
-    background: #475569;
+    background: var(--hsa-muted);
     color: #ffffff;
-    border: 1px solid #475569;
+    border: 1px solid var(--hsa-muted);
 }
 
 .editable-codes-table .cancel-btn:hover {
-    background: #334155;
+    background: var(--hsa-ink-soft);
 }
 
 /* No Codes Message */
 .editable-codes-table .no-codes {
     text-align: center;
     padding: 40px;
-    color: #334155;
+    color: var(--hsa-ink-soft);
     font-weight: 600;
     font-size: 16px;
-    border-top: 2px solid #cbd5e1;
+    border-top: 2px solid var(--hsa-border);
 }
 
 /* Accessibility Focus */
@@ -1343,7 +1343,7 @@
 .editable-codes-table .delete-btn:focus,
 .editable-codes-table .save-btn:focus,
 .editable-codes-table .cancel-btn:focus {
-    outline: 2px solid #0f4c64;
+    outline: 2px solid var(--hsa-teal-700);
     outline-offset: 2px;
 }
 
@@ -1382,14 +1382,14 @@
     border-radius: 6px;
     font-size: 15px;
     font-family: inherit;
-    color: #0f172a;
-    background-color: #ffffff;
+    color: var(--hsa-ink);
+    background-color: var(--hsa-surface);
 }
 
 .editable-codes-table .codes-filters .codes-search:focus,
 .editable-codes-table .codes-filters .codes-category-filter:focus {
     outline: none;
-    border-color: #0f4c64;
+    border-color: var(--hsa-teal-700);
     box-shadow: 0 0 0 3px rgba(15, 76, 100, 0.2);
 }
 
@@ -1398,7 +1398,7 @@
     margin: 0;
     font-size: 13px;
     font-weight: 600;
-    color: #475569;
+    color: var(--hsa-muted);
 }
 
 /* Phone-only pieces */
@@ -1451,18 +1451,18 @@
         column-gap: 10px;
         padding: 10px 12px;
         margin-bottom: 8px;
-        background: #ffffff;
-        border: 1.5px solid #cbd5e1;
+        background: var(--hsa-surface);
+        border: 1.5px solid var(--hsa-border);
         border-radius: 8px;
         cursor: pointer;
     }
 
     .editable-codes-table .codes-table tr:hover {
-        background: #f8fafc;
+        background: var(--hsa-surface-subtle);
     }
 
     .editable-codes-table .codes-table tr.expanded {
-        border-color: #0f4c64;
+        border-color: var(--hsa-teal-700);
     }
 
     .editable-codes-table .codes-table td {
@@ -1495,7 +1495,7 @@
         grid-row: 1;
         grid-column: 3;
         font-weight: 700;
-        color: #0f4c64;
+        color: var(--hsa-teal-700);
         white-space: nowrap;
     }
 
@@ -1503,7 +1503,7 @@
         content: " pts";
         font-size: 12px;
         font-weight: 600;
-        color: #64748b;
+        color: var(--hsa-muted-light);
     }
 
     .editable-codes-table .codes-table .cell-toggle {
@@ -1523,7 +1523,7 @@
         border-radius: 6px;
         background: transparent;
         box-shadow: none;
-        color: #0f4c64;
+        color: var(--hsa-teal-700);
         font-size: 28px;
         line-height: 1;
         transition: transform 0.15s ease;
@@ -1534,7 +1534,7 @@
     }
 
     .editable-codes-table .codes-table .toggle-btn:hover {
-        background: #e2e8f0;
+        background: var(--hsa-border-light);
     }
 
     /* Details: hidden until the row is expanded */
@@ -1556,7 +1556,7 @@
         content: attr(data-label);
         font-size: 13px;
         font-weight: 700;
-        color: #475569;
+        color: var(--hsa-muted);
     }
 
     .editable-codes-table .codes-table tr.expanded .actions-cell {
@@ -1596,7 +1596,7 @@
         content: attr(data-label);
         font-size: 13px;
         font-weight: 700;
-        color: #475569;
+        color: var(--hsa-muted);
     }
 
     .editable-codes-table .codes-table tr.expanded.editing td input[type="checkbox"] {
@@ -1634,11 +1634,11 @@
 .user-points-lookup .lookup-cabinet-points {
     margin: 0 0 12px;
     text-align: center;
-    color: #475569;
+    color: var(--hsa-muted);
 }
 
 .user-points-lookup .lookup-cabinet-points strong {
-    color: #0f4c64;
+    color: var(--hsa-teal-700);
 }
 
 /* ---- UFL/SF Email Lookup (EmailLookup.tsx, on the User Lookup page) ---- */
@@ -1689,8 +1689,8 @@
     justify-content: space-between;
     gap: 12px;
     padding: 10px 14px;
-    background: #ffffff;
-    border: 1.5px solid #cbd5e1;
+    background: var(--hsa-surface);
+    border: 1.5px solid var(--hsa-border);
     border-radius: 8px;
 }
 
@@ -1702,13 +1702,13 @@
 
 .user-points-lookup .email-lookup__name {
     font-weight: 700;
-    color: #0f172a;
+    color: var(--hsa-ink);
 }
 
 .user-points-lookup .email-lookup__email {
-    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-family: var(--hsa-font-mono);
     font-size: 13px;
-    color: #0f4c64;
+    color: var(--hsa-teal-700);
     word-break: break-all;
 }
 
@@ -1717,10 +1717,10 @@
     min-width: 0;
     min-height: 0;
     padding: 8px 14px;
-    border: 1.5px solid #155776;
+    border: 1.5px solid var(--hsa-teal-600);
     border-radius: 6px;
-    background: #ffffff;
-    color: #155776;
+    background: var(--hsa-surface);
+    color: var(--hsa-teal-600);
     font-family: inherit;
     font-size: 13px;
     font-weight: 700;
@@ -1729,9 +1729,9 @@
 }
 
 .user-points-lookup .email-lookup__use:hover {
-    background: #155776;
+    background: var(--hsa-teal-600);
     color: #ffffff;
-    border-color: #155776;
+    border-color: var(--hsa-teal-600);
     box-shadow: none;
 }
 
@@ -1750,8 +1750,8 @@
 /* ---- List of Codes card  (EditableCodesTable.tsx) ---------------------- */
 .editable-codes-table .codes-card {
     padding: 20px;
-    background: #ffffff;
-    border: 2px solid #155776;
+    background: var(--hsa-surface);
+    border: 2px solid var(--hsa-teal-600);
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -1775,9 +1775,9 @@
     min-width: 0;
     min-height: 0;
     padding: 12px 26px;
-    border: 2px solid #166534;
+    border: 2px solid var(--hsa-success);
     border-radius: 8px;
-    background: #166534;
+    background: var(--hsa-success);
     color: #ffffff;
     font-family: inherit;
     font-size: 16px;
@@ -1788,19 +1788,19 @@
 }
 
 .create-code-toggle .create-code-toggle__button:hover {
-    background: #14532d;
-    border-color: #14532d;
+    background: var(--hsa-success-strong);
+    border-color: var(--hsa-success-strong);
     transform: translateY(-1px);
 }
 
 .create-code-toggle .create-code-toggle__button[aria-expanded="true"] {
-    background: #475569;
-    border-color: #475569;
+    background: var(--hsa-muted);
+    border-color: var(--hsa-muted);
 }
 
 .create-code-toggle__done {
     margin: 0;
-    color: #166534;
+    color: var(--hsa-success);
     font-weight: 700;
 }
 
@@ -1832,8 +1832,8 @@
     margin: 10px auto 20px;
     padding: 20px;
     text-align: center;
-    background: #ffffff;
-    border: 2px solid #155776;
+    background: var(--hsa-surface);
+    border: 2px solid var(--hsa-teal-600);
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -1844,7 +1844,7 @@
     padding: 10px 20px;
     border: none;
     border-radius: 6px;
-    background: #155776;
+    background: var(--hsa-teal-600);
     color: #ffffff;
     font-family: inherit;
     font-size: 15px;
@@ -1853,7 +1853,7 @@
 }
 
 .admin-tool-card .admin-tool-card__button:hover {
-    background: #0d3f54;
+    background: var(--hsa-teal-800);
     border: none;
     box-shadow: none;
 }

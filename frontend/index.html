@@ -18,7 +18,11 @@
     <title>HSA UF</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!-- Montserrat, weight axis only, 400-800. The old request was
+         ital,wght@0,100..900;1,100..900 — nothing on the site sets italic
+         or a weight outside 400-800 (the stylesheets use 500/600/700/800
+         and inherit 400), so most of that download was never used. -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&display=swap" rel="stylesheet">
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

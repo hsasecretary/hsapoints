@@ -1,0 +1,94 @@
+/* ==========================================================================
+   Design tokens — the site's colour, type and elevation vocabulary.
+
+   Before this file there were ~65 distinct hex values across the five area
+   stylesheets, including four different dark teals and three near-identical
+   off-whites, with no way to tell which were meant to be the same colour.
+   Everything recurring now resolves to one of the variables below, so a
+   brand tweak is one edit here instead of a grep across 4,000 lines.
+
+   Imported first from main.css, so every later file can use these.
+
+   Naming: --hsa-<role>-<weight>. Lower numbers are lighter. Pick by ROLE
+   (surface, border, ink) rather than by how the colour looks, so the name
+   still makes sense if the value changes.
+   ========================================================================== */
+:root {
+    /* ---- Brand teal ------------------------------------------------------
+       HSA's blue-teal, darkest to lightest. 700 and 600 do almost all the
+       work: 600 is the brand colour on white (7.9:1, comfortably AA for body text),
+       700 is the darker pairing used for headers, table heads and hovers. */
+    --hsa-teal-900: #082f3f;   /* deepest — focus rings on dark fills */
+    --hsa-teal-800: #0d3f54;
+    --hsa-teal-700: #0f4c64;   /* 9.38:1 on white */
+    --hsa-teal-600: #155776;   /* 7.9:1 on white — the brand colour */
+    --hsa-teal-500: #1e6b8a;   /* hover / gradient top end */
+    --hsa-teal-400: #267ba3;
+    --hsa-teal-100: #e3f2fd;   /* tinted fill behind selected rows */
+
+    /* ---- Neutrals (slate) -------------------------------------------------
+       Text and chrome. --hsa-ink is body copy; --hsa-muted is the lightest
+       grey that still passes AA on white (7.58:1), so secondary text should
+       stop there rather than fading further. */
+    --hsa-ink: #0f172a;           /* 17.85:1 on white */
+    --hsa-ink-soft: #334155;      /* 10.35:1 */
+    --hsa-muted: #475569;         /*  7.58:1 — lightest AA-safe body text */
+    --hsa-muted-light: #64748b;   /*  4.76:1 — AA at body size, only just */
+    --hsa-border: #cbd5e1;        /* default 1px rules and input borders */
+    --hsa-border-light: #e2e8f0;  /* dividers inside a card */
+
+    /* ---- Surfaces --------------------------------------------------------- */
+    --hsa-surface: #ffffff;       /* cards, panels, table rows */
+    --hsa-surface-subtle: #f8fafc;/* zebra rows, inset panels */
+    --hsa-surface-sunken: #f1f5f9;/* the step below that (table heads, wells) */
+    --hsa-page: #f0f1f2;          /* the page behind everything */
+
+    /* ---- Status ----------------------------------------------------------
+       Text weights are the AA-safe ones; -bg is the pale fill they sit on. */
+    --hsa-danger: #b91c1c;        /* 6.47:1 on white */
+    --hsa-danger-strong: #991b1b; /* 8.31:1 */
+    --hsa-danger-bg: #fee2e2;
+    --hsa-danger-border: #fca5a5;
+    --hsa-success: #166534;       /* 7.13:1 on white */
+    --hsa-success-strong: #14532d;/* 9.11:1 */
+    --hsa-success-bg: #dcfce7;
+    --hsa-success-border: #86efac;
+
+    /* ---- Type ------------------------------------------------------------
+       Montserrat does both jobs for now, as it did before. It is drawn
+       from Buenos Aires street signage, which suits this organisation
+       better than anything picked off a pairing list, and it is already
+       the site's voice.
+
+       The two tokens point at the same family on purpose, not by
+       accident. Montserrat is a geometric display face — wide, and with
+       most lowercase letters built from the same circle — which is
+       excellent at 36px and works against you at the 12-14px this app
+       is full of (~40 rules at those sizes, mostly tables and forms).
+       Body copy is the part likely to change.
+
+       Because every rule now asks for one of these two tokens instead of
+       naming Montserrat directly, swapping the body face later is this
+       line plus the font link in index.html — nothing else. Candidates
+       tried and parked: Nunito Sans (humanist, round, has an optical-size
+       axis that redraws rather than shrinks at 12px) and Mulish
+       (narrower, more reserved, same round feel). */
+    --hsa-font-display: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
+    --hsa-font-body: 'Montserrat', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --hsa-font-mono: 'Monaco', 'Menlo', 'Consolas', monospace;
+
+    /* ---- Type scale ------------------------------------------------------
+       A 1.25 ratio off a 16px body. Before this, a page title was 30px and a
+       section title 22px, so nearly every heading landed within a few px of
+       its neighbours and teal had to carry the hierarchy on its own. The
+       gaps here are wide enough that size alone tells you where you are.
+
+       --step-0 is body copy; go below it only for genuinely secondary text. */
+    --hsa-text-xs: 12px;
+    --hsa-text-sm: 14px;
+    --hsa-text-base: 16px;   /* body */
+    --hsa-text-lg: 20px;     /* section titles */
+    --hsa-text-xl: 24px;
+    --hsa-text-2xl: 30px;
+    --hsa-text-3xl: 36px;    /* page titles */
+}
