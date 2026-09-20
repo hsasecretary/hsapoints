@@ -10,5 +10,18 @@ export default defineConfig({
     // Keep CRA's output folder so firebase.json ("public": "build") and the
     // GitHub Actions deploy workflows keep working unchanged.
     outDir: 'build',
+    rollupOptions: {
+      output: {
+        // Route chunks (the lazy() calls in App.tsx) only split off our own
+        // pages; most of the bundle is the Firebase SDK and React, which every
+        // page needs. Splitting those out doesn't shrink a cold load, but they
+        // change only on a dependency bump, so returning members re-download
+        // just the small app chunk after a deploy instead of all ~660 kB.
+        manualChunks: {
+          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          react: ['react', 'react-dom', 'react-router-dom'],
+        },
+      },
+    },
   },
 });

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
+import { fetchAttendedEvents, sumVoterEligiblePoints } from '../../lib/attendedEvents';
 import { db } from '../../lib/firebase';
 import { isGeneralMember } from '../../lib/members';
 import EventsAttendedList from '../../components/members/EventsAttendedList';
@@ -96,40 +97,14 @@ function UserPointsLookup() {
             };
 
             // Calculate voter eligible points
-            const eventCodes = userData.eventCodes || [];
-            const codesCollection = collection(db, "codes");
-            const codesSnapshot = await getDocs(codesCollection);
-            
-            let voterEligibleTotal = 0;
-            const eventDetails: any[] = [];
+            const eventDetails = await fetchAttendedEvents(userData.eventCodes);
+            const voterEligibleTotal = sumVoterEligiblePoints(eventDetails, userData.otherPoints);
 
-            for (const docSnap of codesSnapshot.docs) {
-                const docData = docSnap.data();
-                if (eventCodes.includes(docSnap.id)) {
-                    eventDetails.push({
-                        code: docSnap.id.toUpperCase(),
-                        event: docData.event,
-                        category: docData.category,
-                        points: docData.points,
-                        semester: docData.semester,
-                        eventDate: docData.eventDate,
-                        voterEligible: docData.voterEligible,
-                        attended: true
-                    });
-
-                    if (docData.voterEligible) {
-                        // use the stored points value for voter eligibility
-                        voterEligibleTotal += docData.points || 0;
-                    }
-                }
-            }
-
-            voterEligibleTotal += userData.otherPoints || 0;
             pointsBreakdown.voterEligiblePoints = voterEligibleTotal;
             pointsBreakdown.isVoterEligible = voterEligibleTotal >= 15;
 
             setUserPoints(pointsBreakdown);
-            setEventBreakdown(eventDetails.sort((a, b) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime()));
+            setEventBreakdown(eventDetails);
 
         } catch (err) {
             console.error('Error fetching user data:', err);

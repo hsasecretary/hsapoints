@@ -425,3 +425,15 @@ input, select
   outline: 3px solid rgba(15, 76, 100, 0.35);
   outline-offset: 2px;
 }
+
+/* Shown while a lazily-loaded route chunk arrives (see the lazy() calls in
+   App.tsx). Reserves height so the header/footer don't jump. */
+.route-loading {
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #155776;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
