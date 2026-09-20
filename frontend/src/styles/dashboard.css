@@ -6,19 +6,17 @@
 
 .formDash {
     /* Full-width white page under the header: no grey gap or sides. Content
-       inside keeps its own max-width and stays centred. */
+       inside keeps its own max-width and stays centred. Plain block flow
+       (not flex) so children always stack full-width, one per row — the
+       wrap-into-columns flex layout this used to have let "My Information"/
+       "Points Summary" and "Submit Point Request" end up side by side once
+       both had their own centred max-width. */
     background-color: #ffffff;
     width: 100%;
     margin: 0;
     padding: 24px 16px 32px;
     flex: 1 0 auto;
-    display: flex;
-    flex-flow: wrap;
-    justify-content: flex-start;
-}
-
-.formDash > .user-points-lookup {
-    flex: 1 1 100%;
+    display: block;
 }
 
 #dash {
