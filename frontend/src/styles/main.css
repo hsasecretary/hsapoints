@@ -5,6 +5,8 @@
    auth.css      login / sign up / forgot password
    dashboard.css member dashboard and cabinet page
    eboard.css    e-board tools
+   animations.css  page / tab entry animations (imported last so its
+                   reveal rules win over an area file's own animation)
 
    Rules in the area files are scoped to a component's root class/id, so
    sections can't leak into each other. Put new shared pieces in base.css. */
@@ -13,3 +15,4 @@
 @import './dashboard.css';
 @import './layout.css';
 @import './eboard.css';
+@import './animations.css';
