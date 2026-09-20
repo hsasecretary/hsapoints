@@ -47,6 +47,9 @@ yarn-error.log*
 .vscode/
 .idea/
 
+# Claude Code
+CLAUDE.md
+
 # Logs
 logs
 *.log

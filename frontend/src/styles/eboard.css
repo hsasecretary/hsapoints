@@ -733,7 +733,7 @@
 
 /* PointRequestReview Styles */
 .point-request-review {
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 20px;
 }
@@ -815,12 +815,15 @@
     border-radius: 10px;
 }
 
-/* Requests Grid */
+/* Requests Grid — multiple cards per row on desktop so reviewing a long
+   queue doesn't mean endless vertical scrolling. auto-fit (not auto-fill)
+   so a short list doesn't leave dangling empty columns. */
 .point-request-review .requests-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
     margin-top: 20px;
+    align-items: start;
 }
 
 /* Request Card */
@@ -828,7 +831,7 @@
     background: #ffffff;
     border: 1.5px solid #cbd5e1;
     border-radius: 12px;
-    padding: 22px;
+    padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
     transition: transform 0.2s, box-shadow 0.2s;
 }
