@@ -30,7 +30,11 @@ function PointTabs() {
                 </button>
             </div>
 
-            {activeTab === 'submit' ? <PointRequestForm /> : <MyRequests />}
+            {/* key: React replaces the panel on every tab click, so the
+                animation in animations.css replays and the card fades in */}
+            <div className="point-request-section__panel hsa-reveal" key={activeTab}>
+                {activeTab === 'submit' ? <PointRequestForm /> : <MyRequests />}
+            </div>
         </div>
     );
 }
