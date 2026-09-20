@@ -49,6 +49,7 @@ yarn-error.log*
 
 # Claude Code
 CLAUDE.md
+.claude/settings.local.json
 
 # Logs
 logs

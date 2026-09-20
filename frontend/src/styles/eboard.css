@@ -1046,39 +1046,51 @@
     max-width: 90%;
     max-height: 90%;
     background: #ffffff;
-    border-radius: 10px;
-    padding: 24px;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+    border-radius: 16px;
+    padding: 6px;
+    box-shadow: 0 20px 48px rgba(15, 23, 42, 0.45);
 }
 
 .point-request-review .modal-content img {
+    display: block;
     max-width: 100%;
     max-height: 80vh;
     width: auto;
     height: auto;
-    border-radius: 6px;
+    border-radius: 12px;
 }
 
+/* A true circle (min-width/min-height reset undoes the global button rule
+   in base.css, which was stretching this into a pill/oval), floated just
+   outside the image corner and in the site's own teal rather than an
+   alarm-red that made "close" read as a destructive action. */
 .point-request-review .close-modal {
     position: absolute;
-    top: 10px;
-    right: 12px;
-    background: #b91c1c;
+    top: -18px;
+    right: -18px;
+    min-width: 0;
+    min-height: 0;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: #155776;
     color: #ffffff;
-    border: none;
+    border: 1px solid #ffffff;
     border-radius: 50%;
-    width: 34px;
-    height: 34px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.4);
     cursor: pointer;
     font-size: 18px;
+    line-height: 1;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background-color 0.2s, transform 0.2s;
 }
 
 .point-request-review .close-modal:hover {
-    background: #991b1b;
+    background: #0f4c64;
+    transform: scale(1.08);
 }
 
 /* Responsive adjustments */
