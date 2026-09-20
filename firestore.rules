@@ -3,17 +3,93 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function callerEmail() {
+      return request.auth.token.email.lower();
+    }
+
+    function isSelf(email) {
+      return signedIn() && callerEmail() == email;
+    }
+
+    // E-board status lives on the caller's own user doc, which every
+    // signed-in user is allowed to read (see /users/{email} below).
+    function isEboard() {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/users/$(callerEmail())) &&
+        get(/databases/$(database)/documents/users/$(callerEmail())).data.eboard == true;
+    }
+
+    // Fields a general member may change on their own doc when redeeming
+    // an event code (see EventCodeForm.tsx) — never profile/role fields.
+    function selfUpdateAllowedFields() {
+      return [
+        'fallPoints', 'springPoints', 'eventCodes',
+        'programmingPointsVE', 'programmingPointsNVE',
+        'gbmPointsVE', 'gbmPointsNVE',
+        'mlpFallPointsVE', 'mlpFallPointsNVE',
+        'mlpSpringPointsVE', 'mlpSpringPointsNVE',
+        'opaPointsVE', 'opaPointsNVE',
+        'cabinetPoints', 'otherPoints'
+      ];
+    }
+
+    match /users/{email} {
+      allow get: if isSelf(email) || isEboard();
+      allow list: if isEboard();
+
+      // Sign-up creates the caller's own doc; block self-granted eboard
+      // status or a non-zero starting point balance.
+      allow create: if isSelf(email) &&
+        request.resource.data.email == email &&
+        request.resource.data.eboard == false &&
+        request.resource.data.fallPoints == 0 &&
+        request.resource.data.springPoints == 0 &&
+        request.resource.data.strikes == 0;
+
+      allow update: if isEboard() ||
+        (isSelf(email) &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(selfUpdateAllowedFields()));
+
+      allow delete: if isEboard();
+    }
+
+    match /codes/{code} {
+      // Every signed-in member needs to list/read codes (dashboard,
+      // voter-eligibility calc, redemption) — but never write them,
+      // except for the attendee-count bump on redemption.
+      allow get, list: if signedIn();
+      allow create, delete: if isEboard();
+      allow update: if isEboard() ||
+        (signedIn() &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendeeCount', 'ateendecode']));
+    }
+
+    match /pointRequests/{id} {
+      allow get, list: if isEboard() ||
+        (signedIn() && resource.data.userEmail == callerEmail());
+      allow create: if signedIn() && request.resource.data.userEmail == callerEmail();
+      allow update, delete: if isEboard();
+    }
+
+    match /cabinets/{cabinetDoc} {
+      allow get, list: if isEboard();
+      allow create, delete: if isEboard();
+
+      // Sign-up appends the caller's own email to cabinets/regular or
+      // cabinets/pending — allow only that (no removals, no other emails).
+      allow update: if isEboard() ||
+        (signedIn() &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['emails']) &&
+         request.resource.data.emails.hasAll(resource.data.emails) &&
+         request.resource.data.emails.hasOnly(resource.data.emails.concat([callerEmail()])));
+    }
+
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }
