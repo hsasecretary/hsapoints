@@ -19,20 +19,32 @@ html, body {
 
 body {
   margin: 0;
-  src: url("https://fonts.google.com/specimen/Reddit+Mono");
-  font-family: 'Montserrat', sans-serif;
+  /* A `src:` descriptor lived here pointing at a Google Fonts *web page*.
+     `src` is only meaningful inside @font-face, so it never loaded anything
+     and never showed up as a request — it just looked like a font import. */
+  font-family: var(--hsa-font-body);
+  font-size: var(--hsa-text-base);
+  line-height: 1.5;
+  color: var(--hsa-ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f0f1f2;
+  background-color: var(--hsa-page);
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: var(--hsa-font-mono);
 }
-input, select
-{
-  font-family: Montserrat, sans-serif;
+
+/* Form controls don't inherit the page font on their own. */
+input, select, textarea, button {
+  font-family: var(--hsa-font-body);
+}
+
+/* Headings carry the display face. Set here rather than on each component so
+   a new heading gets the right face without remembering to ask for it. */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--hsa-font-display);
+  letter-spacing: -0.015em;
 }
 
 /* ==========================================================================
@@ -45,7 +57,7 @@ input, select
     h2 {
         text-align: center;
         font-size: 2em;
-        color: #155776;
+        color: var(--hsa-teal-600);
         margin: 0 0 20px;
     }
 
@@ -61,7 +73,7 @@ input, select
     form label {
         font-size: 1.4em;
         font-weight: 600;
-        color: #155776;
+        color: var(--hsa-teal-600);
         display: inline-block;
         margin-top: 0.4em;
     }
@@ -87,7 +99,7 @@ input, select
         min-height: 2em;
         border-radius: 5px;
         font-size: 1.2em;
-        font-family: 'Montserrat', sans-serif;
+        font-family: var(--hsa-font-body);
     }
 
     input[type="submit"] {
@@ -99,7 +111,7 @@ input, select
     button:not(.logout-button):hover,
     input[type="submit"]:hover {
         background-color: #6db0cf;
-        border: 1px solid #155776;
+        border: 1px solid var(--hsa-teal-600);
         box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
     }
 
@@ -118,7 +130,7 @@ input, select
 
     th,
     td {
-        border: 1px solid #155776;
+        border: 1px solid var(--hsa-teal-600);
     }
 
     thead {
@@ -209,7 +221,7 @@ input, select
 
 .form-group :where(label) {
   font-weight: 700;
-  color: #0f172a;
+  color: var(--hsa-ink);
   margin-bottom: 6px;
   font-size: 14px;
 }
@@ -226,18 +238,18 @@ input, select
   border-radius: 6px;
   font-size: 14px;
   font-family: inherit;
-  color: #0f172a;
-  background-color: #ffffff;
+  color: var(--hsa-ink);
+  background-color: var(--hsa-surface);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-group :where(input, textarea)::placeholder {
-  color: #64748b;
+  color: var(--hsa-muted-light);
 }
 
 .form-group :where(input, select, textarea):focus {
   outline: none;
-  border-color: #0f4c64;
+  border-color: var(--hsa-teal-700);
   box-shadow: 0 0 0 3px rgba(15, 76, 100, 0.2);
 }
 
@@ -286,7 +298,7 @@ input, select
 
 /* Primary form submit button */
 .submit-button {
-  background: linear-gradient(135deg, #155776, #1a6b8a);
+  background: linear-gradient(135deg, var(--hsa-teal-600), #1a6b8a);
   color: white;
   padding: 15px 40px;
   border: none;
@@ -301,7 +313,7 @@ input, select
 .submit-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #0d3f54, #155776);
+  background: linear-gradient(135deg, var(--hsa-teal-800), var(--hsa-teal-600));
 }
 
 .submit-button:disabled {
@@ -342,12 +354,12 @@ input, select
 .section-title.section-title--center,
 .section-title.section-title--left {
   margin: 0 0 12px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 22px;
+  font-family: var(--hsa-font-display);
+  font-size: var(--hsa-text-lg);
   font-weight: 700;
   line-height: 1.25;
-  letter-spacing: -0.01em;
-  color: #155776;
+  letter-spacing: -0.015em;
+  color: var(--hsa-teal-600);
 }
 
 .section-title.section-title--center {
@@ -358,20 +370,30 @@ input, select
   text-align: left;
 }
 
-/* Page title (size="page"), e.g. "Dashboard" — bigger than section titles */
+/* Page title (size="page"), e.g. "Dashboard".
+
+   This used to be 30px against a 22px section title — an 8px gap that reads
+   as "slightly bigger" rather than as a different level, which is why teal
+   was doing the work of telling you where you are. 36 against 20 is a clear
+   step, so the hierarchy survives being read in greyscale. */
 .section-title.section-title--page {
-  font-size: 30px;
-  margin-bottom: 16px;
+  font-size: var(--hsa-text-3xl);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 20px;
+  color: var(--hsa-teal-700);
 }
 
 @media (max-width: 480px) {
   .section-title.section-title--center,
   .section-title.section-title--left {
-    font-size: 20px;
+    font-size: 18px;
   }
 
+  /* Keeps roughly the desktop ratio rather than flattening the two levels
+     together, which is what a shrunk-down scale usually does on a phone. */
   .section-title.section-title--page {
-    font-size: 26px;
+    font-size: 28px;
   }
 }
 
@@ -395,8 +417,8 @@ input, select
   margin: 0;
   border: 1.5px solid #94a3b8;
   border-radius: 6px;
-  background: #ffffff;
-  color: #0f172a;
+  background: var(--hsa-surface);
+  color: var(--hsa-ink);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -404,12 +426,12 @@ input, select
 }
 
 .choice-group .choice-group__option:hover {
-  border-color: #0f4c64;
+  border-color: var(--hsa-teal-700);
 }
 
 .choice-group .choice-group__option.is-selected {
-  background: #0f4c64;
-  border-color: #0f4c64;
+  background: var(--hsa-teal-700);
+  border-color: var(--hsa-teal-700);
   color: #ffffff;
 }
 

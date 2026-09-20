@@ -4,9 +4,11 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
 import { EBOARD_TOOLS } from '../../pages/eboard/eboardTools';
 
-// White HSA logo, currently served from ufhsa.com (Wix).
-const HSA_LOGO_URL =
-    'https://static.wixstatic.com/media/fd581a_b315c49361854ea9a0f0407243bfb8f0~mv2.png/v1/crop/x_7,y_4,w_516,h_424/fill/w_150,h_124,al_c,q_85,enc_auto/newhsalogo_white_7079520717135231.png';
+// White HSA logo. Served from our own /public rather than from the Wix CDN
+// that ufhsa.com uses: the header logo is on every page of the site, so a
+// third-party host we don't control was in the critical path of every load.
+// The file is the 150x124 Wix export, drawn at 52x43 (2x for retina).
+const HSA_LOGO_URL = '/hsa-logo-white.png';
 const UFHSA_URL = 'https://www.ufhsa.com';
 const CALENDAR_URL =
     'https://calendar.google.com/calendar/embed?src=ae59c0f6702553b609b32a2d3590df6a527b45a92069bbf28f9983f89aaab437%40group.calendar.google.com&ctz=America%2FNew_York';
@@ -80,7 +82,7 @@ function SiteHeader({ signedIn, eboard, cabinet = false }: SiteHeaderProps) {
             {/* Signed out there are no links, so the logo and title sit centred */}
             <div className={`site-header__bar${signedIn ? '' : ' site-header__bar--centered'}`}>
                 <Link to="/dashboard" className="site-header__brand" aria-label="Hispanic-Latine Student Association — go to Dashboard">
-                    <img src={HSA_LOGO_URL} alt="" width="52" height="43" />
+                    <img src={HSA_LOGO_URL} alt="" width="52" height="43" decoding="async" />
                     <span className="site-header__title">
                         Hispanic-Latine<br />Student Association
                     </span>

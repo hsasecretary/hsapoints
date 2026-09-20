@@ -9,7 +9,7 @@
     width: 85%;
     margin: auto;
     border-radius: 8px;
-    border: 2px solid #155776;
+    border: 2px solid var(--hsa-teal-600);
     margin-top: 5%;
     margin-bottom: 5%;
     max-width: 700px;
@@ -26,10 +26,10 @@
     font-size: 1.1rem;
     padding: 10px 14px;
     border-radius: 6px;
-    border: 1.5px solid #155776;
+    border: 1.5px solid var(--hsa-teal-600);
     margin: 0.3em 0 0.8em 0;
     box-sizing: border-box;
-    background-color: #ffffff;
+    background-color: var(--hsa-surface);
     display: block;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -39,7 +39,7 @@
 .form input[type="email"]:focus,
 .form input[type="password"]:focus,
 .form select:focus {
-    border-color: #1e6b8a;
+    border-color: var(--hsa-teal-500);
     box-shadow: 0 0 0 3px rgba(21, 87, 118, 0.15);
 }
 
@@ -50,7 +50,7 @@
 
 /* Submit Button */
 .form input[type="submit"] {
-    background: linear-gradient(135deg, #155776 0%, #1e6b8a 100%);
+    background: linear-gradient(135deg, var(--hsa-teal-600) 0%, var(--hsa-teal-500) 100%);
     color: #ffffff;
     border: none;
     padding: 12px 28px;
@@ -65,7 +65,7 @@
 }
 
 .form input[type="submit"]:hover {
-    background: linear-gradient(135deg, #1e6b8a 0%, #267ba3 100%);
+    background: linear-gradient(135deg, var(--hsa-teal-500) 0%, var(--hsa-teal-400) 100%);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(21, 87, 118, 0.25);
 }
@@ -87,7 +87,7 @@
 
 .login-form h2 {
     margin-bottom: 30px;
-    color: #155776;
+    color: var(--hsa-teal-600);
     font-weight: 600;
 }
 
@@ -103,7 +103,7 @@
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #155776;
+    color: var(--hsa-teal-600);
 }
 
 .input-group input {
@@ -118,7 +118,7 @@
 
 .input-group input:focus {
     outline: none;
-    border-color: #155776 !important;
+    border-color: var(--hsa-teal-600) !important;
     box-shadow: 0 0 0 3px rgba(21, 87, 118, 0.1) !important;
 }
 
@@ -129,7 +129,7 @@
 
 .login-form input.login-button,
 .login-form input[type="submit"].login-button {
-    background: linear-gradient(135deg, #155776 0%, #1e6b8a 100%) !important;
+    background: linear-gradient(135deg, var(--hsa-teal-600) 0%, var(--hsa-teal-500) 100%) !important;
     color: white !important;
     border: none !important;
     padding: 14px 32px !important;
@@ -146,7 +146,7 @@
 
 .login-form input.login-button:hover,
 .login-form input[type="submit"].login-button:hover {
-    background: linear-gradient(135deg, #1e6b8a 0%, #267ba3 100%) !important;
+    background: linear-gradient(135deg, var(--hsa-teal-500) 0%, var(--hsa-teal-400) 100%) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(21, 87, 118, 0.3) !important;
 }
@@ -170,7 +170,7 @@
 
 .signup-link,
 .forgot-link {
-    color: #155776;
+    color: var(--hsa-teal-600);
     text-decoration: none;
     font-weight: 500;
     padding: 10px 20px;
@@ -182,7 +182,7 @@
 .signup-link:hover,
 .forgot-link:hover {
     background-color: rgba(21, 87, 118, 0.1);
-    color: #1e6b8a;
+    color: var(--hsa-teal-500);
 }
 
 @media (max-width: 768px) {

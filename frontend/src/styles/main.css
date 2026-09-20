@@ -1,5 +1,6 @@
 /* The whole site's CSS, imported once from main.tsx.
 
+   tokens.css    colour / type / scale variables — nothing but :root
    base.css      site-wide defaults, shared form pieces, utilities
    layout.css    site header, footer, 404 page (every page)
    auth.css      login / sign up / forgot password
@@ -10,6 +11,7 @@
 
    Rules in the area files are scoped to a component's root class/id, so
    sections can't leak into each other. Put new shared pieces in base.css. */
+@import './tokens.css';
 @import './base.css';
 @import './auth.css';
 @import './dashboard.css';
