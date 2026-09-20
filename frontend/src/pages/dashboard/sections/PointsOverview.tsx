@@ -5,7 +5,8 @@ import { formatAccountType } from '../../../lib/roles';
 import SectionTitle from '../../../components/ui/SectionTitle';
 import EventsAttendedList from '../../../components/members/EventsAttendedList';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
+import { fetchAttendedEvents, sumVoterEligiblePoints } from '../../../lib/attendedEvents';
 import { useNavigate } from 'react-router-dom';
 
 type PointsOverviewProps = {
@@ -81,40 +82,14 @@ export default function PointsOverview({ refreshKey = 0, eventCodeForm }: Points
 						};
 
 						// Calculate voter eligible points and get event details
-						const eventCodes = userData.eventCodes || [];
-						const codesCollection = collection(db, "codes");
-						const codesSnapshot = await getDocs(codesCollection);
-						
-						let voterEligibleTotal = 0;
-						const eventDetails: any[] = [];
+						const eventDetails = await fetchAttendedEvents(userData.eventCodes);
+						const voterEligibleTotal = sumVoterEligiblePoints(eventDetails, userData.otherPoints);
 
-						for (const docSnap of codesSnapshot.docs) {
-							const docData = docSnap.data();
-							if (eventCodes.includes(docSnap.id)) {
-								eventDetails.push({
-									code: docSnap.id.toUpperCase(),
-									event: docData.event,
-									category: docData.category,
-									points: docData.points,
-									semester: docData.semester,
-									eventDate: docData.eventDate,
-									voterEligible: docData.voterEligible,
-									attended: true
-								});
-
-								if (docData.voterEligible) {
-									// use the stored point value on the code document
-									voterEligibleTotal += docData.points || 0;
-								}
-							}
-						}
-
-						voterEligibleTotal += userData.otherPoints || 0;
 						pointsBreakdown.voterEligiblePoints = voterEligibleTotal;
 						pointsBreakdown.isVoterEligible = voterEligibleTotal >= 15;
 
 						setUserPoints(pointsBreakdown);
-						setEventBreakdown(eventDetails.sort((a, b) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime()));
+						setEventBreakdown(eventDetails);
 					}
 				} catch (error) {
 					console.error("Error fetching user data:", error);

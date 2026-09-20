@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { db } from '../../lib/firebase';
 import ChoiceGroup from '../../components/ui/ChoiceGroup';
 import { currentSemester } from '../../lib/semester';
-import { setDoc, doc, collection, getDocs } from 'firebase/firestore';
+import { setDoc, getDoc, doc } from 'firebase/firestore';
 
 type CreateCodeProps = {
     /** Called with the new code (e.g. "GOLAZO") after it's saved. */
@@ -87,13 +87,13 @@ function CreateCode({ onCreated }: CreateCodeProps) {
             errors.push('Cabinet events must be marked as "Cabinet Required"');
         }
 
-        // Check for duplicate code
+        // Check for duplicate code. The doc ID is the uppercased code (that's
+        // what the setDoc below writes), so this is the exact row we'd collide
+        // with — no need to download the whole collection to find out.
         try {
-            const codesCollection = collection(db, 'codes');
-            const codesSnapshot = await getDocs(codesCollection);
-            const existingCodes = codesSnapshot.docs.map(doc => doc.id.toLowerCase());
-            
-            if (existingCodes.includes(formData.eventCode.toLowerCase().trim())) {
+            const existing = await getDoc(doc(db, 'codes', formData.eventCode.trim().toUpperCase()));
+
+            if (existing.exists()) {
                 errors.push('Event code already exists');
             }
         } catch (error) {

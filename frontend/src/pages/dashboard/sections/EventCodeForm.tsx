@@ -360,72 +360,48 @@ function EventCodeForm({ onPointsUpdate }) {
     return (
         <div className="attendanceForm">
             <SectionTitle>Have an Event Code?</SectionTitle>
-            <p style={{textAlign: 'center', color: '#666', marginBottom: '20px'}}>
+            <p className="attendance-intro">
                 Enter the code from the event to check in and earn your points.
             </p>
-            
+
             {message.text && (
-                <div className={`message ${message.type}`} style={{
-                    padding: '10px',
-                    marginBottom: '15px',
-                    borderRadius: '5px',
-                    textAlign: 'center',
-                    backgroundColor: message.type === 'error' ? '#fee' : '#efe',
-                    color: message.type === 'error' ? '#c33' : '#060',
-                    border: `1px solid ${message.type === 'error' ? '#fcc' : '#cfc'}`
-                }}>
+                /* role=status: screen readers announce the result without
+                   the user having to hunt for it after submitting. */
+                <div className={`message ${message.type} attendance-message`} role="status" aria-live="polite">
                     {message.text}
                 </div>
             )}
 
-            <form onSubmit={checkCode} style={{width: '80%', margin: 'auto', paddingBottom: '20px'}}>
-                <div className="form-group" style={{marginBottom: '20px'}}>
-                    <input 
-                        type="text" 
+            <form onSubmit={checkCode} className="attendance-code-form">
+                <div className="form-group">
+                    <input
+                        type="text"
                         id="code"
                         aria-label="Event code"
+                        aria-describedby="code-hint"
+                        className="attendance-code-input"
                         value={code}
                         onChange={handleCodeChange}
                         placeholder="Enter Event Code"
-                        style={{
-                            width: '100%',
-                            fontSize: '1.3rem',
-                            padding: '12px',
-                            borderRadius: '5px',
-                            border: '2px solid #155776',
-                            boxSizing: 'border-box',
-                            transition: 'border-color 0.3s ease',
-                            textTransform: 'uppercase',
-                            textAlign: 'center'
-                        }}
-                        onFocus={(e) => e.target.style.borderColor = '#6db0cf'}
-                        onBlur={(e) => e.target.style.borderColor = '#155776'}
+                        autoComplete="off"
+                        autoCapitalize="characters"
+                        spellCheck={false}
+                        enterKeyHint="go"
                         disabled={loading}
                     />
-                    <p style={{
-                        fontSize: '0.9em',
-                        color: '#666',
-                        marginTop: '5px',
-                        textAlign: 'center'
-                    }}>
+                    <p id="code-hint" className="attendance-hint">
                         Codes are case-insensitive and only valid on the event date
                     </p>
                 </div>
-                
+
                 <div className="center">
-                    <input 
-                        type="submit" 
+                    {/* is-loading keeps the disabled pulse for the submit wait only —
+                        an empty box shouldn't throb at you (see dashboard.css). */}
+                    <input
+                        type="submit"
+                        className={`submit-button attendance-submit${loading ? ' is-loading' : ''}`}
                         value={loading ? 'Submitting...' : 'Submit Code'}
                         disabled={loading || !code.trim()}
-                        style={{
-                            backgroundColor: loading || !code.trim() ? '#ccc' : '#f2f6f8',
-                            cursor: loading || !code.trim() ? 'not-allowed' : 'pointer',
-                            fontSize: '1.1rem',
-                            padding: '12px 30px',
-                            border: '2px solid #155776',
-                            borderRadius: '5px',
-                            transition: 'all 0.3s ease'
-                        }}
                     />
                 </div>
             </form>

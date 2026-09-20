@@ -72,6 +72,81 @@
     padding: 10px;
 }
 
+/* ---- Event code controls  (EventCodeForm.tsx) ----
+   These were seven inline style={{}} objects, which meant the site's most-used
+   button rendered as raw browser chrome while every other form on the site used
+   .submit-button. Same controls, in CSS, so they can be themed and focused. */
+.attendanceForm .attendance-intro {
+    text-align: center;
+    color: #4a5568;
+    margin-bottom: 20px;
+}
+
+.attendanceForm .attendance-message {
+    text-align: center;
+}
+
+.attendanceForm .attendance-code-form {
+    width: 80%;
+    margin: auto;
+    padding-bottom: 20px;
+}
+
+.attendanceForm .attendance-code-form .form-group {
+    margin-bottom: 20px;
+}
+
+.attendanceForm .attendance-code-input {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1.3rem;
+    padding: 12px;
+    border: 2px solid #155776;
+    border-radius: 5px;
+    text-align: center;
+    text-transform: uppercase;
+    transition: border-color 0.2s ease;
+}
+
+/* Replaces an onFocus handler that wrote #6db0cf (~2:1 on white) straight onto
+   element.style, where no stylesheet could ever override it. */
+.attendanceForm .attendance-code-input:focus-visible {
+    outline: 3px solid #0f4c64;
+    outline-offset: 2px;
+    border-color: #0f4c64;
+}
+
+.attendanceForm .attendance-hint {
+    font-size: 0.9em;
+    color: #4a5568;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.attendanceForm .attendance-submit {
+    font-size: 1.1rem;
+    padding: 14px 32px;
+    min-height: 44px;   /* tap target */
+}
+
+.attendanceForm .attendance-submit:focus-visible {
+    outline: 3px solid #082f3f;
+    outline-offset: 3px;
+}
+
+/* White on base.css's #ccc disabled fill is ~1.6:1. #64748b is 4.78:1 — a
+   disabled control is exempt from AA, but "Submitting..." should be legible. */
+.attendanceForm .attendance-submit:disabled {
+    background: #64748b;
+    color: #fff;
+}
+
+/* .submit-button:disabled pulses to signal a pending submit, but this button is
+   also disabled whenever the box is empty — an idle field shouldn't throb. */
+.attendanceForm .attendance-submit:disabled:not(.is-loading) {
+    animation: none;
+}
+
 /* Enhanced Mobile Responsiveness */
 @media only screen and (max-width: 768px) {
     .formDash {
@@ -127,6 +202,11 @@
         width: calc(100% - 10px);
         margin: 8px 5px;
         padding: 8px;
+    }
+
+    /* 80% of a 375px screen leaves the code box ~290px wide for no reason. */
+    .attendanceForm .attendance-code-form {
+        width: 100%;
     }
 
     #attendanceInput {
@@ -239,6 +319,24 @@
         gap: 10px !important;
     }
 
+    /* On a phone the one thing a member opens this site to do is enter a code.
+       .user-results is a flex column, so order: -1 lifts the form to the top
+       without changing the DOM (desktop keeps its Points Summary -> code order).
+       The --hsa-order overrides re-sync the animations.css reveal stagger,
+       which is keyed to :nth-child() and doesn't follow visual order. */
+    .user-points-lookup .user-results > .attendanceForm {
+        order: -1;
+        --hsa-order: 0;
+    }
+
+    .user-points-lookup .user-results > .user-info-card {
+        --hsa-order: 1;
+    }
+
+    .user-points-lookup .user-results > .points-summary {
+        --hsa-order: 2;
+    }
+
     /* Hide the original table on mobile and create card layout */
     .user-points-lookup .events-table {
         border: none;
@@ -313,8 +411,30 @@
         margin-bottom: 8px;
     }
 
+    /* Was 1fr, which stacked four 150px cards into ~718px of scroll before a
+       member could reach anything else. 2x2 compact tiles cost about a quarter
+       of that and still read at a glance. */
     .user-points-lookup .points-grid {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+    }
+
+    .user-points-lookup .points-card {
+        padding: 10px 8px !important;
+    }
+
+    .user-points-lookup .points-card h4 {
+        font-size: 12px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .user-points-lookup .points-value {
+        font-size: 1.7em !important;
+        margin-bottom: 2px !important;
+    }
+
+    .user-points-lookup .eligibility-status {
+        font-size: 11px !important;
     }
 
     .user-points-lookup .events-table tr {
