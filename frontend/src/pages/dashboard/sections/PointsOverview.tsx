@@ -158,7 +158,9 @@ export default function PointsOverview({ refreshKey = 0, eventCodeForm }: Points
 		<div className="user-points-lookup">
 		
 			
-			<div className="user-results">
+			{/* hsa-reveal: the cards below fade in one after another, the same
+			    cascade as the E-Board User Lookup page (see animations.css) */}
+			<div className="user-results hsa-reveal">
 				<div className="user-info-card">
 					<SectionTitle align="left">My Information</SectionTitle>
 					<div className="user-info-grid">

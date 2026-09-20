@@ -1,0 +1,177 @@
+/* ==========================================================================
+   Entry animations — every page and tab fades its content in.
+
+   All of the site's motion lives here so the timing can be tuned in one
+   place. Nothing in here changes layout: the animations only touch
+   `opacity` and `transform`, both of which are composited by the GPU, so
+   they stay smooth on a phone.
+
+   Two pieces:
+
+   1. Page reveal (automatic). Every routed page is a direct child of
+      `.app-shell` (see App.tsx), so clicking a nav tab, an E-Board
+      dropdown item or the Cabinet link swaps that element and replays the
+      animation — the page's top-level sections fade up one after another.
+      New pages get this for free; there is no class to remember.
+
+   2. `.hsa-reveal` (opt in). Put it on any element whose children should
+      fade up the same way when it appears — used by the Submit Request /
+      My Requests tabs, where a `key` on the panel remounts it so the
+      animation replays on every tab click.
+
+   Timing knobs, smaller and quicker on a phone so a tap feels instant:
+   ========================================================================== */
+:root {
+    --hsa-anim-duration: 500ms;
+    /* Gap between one section and the next */
+    --hsa-anim-step: 70ms;
+    /* How far a section travels up as it fades in */
+    --hsa-anim-rise: 14px;
+    --hsa-anim-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@media (max-width: 600px) {
+    :root {
+        --hsa-anim-duration: 380ms;
+        --hsa-anim-step: 45ms;
+        --hsa-anim-rise: 8px;
+    }
+}
+
+/* Every animation below fills `backwards`, not `both`: the element is
+   held hidden during its stagger delay, then, once the animation is over,
+   it goes back to plain stylesheet values with no transform left on it. A
+   leftover transform (even an identity one) would become the containing
+   block for anything `position: fixed` inside the page, which is enough to
+   break the full-screen image modal in Point Request Review. */
+@keyframes hsa-rise-in {
+    from {
+        opacity: 0;
+        transform: translate3d(0, var(--hsa-anim-rise), 0);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ---- 1. Page reveal ------------------------------------------------------
+   The page root itself is left alone (it usually paints the white page
+   background — fading that would flash the grey body behind it); its
+   top-level sections are what animate. The header and footer are excluded:
+   they stay mounted across pages, and the header is `position: sticky`,
+   which a transform on it would break. */
+.app-shell > :not(.site-header):not(.site-footer) > *,
+.hsa-reveal > * {
+    animation: hsa-rise-in var(--hsa-anim-duration) var(--hsa-anim-ease) backwards;
+    animation-delay: calc(var(--hsa-order, 0) * var(--hsa-anim-step));
+}
+
+/* Stagger: position in the page turns into a delay. `--hsa-order` is set on
+   every child, not just the animated ones, so a nested `.hsa-reveal` can't
+   inherit an outer section's delay. Everything past the 9th section shares
+   the last delay, so a long page doesn't trail off. */
+.app-shell > * > :nth-child(1),
+.hsa-reveal > :nth-child(1) { --hsa-order: 0; }
+
+.app-shell > * > :nth-child(2),
+.hsa-reveal > :nth-child(2) { --hsa-order: 1; }
+
+.app-shell > * > :nth-child(3),
+.hsa-reveal > :nth-child(3) { --hsa-order: 2; }
+
+.app-shell > * > :nth-child(4),
+.hsa-reveal > :nth-child(4) { --hsa-order: 3; }
+
+.app-shell > * > :nth-child(5),
+.hsa-reveal > :nth-child(5) { --hsa-order: 4; }
+
+.app-shell > * > :nth-child(6),
+.hsa-reveal > :nth-child(6) { --hsa-order: 5; }
+
+.app-shell > * > :nth-child(7),
+.hsa-reveal > :nth-child(7) { --hsa-order: 6; }
+
+.app-shell > * > :nth-child(8),
+.hsa-reveal > :nth-child(8) { --hsa-order: 7; }
+
+.app-shell > * > :nth-child(n+9),
+.hsa-reveal > :nth-child(n+9) { --hsa-order: 8; }
+
+/* A <br> used as a spacer (e.g. on the dashboard) is a child like any
+   other, so it takes a turn in the stagger; there's nothing to fade.
+   Every override below repeats the same selector shape as the rule above:
+   its `:not()` chain counts towards specificity, so a shorter selector
+   would lose. */
+.app-shell > :not(.site-header):not(.site-footer) > br {
+    animation: none;
+}
+
+/* The dashboard's points block (PointsOverview) is one section holding
+   every card, so fading it as a whole barely reads as an animation. It
+   hands the job to its cards instead — `.hsa-reveal` on `.user-results`
+   cascades My Information, Points Summary, the event code form, My Events
+   Attended and Points by Category one after another, the way the E-Board
+   User Lookup page cascades its sections. The block itself stops animating
+   so the two fades can't stack and muddy each other; the cards mount when
+   Firestore answers, which is the moment there's something to show.
+   Scoped to .formDash, so the E-Board page (where .user-points-lookup is
+   the page root) keeps fading as one piece. */
+.app-shell > .formDash > .user-points-lookup {
+    animation: none;
+}
+
+/* ---- 2. Tab panels ------------------------------------------------------
+   Submit Request / My Requests (PointTabs.tsx). The panel is keyed on the
+   active tab, so React replaces it on every click and the card inside
+   fades up. */
+.point-request-section__panel {
+    min-width: 0;
+}
+
+/* An overlay that opens on a click happens to be a top-level child of its
+   page, so it would otherwise wait out a stagger delay before appearing.
+   It responds to a tap, so it fades straight in. */
+.app-shell > .point-request-review > .image-modal {
+    animation-duration: 180ms;
+    animation-delay: 0s;
+}
+
+/* ---- 3. Header menus ----------------------------------------------------
+   The E-Board dropdown and the phone menu mount when they're opened, so
+   they fade in the same way. The dropdown keeps its centring
+   translateX(-50%) in both keyframes, or it would slide sideways. */
+@keyframes hsa-dropdown-in {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%);
+    }
+}
+
+.site-header .site-header__dropdown-menu {
+    animation: hsa-dropdown-in 180ms var(--hsa-anim-ease) backwards;
+}
+
+.site-header .site-header__menu {
+    animation: hsa-rise-in 220ms var(--hsa-anim-ease) backwards;
+    animation-delay: 0s;
+}
+
+/* The links inside both menus arrive with the panel — nothing matches them
+   on their own, so there's no stagger to undo. */
+
+/* ---- Reduced motion -----------------------------------------------------
+   Anyone who has asked their phone or computer for less motion gets the
+   finished page straight away. */
+@media (prefers-reduced-motion: reduce) {
+    .app-shell > :not(.site-header):not(.site-footer) > *,
+    .hsa-reveal > *,
+    .site-header .site-header__dropdown-menu,
+    .site-header .site-header__menu {
+        animation: none;
+    }
+}
