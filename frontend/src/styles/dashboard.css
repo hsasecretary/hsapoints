@@ -874,7 +874,6 @@
 with the my requests tab. ---------- */
 
 .point-request-section {
-    --leaderboard-width: 400px;
     flex: 1 1 100%;
     max-width: 800px;
     min-width: 0;
@@ -1051,7 +1050,7 @@ with the my requests tab. ---------- */
    .attended-item expand/collapse shape (border, chevron, .is-open) for a
    consistent interaction across the dashboard. */
 .leaderboard-section {
-    --leaderboard-width: 400px;
+    --leaderboard-width: 560px;
     flex: 1 1 100%;
     max-width: 800px;
     min-width: 0;
@@ -1115,7 +1114,6 @@ with the my requests tab. ---------- */
 
 .leaderboard-row__points,
 .leaderboard-row__score {
-    font-family: var(--hsa-font-mono);
     font-size: var(--hsa-text-sm);
     font-weight: 500;
     font-variant-numeric: tabular-nums;
@@ -1190,9 +1188,9 @@ with the my requests tab. ---------- */
 .leaderboard-board {
     max-width: var(--leaderboard-width);
     margin: 16px auto 0;
-    padding: 44px 18px;
-    /* A step darker than the cards on purpose: the deeper cards in the pile
-       only peek out by ~12px, so they need something to peek against. On a
+    padding: 74px 18px;
+    /* A step darker than the cards on purpose: the cards in the pile overlap
+       heavily, so the ones behind need something to peek against. On a
        near-white panel the cascade collapses into a single card. */
     background: var(--hsa-surface-sunken);
     border: 1px solid var(--hsa-border);
@@ -1222,7 +1220,7 @@ with the my requests tab. ---------- */
 .leaderboard-stack {
     /* No padding of its own: --offset is measured from Your Standing, so any
        padding here would be added to it and the nearest card would sit at
-       18px instead of the specified 9px. The cards translate out of this box
+       37px instead of the specified 9px. The cards translate out of this box
        on purpose — the board's padding is what they overflow into. */
     display: grid;
 }
@@ -1254,10 +1252,13 @@ with the my requests tab. ---------- */
     transform: translateY(calc(var(--dir) * var(--offset))) scale(var(--scale));
 }
 
-/* Cascade spec: 3 rows/side, 17px overlap step, 10% scale step, 1.8px blur step */
-.leaderboard-row--neighbor[data-depth="1"] { --offset: 9px;  --scale: 1;    --blur: 1.8px; --opacity: 1;    --z: 3; }
-.leaderboard-row--neighbor[data-depth="2"] { --offset: 26px; --scale: 0.9;  --blur: 3.6px; --opacity: 0.84; --z: 2; }
-.leaderboard-row--neighbor[data-depth="3"] { --offset: 43px; --scale: 0.8;  --blur: 5.4px; --opacity: 0.68; --z: 1; }
+/* Cascade spec: 3 rows/side, 28px overlap step, 10% scale step, 1.8px blur step.
+   Depth 1 is sharp: it is the one neighbour card whose Rank and score you are
+   meant to actually read, so depth is carried by offset, scale and opacity
+   there, and blur only starts once a card is genuinely further back. */
+.leaderboard-row--neighbor[data-depth="1"] { --offset: 9px;  --scale: 1;    --blur: 0;     --opacity: 1;    --z: 3; }
+.leaderboard-row--neighbor[data-depth="2"] { --offset: 37px; --scale: 0.9;  --blur: 3.6px; --opacity: 0.84; --z: 2; }
+.leaderboard-row--neighbor[data-depth="3"] { --offset: 65px; --scale: 0.8;  --blur: 5.4px; --opacity: 0.68; --z: 1; }
 
 /* A neighbour card is a real card: real Rank, real score, and a redacted
    name slot. overflow is visible on purpose — `overflow: hidden` clips a
