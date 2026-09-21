@@ -1,6 +1,7 @@
 import React, { useEffect, useState, type ReactNode } from "react";
 import { auth, db } from '../../../lib/firebase';
 import { isGeneralMember } from '../../../lib/members';
+import { getTotalPoints } from '../../../lib/points';
 import { formatAccountType } from '../../../lib/roles';
 import SectionTitle from '../../../components/ui/SectionTitle';
 import EventsAttendedList from '../../../components/members/EventsAttendedList';
@@ -51,7 +52,7 @@ export default function PointsOverview({ refreshKey = 0, eventCodeForm }: Points
 						const pointsBreakdown: Record<string, any> = {
 							fallPoints: userData.fallPoints || 0,
 							springPoints: userData.springPoints || 0,
-							totalPoints: (userData.fallPoints || 0) + (userData.springPoints || 0),
+							totalPoints: getTotalPoints(userData),
 							
 							// Category breakdowns
 							gbmTotal: (userData.gbmPointsVE || 0) + (userData.gbmPointsNVE || 0),

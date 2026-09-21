@@ -50,6 +50,7 @@ yarn-error.log*
 # Claude Code
 CLAUDE.md
 .claude/settings.local.json
+docs/
 
 # Logs
 logs
