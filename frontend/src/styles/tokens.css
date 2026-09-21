@@ -68,7 +68,8 @@
     --hsa-surface: #ffffff;       /* cards, panels, table rows */
     --hsa-surface-subtle: #f8fafc;/* zebra rows, inset panels */
     --hsa-surface-sunken: #f1f5f9;/* the step below that (table heads, wells) */
-    --hsa-surface-warm: #fdf8ed;  /* the one warm surface: podiums, medal framing */
+    --hsa-surface-warm: #fdf8ed;  /* the one warm surface. Unused while the Top
+                                    Ranks podium is parked (dashboard.css). */
     --hsa-page: #f0f1f2;          /* the page behind everything */
 
     /* ---- Status ----------------------------------------------------------

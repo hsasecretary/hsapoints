@@ -1062,11 +1062,11 @@ with the my requests tab. ---------- */
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-/* The podium. Raised and warm where the Your Standing board below is sunken
-   and cool, so the two halves of the Leaderboard read as different places:
-   up here Members have names, down there they don't. The label earns its
-   keep for the same reason — without it the first block is just some cards
-   with a gap under them, and dropping out of Top Ranks isn't an event. */
+/* PARKED — the Top Ranks podium: a warm raised frame and a label, the
+   counterweight to the sunken Your Standing board below. Switched off in
+   favour of the medals alone; kept here in case we revisit it. Restore this
+   block together with the wrapper markup noted in LeaderboardSection.tsx.
+
 .leaderboard-top {
     max-width: var(--leaderboard-width);
     margin-inline: auto;
@@ -1086,10 +1086,11 @@ with the my requests tab. ---------- */
     color: var(--hsa-gold-700);
 }
 
-/* The list is already centred inside the frame, so it gives its cap back. */
+The list is already centred inside the frame, so it gives its cap back:
 .leaderboard-list--top {
     max-width: none;
 }
+*/
 
 /* The whole board is capped well inside the section shell — a single narrow
    column reads as a ranking; a full-width one reads as a table. The leftover

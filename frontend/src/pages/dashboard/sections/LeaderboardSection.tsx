@@ -110,20 +110,30 @@ export default function LeaderboardSection({ refreshKey = 0 }: LeaderboardSectio
 		<div className="leaderboard-section">
 			<SectionTitle>Leaderboard</SectionTitle>
 
-			<div className="leaderboard-top">
-				<p className="leaderboard-top__label">Top Ranks</p>
-				<ol className="leaderboard-list leaderboard-list--top">
-					{topRanks.map((group) => (
-						<RankRow
-							key={group.rank}
-							group={group}
-							viewerEmail={viewerEmail}
-							expanded={expandedRanks.has(group.rank)}
-							onToggle={() => toggleExpanded(group.rank)}
-						/>
-					))}
-				</ol>
-			</div>
+			{/* Parked, not dropped: the Top Ranks podium — a warm raised frame
+			    with a "Top Ranks" label, meant as the counterweight to the
+			    sunken Your Standing board below. To bring it back, wrap the
+			    <ol> in:
+
+			        <div className="leaderboard-top">
+			            <p className="leaderboard-top__label">Top Ranks</p>
+			            <ol className="leaderboard-list leaderboard-list--top">
+			            ...
+			        </div>
+
+			    and uncomment the matching block in dashboard.css. The medals
+			    are independent of it and stay either way. */}
+			<ol className="leaderboard-list">
+				{topRanks.map((group) => (
+					<RankRow
+						key={group.rank}
+						group={group}
+						viewerEmail={viewerEmail}
+						expanded={expandedRanks.has(group.rank)}
+						onToggle={() => toggleExpanded(group.rank)}
+					/>
+				))}
+			</ol>
 
 			{yourStanding && !yourStanding.isInTopRanks && (
 				<StandingBoard standing={yourStanding} viewerEmail={viewerEmail} />
