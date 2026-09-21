@@ -24,6 +24,9 @@ type LeaderboardSectionProps = {
 // regardless of tie size (CONTEXT.md: "every other Member's identity hidden").
 const TIE_COLLAPSE_THRESHOLD = 10;
 
+// Ranks at or above this get a medal badge.
+const MEDAL_CUTOFF = 3;
+
 export default function LeaderboardSection({ refreshKey = 0 }: LeaderboardSectionProps) {
 	const [leaderboard, setLeaderboard] = useState<LeaderboardResult | null>(null);
 	const [viewerEmail, setViewerEmail] = useState<string | null>(null);
@@ -107,17 +110,20 @@ export default function LeaderboardSection({ refreshKey = 0 }: LeaderboardSectio
 		<div className="leaderboard-section">
 			<SectionTitle>Leaderboard</SectionTitle>
 
-			<ol className="leaderboard-list">
-				{topRanks.map((group) => (
-					<RankRow
-						key={group.rank}
-						group={group}
-						viewerEmail={viewerEmail}
-						expanded={expandedRanks.has(group.rank)}
-						onToggle={() => toggleExpanded(group.rank)}
-					/>
-				))}
-			</ol>
+			<div className="leaderboard-top">
+				<p className="leaderboard-top__label">Top Ranks</p>
+				<ol className="leaderboard-list leaderboard-list--top">
+					{topRanks.map((group) => (
+						<RankRow
+							key={group.rank}
+							group={group}
+							viewerEmail={viewerEmail}
+							expanded={expandedRanks.has(group.rank)}
+							onToggle={() => toggleExpanded(group.rank)}
+						/>
+					))}
+				</ol>
+			</div>
 
 			{yourStanding && !yourStanding.isInTopRanks && (
 				<StandingBoard standing={yourStanding} viewerEmail={viewerEmail} />
@@ -142,6 +148,11 @@ export default function LeaderboardSection({ refreshKey = 0 }: LeaderboardSectio
 // Top Ranks: named winners. A cluster bigger than TIE_COLLAPSE_THRESHOLD
 // collapses into a count with a toggle, so an unusually large tie doesn't
 // dump dozens of names on the page at once.
+//
+// The first three Ranks get a medal badge. Keyed on the Rank itself, never on
+// the row's position in the list: ties make Ranks skip, so a board can open
+// #1, #2, #2, #2, #2 and then jump straight out of Top Ranks with no third
+// place to award. The badge has to be able to simply not appear.
 type RankRowProps = {
 	group: RankGroup;
 	viewerEmail: string | null;
@@ -158,7 +169,12 @@ function RankRow({ group, viewerEmail, expanded, onToggle }: RankRowProps) {
 	return (
 		<li className={`leaderboard-row${containsViewer ? ' leaderboard-row--you' : ''}${membersVisible ? ' is-open' : ''}`}>
 			<div className="leaderboard-row__header">
-				<span className="leaderboard-row__rank">#{group.rank}</span>
+				<span
+					className="leaderboard-row__rank"
+					data-medal={group.rank <= MEDAL_CUTOFF ? group.rank : undefined}
+				>
+					#{group.rank}
+				</span>
 				<span className="leaderboard-row__points">
 					{group.totalPoints} pt{group.totalPoints === 1 ? '' : 's'}
 				</span>

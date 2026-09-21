@@ -1062,6 +1062,35 @@ with the my requests tab. ---------- */
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+/* The podium. Raised and warm where the Your Standing board below is sunken
+   and cool, so the two halves of the Leaderboard read as different places:
+   up here Members have names, down there they don't. The label earns its
+   keep for the same reason — without it the first block is just some cards
+   with a gap under them, and dropping out of Top Ranks isn't an event. */
+.leaderboard-top {
+    max-width: var(--leaderboard-width);
+    margin-inline: auto;
+    padding: 14px 14px 16px;
+    background: var(--hsa-surface-warm);
+    border: 1px solid var(--hsa-medal-1-line);
+    border-radius: 20px;
+}
+
+.leaderboard-top__label {
+    margin: 0 0 12px;
+    text-align: center;
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--hsa-gold-700);
+}
+
+/* The list is already centred inside the frame, so it gives its cap back. */
+.leaderboard-list--top {
+    max-width: none;
+}
+
 /* The whole board is capped well inside the section shell — a single narrow
    column reads as a ranking; a full-width one reads as a table. The leftover
    width becomes gutters. */
@@ -1110,6 +1139,34 @@ with the my requests tab. ---------- */
     font-size: var(--hsa-text-base);
     font-variant-numeric: tabular-nums;
     color: var(--hsa-gold-700);
+}
+
+/* Medal badge: a pale metal fill with its own dark ink, rather than a
+   metallic numeral. See the --hsa-medal-* tokens for why. min-width holds
+   #1 and a hypothetical #3 to the same badge width so the column of
+   numerals doesn't wobble. */
+.leaderboard-row__rank[data-medal] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 46px;
+    padding: 3px 9px;
+    border: 1px solid var(--hsa-medal-1-line);
+    border-radius: 999px;
+    background: var(--hsa-medal-1-fill);
+    color: var(--hsa-medal-1-ink);
+}
+
+.leaderboard-row__rank[data-medal="2"] {
+    border-color: var(--hsa-medal-2-line);
+    background: var(--hsa-medal-2-fill);
+    color: var(--hsa-medal-2-ink);
+}
+
+.leaderboard-row__rank[data-medal="3"] {
+    border-color: var(--hsa-medal-3-line);
+    background: var(--hsa-medal-3-fill);
+    color: var(--hsa-medal-3-ink);
 }
 
 .leaderboard-row__points,

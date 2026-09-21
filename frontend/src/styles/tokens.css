@@ -33,6 +33,26 @@
     --hsa-gold-700: #8a6113;   /* 5.53:1 on white, 5.28:1 on -subtle, 5.04:1 on
                                   -sunken, 4.84:1 on --hsa-teal-100 */
 
+    /* ---- Medals -----------------------------------------------------------
+       The first three Ranks, as a badge behind the numeral. Named by position
+       rather than by metal because the position is the role: 1 reads gold, 2
+       silver, 3 bronze, but if those ever become something else the names
+       still hold.
+
+       A badge, not coloured text: a true silver or bronze is nowhere near AA
+       as 16px type, and three dark metallics at that size are hard to tell
+       apart anyway. As a pale fill with dark text on top they separate
+       cleanly, and each -ink is measured against its own -fill. */
+    --hsa-medal-1-fill: #fcefc7;
+    --hsa-medal-1-line: #e8c766;
+    --hsa-medal-1-ink:  #7a5410;   /* 5.90:1 on -1-fill */
+    --hsa-medal-2-fill: #eceff3;
+    --hsa-medal-2-line: #c3ccd8;
+    --hsa-medal-2-ink:  #4b5563;   /* 6.55:1 on -2-fill */
+    --hsa-medal-3-fill: #f6e0cd;
+    --hsa-medal-3-line: #dfae86;
+    --hsa-medal-3-ink:  #8a4f22;   /* 5.11:1 on -3-fill */
+
     /* ---- Neutrals (slate) -------------------------------------------------
        Text and chrome. --hsa-ink is body copy; --hsa-muted is the lightest
        grey that still passes AA on white (7.58:1), so secondary text should
@@ -48,6 +68,7 @@
     --hsa-surface: #ffffff;       /* cards, panels, table rows */
     --hsa-surface-subtle: #f8fafc;/* zebra rows, inset panels */
     --hsa-surface-sunken: #f1f5f9;/* the step below that (table heads, wells) */
+    --hsa-surface-warm: #fdf8ed;  /* the one warm surface: podiums, medal framing */
     --hsa-page: #f0f1f2;          /* the page behind everything */
 
     /* ---- Status ----------------------------------------------------------
