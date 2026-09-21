@@ -36,5 +36,5 @@ _Avoid_: Top 5 (imprecise once ties are involved)
 The viewing Member's own Rank and Tie Cluster size on the Leaderboard, always shown regardless of whether they're also in Top Ranks.
 
 **Neighboring Ranks**:
-The Ranks immediately above and below Your Standing on the Leaderboard — up to three in each direction, one per Rank. Their Rank numbers and Total Points are shown; the Members holding them are never named or counted.
+The Ranks immediately above and below Your Standing on the Leaderboard — up to three in each direction, one per Rank. Their Rank numbers and Total Points are shown; the Members holding them are never named or counted. A Rank already in Top Ranks is never also a Neighboring Rank: it is on the Leaderboard by name, so there is nothing about it left to hide.
 _Avoid_: Filler rows, nearby members

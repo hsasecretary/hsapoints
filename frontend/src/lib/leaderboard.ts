@@ -96,8 +96,16 @@ export function buildLeaderboard(members: LeaderboardMember[], viewerEmail: stri
             // empty at the very top or the very bottom. The UI renders that
             // asymmetry rather than padding it out, so an empty side reads
             // honestly as "nobody below you".
+            //
+            // Top Ranks are filtered out of the pile above: they are already
+            // on the page by name, and a blurred card standing in for a Rank
+            // the viewer can read in full two inches higher is a lie about
+            // what is hidden. So the pile grows in as the viewer falls away
+            // from Top Ranks — nothing at the first Rank below the cutoff,
+            // one card at the next, and the full depth from the third on.
             neighborsAbove: groups
                 .slice(Math.max(0, viewerGroupIndex - NEIGHBOR_RANGE), viewerGroupIndex)
+                .filter((group) => group.rank > TOP_RANK_CUTOFF)
                 .map(toNeighborRank),
             neighborsBelow: groups
                 .slice(viewerGroupIndex + 1, viewerGroupIndex + 1 + NEIGHBOR_RANGE)
