@@ -220,22 +220,18 @@ function YourStandingRow({ standing, viewerEmail }: { standing: YourStanding; vi
 	);
 }
 
-// The inset panel holding the cascade. Its generous vertical padding is
-// load-bearing: the deepest neighbour card translates 48px, so without room
-// to overflow into, the pile would collide with whatever sits next to it. A
-// side with no Neighboring Ranks drops both its stack and that padding, so
-// "nothing below me" reads as open space rather than a phantom pile.
+// The inset panel holding the cascade. Its vertical padding is load-bearing:
+// the cards translate out of the stack's own box, so the panel has to hold
+// the room they overflow into. How much room depends on how deep the pile
+// actually is — hence the counts on the element. A three-card pile needs
+// 48px of throw; a one-card pile needs none, and reserving it anyway leaves
+// a band of empty panel between Your Standing and whatever sits above it.
+// dashboard.css maps each count to its padding.
 function StandingBoard({ standing, viewerEmail }: { standing: YourStanding; viewerEmail: string | null }) {
 	const { neighborsAbove, neighborsBelow } = standing;
-	const modifiers = [
-		neighborsAbove.length === 0 ? 'leaderboard-board--no-above' : '',
-		neighborsBelow.length === 0 ? 'leaderboard-board--no-below' : '',
-	]
-		.filter(Boolean)
-		.join(' ');
 
 	return (
-		<div className={`leaderboard-board ${modifiers}`.trim()}>
+		<div className="leaderboard-board" data-above={neighborsAbove.length} data-below={neighborsBelow.length}>
 			<ol className="leaderboard-list leaderboard-list--board">
 				<NeighborStack ranks={neighborsAbove} direction="above" />
 				<YourStandingRow standing={standing} viewerEmail={viewerEmail} />
