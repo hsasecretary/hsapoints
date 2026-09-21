@@ -15,6 +15,17 @@ export type RankGroup = {
     members: LeaderboardMember[];
 };
 
+/**
+ * A Rank adjacent to Your Standing, reduced to position and score. Deliberately
+ * carries no `members` array: identity never crosses into the neighbour path at
+ * all, so the Leaderboard's anonymity is a property of this type rather than a
+ * rendering choice a later edit could undo. See docs/adr/0002.
+ */
+export type NeighborRank = {
+    rank: number;
+    totalPoints: number;
+};
+
 export type YourStanding = {
     rank: number;
     totalPoints: number;
@@ -22,6 +33,10 @@ export type YourStanding = {
     isInTopRanks: boolean;
     /** Points needed to reach the next better Rank; null if already Rank 1. */
     pointsToNextRank: number | null;
+    /** Neighboring Ranks better than the viewer's, in board order (furthest first). */
+    neighborsAbove: NeighborRank[];
+    /** Neighboring Ranks worse than the viewer's, in board order (nearest first). */
+    neighborsBelow: NeighborRank[];
 };
 
 export type LeaderboardResult = {
@@ -32,6 +47,14 @@ export type LeaderboardResult = {
 };
 
 const TOP_RANK_CUTOFF = 5;
+
+/** How many Neighboring Ranks to expose on each side of Your Standing. */
+const NEIGHBOR_RANGE = 3;
+
+/** Strips everything but position and score — the anonymity seam. */
+function toNeighborRank(group: RankGroup): NeighborRank {
+    return { rank: group.rank, totalPoints: group.totalPoints };
+}
 
 export function buildLeaderboard(members: LeaderboardMember[], viewerEmail: string | null): LeaderboardResult {
     const sorted = [...members].sort((a, b) => {
@@ -69,6 +92,16 @@ export function buildLeaderboard(members: LeaderboardMember[], viewerEmail: stri
             members: group.members,
             isInTopRanks: group.rank <= TOP_RANK_CUTOFF,
             pointsToNextRank: nextBetterGroup ? nextBetterGroup.totalPoints - group.totalPoints : null,
+            // Fewer than NEIGHBOR_RANGE when the board runs out on that side;
+            // empty at the very top or the very bottom. The UI renders that
+            // asymmetry rather than padding it out, so an empty side reads
+            // honestly as "nobody below you".
+            neighborsAbove: groups
+                .slice(Math.max(0, viewerGroupIndex - NEIGHBOR_RANGE), viewerGroupIndex)
+                .map(toNeighborRank),
+            neighborsBelow: groups
+                .slice(viewerGroupIndex + 1, viewerGroupIndex + 1 + NEIGHBOR_RANGE)
+                .map(toNeighborRank),
         };
     }
 

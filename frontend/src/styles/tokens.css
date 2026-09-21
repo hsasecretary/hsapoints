@@ -26,6 +26,13 @@
     --hsa-teal-400: #267ba3;
     --hsa-teal-100: #e3f2fd;   /* tinted fill behind selected rows */
 
+    /* ---- Accent gold ------------------------------------------------------
+       Rank numerals only, so a Rank reads as a position rather than as more
+       brand chrome. Deliberately darker than a decorative gold: it sits on
+       white and on --hsa-surface-subtle at small sizes and has to clear AA. */
+    --hsa-gold-700: #8a6113;   /* 5.53:1 on white, 5.28:1 on -subtle, 5.04:1 on
+                                  -sunken, 4.84:1 on --hsa-teal-100 */
+
     /* ---- Neutrals (slate) -------------------------------------------------
        Text and chrome. --hsa-ink is body copy; --hsa-muted is the lightest
        grey that still passes AA on white (7.58:1), so secondary text should

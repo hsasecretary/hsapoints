@@ -26,7 +26,7 @@ A Member's numeric position on the Leaderboard, computed by sorting all Members 
 The set of Members who share the same Total Points value, and therefore the same Rank.
 
 **Leaderboard**:
-The anonymized, per-Member view of standing among all Members: shows Top Ranks by name, then Your Standing, with every other Member's identity hidden.
+The anonymized, per-Member view of standing among all Members: shows Top Ranks by name, then Your Standing surrounded by its Neighboring Ranks, with Neighboring Ranks shown as position and score only, and every other Member's identity hidden.
 
 **Top Ranks**:
 Members whose Rank is 1 through 5. May include more than five Members when a Tie Cluster spans the Rank-5 boundary.
@@ -34,3 +34,7 @@ _Avoid_: Top 5 (imprecise once ties are involved)
 
 **Your Standing**:
 The viewing Member's own Rank and Tie Cluster size on the Leaderboard, always shown regardless of whether they're also in Top Ranks.
+
+**Neighboring Ranks**:
+The Ranks immediately above and below Your Standing on the Leaderboard — up to three in each direction, one per Rank. Their Rank numbers and Total Points are shown; the Members holding them are never named or counted.
+_Avoid_: Filler rows, nearby members

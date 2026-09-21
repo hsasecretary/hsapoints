@@ -8,6 +8,7 @@ import {
 	buildLeaderboard,
 	type LeaderboardMember,
 	type LeaderboardResult,
+	type NeighborRank,
 	type RankGroup,
 	type YourStanding,
 } from '../../../lib/leaderboard';
@@ -22,11 +23,6 @@ type LeaderboardSectionProps = {
 // applies to Top Ranks — Your Standing never names other tied members,
 // regardless of tie size (CONTEXT.md: "every other Member's identity hidden").
 const TIE_COLLAPSE_THRESHOLD = 10;
-
-// Uniform, content-free rows above/below Your Standing. Fixed counts so
-// filler never encodes how large the real gap between ranks is.
-const FILLER_ROWS_ABOVE = 3;
-const FILLER_ROWS_BELOW = 3;
 
 export default function LeaderboardSection({ refreshKey = 0 }: LeaderboardSectionProps) {
 	const [leaderboard, setLeaderboard] = useState<LeaderboardResult | null>(null);
@@ -121,15 +117,11 @@ export default function LeaderboardSection({ refreshKey = 0 }: LeaderboardSectio
 						onToggle={() => toggleExpanded(group.rank)}
 					/>
 				))}
-
-				{yourStanding && !yourStanding.isInTopRanks && (
-					<>
-						<FillerRows count={FILLER_ROWS_ABOVE} keyPrefix="above" />
-						<YourStandingRow standing={yourStanding} viewerEmail={viewerEmail} />
-						<FillerRows count={FILLER_ROWS_BELOW} keyPrefix="below" />
-					</>
-				)}
 			</ol>
+
+			{yourStanding && !yourStanding.isInTopRanks && (
+				<StandingBoard standing={yourStanding} viewerEmail={viewerEmail} />
+			)}
 
 			{yourStanding && (
 				<div className="leaderboard-summary">
@@ -228,17 +220,85 @@ function YourStandingRow({ standing, viewerEmail }: { standing: YourStanding; vi
 	);
 }
 
-function FillerRows({ count, keyPrefix }: { count: number; keyPrefix: string }) {
+// The inset panel holding the cascade. Its generous vertical padding is
+// load-bearing: the deepest neighbour card translates 43px, so without room
+// to overflow into, the pile would collide with whatever sits next to it. A
+// side with no Neighboring Ranks drops both its stack and that padding, so
+// "nothing below me" reads as open space rather than a phantom pile.
+function StandingBoard({ standing, viewerEmail }: { standing: YourStanding; viewerEmail: string | null }) {
+	const { neighborsAbove, neighborsBelow } = standing;
+	const modifiers = [
+		neighborsAbove.length === 0 ? 'leaderboard-board--no-above' : '',
+		neighborsBelow.length === 0 ? 'leaderboard-board--no-below' : '',
+	]
+		.filter(Boolean)
+		.join(' ');
+
 	return (
-		<>
-			{Array.from({ length: count }, (_, i) => (
-				<li key={`${keyPrefix}-${i}`} className="leaderboard-row leaderboard-row--filler" aria-hidden="true">
-					<div className="leaderboard-row__header">
-						<span className="leaderboard-row__rank-placeholder" />
-						<span className="leaderboard-row__points-placeholder" />
-					</div>
-				</li>
-			))}
-		</>
+		<div className={`leaderboard-board ${modifiers}`.trim()}>
+			<ol className="leaderboard-list leaderboard-list--board">
+				<NeighborStack ranks={neighborsAbove} direction="above" />
+				<YourStandingRow standing={standing} viewerEmail={viewerEmail} />
+				<NeighborStack ranks={neighborsBelow} direction="below" />
+			</ol>
+		</div>
 	);
+}
+
+// Neighboring Ranks render as one physical pile rather than a flat list: the
+// card nearest Your Standing stays full size, each one further out shrinks
+// and blurs more, per the design's cascade spec (up to 3 cards/side, 17px
+// overlap step, 10% scale step, 1.8px blur step — see the
+// --offset/--scale/--blur/--opacity rules in dashboard.css).
+//
+// Each card shows its real Rank and real Total Points. Where a name would go
+// sits a smear instead: this component is never handed one (see NeighborRank).
+function NeighborStack({ ranks, direction }: { ranks: NeighborRank[]; direction: 'above' | 'below' }) {
+	if (ranks.length === 0) return null;
+
+	return (
+		<li className={`leaderboard-stack leaderboard-stack--${direction}`} aria-hidden="true">
+			{ranks.map((neighbor, i) => {
+				const depth = direction === 'above' ? ranks.length - i : i + 1;
+				return (
+					<div key={neighbor.rank} className="leaderboard-row leaderboard-row--neighbor" data-depth={depth}>
+						<span className="leaderboard-row__rank">#{neighbor.rank}</span>
+						<NameSmear seed={neighbor.rank} />
+						<span className="leaderboard-row__score">{neighbor.totalPoints}</span>
+					</div>
+				);
+			})}
+		</li>
+	);
+}
+
+// Stands in for the redacted name. Two or three soft-edged segments imitate
+// word spacing; widths are seeded off the Rank so the silhouette is stable
+// across renders but no two cards in a pile match — a uniform bar would read
+// as a skeleton loader still waiting on data.
+function NameSmear({ seed }: { seed: number }) {
+	return (
+		<span className="leaderboard-row__smear">
+			{smearSegments(seed).map((width, i) => (
+				<span key={i} className="leaderboard-row__smear-seg" style={{ width: `${width}%` }} />
+			))}
+		</span>
+	);
+}
+
+// Lehmer generator, seeded by Rank. Nothing here derives from a real name —
+// the widths are decorative noise, not an encoding of anything.
+function smearSegments(seed: number): number[] {
+	let state = (Math.abs(seed) * 48271) % 2147483647 || 1;
+	const next = () => {
+		state = (state * 48271) % 2147483647;
+		return state / 2147483647;
+	};
+
+	const count = next() < 0.45 ? 2 : 3;
+	const weights = Array.from({ length: count }, () => 0.5 + next());
+	const total = weights.reduce((sum, weight) => sum + weight, 0);
+	// Leave the last few percent of the slot empty so the smear stops short of
+	// the score, the way a short name would.
+	return weights.map((weight) => (weight / total) * (88 - count * 3));
 }
