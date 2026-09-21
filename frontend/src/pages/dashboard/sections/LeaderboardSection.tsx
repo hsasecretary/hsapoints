@@ -221,7 +221,7 @@ function YourStandingRow({ standing, viewerEmail }: { standing: YourStanding; vi
 }
 
 // The inset panel holding the cascade. Its generous vertical padding is
-// load-bearing: the deepest neighbour card translates 65px, so without room
+// load-bearing: the deepest neighbour card translates 48px, so without room
 // to overflow into, the pile would collide with whatever sits next to it. A
 // side with no Neighboring Ranks drops both its stack and that padding, so
 // "nothing below me" reads as open space rather than a phantom pile.
@@ -246,8 +246,8 @@ function StandingBoard({ standing, viewerEmail }: { standing: YourStanding; view
 }
 
 // Neighboring Ranks render as one physical pile rather than a flat list: the
-// card nearest Your Standing stays full size and sharp, each one further out
-// shrinks and blurs more, per the design's cascade spec (up to 3 cards/side,
+// card nearest Your Standing stays full size and tucks under the viewer's own
+// row, and each one further out shrinks and blurs more, per the cascade spec (up to 3 cards/side,
 // 28px overlap step, 10% scale step, 1.8px blur step — see the
 // --offset/--scale/--blur/--opacity rules in dashboard.css).
 //
