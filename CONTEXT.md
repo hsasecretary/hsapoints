@@ -16,8 +16,16 @@ A Member with no cabinet role and no e-board role (`isGeneralMember()`).
 **Cabinet Member**:
 A Member approved onto a cabinet. The roster is set at the start of the year and never grows mid-year, so every Core Event of the year applies to every Cabinet Member.
 
+**MLP Member**:
+A General Member taking part in MLP. Not the same as a Cabinet Member on the MLP Fall or MLP Spring cabinet, who runs MLP.
+_Avoid_: MLP cabinet (for program members)
+
 **MLP Cohort**:
 Whether an MLP Member joined in the fall or the spring. MLP Spring members need only 8 Voter Eligible Points.
+
+**MLP Program**:
+MLP Fall or MLP Spring, each run by its own cabinet. An MLP Open event records which MLP Program hosted it; that changes no points or requirements.
+_Avoid_: Cohort (for the program that hosted an event)
 
 **E-Board**:
 Members on the executive board. Exempt from Core Events, Semester Requirements and Strikes; they may still redeem codes to follow their own progress, but nothing is required of them.
@@ -25,12 +33,19 @@ Members on the executive board. Exempt from Core Events, Semester Requirements a
 ### Events and points
 
 **Event Type**:
-A row of the point rubric (e.g. GBM, HSA Fundraiser, Tabling) that fixes an event's Cabinet Points, its Voter Eligible Points, and whether it is a Core Event, a Semester Requirement or an Additional Event. E-Board picks an Event Type for each event; nobody sets those values per event.
+A row of the point rubric (e.g. GBM, HSA Fundraiser, Tabling) that fixes an event's Cabinet Points, its Voter Eligible Points, and whether it is a Core Event, a Semester Requirement or an Additional Event. E-Board picks an Event Type for each event; nobody sets those values per event. There is one rubric for everyone: a GBM is worth 2 VE Points to a General Member and a Cabinet Member alike. The rubric holds for the whole year; if it ever changes, every past Attendance is re-scored under the new values.
 _Avoid_: Category (the old free-form label), cabinet-required flag
+
+**Cabinet-only Event Type**:
+An Event Type only Cabinet Members can earn, by code or Point Request: Cabinet Thursday, Cabinet Retreat, Cabinet Orientation.
 
 **Attendance**:
 A Member's credit for one event, however it arrived: a redeemed code, an approved point request, or E-Board entering it directly. Every Attendance earns its Event Type's points, even when it is also used as a Make-up.
 _Avoid_: Redemption (only one of the ways Attendance arrives)
+
+**Point Request**:
+A Member's claim, with photo proof, that they attended an event, usually one whose code they didn't redeem on the day. When the event had a code, the request names that event, and approving it counts exactly as redeeming its code. Once E-Board approves it and confirms its Event Type, it is an Attendance like any other. A request that fits no Event Type is denied or turned into an Adjustment.
+_Avoid_: Manual points
 
 **Adjustment**:
 Points E-Board added by hand that don't trace back to any event, carried with a note of why.
@@ -56,7 +71,8 @@ The events a Cabinet Member attends every one of over the year: Cabinet Thursday
 _Avoid_: Required events, cabinet-required events
 
 **Semester Requirements** (Tier 2):
-One of each per semester: OPA General, OPA Solidarity Session, HSA Programming, HSA Operations, HSA Fundraising, HSA Service, Affiliate Org event (waived for Cabinet Members in MLP), Tabling (1 hour), Internal Social, External Social.
+One of each per semester: OPA General, OPA Solidarity Session, HSA Programming, HSA Operations, HSA Fundraising, HSA Service, Affiliate Org event (waived for Cabinet Members on the MLP Fall or MLP Spring cabinet; any HLHM event also counts as one, without earning its points twice), Tabling (1 hour; each hour tabled is its own Attendance), Internal Social, External Social. The two socials are separate requirements, shown together as Socials.
+_Avoid_: Cabinet social (that's External Social)
 
 **Additional Events** (Make-up Events):
 Events whose job is to make up a Missed Event or clear a Strike: additional tabling hours, MLP open events, additional HSA fundraisers, additional OPA or programming events, additional affiliate org events, CRASH events.
