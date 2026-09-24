@@ -44,7 +44,7 @@ A Member's credit for one event, however it arrived: a redeemed code, an approve
 _Avoid_: Redemption (only one of the ways Attendance arrives)
 
 **Point Request**:
-A Member's claim, with photo proof, that they attended an event, usually one whose code they didn't redeem on the day. When the event had a code, the request names that event, and approving it counts exactly as redeeming its code. Once E-Board approves it and confirms its Event Type, it is an Attendance like any other. A request that fits no Event Type is denied or turned into an Adjustment.
+A Member's claim, with photo proof, that they attended an event, usually one whose code they didn't redeem on the day. When the event had a code, the request names that event, and approving it counts exactly as redeeming its code. When a Semester Requirement or Additional Event has no code yet, the request gives the event's name and date instead; if E-Board later creates a code for that event, it may attach the request to it when approving, which then counts as redeeming that code. Once E-Board approves it and confirms its Event Type, it is an Attendance like any other. A request that fits no Event Type is denied or turned into an Adjustment.
 _Avoid_: Manual points
 
 **Adjustment**:
@@ -71,23 +71,26 @@ The events a Cabinet Member attends every one of over the year: Cabinet Thursday
 _Avoid_: Required events, cabinet-required events
 
 **Semester Requirements** (Tier 2):
-One of each per semester: OPA General, OPA Solidarity Session, HSA Programming, HSA Operations, HSA Fundraising, HSA Service, Affiliate Org event (waived for Cabinet Members on the MLP Fall or MLP Spring cabinet; any HLHM event also counts as one, without earning its points twice), Tabling (1 hour; each hour tabled is its own Attendance), Internal Social, External Social. The two socials are separate requirements, shown together as Socials.
+One of each per semester: OPA General, OPA Solidarity Session, HSA Programming, HSA Operations, HSA Fundraising, HSA Service, Affiliate Org event (waived for Cabinet Members on the MLP Fall or MLP Spring cabinet; an HLHM event does not count, since HLHM is a program, not an affiliate), Tabling (1 hour; each hour tabled is its own Attendance), Internal Social, External Social. The two socials are separate requirements, shown together as Socials.
 _Avoid_: Cabinet social (that's External Social)
 
 **Additional Events** (Make-up Events):
 Events whose job is to make up a Missed Event or clear a Strike: additional tabling hours, MLP open events, additional HSA fundraisers, additional OPA or programming events, additional affiliate org events, CRASH events.
 
 **Missed Event**:
-A Core Event that has happened and that the Cabinet Member didn't attend. Excused or not, it must be made up.
+A Core Event that has happened and that the Cabinet Member didn't attend. Excused or not, it must be made up. Every Core Event gets a code; a Core Event E-Board never coded is not a Missed Event for anyone, so no Member is penalised for it.
 
 **Excused Absence**:
-A Missed Event E-Board marked excused. It still needs a Make-up, but earns no Strike.
+A Missed Event E-Board marked excused. It still needs a Make-up, but earns no Strike. Only E-Board and the backend see the excused/unexcused split; Members just see Missed Events and their Strike count.
 
 **Strike**:
-The mark an unexcused Missed Event earns. Three Strikes means a conversation with the Chief of Staff. Cleared by a Make-up, or removed by E-Board with a recorded reason.
+The mark an unexcused Missed Event earns. A Member's Strike count is their open Strikes: it goes up with each unexcused Missed Event and down with each Make-up or removal, with no upper limit. At three or more open Strikes, a Cabinet Member is at risk of probation and must meet with the Chief of Staff. Cleared by a Make-up, or removed by E-Board with a recorded reason; removing a Strike does not close its Missed Event, which still needs a Make-up unless E-Board overrides the Missed Event itself.
+
+**Surplus Attendance**:
+An Attendance beyond what a requirement needs: any Additional Event, a Semester Requirement event after the first of that Semester (by event date), or an HLHM event after the first of the year. Other Core Event Attendance is never surplus. A surplus Attendance still earns its Cabinet and VE Points.
 
 **Make-up**:
-Crediting one Attendance against a Missed Event and, when it was unexcused, its Strike — one event covers both at once. Sources are Additional Events, a Semester Requirement event beyond the one that semester needs, or an HLHM event beyond the first. Applied automatically, oldest unexcused Missed Event first, and the Member is shown which Missed Event and Strike each one covered.
+A Surplus Attendance credited against a Missed Event and, when that miss was unexcused, its Strike — one event covers both at once. Applied automatically, oldest unexcused Missed Event first, then the oldest excused one; a Surplus Attendance counts whether it happened before or after the Missed Event. A Member may name the Missed Event when submitting a Point Request (for a request covering several tabling hours, one per hour); an approved request's pick is honoured first. Only approved Attendance counts, never a pending request. The Member is shown which Missed Event and Strike each Make-up covered, never whether the miss was excused.
 
 ### Leaderboard
 

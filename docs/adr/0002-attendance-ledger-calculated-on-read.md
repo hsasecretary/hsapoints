@@ -1,0 +1,14 @@
+# Points are calculated on read from an Attendance ledger
+
+The new point system (Cabinet Points, VE Points, Missed Events, Strikes, Make-ups) must re-score every Member whenever the rubric changes. Stored counters (`gbmPointsVE`, `fallPoints`, `eventCodes`, ...) can't do that: they bake the old rubric into each user doc and are incremented by a long per-category if/else in the browser. So we store facts and calculate everything else.
+
+**Decision**
+
+- **Attendance ledger.** One top-level `attendances/{id}` doc per Attendance: `email`, `eventTypeId`, `eventDate`, `source` (`code` | `request` | `eboard`), `codeId?`, `requestId?`, `makeupFor?`. The ID is `{email}__{CODE}` when the event had a code (an approved Point Request naming a coded event uses the same ID, so it counts exactly as redeeming and can't double-count), `{email}__req-{requestId}` for a request with no code, and `{email}__eb-{autoId}` for E-Board bulk entry. Attendance never copies points.
+- **Rubric is a code constant** (`lib/rubric.ts`), fixed for the year. A `codes/{CODE}` doc stores `eventTypeId`, `eventDate`, `event`, `attendeeCount`; Semester is derived from `eventDate`. Changing the rubric is a deploy; every Member re-scores automatically.
+- **Calculated on read, no stored totals.** One pure module, `computeStanding(member, attendances, rubric, codes) -> Standing` (Cabinet Points, VE Points, Missed Events, Strikes, Make-ups), runs in the browser for the dashboard and E-Board views and in Node for migration checks and the reconcile script. There are no Cloud Functions.
+- **Per-Member facts stay on `users/{email}`, E-Board-writable:** `mlpCohort`, `heldToCabinetRules`, `excusedCodeIds[]`, `strikeRemovals[{codeId, reason}]`, `missedEventOverrides[{codeId, reason}]`, `adjustments[{points, note, date}]`.
+- **Leaderboard reads a projection.** Members can't list `users` (see `firestore.rules`), and ranking from raw Attendance would cost ~N x events reads per load. `standings/{email}` holds `displayName`, `totalPoints`, `updatedAt`, readable by any signed-in Member. A Member's own client refreshes their doc on dashboard load; E-Board refreshes others' on approvals, bulk entry and rubric changes; a reconcile script rebuilds all of them.
+- **Rules.** A Member may create an `attendances` doc only for themselves with `source: 'code'`, whose ID, `eventTypeId` and `eventDate` match the `codes` doc. Request/eboard sources and all updates/deletes are E-Board-only. Members read only their own Attendance. After cut-over, the point counters leave `selfUpdateAllowedFields`.
+
+**Consequences.** Without a server, a Member can still forge their own `standings` score (display only; the reconcile script overwrites it) — the same trust level as the old self-writable counters. If the Leaderboard ever needs to be tamper-proof, Cloud Functions can sit behind the same `computeStanding` interface.
