@@ -91,7 +91,6 @@ function EditableCodesTable({ refreshKey = 0 }: EditableCodesTableProps) {
             await updateDoc(codeDocRef, {
                 event: editData.event,
                 category: editData.category,
-                graphicDate: editData.graphicDate,
                 eventDate: editData.eventDate,
                 points: parseInt(editData.points),
                 voterEligible: editData.voterEligible,
@@ -186,8 +185,8 @@ function EditableCodesTable({ refreshKey = 0 }: EditableCodesTableProps) {
                             <th>Event</th>
                             <th>Category</th>
                             <th>Event Date</th>
-                            <th>Graphic Date</th>
                             <th>Points</th>
+                            <th>Attendees</th>
                             <th>Semester</th>
                             <th>Voter Eligible</th>
                             <th>Cabinet Required</th>
@@ -242,14 +241,6 @@ function EditableCodesTable({ refreshKey = 0 }: EditableCodesTableProps) {
                                                 className="edit-input"
                                             />
                                         </td>
-                                        <td className="cell-detail" data-label="Graphic Date">
-                                            <input
-                                                type="text"
-                                                value={editData.graphicDate || ''}
-                                                onChange={(e) => handleInputChange('graphicDate', e.target.value)}
-                                                className="edit-input"
-                                            />
-                                        </td>
                                         <td className="cell-points" data-label="Points">
                                             <input
                                                 type="number"
@@ -260,6 +251,8 @@ function EditableCodesTable({ refreshKey = 0 }: EditableCodesTableProps) {
                                                 max="10"
                                             />
                                         </td>
+                                        {/* Read-only: redemptions bump this, so it's never part of the save. */}
+                                        <td className="cell-detail" data-label="Attendees">{code.attendeeCount ?? 0}</td>
                                         <td className="cell-detail" data-label="Semester">
                                             <select
                                                 value={editData.semester || ''}
@@ -297,8 +290,8 @@ function EditableCodesTable({ refreshKey = 0 }: EditableCodesTableProps) {
                                         <td className="cell-event" data-label="Event">{code.event}</td>
                                         <td className="cell-detail" data-label="Category">{code.category}</td>
                                         <td className="cell-detail" data-label="Event Date">{code.eventDate}</td>
-                                        <td className="cell-detail" data-label="Graphic Date">{code.graphicDate}</td>
                                         <td className="cell-points" data-label="Points">{code.points}</td>
+                                        <td className="cell-detail" data-label="Attendees">{code.attendeeCount ?? 0}</td>
                                         <td className="cell-detail" data-label="Semester">{code.semester === 'fallPoints' ? 'Fall' : 'Spring'}</td>
                                         <td className="cell-detail" data-label="Voter Eligible">
                                             <span className={`badge ${code.voterEligible ? 'badge-yes' : 'badge-no'}`}>
