@@ -31,7 +31,7 @@ Where attendance for events before the site had codes for them lives, so the mig
 
 Firestore has 74 users holding a cabinet value, so each form is short of the full roster by 11–22 people. Only 29 people are on both the Orientation and Retreat forms, 36 on Orientation and Aug 27, 39 on Retreat and Aug 27.
 
-**Excuses: none recorded.** No form asked for an excuse, and the one Retreat "No" has no reason attached. No "Valid Excuse Form" responses were among what E-Board sent. Under the policy an excuse had to reach the Secretary before the event, so if that form was live on Jul 30 / Aug 22, its responses are the only place excuses for these two events can be.
+**Excuses: none recorded.** No form asked for an excuse, and the one Retreat "No" has no reason attached. No "Valid Excuse Form" responses were among what E-Board sent. Under the policy an excuse had to reach the Secretary before the event, so if that form was live on Jul 30 / Aug 22, its responses are the only place excuses for these two events can be. _Deliberately left for later:_ those responses will be entered after the new system ships, as a bulk test of Excused Absences and Strike removal.
 
 ## What the migration has to deal with
 

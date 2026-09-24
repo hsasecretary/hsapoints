@@ -4,7 +4,7 @@ Transcribed from the two source documents E-Board sent over (received 2026-09-24
 
 ## Attendance policy (the signed contract)
 
-In effect from September 20, 2026 (the document calls it "Monday", but that date is a Sunday). Applies to E-Board and Cabinet.
+In effect from Monday, September 21, 2026 (the document says September 20th, which is a Sunday; corrected per E-Board). Applies to E-Board and Cabinet.
 
 **Required events** (glossary: Core Events)
 1. HSA Cabinet Thursdays
@@ -96,11 +96,11 @@ Total: 15 (8 for spring MLPers).
 
 ## Where the sources disagree
 
-Raised for E-Board; nothing here changes `CONTEXT.md` until they answer.
+Raised for E-Board; nothing here changes `CONTEXT.md` until they answer. Settled items are marked.
 
-1. **MLP Spring VE threshold:** the Cabinet System tab says 10, the Voter Eligibility tab says 8. The glossary uses 8.
+1. **MLP Spring VE threshold:** _Settled: 8._ The Cabinet System tab's 10 is a mistake in the sheet; the glossary's 8 stands.
 2. **HLHM frequency:** the policy says one HLHM event (for the year); the sheet says once per semester. The glossary uses one per year.
-3. **Probation gates graduation:** the policy withholds Cabinet completion from anyone still on probation. The glossary says Core Events and Semester Requirements "do not gate" Graduating Cabinet; 3+ open Strikes (probation) may need to.
+3. **Probation gates graduation:** _Settled: not a feature._ The policy withholds Cabinet completion from anyone still on probation, but this is rarely enforced, so the system does not model it; Graduating Cabinet stays 20 Cabinet Points only.
 4. **Socials:** the policy's two socials are *Internal HSA* and *Cabinet-Specific*; the sheet's notes define three (External, Internal, Cabinet-specific). The glossary's pair is Internal + External, which doesn't line up with the policy's names.
 5. **"Max" 20 Cabinet Points:** the sheet says max, the policy says 20 must be earned. The glossary treats 20 as the target, not a cap.
 6. **Excuse deadline:** the policy requires the excuse *before* the event; the glossary has no deadline rule for an Excused Absence.
