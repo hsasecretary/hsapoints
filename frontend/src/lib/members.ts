@@ -15,3 +15,15 @@ export function isGeneralMember(member: MemberDoc): boolean {
     }
     return (member.cabinet ?? 'none') === 'none' && !member.eboard;
 }
+
+/** Held to the Cabinet Member rules (Core Events, Semester Requirements,
+ *  Strikes, Cabinet-only Event Types): Cabinet Members and Web-team Testers.
+ *  E-Board sets `heldToCabinetRules`; until the migration (#77) backfills it,
+ *  fall back to the rule the migration uses: approved onto a cabinet and not
+ *  on E-Board. */
+export function isHeldToCabinetRules(
+    member: MemberDoc & { approved?: boolean; heldToCabinetRules?: boolean },
+): boolean {
+    if (typeof member.heldToCabinetRules === 'boolean') return member.heldToCabinetRules;
+    return (member.cabinet ?? 'none') !== 'none' && member.approved === true && !member.eboard;
+}
