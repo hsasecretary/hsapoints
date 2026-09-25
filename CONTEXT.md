@@ -30,6 +30,13 @@ _Avoid_: Cohort (for the program that hosted an event)
 **E-Board**:
 Members on the executive board. Exempt from Core Events, Semester Requirements and Strikes; they may still redeem codes to follow their own progress, but nothing is required of them.
 
+**Web-team Tester**:
+A Member on the web team who is held to the Cabinet Member rules so the Cabinet view can be tested on a real account. Not the same as E-Board: being a tester grants no E-Board tools.
+
+**Own View**:
+The dashboard a Member is really held to: the General Member view for General Members, MLP Members and E-Board; the Cabinet Member view for Cabinet Members and Web-team Testers. E-Board and Web-team Testers may switch to the other view to check it works; the dashboard always marks which one is their Own View.
+_Avoid_: Role (a view is what is shown, not what the Member is)
+
 ### Events and points
 
 **Event Type**:
@@ -62,7 +69,7 @@ Another name for Voter Eligible Points — the label E-Board uses today, kept fo
 _Avoid_: Using it to mean Cabinet Points
 
 **Graduating Cabinet**:
-Reaching 20 Cabinet Points. Core Events and Semester Requirements are tracked but do not gate it.
+Reaching 20 Cabinet Points. 20 is a target, not a cap: Cabinet Points keep counting past it. Core Events and Semester Requirements are tracked but do not gate it.
 
 ### Cabinet requirements
 
@@ -84,13 +91,13 @@ A social HSA publicizes and opens to everyone (e.g. the Open House Social). An A
 Events whose job is to make up a Missed Event or clear a Strike: additional tabling hours, MLP open events, additional HSA fundraisers, additional OPA or programming events, additional affiliate org events, CRASH events, External Socials.
 
 **Missed Event**:
-A Core Event that has happened and that the Cabinet Member didn't attend. Excused or not, it must be made up. Every Core Event gets a code; a Core Event E-Board never coded is not a Missed Event for anyone, so no Member is penalised for it.
+A Core Event that has happened and that the Cabinet Member didn't attend. Excused or not, it must be made up. Every Core Event gets a code; a Core Event E-Board never coded is not a Missed Event for anyone, so no Member is penalised for it. A Missed Event stays owed across Semesters: a fall miss still open in the spring can be made up then.
 
 **Excused Absence**:
-A Missed Event E-Board marked excused. It still needs a Make-up, but earns no Strike. Only E-Board and the backend see the excused/unexcused split; Members just see Missed Events and their Strike count.
+A Missed Event E-Board marked excused. It still needs a Make-up, but earns no Strike. The policy asks for the excuse before the event; E-Board judges that when marking it, and the system sets no deadline. Only E-Board and the backend see the excused/unexcused split; Members just see Missed Events and their Strike count.
 
 **Strike**:
-The mark an unexcused Missed Event earns. A Member's Strike count is their open Strikes: it goes up with each unexcused Missed Event and down with each Make-up or removal, with no upper limit. At three or more open Strikes, a Cabinet Member is at risk of probation and must meet with the Chief of Staff. Cleared by a Make-up, or removed by E-Board with a recorded reason; removing a Strike does not close its Missed Event, which still needs a Make-up unless E-Board overrides the Missed Event itself.
+The mark an unexcused Missed Event earns. A Member's Strike count is their open Strikes: it goes up with each unexcused Missed Event and down with each Make-up or removal, with no upper limit. Strikes never reset: open fall Strikes carry into the spring. At three or more open Strikes, a Cabinet Member is at risk of probation and must meet with the Chief of Staff. Cleared by a Make-up, or removed by E-Board with a recorded reason; removing a Strike does not close its Missed Event, which still needs a Make-up unless E-Board overrides the Missed Event itself.
 
 **Surplus Attendance**:
 An Attendance beyond what a requirement needs: any Additional Event, a Semester Requirement event after the first of that Semester (by event date), or an HLHM event after the first of the year. Other Core Event Attendance is never surplus. A surplus Attendance still earns its Cabinet and VE Points.
