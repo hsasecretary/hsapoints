@@ -101,6 +101,6 @@ Raised for E-Board; nothing here changes `CONTEXT.md` until they answer. Settled
 1. **MLP Spring VE threshold:** _Settled: 8._ The Cabinet System tab's 10 is a mistake in the sheet; the glossary's 8 stands.
 2. **HLHM frequency:** the policy says one HLHM event (for the year); the sheet says once per semester. The glossary uses one per year.
 3. **Probation gates graduation:** _Settled: not a feature._ The policy withholds Cabinet completion from anyone still on probation, but this is rarely enforced, so the system does not model it; Graduating Cabinet stays 20 Cabinet Points only.
-4. **Socials:** the policy's two socials are *Internal HSA* and *Cabinet-Specific*; the sheet's notes define three (External, Internal, Cabinet-specific). The glossary's pair is Internal + External, which doesn't line up with the policy's names.
+4. **Socials:** _Settled: Internal Social = open only to Cabinet (a Semester Requirement); External Social = publicized and open to everyone, now an Additional Event, not a requirement._ Originally: the policy's two socials are *Internal HSA* and *Cabinet-Specific*; the sheet's notes define three (External, Internal, Cabinet-specific). The glossary's pair is Internal + External, which doesn't line up with the policy's names.
 5. **"Max" 20 Cabinet Points:** the sheet says max, the policy says 20 must be earned. The glossary treats 20 as the target, not a cap.
 6. **Excuse deadline:** the policy requires the excuse *before* the event; the glossary has no deadline rule for an Excused Absence.

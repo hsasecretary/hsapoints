@@ -39,5 +39,5 @@ Firestore has 74 users holding a cabinet value, so each form is short of the ful
 2. **The Aug 27 Cabinet Thursday isn't in Firestore.** The two Cabinet codes there are 09/10 and 09/17, so Aug 27 (and any Cabinet Thursday between it and 09/10) exists only as a form. It needs a code or ledger entry of its own, or the migration will count nobody as having attended it.
 3. **A missing name is not yet a Missed Event.** People absent from a form may have been excused, may not have been on Cabinet yet (Orientation was in July), or may have filled in the form with an email that doesn't match. With no excuse records, turning absences into Strikes retroactively needs E-Board to confirm the roster for each date first.
 4. **The one Retreat "No"** is a response that must *not* become Attendance.
-5. **Open House Social is a social**, not a cabinet event. Which social Event Type it is (Internal or External) is an E-Board call; see disagreement 4 in [the policy transcription](../policy/cabinet-attendance-policy-2026-27.md#where-the-sources-disagree).
+5. **Open House Social is an External Social** (publicized, open to everyone): an Additional Event, not a cabinet event. Settled in [#44](https://github.com/hsasecretary/hsapoints/issues/44).
 6. **The Orientation duplicate** must collapse to one Attendance (the ledger's deterministic ID already guarantees this).

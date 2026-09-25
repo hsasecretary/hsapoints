@@ -71,11 +71,17 @@ The events a Cabinet Member attends every one of over the year: Cabinet Thursday
 _Avoid_: Required events, cabinet-required events
 
 **Semester Requirements** (Tier 2):
-One of each per semester: OPA General, OPA Solidarity Session, HSA Programming, HSA Operations, HSA Fundraising, HSA Service, Affiliate Org event (waived for Cabinet Members on the MLP Fall or MLP Spring cabinet; an HLHM event does not count, since HLHM is a program, not an affiliate), Tabling (1 hour; each hour tabled is its own Attendance), Internal Social, External Social. The two socials are separate requirements, shown together as Socials.
-_Avoid_: Cabinet social (that's External Social)
+One of each per semester: OPA General, OPA Solidarity Session, HSA Programming, HSA Operations, HSA Fundraising, HSA Service, Affiliate Org event (waived for Cabinet Members on the MLP Fall or MLP Spring cabinet; an HLHM event does not count, since HLHM is a program, not an affiliate), Tabling (1 hour; each hour tabled is its own Attendance), Internal Social.
+
+**Internal Social**:
+A social open only to Cabinet Members, not the general public (e.g. the Lake Wauburg trip). A Semester Requirement.
+_Avoid_: Cabinet social
+
+**External Social**:
+A social HSA publicizes and opens to everyone (e.g. the Open House Social). An Additional Event, not a Semester Requirement.
 
 **Additional Events** (Make-up Events):
-Events whose job is to make up a Missed Event or clear a Strike: additional tabling hours, MLP open events, additional HSA fundraisers, additional OPA or programming events, additional affiliate org events, CRASH events.
+Events whose job is to make up a Missed Event or clear a Strike: additional tabling hours, MLP open events, additional HSA fundraisers, additional OPA or programming events, additional affiliate org events, CRASH events, External Socials.
 
 **Missed Event**:
 A Core Event that has happened and that the Cabinet Member didn't attend. Excused or not, it must be made up. Every Core Event gets a code; a Core Event E-Board never coded is not a Missed Event for anyone, so no Member is penalised for it.
