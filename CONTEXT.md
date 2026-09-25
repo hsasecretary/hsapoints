@@ -16,21 +16,43 @@ A Member with no cabinet role and no e-board role (`isGeneralMember()`).
 **Cabinet Member**:
 A Member approved onto a cabinet. The roster is set at the start of the year and never grows mid-year, so every Core Event of the year applies to every Cabinet Member.
 
+**MLP Member**:
+A General Member taking part in MLP. Not the same as a Cabinet Member on the MLP Fall or MLP Spring cabinet, who runs MLP.
+_Avoid_: MLP cabinet (for program members)
+
 **MLP Cohort**:
 Whether an MLP Member joined in the fall or the spring. MLP Spring members need only 8 Voter Eligible Points.
+
+**MLP Program**:
+MLP Fall or MLP Spring, each run by its own cabinet. An MLP Open event records which MLP Program hosted it; that changes no points or requirements.
+_Avoid_: Cohort (for the program that hosted an event)
 
 **E-Board**:
 Members on the executive board. Exempt from Core Events, Semester Requirements and Strikes; they may still redeem codes to follow their own progress, but nothing is required of them.
 
+**Web-team Tester**:
+A Member on the web team who is held to the Cabinet Member rules so the Cabinet view can be tested on a real account. Not the same as E-Board: being a tester grants no E-Board tools.
+
+**Own View**:
+The dashboard a Member is really held to: the General Member view for General Members, MLP Members and E-Board; the Cabinet Member view for Cabinet Members and Web-team Testers. E-Board and Web-team Testers may switch to the other view to check it works; the dashboard always marks which one is their Own View.
+_Avoid_: Role (a view is what is shown, not what the Member is)
+
 ### Events and points
 
 **Event Type**:
-A row of the point rubric (e.g. GBM, HSA Fundraiser, Tabling) that fixes an event's Cabinet Points, its Voter Eligible Points, and whether it is a Core Event, a Semester Requirement or an Additional Event. E-Board picks an Event Type for each event; nobody sets those values per event.
+A row of the point rubric (e.g. GBM, HSA Fundraiser, Tabling) that fixes an event's Cabinet Points, its Voter Eligible Points, and whether it is a Core Event, a Semester Requirement or an Additional Event. E-Board picks an Event Type for each event; nobody sets those values per event. There is one rubric for everyone: a GBM is worth 2 VE Points to a General Member and a Cabinet Member alike. The rubric holds for the whole year; if it ever changes, every past Attendance is re-scored under the new values.
 _Avoid_: Category (the old free-form label), cabinet-required flag
+
+**Cabinet-only Event Type**:
+An Event Type only Cabinet Members can earn, by code or Point Request: Cabinet Thursday, Cabinet Retreat, Cabinet Orientation, Internal Social.
 
 **Attendance**:
 A Member's credit for one event, however it arrived: a redeemed code, an approved point request, or E-Board entering it directly. Every Attendance earns its Event Type's points, even when it is also used as a Make-up.
 _Avoid_: Redemption (only one of the ways Attendance arrives)
+
+**Point Request**:
+A Member's claim, with photo proof, that they attended an event, usually one whose code they didn't redeem on the day. When the event had a code, the request names that event, and approving it counts exactly as redeeming its code. When a Semester Requirement or Additional Event has no code yet, the request gives the event's name and date instead; if E-Board later creates a code for that event, it may attach the request to it when approving, which then counts as redeeming that code. Once E-Board approves it and confirms its Event Type, it is an Attendance like any other. A request that fits no Event Type is denied or turned into an Adjustment.
+_Avoid_: Manual points
 
 **Adjustment**:
 Points E-Board added by hand that don't trace back to any event, carried with a note of why.
@@ -47,7 +69,7 @@ Another name for Voter Eligible Points — the label E-Board uses today, kept fo
 _Avoid_: Using it to mean Cabinet Points
 
 **Graduating Cabinet**:
-Reaching 20 Cabinet Points. Core Events and Semester Requirements are tracked but do not gate it.
+Reaching 20 Cabinet Points. 20 is a target, not a cap: Cabinet Points keep counting past it. Core Events and Semester Requirements are tracked but do not gate it.
 
 ### Cabinet requirements
 
@@ -56,22 +78,32 @@ The events a Cabinet Member attends every one of over the year: Cabinet Thursday
 _Avoid_: Required events, cabinet-required events
 
 **Semester Requirements** (Tier 2):
-One of each per semester: OPA General, OPA Solidarity Session, HSA Programming, HSA Operations, HSA Fundraising, HSA Service, Affiliate Org event (waived for Cabinet Members in MLP), Tabling (1 hour), Internal Social, External Social.
+One of each per semester: OPA General, OPA Solidarity Session, HSA Programming, HSA Operations, HSA Fundraising, HSA Service, Affiliate Org event (waived for Cabinet Members on the MLP Fall or MLP Spring cabinet; an HLHM event does not count, since HLHM is a program, not an affiliate), Tabling (1 hour; each hour tabled is its own Attendance), Internal Social.
+
+**Internal Social**:
+A social open only to Cabinet Members, not the general public (e.g. the Lake Wauburg trip). A Semester Requirement.
+_Avoid_: Cabinet social
+
+**External Social**:
+A social HSA publicizes and opens to everyone (e.g. the Open House Social). An Additional Event, not a Semester Requirement.
 
 **Additional Events** (Make-up Events):
-Events whose job is to make up a Missed Event or clear a Strike: additional tabling hours, MLP open events, additional HSA fundraisers, additional OPA or programming events, additional affiliate org events, CRASH events.
+Events whose job is to make up a Missed Event or clear a Strike: additional tabling hours, MLP open events, additional HSA fundraisers, additional OPA or programming events, additional affiliate org events, CRASH events, External Socials.
 
 **Missed Event**:
-A Core Event that has happened and that the Cabinet Member didn't attend. Excused or not, it must be made up.
+A Core Event that has happened and that the Cabinet Member didn't attend. Excused or not, it must be made up. Every Core Event gets a code; a Core Event E-Board never coded is not a Missed Event for anyone, so no Member is penalised for it. A Missed Event stays owed across Semesters: a fall miss still open in the spring can be made up then.
 
 **Excused Absence**:
-A Missed Event E-Board marked excused. It still needs a Make-up, but earns no Strike.
+A Missed Event E-Board marked excused. It still needs a Make-up, but earns no Strike. The policy asks for the excuse before the event; E-Board judges that when marking it, and the system sets no deadline. Only E-Board and the backend see the excused/unexcused split; Members just see Missed Events and their Strike count.
 
 **Strike**:
-The mark an unexcused Missed Event earns. Three Strikes means a conversation with the Chief of Staff. Cleared by a Make-up, or removed by E-Board with a recorded reason.
+The mark an unexcused Missed Event earns. A Member's Strike count is their open Strikes: it goes up with each unexcused Missed Event and down with each Make-up or removal, with no upper limit. Strikes never reset: open fall Strikes carry into the spring. At three or more open Strikes, a Cabinet Member is at risk of probation and must meet with the Chief of Staff. Cleared by a Make-up, or removed by E-Board with a recorded reason; removing a Strike does not close its Missed Event, which still needs a Make-up unless E-Board overrides the Missed Event itself.
+
+**Surplus Attendance**:
+An Attendance beyond what a requirement needs: any Additional Event, a Semester Requirement event after the first of that Semester (by event date), or an HLHM event after the first of the year. Other Core Event Attendance is never surplus. A surplus Attendance still earns its Cabinet and VE Points.
 
 **Make-up**:
-Crediting one Attendance against a Missed Event and, when it was unexcused, its Strike — one event covers both at once. Sources are Additional Events, a Semester Requirement event beyond the one that semester needs, or an HLHM event beyond the first. Applied automatically, oldest unexcused Missed Event first, and the Member is shown which Missed Event and Strike each one covered.
+A Surplus Attendance credited against a Missed Event and, when that miss was unexcused, its Strike — one event covers both at once. Applied automatically: first the oldest Missed Event that still carries a Strike (clearing both at once), then the oldest other Missed Event (excused, or its Strike already removed by E-Board); a Surplus Attendance counts whether it happened before or after the Missed Event. A Member may name the Missed Event when submitting a Point Request (for a request covering several tabling hours, one per hour); an approved request's pick is honoured first. Only approved Attendance counts, never a pending request. The Member is shown which Missed Event and Strike each Make-up covered, never whether the miss was excused.
 
 ### Leaderboard
 
