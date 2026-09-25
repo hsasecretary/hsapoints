@@ -4,7 +4,7 @@
 import { arrayUnion, doc, increment, runTransaction, type Firestore } from 'firebase/firestore';
 import { isHeldToCabinetRules } from './members';
 import { eventType } from './rubric';
-import { currentSemester } from './semester';
+import { currentSemester, fromIsoDate } from './semester';
 
 export type RedeemResult =
     | { ok: true }
@@ -23,10 +23,13 @@ export async function redeemCode(
     typedCode: string,
     { today, viewingAsCabinet = false }: RedeemOptions,
 ): Promise<RedeemResult> {
+    // Member docs and Attendance IDs are keyed by the lowercase email, which
+    // is also what firestore.rules compares against.
+    const memberEmail = email.toLowerCase();
     const codeId = typedCode.trim().toUpperCase();
     const codeRef = doc(db, 'codes', codeId);
-    const attendanceRef = doc(db, 'attendances', `${email}__${codeId}`);
-    const userRef = doc(db, 'users', email);
+    const attendanceRef = doc(db, 'attendances', `${memberEmail}__${codeId}`);
+    const userRef = doc(db, 'users', memberEmail);
 
     return runTransaction(db, async (tx) => {
         const code = (await tx.get(codeRef)).data();
@@ -51,7 +54,7 @@ export async function redeemCode(
         // migration (#77) types it and writes its Attendance from eventCodes.
         if (code.eventTypeId) {
             tx.set(attendanceRef, {
-                email,
+                email: memberEmail,
                 eventTypeId: code.eventTypeId,
                 eventDate: code.eventDate,
                 source: 'code',
@@ -81,7 +84,7 @@ const legacyCategoryFields: Record<string, string> = {
  */
 function legacyCounters(codeId: string, code: Record<string, any>) {
     const points: number = code.points ?? eventType(code.eventTypeId)?.vePoints ?? 0;
-    const semester: string = code.semester ?? currentSemester(parseDate(code.eventDate));
+    const semester: string = code.semester ?? currentSemester(fromIsoDate(code.eventDate));
     const categoryField = code.category === 'Cabinet'
         ? 'cabinetPoints'
         : legacyCategoryFields[code.category]
@@ -92,10 +95,4 @@ function legacyCounters(codeId: string, code: Record<string, any>) {
         [semester]: increment(points),
         [categoryField]: increment(points),
     };
-}
-
-/** 'YYYY-MM-DD' as a local date (new Date('YYYY-MM-DD') would be UTC). */
-function parseDate(isoDate: string): Date {
-    const [year, month, day] = isoDate.split('-').map(Number);
-    return new Date(year, month - 1, day);
 }

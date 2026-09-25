@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { auth, db } from '../../../lib/firebase';
 import SectionTitle from '../../../components/ui/SectionTitle';
 import { redeemCode, type RedeemResult } from '../../../lib/redeemCode';
+import { toIsoDate } from '../../../lib/semester';
 
 const refusalMessages: Record<Extract<RedeemResult, { ok: false }>['reason'], string> = {
     'not-found': '*Error: Code is Invalid',
@@ -9,13 +10,6 @@ const refusalMessages: Record<Extract<RedeemResult, { ok: false }>['reason'], st
     'not-active': '*Error: Code is not active',
     'cabinet-only': '*Error: This code is for Cabinet Members only',
 };
-
-/** Today as 'YYYY-MM-DD' in local time, the format codes' eventDate uses. */
-function localIsoDate(date: Date): string {
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${date.getFullYear()}-${month}-${day}`;
-}
 
 function EventCodeForm({ onPointsUpdate }) {
     const [code, setCode] = useState('');
@@ -51,7 +45,7 @@ function EventCodeForm({ onPointsUpdate }) {
         }
 
         try {
-            const result = await redeemCode(db, auth.currentUser.email, code, { today: localIsoDate(new Date()) });
+            const result = await redeemCode(db, auth.currentUser.email, code, { today: toIsoDate(new Date()) });
             // `=== false`: with strict off, TS won't narrow on `!result.ok`.
             if (result.ok === false) {
                 setMessage({ text: refusalMessages[result.reason], type: 'error' });

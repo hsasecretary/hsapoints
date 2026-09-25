@@ -95,6 +95,11 @@ describe('attendances', () => {
         await assertSucceeds(getDoc(doc(db, `attendances/${MEMBER}__GBM1`)));
     });
 
+    it("won't tell a Member whether someone else attended, even when they didn't", async () => {
+        const db = signedInAs(env, MEMBER);
+        await assertFails(getDoc(doc(db, `attendances/${OTHER_MEMBER}__GBM1`)));
+    });
+
     it('lets E-Board read, write and delete any Attendance', async () => {
         await seed(env, { [`attendances/${MEMBER}__GBM1`]: codeAttendance(MEMBER) });
         const db = signedInAs(env, EBOARD);

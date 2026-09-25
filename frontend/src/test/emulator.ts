@@ -6,11 +6,10 @@ import {
     initializeTestEnvironment,
     type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { doc, setDoc, type Firestore } from 'firebase/firestore';
+import { doc, getDoc, setDoc, type DocumentData, type Firestore } from 'firebase/firestore';
 
 export const MEMBER = 'ana@ufl.edu';
 export const OTHER_MEMBER = 'beto@ufl.edu';
-export const CABINET_MEMBER = 'cami@ufl.edu';
 export const EBOARD = 'eva@ufl.edu';
 
 export function startEmulator(): Promise<RulesTestEnvironment> {
@@ -59,4 +58,14 @@ export async function seed(env: RulesTestEnvironment, docs: Record<string, objec
             await setDoc(doc(db, path), data);
         }
     });
+}
+
+/** Reads the doc at `path` with the rules switched off, to see what a write left behind. */
+export async function readPastRules(env: RulesTestEnvironment, path: string): Promise<DocumentData | undefined> {
+    let data: DocumentData | undefined;
+    await env.withSecurityRulesDisabled(async (context) => {
+        const snap = await getDoc(doc(context.firestore() as unknown as Firestore, path));
+        data = snap.data();
+    });
+    return data;
 }

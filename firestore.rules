@@ -94,7 +94,7 @@ service cloud.firestore {
     // A Member may only record redeeming a code themselves; request and
     // E-Board sources, and every update or delete, are E-Board-only.
     match /attendances/{id} {
-      // The doc EventCodeForm.tsx writes: ID `{email}__{CODE}`, Event Type
+      // The doc lib/redeemCode.ts writes: ID `{email}__{CODE}`, Event Type
       // and date copied from codes/{CODE}, nothing else.
       function isOwnCodeAttendance() {
         let attendance = request.resource.data;
@@ -107,10 +107,17 @@ service cloud.firestore {
           attendance.eventDate == code.eventDate;
       }
 
-      // A missing doc (resource == null) is readable so a Member can check
-      // "already redeemed?" before writing; it reveals nothing.
+      // Every Attendance ID starts `{email}__` (ADR-0002).
+      function isCallersId() {
+        let prefix = callerEmail() + '__';
+        return id.size() > prefix.size() && id[0:prefix.size()] == prefix;
+      }
+
+      // A missing doc under the caller's own ID is readable so they can check
+      // "already redeemed?" before writing. Only their own: allowing any
+      // missing doc would let them probe who attended what.
       allow get: if isEboard() ||
-        (signedIn() && (resource == null || resource.data.email == callerEmail()));
+        (signedIn() && (resource == null ? isCallersId() : resource.data.email == callerEmail()));
       // Members list only with `where('email', '==', <their email>)`.
       allow list: if isEboard() || (signedIn() && resource.data.email == callerEmail());
       allow create: if isEboard() || (signedIn() && isOwnCodeAttendance());
