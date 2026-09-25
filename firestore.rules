@@ -37,6 +37,27 @@ service cloud.firestore {
       ];
     }
 
+    // Per-Member facts only E-Board sets (ADR-0002). A Member can't write
+    // them on update (they're not in selfUpdateAllowedFields) or sneak them
+    // in at sign-up.
+    function eboardOnlyMemberFields() {
+      return [
+        'mlpCohort', 'heldToCabinetRules', 'webTeam',
+        'excusals', 'strikeRemovals', 'missedEventOverrides', 'adjustments',
+        'absenceLog'
+      ];
+    }
+
+    // absenceLog is the history behind every Excuse Absence change, so it is
+    // append-only even for E-Board: the old entries must stay, unchanged and
+    // in order, at the front.
+    function absenceLogOnlyGrows() {
+      let before = resource.data.get('absenceLog', []);
+      let after = request.resource.data.get('absenceLog', []);
+      return before.size() == 0 ||
+        (after.size() >= before.size() && after[0:before.size()] == before);
+    }
+
     match /users/{email} {
       allow get: if isSelf(email) || isEboard();
       allow list: if isEboard();
@@ -48,9 +69,10 @@ service cloud.firestore {
         request.resource.data.eboard == false &&
         request.resource.data.fallPoints == 0 &&
         request.resource.data.springPoints == 0 &&
-        request.resource.data.strikes == 0;
+        request.resource.data.strikes == 0 &&
+        !request.resource.data.keys().hasAny(eboardOnlyMemberFields());
 
-      allow update: if isEboard() ||
+      allow update: if (isEboard() && absenceLogOnlyGrows()) ||
         (isSelf(email) &&
          request.resource.data.diff(resource.data).affectedKeys().hasOnly(selfUpdateAllowedFields()));
 
@@ -66,6 +88,40 @@ service cloud.firestore {
       allow update: if isEboard() ||
         (signedIn() &&
          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendeeCount', 'ateendecode']));
+    }
+
+    // One doc per Attendance (docs/adr/0002-attendance-ledger-calculated-on-read.md).
+    // A Member may only record redeeming a code themselves; request and
+    // E-Board sources, and every update or delete, are E-Board-only.
+    match /attendances/{id} {
+      // The doc lib/redeemCode.ts writes: ID `{email}__{CODE}`, Event Type
+      // and date copied from codes/{CODE}, nothing else.
+      function isOwnCodeAttendance() {
+        let attendance = request.resource.data;
+        let code = get(/databases/$(database)/documents/codes/$(attendance.codeId)).data;
+        return attendance.keys().hasOnly(['email', 'eventTypeId', 'eventDate', 'source', 'codeId']) &&
+          attendance.email == callerEmail() &&
+          attendance.source == 'code' &&
+          id == callerEmail() + '__' + attendance.codeId &&
+          attendance.eventTypeId == code.eventTypeId &&
+          attendance.eventDate == code.eventDate;
+      }
+
+      // Every Attendance ID starts `{email}__` (ADR-0002).
+      function isCallersId() {
+        let prefix = callerEmail() + '__';
+        return id.size() > prefix.size() && id[0:prefix.size()] == prefix;
+      }
+
+      // A missing doc under the caller's own ID is readable so they can check
+      // "already redeemed?" before writing. Only their own: allowing any
+      // missing doc would let them probe who attended what.
+      allow get: if isEboard() ||
+        (signedIn() && (resource == null ? isCallersId() : resource.data.email == callerEmail()));
+      // Members list only with `where('email', '==', <their email>)`.
+      allow list: if isEboard() || (signedIn() && resource.data.email == callerEmail());
+      allow create: if isEboard() || (signedIn() && isOwnCodeAttendance());
+      allow update, delete: if isEboard();
     }
 
     match /pointRequests/{id} {

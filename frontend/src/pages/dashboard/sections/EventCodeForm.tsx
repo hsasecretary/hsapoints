@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { auth, db } from '../../../lib/firebase';
 import SectionTitle from '../../../components/ui/SectionTitle';
-import { doc, getDoc, arrayUnion, writeBatch, increment } from 'firebase/firestore';
+import { redeemCode, type RedeemResult } from '../../../lib/redeemCode';
+import { toIsoDate } from '../../../lib/semester';
+
+const refusalMessages: Record<Extract<RedeemResult, { ok: false }>['reason'], string> = {
+    'not-found': '*Error: Code is Invalid',
+    'already-redeemed': '*Error: Already Submitted This Code',
+    'not-active': '*Error: Code is not active',
+    'cabinet-only': '*Error: This code is for Cabinet Members only',
+};
 
 function EventCodeForm({ onPointsUpdate }) {
     const [code, setCode] = useState('');
@@ -37,318 +45,21 @@ function EventCodeForm({ onPointsUpdate }) {
         }
 
         try {
-            var email = auth.currentUser.email;
-            var codeToCheck = code.toUpperCase().trim(); // Changed to uppercase to match database
-            
-            let date: any = new Date();
-            let day: any = date.getDate();
-            if(day < 10) {
-                day = "0" + day;
+            const result = await redeemCode(db, auth.currentUser.email, code, { today: toIsoDate(new Date()) });
+            // `=== false`: with strict off, TS won't narrow on `!result.ok`.
+            if (result.ok === false) {
+                setMessage({ text: refusalMessages[result.reason], type: 'error' });
+                return;
             }
-            let month: any = date.getMonth()+1;
-            if(month < 10) {
-                month = "0" + month;
-            }
-            let year = date.getFullYear();
-            date = year + "-" + month + "-" +day;
-            
-            const userDocRef = doc(db, "users", email);
-            const userDocSnap = await getDoc(userDocRef);
-            var data = userDocSnap.data();
-            
-            if(userDocSnap.exists()) {
-                const eventCodes = data.eventCodes;
-                if(eventCodes.length !== 0) {
-                    for(var i = 0; i < eventCodes.length; i++) {
-                        // Make duplicate check case-insensitive by comparing uppercase versions
-                        if(eventCodes[i].toUpperCase() === codeToCheck) {
-                            setMessage({ text: '*Error: Already Submitted This Code', type: 'error' });
-                            setLoading(false);
-                            return;
-                        }
-                    }
+            setCode('');
+            setMessage({ text: 'Success! Code submitted and points added to your account!', type: 'success' });
+
+            // Call the callback to refresh points instead of reloading the page
+            setTimeout(() => {
+                if (onPointsUpdate) {
+                    onPointsUpdate();
                 }
-                
-                const codeDocRef = await doc(db, "codes", codeToCheck);
-                const codeDocSnap = await getDoc(codeDocRef);
-                var added = false;
-                
-                if(codeDocSnap.exists()) {
-                    if(date !== codeDocSnap.data().eventDate) {
-                        setMessage({ text: '*Error: Code is not active', type: 'error' });
-                        setLoading(false);
-                        return;
-                    }
-                    
-                    added = true;
-                    const batch = writeBatch(db);
-
-                    var semester = codeDocSnap.data().semester;
-                    var addPoints = codeDocSnap.data().points;
-                    var currentPoints;
-                    var voterEligible = codeDocSnap.data().voterEligible;
-                    var category = codeDocSnap.data().category;
-                    
-                    if (semester === "fallPoints") {
-                        currentPoints = data.fallPoints;
-                        currentPoints = currentPoints + addPoints;
-                        if(voterEligible === false) {
-                            if(category === "GBM") {
-                                var gbmNVE = data.gbmPointsNVE;
-                                gbmNVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "fallPoints": currentPoints, 
-                                    "gbmPointsNVE": gbmNVE
-                                });
-                            } else if(category === "MLP Fall") {
-                                var mlpFallNVE = data.mlpFallPointsNVE;
-                                mlpFallNVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "fallPoints": currentPoints, 
-                                    "mlpFallPointsNVE": mlpFallNVE
-                                });
-                            } else if(category === "MLP Spring") {
-                                var mlpSpringNVE = data.mlpSpringPointsNVE;
-                                mlpSpringNVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "fallPoints": currentPoints, 
-                                    "mlpSpringPointsNVE": mlpSpringNVE
-                                });
-                            } else if(category === "OPA") {
-                                var opa = data.opaPointsNVE;
-                                opa += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "fallPoints": currentPoints,
-                                    "opaPointsNVE": opa
-                                });
-                            } else if(category === "Programming") {
-                                var prgmNVE = data.programmingPointsNVE;
-                                prgmNVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "fallPoints": currentPoints,
-                                    "programmingPointsNVE": prgmNVE
-                                });
-                            } else if(category === "Cabinet") {
-                                var cabinet = data.cabinetPoints;
-                                cabinet += addPoints;
-                                batch.update(userDocRef, { 
-                                    "eventCodes":arrayUnion(codeToCheck), 
-                                    "fallPoints":currentPoints,
-                                    "cabinetPoints":cabinet
-                                })
-                            } else {
-                                var other = data.otherPoints;
-                                other += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "fallPoints": currentPoints,
-                                    "otherPoints": other
-                                });
-                            }
-                        } else {
-                            if(category === "Programming") {
-                                var prgmVE = data.programmingPointsVE;
-                                prgmVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "fallPoints": currentPoints,
-                                    "programmingPointsVE": prgmVE
-                                });
-                            } else if(category === "GBM") {
-                                var gbmVE = data.gbmPointsVE;
-                                gbmVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "fallPoints": currentPoints, 
-                                    "gbmPointsVE": gbmVE
-                                });
-                            } else if(category === "MLP Fall") {
-                                var mlpFallVE = data.mlpFallPointsVE;
-                                mlpFallVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "fallPoints": currentPoints, 
-                                    "mlpFallPointsVE": mlpFallVE
-                                });
-                            } else if(category === "MLP Spring") {
-                                var mlpSpringVE = data.mlpSpringPointsVE;
-                                mlpSpringVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "fallPoints": currentPoints, 
-                                    "mlpSpringPointsVE": mlpSpringVE
-                                });
-                                
-                            } else if(category === "OPA") {
-                                var opaVE = data.opaPointsVE;
-                                opaVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "fallPoints": currentPoints, 
-                                    "opaPointsVE": opaVE
-                                });
-                            } else if(category === "Cabinet") {
-                                cabinet = data.cabinetPoints;
-                                cabinet += addPoints;
-                                batch.update(userDocRef, { 
-                                    "eventCodes":arrayUnion(codeToCheck), 
-                                    "fallPoints":currentPoints,
-                                    "cabinetPoints":cabinet
-                                })
-                            } 
-                        }
-                            
-                    } else {
-                        currentPoints = data.springPoints;
-                        currentPoints += addPoints;
-                        if(voterEligible === false) {
-                            if(category === "GBM") {
-                                gbmNVE = data.gbmPointsNVE;
-                                gbmNVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "springPoints": currentPoints, 
-                                    "gbmPointsNVE": gbmNVE
-                                });
-                            } else if(category === "MLP Fall") {
-                                mlpFallNVE = data.mlpFallPointsNVE;
-                                mlpFallNVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "springPoints": currentPoints, 
-                                    "mlpFallPointsNVE": mlpFallNVE
-                                });
-                            } else if(category === "MLP Spring") {
-                                mlpSpringNVE = data.mlpSpringPointsNVE;
-                                mlpSpringNVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "springPoints": currentPoints, 
-                                    "mlpSpringPointsNVE": mlpSpringNVE
-                                });
-                            } else if(category === "OPA") {
-                                opa = data.opaPointsNVE;
-                                opa += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "springPoints": currentPoints,
-                                    "opaPointsNVE": opa
-                                });
-                            } else if(category === "Programming") {
-                                prgmNVE = data.programmingPointsNVE;
-                                prgmNVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "springPoints": currentPoints,
-                                    "programmingPointsNVE": prgmNVE
-                                });
-                            } else if(category === "Cabinet") {
-                                cabinet = data.cabinetPoints;
-                                cabinet += addPoints;
-                                batch.update(userDocRef, { 
-                                    "eventCodes":arrayUnion(codeToCheck), 
-                                    "springPoints":currentPoints,
-                                    "cabinetPoints":cabinet
-                                })
-                            } else {
-                                other = data.otherPoints;
-                                other += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "springPoints": currentPoints,
-                                    "otherPoints": other
-                                });
-                            }
-                        } else {
-                            if(category === "Programming") {
-                                prgmVE = data.programmingPointsVE;
-                                prgmVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "springPoints": currentPoints,
-                                    "programmingPointsVE": prgmVE
-                                });
-                            } else if(category === "GBM") {
-                                gbmVE = data.gbmPointsVE;
-                                gbmVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "springPoints": currentPoints, 
-                                    "gbmPointsVE": gbmVE
-                                });
-                            } else if(category === "MLP Fall") {
-                                mlpFallVE = data.mlpFallPointsVE;
-                                mlpFallVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "springPoints": currentPoints, 
-                                    "mlpFallPointsVE": mlpFallVE
-                                });
-                            } else if(category === "MLP Spring") {
-                                mlpSpringVE = data.mlpSpringPointsVE;
-                                mlpSpringVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "springPoints": currentPoints, 
-                                    "mlpSpringPointsVE": mlpSpringVE
-                                });
-                            } else if(category === "OPA") {
-                                opaVE = data.opaPointsVE;
-                                opaVE += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "springPoints": currentPoints, 
-                                    "opaPointsVE": opaVE
-                                });
-                            } else if(category === "Cabinet") {
-                                cabinet = data.cabinetPoints;
-                                cabinet += addPoints;
-                                batch.update(userDocRef, { 
-                                    "eventCodes":arrayUnion(codeToCheck), 
-                                    "springPoints":currentPoints,
-                                    "cabinetPoints":cabinet
-                                })
-                            } else {
-                                other = data.otherPoints;
-                                other += addPoints;
-                                batch.update(userDocRef, {
-                                    "eventCodes": arrayUnion(codeToCheck),
-                                    "springPoints": currentPoints,
-                                    "otherPoints": other
-                                });
-                            }
-                        }
-                    }
-
-                    // Implemented the attendee counter to increment on our
-                    // end in order to reflect how many people attended
-                    batch.update(codeDocRef, {
-                        attendeeCount: increment(1),
-                        ateendecode: true
-                    });
-
-                    await batch.commit();
-                }
-
-                if(added) {
-                    setCode('');
-                    setMessage({ text: 'Success! Code submitted and points added to your account!', type: 'success' });
-                    
-                    // Call the callback to refresh points instead of reloading the page
-                    setTimeout(() => {
-                        if (onPointsUpdate) {
-                            onPointsUpdate();
-                        }
-                    }, 1500);
-                } else {
-                    setMessage({ text: '*Error: Code is Invalid', type: 'error' });
-                }
-            }
+            }, 1500);
         } catch (error) {
             console.error('Error submitting code:', error);
             setMessage({ text: 'An error occurred. Please try again.', type: 'error' });
