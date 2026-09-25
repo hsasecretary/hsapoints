@@ -37,7 +37,7 @@ A row of the point rubric (e.g. GBM, HSA Fundraiser, Tabling) that fixes an even
 _Avoid_: Category (the old free-form label), cabinet-required flag
 
 **Cabinet-only Event Type**:
-An Event Type only Cabinet Members can earn, by code or Point Request: Cabinet Thursday, Cabinet Retreat, Cabinet Orientation.
+An Event Type only Cabinet Members can earn, by code or Point Request: Cabinet Thursday, Cabinet Retreat, Cabinet Orientation, Internal Social.
 
 **Attendance**:
 A Member's credit for one event, however it arrived: a redeemed code, an approved point request, or E-Board entering it directly. Every Attendance earns its Event Type's points, even when it is also used as a Make-up.
