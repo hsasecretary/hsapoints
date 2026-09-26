@@ -9,6 +9,15 @@
 
 export type Tier = 'core' | 'semester' | 'additional';
 
+/** The tiers in the order they're listed. */
+export const tiers: readonly Tier[] = ['core', 'semester', 'additional'];
+
+export const tierLabels: Record<Tier, string> = {
+    core: 'Core Event',
+    semester: 'Semester Requirement',
+    additional: 'Additional Event',
+};
+
 export interface EventType {
     id: string;
     label: string;
@@ -55,6 +64,9 @@ const rows = [
 export type EventTypeId = (typeof rows)[number]['id'];
 
 export const rubric: readonly EventType[] = rows;
+
+/** The Event Types E-Board can give a code: Tabling and CRASH arrive only by Point Request. */
+export const codeableTypes: readonly EventType[] = rubric.filter((type) => type.codeable);
 
 const byId = new Map<string, EventType>(rubric.map((type) => [type.id, type]));
 

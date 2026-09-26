@@ -22,7 +22,7 @@ beforeEach(async () => {
         [`users/${MEMBER}`]: memberDoc(MEMBER),
         'codes/GBM1': {
             event: 'GBM 1', eventTypeId: 'gbm', eventDate: TODAY, attendeeCount: 0,
-            // The old per-event fields, still set on codes until the Event Codes page is rebuilt.
+            // The old per-event fields, still on codes made before Event Types.
             category: 'GBM', points: 2, semester: 'fallPoints', voterEligible: true,
         },
     });
