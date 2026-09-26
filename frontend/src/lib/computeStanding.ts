@@ -2,6 +2,9 @@
 // Missed Events, Strikes and Make-ups are calculated (see CONTEXT.md and
 // docs/adr/0002-attendance-ledger-calculated-on-read.md). Pure and free of
 // Firestore imports, so the migration can run it in Node too.
+//
+// Pass one academic year: Semester is only fall or spring, so the codes and
+// Attendance of two years would share Semester Requirements.
 import { isHeldToCabinetRules } from './members';
 import type { EventType } from './rubric';
 import { currentSemester, fromIsoDate } from './semester';
@@ -28,6 +31,8 @@ export type Attendance = {
     /** 'YYYY-MM-DD'. */
     eventDate: string;
     source: 'code' | 'request' | 'eboard';
+    /** Set on every Attendance for a coded event, however it arrived: it is
+     *  how a Core Event counts as attended. */
     codeId?: string;
     requestId?: string;
     /** The Missed Event (a codeId) the Member picked for this to make up. */
@@ -50,8 +55,8 @@ export type CoreEvent = {
     eventTypeId: string;
     eventDate: string;
     semester: Semester;
-    /** `not-required`: an HLHM event the Member doesn't need, since one HLHM event a year fills the Core Event. */
-    status: 'attended' | 'missed' | 'upcoming' | 'not-required';
+    /** `optional`: an HLHM event the Member can skip, since any one HLHM event a year fills the Core Event. */
+    status: 'attended' | 'missed' | 'upcoming' | 'optional';
 };
 
 export type MissedEvent = {
@@ -110,9 +115,15 @@ export type Standing = {
 export type StandingOptions = {
     /** Local date as 'YYYY-MM-DD'. A Core Event is missed once its day is over. */
     today: string;
-    /** E-Board or a General Member previewing the Cabinet Member view. */
+    /** E-Board or a Web-team Tester previewing the Cabinet Member view. */
     viewingAsCabinet?: boolean;
 };
+
+/** One HLHM event a year fills its Core Event; any beyond it is surplus. */
+const HLHM = 'hlhm';
+
+/** The cabinets that run MLP, whose members have Affiliate Org waived. */
+const MLP_CABINETS = ['mlpFall', 'mlpSpring'];
 
 export function computeStanding(
     member: Member,
@@ -123,9 +134,14 @@ export function computeStanding(
 ): Standing {
     const types = new Map(rubric.map((type) => [type.id, type]));
     const heldToCabinetRules = viewingAsCabinet || isHeldToCabinetRules(member);
-    // Replay in date order; the ID breaks ties so the result never depends
-    // on the order Firestore returned the docs in.
-    const replay = [...attendances].sort(byDateThenId);
+    // Replay in date order. On the same date an Attendance with a Make-up
+    // pick goes last, so it's the one left surplus to honour its pick (a
+    // Tabling request's hours share a date); then the ID breaks ties, so the
+    // result never depends on the order Firestore returned the docs in.
+    const replay = [...attendances].sort((a, b) =>
+        a.eventDate.localeCompare(b.eventDate)
+        || Number(Boolean(a.makeupFor)) - Number(Boolean(b.makeupFor))
+        || a.id.localeCompare(b.id));
 
     let cabinetPoints = 0;
     let vePoints = 0;
@@ -179,7 +195,7 @@ export function computeStanding(
     const missedEvents: MissedEvent[] = coreEvents
         .filter((event) => event.status === 'missed')
         .map((event) => {
-            const id = event.codeId.toUpperCase();
+            const id = codeKey(event.codeId);
             const isOverridden = overridden.has(id);
             const isExcused = excused.has(id);
             const isStrikeRemoved = strikeRemoved.has(id);
@@ -197,8 +213,8 @@ export function computeStanding(
             };
         });
 
-    const picks = new Map(replay.map((attendance) => [attendance.id, attendance.makeupFor?.toUpperCase()]));
-    assignMakeups(surplus, missedEvents, picks);
+    const makeupPicks = new Map(replay.map((attendance) => [attendance.id, attendance.makeupFor && codeKey(attendance.makeupFor)]));
+    assignMakeups(surplus, missedEvents, makeupPicks);
 
     return {
         heldToCabinetRules,
@@ -212,12 +228,6 @@ export function computeStanding(
         surplus,
     };
 }
-
-/** One HLHM event a year fills its Core Event; any beyond it is surplus. */
-const HLHM = 'hlhm';
-
-/** The cabinets that run MLP, whose members have Affiliate Org waived. */
-const MLP_CABINETS = ['mlpFall', 'mlpSpring'];
 
 function listSemesterRequirements(rubric: readonly EventType[], affiliateWaived: boolean): SemesterRequirement[] {
     return rubric
@@ -238,24 +248,24 @@ function listSemesterRequirements(rubric: readonly EventType[], affiliateWaived:
 function assignMakeups(
     surplus: SurplusAttendance[],
     missedEvents: MissedEvent[],
-    picks: Map<string, string | undefined>,
+    makeupPicks: Map<string, string | undefined>,
 ) {
-    const cover = (extra: SurplusAttendance, missed: MissedEvent) => {
-        extra.makeupFor = missed.codeId;
-        missed.madeUpBy = extra.attendanceId;
+    const cover = (surplusAttendance: SurplusAttendance, missed: MissedEvent) => {
+        surplusAttendance.makeupFor = missed.codeId;
+        missed.madeUpBy = surplusAttendance.attendanceId;
         missed.owed = false;
         missed.strike = false;
     };
-    for (const extra of surplus) {
-        const pick = picks.get(extra.attendanceId);
-        const picked = pick && missedEvents.find((missed) => missed.owed && missed.codeId.toUpperCase() === pick);
-        if (picked) cover(extra, picked);
+    for (const surplusAttendance of surplus) {
+        const pick = makeupPicks.get(surplusAttendance.attendanceId);
+        const picked = pick && missedEvents.find((missed) => missed.owed && codeKey(missed.codeId) === pick);
+        if (picked) cover(surplusAttendance, picked);
     }
-    for (const extra of surplus) {
-        if (extra.makeupFor) continue;
+    for (const surplusAttendance of surplus) {
+        if (surplusAttendance.makeupFor) continue;
         const target = missedEvents.find((missed) => missed.strike) ?? missedEvents.find((missed) => missed.owed);
         if (!target) return;
-        cover(extra, target);
+        cover(surplusAttendance, target);
     }
 }
 
@@ -265,23 +275,24 @@ function listCoreEvents(
     replay: Attendance[],
     today: string,
 ): CoreEvent[] {
-    const attendedCodes = new Set(replay.map((attendance) => attendance.codeId?.toUpperCase()).filter(Boolean));
+    const attendedCodes = new Set(replay.filter((attendance) => attendance.codeId).map((attendance) => codeKey(attendance.codeId)));
     const coreCodes = codes
         .filter((code) => types.get(code.eventTypeId)?.tier === 'core')
-        .sort((a, b) => a.eventDate.localeCompare(b.eventDate) || a.id.localeCompare(b.id));
+        .sort(byDateThenId);
     // Any one HLHM event fills the HLHM Core Event, so it is missed only once
     // the last HLHM event has passed with none attended; that last one is
-    // the Missed Event, and the rest were never required.
+    // the Missed Event, and the rest were optional. (A later HLHM code moves
+    // the miss, and any excusal keyed to the old one, onto itself.)
     const hlhmAttended = replay.some((attendance) => attendance.eventTypeId === HLHM);
     const hlhmCodes = coreCodes.filter((code) => code.eventTypeId === HLHM);
     const lastHlhm = hlhmCodes[hlhmCodes.length - 1];
 
     return coreCodes.map((code) => {
         let status: CoreEvent['status'];
-        if (attendedCodes.has(code.id.toUpperCase())) status = 'attended';
-        else if (code.eventTypeId === HLHM && hlhmAttended) status = 'not-required';
+        if (attendedCodes.has(codeKey(code.id))) status = 'attended';
+        else if (code.eventTypeId === HLHM && hlhmAttended) status = 'optional';
         else if (code.eventDate >= today) status = 'upcoming';
-        else if (code.eventTypeId === HLHM && code !== lastHlhm) status = 'not-required';
+        else if (code.eventTypeId === HLHM && code !== lastHlhm) status = 'optional';
         else status = 'missed';
         return {
             codeId: code.id,
@@ -298,10 +309,15 @@ function semesterOf(isoDate: string): Semester {
     return currentSemester(fromIsoDate(isoDate)) === 'springPoints' ? 'spring' : 'fall';
 }
 
-function codeIdSet(entries: { codeId: string }[] | undefined): Set<string> {
-    return new Set((entries ?? []).map((entry) => entry.codeId.toUpperCase()));
+/** Code IDs are uppercase doc IDs, but a few older rows were stored in mixed case. */
+function codeKey(codeId: string): string {
+    return codeId.toUpperCase();
 }
 
-function byDateThenId(a: Attendance, b: Attendance): number {
+function codeIdSet(entries: { codeId: string }[] | undefined): Set<string> {
+    return new Set((entries ?? []).map((entry) => codeKey(entry.codeId)));
+}
+
+function byDateThenId(a: { eventDate: string; id: string }, b: { eventDate: string; id: string }): number {
     return a.eventDate.localeCompare(b.eventDate) || a.id.localeCompare(b.id);
 }

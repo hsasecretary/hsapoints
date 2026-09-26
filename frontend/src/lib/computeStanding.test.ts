@@ -200,7 +200,7 @@ describe('computeStanding', () => {
         );
 
         expect(standing.coreEvents.filter((event) => event.eventTypeId === 'hlhm').map((event) => [event.codeId, event.status]))
-            .toEqual([['HLHM1', 'attended'], ['HLHM2', 'attended'], ['HLHM3', 'not-required']]);
+            .toEqual([['HLHM1', 'attended'], ['HLHM2', 'attended'], ['HLHM3', 'optional']]);
         expect(standing.surplus).toEqual([
             { attendanceId: 'm__HLHM2', eventTypeId: 'hlhm', eventDate: '2026-10-01', makeupFor: 'CT1' },
         ]);
@@ -213,12 +213,12 @@ describe('computeStanding', () => {
 
         const midMonth = computeStanding(cabinetMember, [], rubric, [first, last], { today: '2026-10-01' });
         expect(midMonth.coreEvents.map((event) => [event.codeId, event.status]))
-            .toEqual([['HLHM1', 'not-required'], ['HLHM2', 'upcoming']]);
+            .toEqual([['HLHM1', 'optional'], ['HLHM2', 'upcoming']]);
         expect(midMonth.missedEvents).toEqual([]);
 
         const afterwards = computeStanding(cabinetMember, [], rubric, [first, last], { today: TODAY });
         expect(afterwards.coreEvents.map((event) => [event.codeId, event.status]))
-            .toEqual([['HLHM1', 'not-required'], ['HLHM2', 'missed']]);
+            .toEqual([['HLHM1', 'optional'], ['HLHM2', 'missed']]);
         expect(afterwards.missedEvents.map((missed) => missed.codeId)).toEqual(['HLHM2']);
         expect(afterwards.openStrikes).toBe(1);
     });
@@ -235,6 +235,20 @@ describe('computeStanding', () => {
             ['GBM1', 'm__req-r1'],
         ]);
         expect(standing.openStrikes).toBe(0);
+    });
+
+    it('keeps a picked Tabling hour as the surplus one when hours tie on date, so its pick is honoured', () => {
+        const thursday = code('CT1', 'cabinet-thursday', '2026-09-03');
+        const gbm = code('GBM1', 'gbm', '2026-09-10');
+        const pickedHour = requested('t1-h1', 'tabling', '2026-09-15', { makeupFor: 'GBM1' });
+        const plainHour = requested('t1-h2', 'tabling', '2026-09-15');
+        const standing = computeStanding(cabinetMember, [pickedHour, plainHour], rubric, [thursday, gbm], { today: TODAY });
+
+        expect(standing.semesterRequirements.fall.find((req) => req.eventTypeId === 'tabling')?.filledBy).toBe('m__req-t1-h2');
+        expect(standing.missedEvents.map((missed) => [missed.codeId, missed.madeUpBy])).toEqual([
+            ['CT1', null],
+            ['GBM1', 'm__req-t1-h1'],
+        ]);
     });
 
     it('falls back to the automatic order when a pick names nothing still owed', () => {
