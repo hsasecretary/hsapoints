@@ -1,5 +1,5 @@
 /* ========================================================================
-   Member dashboard (/dashboard), Cabinet page (/cabinet) and Strikes page (/strikes)
+   Member dashboard (/dashboard) and Cabinet page (/cabinet)
    ======================================================================== */
 
 /* ---- Dashboard page shell, attendance box, points cards  (Dashboard.tsx, Attendance.tsx, CabinetPoints.tsx) ---------- */
@@ -477,9 +477,10 @@
     }
 }
 
-/* ---- Submit Point Request form  (PointRequest.tsx) ----------------------------------- */
+/* ---- Submit Point Request  (PointRequestForm.tsx, pointRequest/*) --------------------
+   Variant C of the prototype (#47): the "what you owe" sidebar, the form
+   beside it, and the Strikes view in the same card. req- = point request. */
 
-/* PointRequest Styles */
 .point-request {
     max-width: 800px;
     flex: 1 1 100%;
@@ -493,452 +494,174 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.point-request h2 {
-    text-align: center;
-    color: var(--hsa-teal-600);
-    margin-bottom: 10px;
-}
+.point-request.req { display: flex; flex-direction: column; gap: 22px; text-align: left; }
+.point-request.req * { box-sizing: border-box; }
 
-.point-request .description {
-    text-align: center;
-    color: #666;
-    margin-bottom: 30px;
-    font-size: 16px;
-    line-height: 1.5;
-}
+.point-request .req-title { margin: 0; font-size: var(--hsa-text-2xl); color: var(--hsa-teal-700); text-align: left; }
+.point-request .req-lede { margin: -12px 0 0; color: var(--hsa-muted); font-size: var(--hsa-text-base); }
+.point-request .req-message { margin: 0; padding: 10px 14px; border-radius: 6px; font-weight: 600; }
+.point-request .req-message--success { background: var(--hsa-success-bg); color: var(--hsa-success-strong); }
+.point-request .req-message--error { background: var(--hsa-danger-bg); color: var(--hsa-danger-strong); }
 
-/* Form Styles */
-.point-request .request-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.point-request .req-field { display: flex; flex-direction: column; gap: 8px; margin: 0; font-size: var(--hsa-text-base); font-weight: 400; color: var(--hsa-ink); }
+.point-request .req-label { font-size: var(--hsa-text-sm); font-weight: 700; color: var(--hsa-teal-700); padding: 0; }
+.point-request .req-hint { margin: 0; color: var(--hsa-muted); font-size: var(--hsa-text-sm); font-weight: 400; }
+.point-request .req-error { margin: 0; color: var(--hsa-danger); font-size: var(--hsa-text-sm); }
+.point-request .req-row { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+.point-request.req input:not([type=radio]):not([type=checkbox]):not([type=file]), .point-request.req textarea {
+    width: 100%; margin: 0; padding: 10px 12px; border: 1.5px solid var(--hsa-border); border-radius: 6px;
+    font-size: var(--hsa-text-base); background: var(--hsa-surface); color: var(--hsa-ink);
 }
-
-.point-request .form-group textarea {
-    resize: vertical;
-    min-height: 100px;
+.point-request.req input:focus-visible, .point-request.req textarea:focus-visible, .point-request.req button:focus-visible,
+.point-request .req-event:focus-within, .point-request .req-choice:focus-within, .point-request .req-photo:focus-within {
+    outline: 3px solid rgba(15, 76, 100, 0.35); outline-offset: 2px;
 }
+.point-request.req button { font-family: var(--hsa-font-body); margin: 0; min-height: 0; }
 
-.point-request .help-text {
-    font-size: 12px;
-    color: #666;
-    margin-top: 5px;
-    font-style: italic;
+/* Event Type chips */
+.point-request .req-chipgroup { display: flex; flex-direction: column; gap: 6px; }
+.point-request .req-chipgroup__label { font-size: var(--hsa-text-xs); font-weight: 600; color: var(--hsa-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.point-request .req-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.point-request .req-chip {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 8px 12px;
+    border: 1.5px solid #94a3b8; border-radius: 8px; background: var(--hsa-surface); color: var(--hsa-ink);
+    font-weight: 600; font-size: var(--hsa-text-sm); cursor: pointer;
 }
+.point-request .req-chip:hover { border-color: var(--hsa-teal-700); }
+.point-request .req-chip.is-on { background: var(--hsa-teal-700); border-color: var(--hsa-teal-700); color: #fff; }
+.point-request .req-chip__pts { font-weight: 400; font-size: var(--hsa-text-xs); opacity: .8; }
+.point-request .req-chip--other { border-style: dashed; }
 
-/* Image Upload and Preview */
-.point-request .form-group input[type="file"] {
-    padding: 8px;
-    border: 2px dashed #ddd;
-    background-color: #f9f9f9;
+/* Coded event list */
+.point-request .req-events { display: flex; flex-direction: column; border: 1px solid var(--hsa-border); border-radius: 8px; overflow: hidden; }
+.point-request .req-event {
+    display: grid; grid-template-columns: auto 1fr auto auto; gap: 10px; align-items: center; margin: 0; padding: 10px 12px;
+    border-top: 1px solid var(--hsa-border-light); font-size: var(--hsa-text-base); font-weight: 500; color: var(--hsa-ink); cursor: pointer;
 }
+.point-request .req-event:first-child { border-top: 0; }
+.point-request .req-event.is-on { background: var(--hsa-teal-100); }
+.point-request .req-event__date { color: var(--hsa-muted); font-size: var(--hsa-text-sm); }
+.point-request .req-event--other { border-top-style: dashed; }
+.point-request .req-event--other .req-event__name { color: var(--hsa-teal-700); font-weight: 700; }
+.point-request .req-tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: var(--hsa-text-xs); font-weight: 700; }
+.point-request .req-tag--miss { background: var(--hsa-danger-bg); color: var(--hsa-danger-strong); }
+.point-request .req-tag--pending { background: var(--hsa-surface-sunken); color: var(--hsa-ink-soft); }
 
-.point-request .form-group input[type="file"]:hover {
-    border-color: var(--hsa-teal-600);
-    background-color: #f0f8ff;
+/* Hours stepper */
+.point-request .req-stepper { display: inline-flex; align-items: center; gap: 12px; }
+.point-request .req-stepper button { width: 44px; height: 44px; border: 1.5px solid var(--hsa-teal-700); border-radius: 8px; background: var(--hsa-surface); color: var(--hsa-teal-700); font-size: 20px; cursor: pointer; }
+.point-request .req-stepper button:disabled { border-color: var(--hsa-border); color: var(--hsa-muted); cursor: not-allowed; }
+.point-request .req-stepper output { min-width: 80px; text-align: center; font-weight: 700; }
+
+/* Make-up picker */
+.point-request .req-makeup { margin: 0; padding: 14px; border: 1.5px solid var(--hsa-danger-border); border-radius: 8px; display: flex; flex-direction: column; gap: 6px; }
+.point-request .req-makeup legend { padding: 0 6px; }
+.point-request .req-choice { display: flex; gap: 10px; align-items: center; margin: 0; padding: 6px 4px; font-size: var(--hsa-text-base); font-weight: 400; color: var(--hsa-ink); cursor: pointer; }
+.point-request .req-choice.is-on { font-weight: 600; }
+
+/* "If E-Board approves it" */
+.point-request .req-preview { border-left: 4px solid var(--hsa-teal-600); padding: 12px 16px; border-radius: 0 8px 8px 0; }
+.point-request .req-preview__title { margin: 0 0 6px; font-weight: 700; color: var(--hsa-teal-700); font-size: var(--hsa-text-sm); }
+.point-request .req-preview ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+
+/* Photo proof: the file input sits inside the dashed button */
+.point-request .req-photo { position: relative; display: block; margin: 0; padding: 12px; border: 1.5px dashed #94a3b8; border-radius: 8px; background: var(--hsa-surface-subtle); color: var(--hsa-muted); cursor: pointer; font-size: var(--hsa-text-sm); font-weight: 400; }
+.point-request .req-photo.is-on { border-style: solid; border-color: var(--hsa-success); color: var(--hsa-success-strong); background: var(--hsa-success-bg); }
+.point-request .req-photo__input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.point-request .req-photo__preview { display: flex; align-items: flex-end; gap: 12px; }
+.point-request .req-photo__preview img { max-width: 160px; max-height: 160px; border-radius: 6px; border: 1px solid var(--hsa-border); }
+.point-request .req-photo__preview button { padding: 0; border: 0; background: none; color: var(--hsa-danger); font-size: var(--hsa-text-sm); font-weight: 600; text-decoration: underline; cursor: pointer; }
+
+.point-request .req-submit { align-self: flex-start; height: 48px; padding: 0 28px; border: 0; border-radius: 8px; background: var(--hsa-teal-700); color: #fff; font-weight: 700; font-size: var(--hsa-text-base); cursor: pointer; }
+.point-request .req-submit:disabled { background: var(--hsa-border); color: var(--hsa-muted); cursor: not-allowed; }
+
+/* Start from what you owe: the sidebar and the form beside it */
+.point-request .req-c__head { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.point-request .req-c__head .req-title { min-width: 0; }
+.point-request .req-c__grid { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+.point-request.req-c--general .req-c__grid { grid-template-columns: 1fr; }
+.point-request .req-owe { display: flex; flex-direction: column; gap: 2px; padding-right: 20px; border-right: 1px solid var(--hsa-border-light); }
+.point-request .req-owe__h { margin: 12px 0 4px; font-size: var(--hsa-text-sm); font-weight: 700; color: var(--hsa-teal-700); }
+.point-request .req-owe__h:first-child { margin-top: 0; }
+.point-request .req-owe__row { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px; padding: 8px 10px; border: 0; border-radius: 6px; background: none; color: var(--hsa-ink); font-size: var(--hsa-text-sm); font-weight: 500; text-align: left; cursor: pointer; }
+.point-request .req-owe__row:hover { background: var(--hsa-surface-subtle); }
+.point-request .req-owe__row.is-on { background: var(--hsa-teal-100); font-weight: 700; }
+.point-request .req-owe__row--other { margin-top: 10px; border: 1.5px dashed var(--hsa-border); }
+.point-request .req-owe__meta { display: flex; gap: 6px; align-items: center; color: var(--hsa-muted); font-size: var(--hsa-text-xs); white-space: nowrap; }
+.point-request .req-c__form { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.point-request .req-c__empty { margin: 0; padding: 24px; border: 1.5px dashed var(--hsa-border); border-radius: 10px; color: var(--hsa-muted); }
+.point-request .req-c__lead { margin: 0; font-size: var(--hsa-text-lg); }
+.point-request .req-fork { display: flex; flex-direction: column; gap: 10px; }
+.point-request .req-forkbtn { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; padding: 14px 16px; border: 1.5px solid var(--hsa-border); border-radius: 10px; background: var(--hsa-surface); color: var(--hsa-ink); text-align: left; cursor: pointer; font-size: var(--hsa-text-sm); }
+.point-request .req-forkbtn:hover { border-color: var(--hsa-teal-700); }
+.point-request .req-forkbtn strong { font-size: var(--hsa-text-base); color: var(--hsa-teal-700); }
+
+/* The Strikes button beside the title: red at 3 or more */
+.point-request .req-strikebtn {
+    flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: auto; min-width: 0; height: 44px; padding: 0 8px 0 16px; margin: 0;
+    border: 1.5px solid var(--hsa-teal-700); border-radius: 999px; background: var(--hsa-surface);
+    color: var(--hsa-teal-700); font-weight: 700; font-size: var(--hsa-text-sm); cursor: pointer;
 }
-
-.point-request .image-preview {
-    margin-top: 15px;
-    padding: 15px;
-    border: 2px solid var(--hsa-teal-600);
-    border-radius: 8px;
-    background-color: var(--hsa-surface-subtle);
+.point-request .req-strikebtn:hover { background: var(--hsa-teal-100); }
+.point-request .req-strikebtn__n {
+    min-width: 26px; height: 26px; padding: 0 6px; display: inline-grid; place-items: center; border-radius: 999px;
+    background: var(--hsa-teal-700); color: #fff; font-size: var(--hsa-text-xs);
 }
+.point-request .req-strikebtn.is-over { border-color: var(--hsa-danger-strong); color: var(--hsa-danger-strong); }
+.point-request .req-strikebtn.is-over:hover { background: var(--hsa-danger-bg); }
+.point-request .req-strikebtn.is-over .req-strikebtn__n { background: var(--hsa-danger-strong); }
 
-.point-request .image-preview h4 {
-    margin: 0 0 10px 0;
-    color: var(--hsa-teal-600);
+/* The Strikes view */
+.point-request .req-sp__back {
+    align-self: flex-start; padding: 0; border: 0; background: none; color: var(--hsa-teal-700);
+    font-size: var(--hsa-text-sm); font-weight: 600; text-decoration: underline; cursor: pointer;
 }
-
-.point-request .preview-container {
-    position: relative;
-    display: inline-block;
+.point-request .req-strikes {
+    display: flex; flex-direction: column; gap: 12px; padding: 18px 20px;
+    border: 1.5px solid var(--hsa-border); border-radius: 10px; background: var(--hsa-surface);
 }
-
-.point-request .preview-container img {
-    max-width: 300px;
-    max-height: 300px;
-    width: auto;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+.point-request .req-strikes.is-over { border-color: var(--hsa-danger-border); background: var(--hsa-danger-bg); }
+.point-request .req-strikes__count { margin: 0; display: flex; align-items: baseline; gap: 8px; font-size: var(--hsa-text-lg); color: var(--hsa-ink); }
+.point-request .req-strikes__count strong { font-size: var(--hsa-text-3xl); line-height: 1; color: var(--hsa-teal-700); }
+.point-request .req-strikes.is-over .req-strikes__count strong { color: var(--hsa-danger-strong); }
+.point-request .req-strikes__away { margin-left: auto; color: var(--hsa-muted); font-size: var(--hsa-text-sm); }
+.point-request .req-strikes__track { display: flex; gap: 6px; padding-bottom: 18px; }
+.point-request .req-strikes__slot { position: relative; flex: 1; height: 14px; border-radius: 4px; background: var(--hsa-surface-sunken); }
+.point-request .req-strikes__slot.is-full { background: var(--hsa-teal-600); }
+.point-request .req-strikes.is-over .req-strikes__slot.is-full { background: var(--hsa-danger); }
+/* The line at 3, labelled under the third slot */
+.point-request .req-strikes__slot.is-line::after {
+    content: '3'; position: absolute; right: 0; top: 18px; font-size: var(--hsa-text-xs); font-weight: 700; color: var(--hsa-muted);
 }
-
-.point-request .clear-image {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+.point-request .req-strikes__warn { margin: 0; font-size: var(--hsa-text-base); font-weight: 700; color: var(--hsa-danger-strong); }
+.point-request .req-sp__list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--hsa-border); border-radius: 8px; }
+.point-request .req-sp__list li {
+    display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 10px 12px;
+    border-top: 1px solid var(--hsa-border-light);
 }
-
-.point-request .clear-image:hover {
-    background-color: #c82333;
+.point-request .req-sp__list li:first-child { border-top: 0; }
+.point-request .req-sp__event { font-weight: 600; color: var(--hsa-ink); }
+.point-request .req-sp__date { color: var(--hsa-muted); font-size: var(--hsa-text-sm); }
+.point-request .req-sp__fix {
+    height: 36px; padding: 0 12px; border: 1.5px solid var(--hsa-teal-700); border-radius: 6px; background: var(--hsa-surface);
+    color: var(--hsa-teal-700); font-weight: 700; font-size: var(--hsa-text-xs); cursor: pointer;
 }
+.point-request .req-sp__fix:hover { background: var(--hsa-teal-100); }
 
-/* Information Section */
-.point-request .info-section {
-    margin-top: 40px;
-    padding: 20px;
-    background-color: var(--hsa-teal-100);
-    border-radius: 8px;
-    border-left: 4px solid var(--hsa-teal-600);
-}
-
-.point-request .info-section ul {
-    margin: 0;
-    padding-left: 20px;
-}
-
-.point-request .info-section li {
-    margin-bottom: 8px;
-    line-height: 1.5;
-    color: #333;
-}
-
-/* Browsers draw date inputs taller than number inputs with the same
-   padding; pin Date and Points Requested to one height so they line up. */
-.point-request .request-form .form-row input[type="date"] {
-    height: 48px;
-}
-
-/* Responsive Design */
 @media (max-width: 768px) {
     .point-request {
         margin: 10px;
         padding: 15px;
     }
-
-    /* iOS Safari draws date inputs at their own size, ignoring width and
-       overlapping the next field. Dropping the native styling makes them
-       respect the box; tapping still opens the date picker. */
-    .point-request .form-group input[type="date"] {
-        -webkit-appearance: none;
-        appearance: none;
-        min-height: 48px;
-        background-color: #fff;
-    }
-
-    .point-request .form-group input[type="date"]::-webkit-date-and-time-value {
-        text-align: left;
-    }
-
-    .point-request .preview-container img {
-        max-width: 100%;
-        max-height: 250px;
-    }
 }
 
-@media (max-width: 480px) {
-    .point-request h2 {
-        font-size: 24px;
-    }
-
-    .point-request .description {
-        font-size: 14px;
-    }
-
-    .point-request .preview-container img {
-        max-height: 200px;
-    }
-}
-.point-request .form-group label[for="eventName"]:after,
-.point-request .form-group label[for="eventDate"]:after,
-.point-request .form-group label[for="hours"]:after,
-.point-request .form-group label[for="note"]:after,
-.point-request .form-group label[for="imageUpload"]:after {
-    content: ' *';
-    color: #dc3545;
-}
-
-/* ---- Submit Point Request, variant C (PointRequestForm.tsx) ------------------------ */
-
-/* Title with the Strikes button beside it. */
-.point-request .point-request__head {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.point-request .strikes-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 0 14px;
-    border: 1.5px solid var(--hsa-teal-700);
-    border-radius: 999px;
-    color: var(--hsa-teal-700);
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.point-request .strikes-button__count {
-    min-width: 24px;
-    padding: 2px 6px;
-    border-radius: 999px;
-    background: var(--hsa-teal-700);
-    color: #fff;
-    text-align: center;
-}
-
-/* Red at 3 or more open Strikes. */
-.point-request .strikes-button.is-at-risk {
-    border-color: var(--hsa-danger);
-    color: var(--hsa-danger);
-}
-
-.point-request .strikes-button.is-at-risk .strikes-button__count {
-    background: var(--hsa-danger);
-}
-
-/* One question of the form: a legend and its bubbles. */
-.point-request .request-step {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    min-width: 0;
-}
-
-.point-request .request-step legend {
-    margin-bottom: 10px;
-    color: var(--hsa-ink);
-    font-size: var(--hsa-text-base);
-    font-weight: 700;
-}
-
-.point-request .request-step__group + .request-step__group,
-.point-request .request-step__group + .bubbles {
-    margin-top: 14px;
-}
-
-.point-request .request-step__group h4 {
-    margin: 0 0 8px;
-    color: var(--hsa-muted);
-    font-size: var(--hsa-text-sm);
-    font-weight: 600;
-}
-
-.point-request .request-step__search {
-    width: 100%;
-    margin-bottom: 14px;
-}
-
-.point-request .bubbles {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-/* A pill button; pressed = picked. */
-.point-request .bubble {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    min-height: 44px;
-    padding: 8px 14px;
-    border: 1.5px solid #94a3b8;
-    border-radius: 999px;
-    background: var(--hsa-surface);
-    color: var(--hsa-ink);
-    font: inherit;
-    font-size: var(--hsa-text-sm);
-    font-weight: 600;
-    text-align: left;
-    cursor: pointer;
-}
-
-.point-request .bubble:hover {
-    border-color: var(--hsa-teal-700);
-}
-
-.point-request .bubble:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.point-request .bubble.is-selected {
-    background: var(--hsa-teal-700);
-    border-color: var(--hsa-teal-700);
-    color: #fff;
-}
-
-.point-request .bubble:focus-visible {
-    outline: 3px solid rgba(15, 76, 100, 0.35);
-    outline-offset: 2px;
-}
-
-.point-request .tag,
-.strikes-page .tag {
-    padding: 1px 8px;
-    border-radius: 999px;
-    background: var(--hsa-surface-sunken);
-    color: var(--hsa-ink-soft);
-    font-size: var(--hsa-text-xs);
-    font-weight: 600;
-}
-
-.point-request .tag--strike,
-.strikes-page .tag--strike {
-    background: var(--hsa-danger-bg);
-    color: var(--hsa-danger-strong);
-}
-
-.point-request .bubble.is-selected .tag {
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
-}
-
-.point-request .field-error {
-    color: var(--hsa-danger);
-    font-size: var(--hsa-text-sm);
-}
-
-.point-request .request-preview {
-    padding: 14px 16px;
-    border-left: 4px solid var(--hsa-teal-600);
-    border-radius: 6px;
-    background: var(--hsa-teal-100);
-}
-
-.point-request .request-preview h4 {
-    margin: 0 0 6px;
-    color: var(--hsa-teal-700);
-}
-
-.point-request .request-preview p,
-.point-request .request-preview ul {
-    margin: 0;
-}
-
-.point-request .request-preview ul {
-    margin-top: 6px;
-    padding-left: 20px;
-}
-
-/* ---- Strikes page  (pages/strikes/Strikes.tsx) ------------------------------------ */
-
-.strikes-page {
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 24px 16px 40px;
-}
-
-.strikes-page .strikes-card {
-    margin: 16px 0 28px;
-    padding: 20px;
-    border: 2px solid var(--hsa-teal-600);
-    border-radius: 10px;
-    background: var(--hsa-surface);
-}
-
-.strikes-page .strikes-card.is-at-risk {
-    border-color: var(--hsa-danger);
-}
-
-.strikes-page .strikes-card__count {
-    margin: 0 0 12px;
-    font-size: var(--hsa-text-lg);
-    font-weight: 600;
-}
-
-.strikes-page .strikes-card__count span {
-    font-size: var(--hsa-text-3xl);
-    font-weight: 800;
-    color: var(--hsa-teal-700);
-}
-
-.strikes-page .strikes-card.is-at-risk .strikes-card__count span {
-    color: var(--hsa-danger);
-}
-
-/* One slot per Strike, with a line after the third; grows past 3. */
-.strikes-page .strike-bar {
-    display: flex;
-    gap: 4px;
-}
-
-.strikes-page .strike-bar__slot {
-    flex: 1;
-    height: 14px;
-    border-radius: 3px;
-    background: var(--hsa-surface-sunken);
-}
-
-.strikes-page .strike-bar__slot.is-filled {
-    background: var(--hsa-teal-600);
-}
-
-.strikes-page .strikes-card.is-at-risk .strike-bar__slot.is-filled {
-    background: var(--hsa-danger);
-}
-
-.strikes-page .strike-bar__slot.is-mark {
-    box-shadow: 4px 0 0 var(--hsa-surface), 7px 0 0 var(--hsa-ink);
-}
-
-.strikes-page .strikes-card__warning {
-    margin: 14px 0 0;
-    padding: 10px 12px;
-    border-radius: 6px;
-    background: var(--hsa-danger-bg);
-    color: var(--hsa-danger-strong);
-    font-weight: 600;
-}
-
-.strikes-page .strikes-card__help {
-    margin: 12px 0 0;
-    color: var(--hsa-muted);
-    font-size: var(--hsa-text-sm);
-}
-
-.strikes-page .strikes-list ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.strikes-page .strikes-list li {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px 16px;
-    min-height: 48px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--hsa-border-light);
-}
-
-.strikes-page .strikes-list__event {
-    display: inline-flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    font-weight: 600;
-}
-
-.strikes-page .strikes-list__date {
-    color: var(--hsa-muted);
-    font-weight: 400;
-}
-
-.strikes-page .strikes-list a {
-    color: var(--hsa-teal-600);
-    font-weight: 600;
+@media (max-width: 640px) {
+    .point-request .req-row { grid-template-columns: 1fr; }
+    .point-request .req-c__grid { grid-template-columns: 1fr; }
+    .point-request .req-owe { padding: 0 0 16px; border-right: 0; border-bottom: 1px solid var(--hsa-border-light); }
+    .point-request .req-sp__list li { grid-template-columns: 1fr auto; }
+    .point-request .req-sp__list li > :last-child { grid-column: 1 / -1; justify-self: start; }
 }
 
 /* ---- Cabinet points breakdown  (CabinetPoints.tsx) ------------------------------------ */
@@ -973,60 +696,6 @@
 
 .strike {
     color:red;
-}
-
-/* ---- Points Requested: 1 / 2 choice  (PointRequest.tsx) ----------------
-   Only shown for "Other"; without it the Date field spans the row. */
-.point-request .form-row--single {
-    grid-template-columns: minmax(0, 1fr);
-}
-
-.point-request .points-choice {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.point-request .points-choice__option {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 48px;
-    margin: 0;
-    border: 1.5px solid #94a3b8;
-    border-radius: 6px;
-    background: var(--hsa-surface);
-    color: var(--hsa-ink);
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: border-color 0.2s, background-color 0.2s, color 0.2s;
-}
-
-.point-request .points-choice__option:hover {
-    border-color: var(--hsa-teal-700);
-}
-
-.point-request .points-choice__option.is-selected {
-    background: var(--hsa-teal-700);
-    border-color: var(--hsa-teal-700);
-    color: #ffffff;
-}
-
-/* The real radio stays in the page (keyboard + form validation) but is
-   drawn by its label instead. */
-.point-request .points-choice__option input {
-    position: absolute;
-    opacity: 0;
-    width: 1px;
-    height: 1px;
-    margin: 0;
-}
-
-.point-request .points-choice__option:focus-within {
-    outline: 3px solid rgba(15, 76, 100, 0.35);
-    outline-offset: 2px;
 }
 
 /* ---- My Events Attended  (EventsAttendedList.tsx) ----------------------

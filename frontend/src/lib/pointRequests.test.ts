@@ -39,6 +39,16 @@ describe('pickerGroups', () => {
     });
 });
 
+describe('pickerGroups for Cabinet Members', () => {
+    it('lists every Event Type as one set of chips, Cabinet-only ones included', () => {
+        const groups = pickerGroups(true);
+
+        expect(groups).toHaveLength(1);
+        expect(groups[0].choices).toHaveLength(18);
+        expect(groups[0].choices.map((choice) => choice.id)).toContain('internal-social');
+    });
+});
+
 describe('eventChoices', () => {
     const lastYear = code('OPA25', 'opa-general', '2026-03-02');
     const opaGeneral = code('OPAGEN', 'opa-general', '2026-09-10');
@@ -168,14 +178,14 @@ describe('buildPointRequest', () => {
 
     it("saves a Tabling request's hours with one Make-up pick per hour", () => {
         const built = buildPointRequest(draft({
-            typeChoiceId: 'tabling', eventTypeId: 'tabling', eventDate: '2026-10-12', hours: 3,
+            typeChoiceId: 'tabling', eventTypeId: 'tabling', eventName: 'Turlington table', eventDate: '2026-10-12', hours: 3,
             note: 'Tabled at Turlington', makeupFor: ['CT1'],
         }), context);
 
         expect(built.ok && built.data).toMatchObject({
             codeId: null,
             eventTypeId: 'tabling',
-            activityName: 'Tabling',
+            activityName: 'Turlington table',
             hours: 3,
             makeupFor: ['CT1', null, null],
             description: 'Tabled at Turlington',
@@ -199,7 +209,9 @@ describe('buildPointRequest', () => {
         ['no date', draft({ typeChoiceId: 'crash', eventTypeId: 'crash', eventName: 'CRASH', note: 'x' }), 'Pick the date of the event.'],
         ['a date in the future', draft({ typeChoiceId: 'crash', eventTypeId: 'crash', eventName: 'CRASH', eventDate: '2026-10-16', note: 'x' }), "The event can't be in the future."],
         ['no note', draft({ typeChoiceId: 'crash', eventTypeId: 'crash', eventName: 'CRASH', eventDate: '2026-10-02' }), 'Say what you did.'],
-        ['part of an hour', draft({ typeChoiceId: 'tabling', eventTypeId: 'tabling', eventDate: '2026-10-02', note: 'x', hours: 1.5 }), 'Enter whole hours, from 1 to 12.'],
+        ['no name for Tabling', draft({ typeChoiceId: 'tabling', eventTypeId: 'tabling', eventDate: '2026-10-02', note: 'x' }), 'Name the event.'],
+        ['part of an hour', draft({ typeChoiceId: 'tabling', eventTypeId: 'tabling', eventName: 'Table', eventDate: '2026-10-02', note: 'x', hours: 1.5 }), 'Enter whole hours, from 1 to 8.'],
+        ['more hours than a day', draft({ typeChoiceId: 'tabling', eventTypeId: 'tabling', eventName: 'Table', eventDate: '2026-10-02', note: 'x', hours: 9 }), 'Enter whole hours, from 1 to 8.'],
     ])('refuses a request with %s', (_, request, error) => {
         expect(buildPointRequest(request, context)).toEqual({ ok: false, error });
     });

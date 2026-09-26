@@ -23,7 +23,6 @@ const UserPointsLookup = lazy(() => import('./pages/eboard/UserPointsLookup'));
 const ExcuseAbscense = lazy(() => import('./pages/eboard/ExcuseAbscense'));
 const ApprovedCabinet = lazy(() => import('./pages/eboard/ApprovedCabinet'));
 const Cabinet = lazy(() => import('./pages/cabinet/Cabinet'));
-const Strikes = lazy(() => import('./pages/strikes/Strikes'));
 
 function App() {
     const [userEmail, setUserEmail] = useState(null);
@@ -88,7 +87,6 @@ function App() {
                         <Route path="/signup" element={userEmail ? <Navigate to="/dashboard" replace /> : <SignUp />} />
                         <Route path="/login" element={userEmail ? <Navigate to="/dashboard" replace /> : <Login />} />
                         <Route path="/dashboard" element={userEmail ? <Dashboard cabinet={isCabinetMember} email={userEmail} /> : <Navigate to="/login" />} />
-                        <Route path="/strikes" element={userEmail ? <Strikes /> : <Navigate to="/login" />} />
                         <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember} /> : <Navigate to="/login" />} />
                         {/* E-Board tools, one page each (list in pages/eboard/eboardTools.ts) */}
                         <Route path="/eboard" element={userEmail ? <Eboard eboard={isEboard} /> : <Navigate to="/login" />}>

@@ -3,7 +3,7 @@
 // pointRequests/{id} doc it saves. Pure, so it's tested without Firestore;
 // points and Make-ups come only from computeStanding.
 import { computeStanding, type Attendance, type Code, type Member } from './computeStanding';
-import { eventType, rubric, tierLabels, tiers } from './rubric';
+import { eventType, rubric } from './rubric';
 import { academicYear } from './semester';
 
 /** The "Not listed" bubble: E-Board picks the Event Type on review, or denies it or records an Adjustment. */
@@ -41,17 +41,12 @@ export function typeChoiceFor(eventTypeId: string): TypeChoice {
 }
 
 /**
- * The "Something else" search's bubbles. Members held to the Cabinet rules
- * get every Event Type by tier; General Members get friendlier groups
- * without the Cabinet-only ones.
+ * The "Something else" search's chips. Members held to the Cabinet rules
+ * get every Event Type as one set (each chip shows its tier); General
+ * Members get friendlier groups without the Cabinet-only ones.
  */
 export function pickerGroups(heldToCabinetRules: boolean): TypeChoiceGroup[] {
-    if (heldToCabinetRules) {
-        return tiers.map((tier) => ({
-            label: `${tierLabels[tier]}s`,
-            choices: rubric.filter((type) => type.tier === tier).map((type) => typeChoiceFor(type.id)),
-        }));
-    }
+    if (heldToCabinetRules) return [{ label: '', choices: rubric.map((type) => typeChoiceFor(type.id)) }];
     return generalGroups.map((group) => ({
         label: group.label,
         choices: group.choices.map((choice) => (typeof choice === 'string' ? typeChoiceFor(choice) : choice)),
@@ -214,7 +209,8 @@ export type BuildContext = { email: string; codes: Code[]; today: string };
 
 export type Built = { ok: true; data: PointRequestDoc } | { ok: false; error: string };
 
-const MAX_HOURS = 12;
+/** The hours stepper's top: more than a day's tabling is a typo. */
+export const MAX_HOURS = 8;
 
 /** Checks a draft and turns it into the doc to save. */
 export function buildPointRequest(draft: RequestDraft, { email, codes, today }: BuildContext): Built {
@@ -228,8 +224,7 @@ export function buildPointRequest(draft: RequestDraft, { email, codes, today }: 
     const name = draft.eventName.trim();
 
     if (!code) {
-        // Tabling is named by its Event Type; every other event without a code needs a name.
-        if (!type?.perHour && !name) return { ok: false, error: 'Name the event.' };
+        if (!name) return { ok: false, error: 'Name the event.' };
         if (!date) return { ok: false, error: 'Pick the date of the event.' };
         if (date > today) return { ok: false, error: "The event can't be in the future." };
         if (!note) return { ok: false, error: 'Say what you did.' };

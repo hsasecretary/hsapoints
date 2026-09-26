@@ -61,15 +61,18 @@ function PhotoField({ value, onChange }: PhotoFieldProps) {
     };
 
     return (
-        <div className="form-group">
-            <label htmlFor="imageUpload">Photo from the event</label>
-            <input ref={input} type="file" id="imageUpload" accept="image/*" onChange={(e) => pick(e.target.files?.[0])} />
-            <span className="help-text">A photo that shows you were there. Max {MAX_SIZE_MB}MB.</span>
-            {error && <span className="field-error" role="alert">{error}</span>}
+        <div className="req-field">
+            <span className="req-label">Photo proof</span>
+            <label className={`req-photo${value ? ' is-on' : ''}`}>
+                <input ref={input} type="file" accept="image/*" className="req-photo__input"
+                    onChange={(e) => pick(e.target.files?.[0])} />
+                {value ? 'Photo attached (tap to change)' : 'Attach a photo that shows you were there'}
+            </label>
+            {error && <p className="req-error" role="alert">{error}</p>}
             {value && (
-                <div className="preview-container">
+                <div className="req-photo__preview">
                     <img src={value} alt="Your photo" />
-                    <button type="button" className="clear-image" onClick={clear} aria-label="Remove photo">✕</button>
+                    <button type="button" onClick={clear}>Remove photo</button>
                 </div>
             )}
         </div>
