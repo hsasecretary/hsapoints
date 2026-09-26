@@ -3,13 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../../../lib/firebase';
 import SectionTitle from '../../../components/ui/SectionTitle';
-import type { Code, MissedEvent } from '../../../lib/computeStanding';
+import { AT_RISK_STRIKES, type Code, type MissedEvent } from '../../../lib/computeStanding';
 import {
-    attendanceCount, buildPointRequest, eventChoices, makeupTypeChoices, NOT_LISTED, pickerGroups, previewRequest, typeChoiceFor,
+    attendanceCount, buildPointRequest, eventChoices, makeupTypeChoices, missedEventName, NOT_LISTED, pickerGroups, previewRequest, typeChoiceFor,
     type RequestDraft, type TypeChoice,
 } from '../../../lib/pointRequests';
 import { eventType } from '../../../lib/rubric';
-import { currentSemester, fromIsoDate, shortDate } from '../../../lib/semester';
+import { semesterOf, shortDate } from '../../../lib/semester';
 import { pendingMakeups, useMemberStanding } from '../useMemberStanding';
 import PhotoField from './PhotoField';
 
@@ -24,9 +24,12 @@ type EventPick = { kind: 'code'; code: Code } | { kind: 'other' } | null;
 
 const emptyFields = { eventName: '', eventDate: '', note: '', hours: 1 };
 
-function Bubble({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: ReactNode }) {
+type BubbleProps = { selected: boolean; onClick: () => void; children: ReactNode; disabled?: boolean };
+
+function Bubble({ selected, onClick, children, disabled }: BubbleProps) {
     return (
-        <button type="button" className={`bubble${selected ? ' is-selected' : ''}`} aria-pressed={selected} onClick={onClick}>
+        <button type="button" className={`bubble${selected ? ' is-selected' : ''}`} aria-pressed={selected}
+            disabled={disabled} onClick={onClick}>
             {children}
         </button>
     );
@@ -70,13 +73,12 @@ function PointRequestForm() {
     const owed = standing.missedEvents.filter((missed) => missed.owed);
     const pendingPicks = pendingMakeups(pending);
     const missedLabel = (missed: Pick<MissedEvent, 'codeId' | 'eventTypeId' | 'eventDate'>) =>
-        `${codeById.get(missed.codeId)?.event || eventType(missed.eventTypeId)?.label} · ${shortDate(missed.eventDate)}`;
-    const semester = currentSemester(fromIsoDate(today)) === 'springPoints' ? 'spring' : 'fall';
-    const openRequirements = standing.semesterRequirements[semester].filter((requirement) => !requirement.met);
+        `${missedEventName(codes, missed)} · ${shortDate(missed.eventDate)}`;
+    const openRequirements = standing.semesterRequirements[semesterOf(today)].filter((requirement) => !requirement.met);
     const missed = from?.kind === 'missed' ? owed.find((row) => row.codeId === from.codeId) : undefined;
     const iWasThere = from?.kind === 'missed' && from.mode === 'attended' && missed;
     const choices = typeChoice
-        ? eventChoices(typeChoice, { codes, attendances, pendingCodeIds: [...pendingPicks], today })
+        ? eventChoices(typeChoice, { codes, attendances, pendingCodeIds: pending.map((request) => request.codeId).filter(Boolean), today })
         : null;
     const notListed = typeChoice?.id === NOT_LISTED;
     const pickedCode = iWasThere ? codeById.get(missed.codeId) : eventPick?.kind === 'code' ? eventPick.code : null;
@@ -119,7 +121,10 @@ function PointRequestForm() {
         ? previewRequest(member, attendances, codes, { ...baseDraft, makeupFor: picks.map((pick) => pick ?? null) }, options)
         : null;
     const defaultIndex = firstPass?.attendances.findIndex((attendance) => attendance.surplus) ?? -1;
-    const makeupFor = (firstPass?.attendances ?? [{}]).map((_, i) => {
+    // Only a Surplus Attendance can be a Make-up, so a pick left from before
+    // the date or hours changed goes with its picker.
+    const makeupFor = (firstPass?.attendances ?? [{ surplus: false }]).map((attendance, i) => {
+        if (!attendance.surplus) return null;
         if (picks[i] !== undefined) return picks[i];
         return from?.kind === 'missed' && from.mode === 'makeup' && i === defaultIndex ? from.codeId : null;
     });
@@ -171,7 +176,7 @@ function PointRequestForm() {
             <div className="point-request__head">
                 <SectionTitle>Submit Point Request</SectionTitle>
                 {held && (
-                    <Link to="/strikes" className={`strikes-button${standing.openStrikes >= 3 ? ' is-at-risk' : ''}`}>
+                    <Link to="/strikes" className={`strikes-button${standing.openStrikes >= AT_RISK_STRIKES ? ' is-at-risk' : ''}`}>
                         Strikes <span className="strikes-button__count">{standing.openStrikes}</span>
                     </Link>
                 )}
@@ -192,6 +197,7 @@ function PointRequestForm() {
                                 <div className="bubbles">
                                     {owed.map((row) => (
                                         <Bubble key={row.codeId} selected={from?.kind === 'missed' && from.codeId === row.codeId}
+                                            disabled={pendingPicks.has(row.codeId)}
                                             onClick={() => chooseStart({ kind: 'missed', codeId: row.codeId, mode: null })}>
                                             {missedLabel(row)}
                                             {row.strike && <span className="tag tag--strike">Strike</span>}
@@ -324,9 +330,11 @@ function PointRequestForm() {
                                 <select id={`makeup-${i}`} value={makeupFor[i] ?? ''} onChange={(e) => setPick(i, e.target.value || null)}>
                                     <option value="">
                                         Pick for me{!makeupFor[i] && attendance.makeupFor
-                                            ? ` (${missedLabel(owed.find((row) => row.codeId === attendance.makeupFor))})` : ''}
+                                            ? ` (${missedLabel(standing.missedEvents.find((row) => row.codeId === attendance.makeupFor))})` : ''}
                                     </option>
-                                    {owed.map((row) => (
+                                    {/* Not one another hour already makes up, or a pending request covers. */}
+                                    {owed.filter((row) => row.codeId === makeupFor[i]
+                                        || (!pendingPicks.has(row.codeId) && !makeupFor.includes(row.codeId))).map((row) => (
                                         <option key={row.codeId} value={row.codeId}>
                                             {missedLabel(row)}{row.strike ? ' (Strike)' : ''}
                                         </option>

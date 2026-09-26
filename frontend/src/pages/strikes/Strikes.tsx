@@ -1,12 +1,10 @@
 import { Link, Navigate } from 'react-router-dom';
 import { auth } from '../../lib/firebase';
+import { AT_RISK_STRIKES as AT_RISK } from '../../lib/computeStanding';
+import { missedEventName } from '../../lib/pointRequests';
 import SectionTitle from '../../components/ui/SectionTitle';
-import { eventType } from '../../lib/rubric';
 import { shortDate } from '../../lib/semester';
 import { pendingMakeups, useMemberStanding } from '../dashboard/useMemberStanding';
-
-/** Open Strikes at which a Cabinet Member is at risk of probation. */
-const AT_RISK = 3;
 
 // /strikes (#47 variant C): a Cabinet Member's open Strikes and the Missed
 // Events still to make up. Members never see whether a miss was excused:
@@ -24,8 +22,6 @@ function Strikes() {
     const slots = Math.max(AT_RISK + 1, count);
     const owed = standing.missedEvents.filter((missed) => missed.owed);
     const pendingPicks = pendingMakeups(pending);
-    const eventName = (codeId: string, eventTypeId: string) =>
-        codes.find((code) => code.id === codeId)?.event || eventType(eventTypeId)?.label;
 
     return (
         <div className="strikes-page">
@@ -59,7 +55,7 @@ function Strikes() {
                         {owed.map((missed) => (
                             <li key={missed.codeId}>
                                 <span className="strikes-list__event">
-                                    {eventName(missed.codeId, missed.eventTypeId)}
+                                    {missedEventName(codes, missed)}
                                     <span className="strikes-list__date">{shortDate(missed.eventDate)}</span>
                                     {missed.strike && <span className="tag tag--strike">Strike</span>}
                                 </span>

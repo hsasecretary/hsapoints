@@ -1,5 +1,5 @@
 /* ========================================================================
-   Member dashboard (/dashboard) and Cabinet page (/cabinet)
+   Member dashboard (/dashboard), Cabinet page (/cabinet) and Strikes page (/strikes)
    ======================================================================== */
 
 /* ---- Dashboard page shell, attendance box, points cards  (Dashboard.tsx, Attendance.tsx, CabinetPoints.tsx) ---------- */
@@ -763,6 +763,11 @@
 
 .point-request .bubble:hover {
     border-color: var(--hsa-teal-700);
+}
+
+.point-request .bubble:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .point-request .bubble.is-selected {

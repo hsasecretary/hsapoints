@@ -4,7 +4,7 @@
 // points and Make-ups come only from computeStanding.
 import { computeStanding, type Attendance, type Code, type Member } from './computeStanding';
 import { eventType, rubric, tierLabels, tiers } from './rubric';
-import { fromIsoDate } from './semester';
+import { academicYear } from './semester';
 
 /** The "Not listed" bubble: E-Board picks the Event Type on review, or denies it or records an Adjustment. */
 export const NOT_LISTED = 'not-listed';
@@ -29,6 +29,11 @@ const generalGroups: { label: string; choices: (string | TypeChoice)[] }[] = [
     { label: 'Socials and MLP', choices: ['external-social', 'mlp-open'] },
 ];
 
+/** A Missed Event's name: its code's event, else its Event Type. */
+export function missedEventName(codes: Code[], missed: { codeId: string; eventTypeId: string }): string {
+    return codes.find((code) => code.id === missed.codeId)?.event || eventType(missed.eventTypeId)?.label || missed.codeId;
+}
+
 /** The bubble for one Event Type. */
 export function typeChoiceFor(eventTypeId: string): TypeChoice {
     const type = rubric.find((row) => row.id === eventTypeId);
@@ -51,13 +56,6 @@ export function pickerGroups(heldToCabinetRules: boolean): TypeChoiceGroup[] {
         label: group.label,
         choices: group.choices.map((choice) => (typeof choice === 'string' ? typeChoiceFor(choice) : choice)),
     }));
-}
-
-/** A school year runs June to May, since June and July count toward the coming Fall. */
-export function academicYear(today: string): { start: string; end: string } {
-    const date = fromIsoDate(today);
-    const fallYear = date.getMonth() + 1 >= 6 ? date.getFullYear() : date.getFullYear() - 1;
-    return { start: `${fallYear}-06-01`, end: `${fallYear + 1}-05-31` };
 }
 
 export type EventChoiceContext = {

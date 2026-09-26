@@ -7,7 +7,7 @@
 // Attendance of two years would share Semester Requirements.
 import { isHeldToCabinetRules } from './members';
 import type { EventType } from './rubric';
-import { currentSemester, fromIsoDate } from './semester';
+import { semesterOf } from './semester';
 
 /** The users/{email} fields a standing depends on. */
 export type Member = {
@@ -118,6 +118,9 @@ export type StandingOptions = {
     /** E-Board or a Web-team Tester previewing the Cabinet Member view. */
     viewingAsCabinet?: boolean;
 };
+
+/** Open Strikes at which a Cabinet Member is at risk of probation and must meet with the Chief of Staff. */
+export const AT_RISK_STRIKES = 3;
 
 /** One HLHM event a year fills its Core Event; any beyond it is surplus. */
 const HLHM = 'hlhm';
@@ -302,11 +305,6 @@ function listCoreEvents(
             status,
         };
     });
-}
-
-/** Semester comes from the event date, never from a stored field. */
-function semesterOf(isoDate: string): Semester {
-    return currentSemester(fromIsoDate(isoDate)) === 'springPoints' ? 'spring' : 'fall';
 }
 
 /** Code IDs are uppercase doc IDs, but a few older rows were stored in mixed case. */
