@@ -548,6 +548,10 @@
 .point-request .req-tag--pending { background: var(--hsa-surface-sunken); color: var(--hsa-ink-soft); }
 
 /* Hours stepper */
+/* base.css gives every button a 10em min-width and 1.2em text on phones;
+   the form's buttons size themselves. */
+.point-request button { min-width: 0; min-height: 0; font-size: inherit; }
+
 .point-request .req-stepper { display: inline-flex; align-items: center; gap: 12px; }
 .point-request .req-stepper button { width: 44px; height: 44px; border: 1.5px solid var(--hsa-teal-700); border-radius: 8px; background: var(--hsa-surface); color: var(--hsa-teal-700); font-size: 20px; cursor: pointer; }
 .point-request .req-stepper button:disabled { border-color: var(--hsa-border); color: var(--hsa-muted); cursor: not-allowed; }
