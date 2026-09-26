@@ -599,6 +599,8 @@
 .point-request .req-forkbtn { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; padding: 14px 16px; border: 1.5px solid var(--hsa-border); border-radius: 10px; background: var(--hsa-surface); color: var(--hsa-ink); text-align: left; cursor: pointer; font-size: var(--hsa-text-sm); }
 .point-request .req-forkbtn:hover { border-color: var(--hsa-teal-700); }
 .point-request .req-forkbtn strong { font-size: var(--hsa-text-base); color: var(--hsa-teal-700); }
+.point-request .req-pending { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 14px 16px; border: 1.5px dashed var(--hsa-border); border-radius: 10px; background: var(--hsa-surface-sunken); color: var(--hsa-ink-soft); font-size: var(--hsa-text-sm); }
+.point-request .req-pending strong { font-size: var(--hsa-text-base); color: var(--hsa-ink); }
 
 /* The Strikes button beside the title: red at 3 or more */
 .point-request .req-strikebtn {

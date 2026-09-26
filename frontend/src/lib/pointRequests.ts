@@ -270,20 +270,3 @@ export function buildPointRequest(draft: RequestDraft, { email, codes, today }: 
         },
     };
 }
-
-/**
- * "I made it up at another event": the Event Types an event today would be
- * Surplus Attendance for, so it can be a Make-up. Tabling always, since
- * any hour after the first is Surplus.
- */
-export function makeupTypeChoices(member: Member, attendances: Attendance[], codes: Code[], options: PreviewOptions): TypeChoice[] {
-    return rubric
-        .filter((type) => {
-            const preview = previewRequest(member, attendances, codes, {
-                typeChoiceId: type.id, eventTypeId: type.id, codeId: null, eventName: '', eventDate: options.today,
-                note: '', hours: 2, makeupFor: [], photo: '',
-            }, options);
-            return preview.attendances.some((attendance) => attendance.surplus);
-        })
-        .map((type) => typeChoiceFor(type.id));
-}
