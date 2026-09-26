@@ -4,6 +4,7 @@ import { createCode, suggestCode } from '../../../lib/eventCodes';
 import { eventType } from '../../../lib/rubric';
 import { toIsoDate } from '../../../lib/semester';
 import EventTypeSelect from './EventTypeSelect';
+import DatePicker from './DatePicker';
 import TypeFacts from './TypeFacts';
 
 const blank = { event: '', code: '', eventDate: '', eventTypeId: '', graphicDate: '' };
@@ -55,8 +56,8 @@ function QuickAdd() {
                 }} />
             <input aria-label="Code" placeholder="CODE" className="quick-add__code" value={row.code}
                 onChange={(e) => { set('code', e.target.value.toUpperCase()); setCodeTyped(true); }} />
-            <input aria-label="Event date" type="date" className="quick-add__date" value={row.eventDate}
-                onChange={(e) => set('eventDate', e.target.value)} />
+            <DatePicker label="Event date" hideLabel className="quick-add__date" value={row.eventDate}
+                onChange={(iso) => set('eventDate', iso)} />
             <EventTypeSelect value={row.eventTypeId} onChange={(id) => set('eventTypeId', id)} />
             <button type="submit" className="quick-add__submit" disabled={saving}>{saving ? 'Adding…' : 'Add code'}</button>
             <button type="button" className="link-button quick-add__more-toggle" onClick={() => setMore((open) => !open)}
@@ -64,10 +65,9 @@ function QuickAdd() {
                 {more ? 'Less' : 'More'}
             </button>
             {more && (
-                <label id="quick-add-more" className="quick-add__more">
-                    Graphic posted (optional, for reference only)
-                    <input type="date" value={row.graphicDate} onChange={(e) => set('graphicDate', e.target.value)} />
-                </label>
+                <div id="quick-add-more" className="quick-add__more">
+                    <DatePicker label="Graphic posted" optional value={row.graphicDate} onChange={(iso) => set('graphicDate', iso)} />
+                </div>
             )}
             <div className="quick-add__status" role="status">
                 {status?.error ? <span className="quick-add__error">{status.text}</span>

@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@internationalized/date": "^3.12.4",
     "firebase": "^10.11.1",
     "react": "^18.3.1",
+    "react-aria-components": "^1.21.1",
     "react-dom": "^18.3.1",
     "react-firebase-hooks": "^5.1.1",
     "react-router-dom": "^6.23.0",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^3.0.4",
+    "@react-aria/optimize-locales-plugin": "^2.0.2",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.7.0",

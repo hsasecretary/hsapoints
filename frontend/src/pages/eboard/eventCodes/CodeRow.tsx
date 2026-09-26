@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { db } from '../../../lib/firebase';
 import { deleteCode, updateCode, type CodeRow as Code } from '../../../lib/eventCodes';
 import { eventType } from '../../../lib/rubric';
+import DatePicker from './DatePicker';
 import EventTypeSelect from './EventTypeSelect';
 import TypeFacts from './TypeFacts';
 
@@ -86,8 +87,11 @@ function CodeEditForm({ code, onDone }: { code: Code; onDone: () => void }) {
         run(() => updateCode(db, code.id, edit));
     };
 
+    // Delete asks "are you sure" right in the form instead of a browser dialog.
+    const [confirming, setConfirming] = useState(false);
     const remove = () => {
-        if (window.confirm(`Delete ${code.id}? This can't be undone.`)) run(() => deleteCode(db, code.id));
+        setConfirming(false);
+        run(() => deleteCode(db, code.id));
     };
 
     return (
@@ -96,28 +100,33 @@ function CodeEditForm({ code, onDone }: { code: Code; onDone: () => void }) {
                 <label htmlFor={fieldId('event')}>Event name
                     <input id={fieldId('event')} value={edit.event} onChange={(e) => set('event', e.target.value)} />
                 </label>
-                <label htmlFor={fieldId('date')}>Date
-                    <input id={fieldId('date')} type="date" value={edit.eventDate} onChange={(e) => set('eventDate', e.target.value)} />
-                </label>
+                <DatePicker label="Date" value={edit.eventDate} onChange={(iso) => set('eventDate', iso)} />
                 <label htmlFor={fieldId('type')}>Event Type
                     <EventTypeSelect id={fieldId('type')} value={edit.eventTypeId} onChange={(id) => set('eventTypeId', id)} />
                 </label>
-                <label htmlFor={fieldId('graphic')}>Graphic posted <small>(optional)</small>
-                    <input id={fieldId('graphic')} type="date" value={edit.graphicDate} onChange={(e) => set('graphicDate', e.target.value)} />
-                </label>
+                <DatePicker label="Graphic posted" optional value={edit.graphicDate} onChange={(iso) => set('graphicDate', iso)} />
             </div>
             <TypeFacts eventTypeId={edit.eventTypeId} eventDate={edit.eventDate} />
             {code.category && !code.eventTypeId && (
                 <p className="code-edit__note">Made before Event Types. Old category: {code.category}</p>
             )}
             {error && <p className="code-edit__error" role="alert">{error}</p>}
-            <div className="code-edit__actions">
-                <button type="submit" className="code-edit__save" disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
-                <button type="button" className="link-button" onClick={onDone}>Cancel</button>
-                <button type="button" className="link-button link-button--danger code-edit__delete" onClick={remove} disabled={saving}>
-                    Delete code
-                </button>
-            </div>
+            {confirming ? (
+                <div className="code-edit__confirm" role="alertdialog" aria-labelledby={fieldId('confirm')}>
+                    <p id={fieldId('confirm')}>Delete <strong>{code.id}</strong>? This can't be undone.</p>
+                    <button type="button" className="code-edit__confirm-delete" onClick={remove}>Yes, delete</button>
+                    <button type="button" className="link-button" onClick={() => setConfirming(false)} autoFocus>Keep it</button>
+                </div>
+            ) : (
+                <div className="code-edit__actions">
+                    <button type="submit" className="code-edit__save" disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
+                    <button type="button" className="link-button" onClick={onDone}>Cancel</button>
+                    <button type="button" className="link-button link-button--danger code-edit__delete"
+                        onClick={() => { setConfirming(true); setError(''); }} disabled={saving}>
+                        Delete code
+                    </button>
+                </div>
+            )}
         </form>
     );
 }

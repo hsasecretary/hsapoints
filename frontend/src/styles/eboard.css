@@ -1081,14 +1081,80 @@
     border: 1.5px solid var(--hsa-teal-600);
     border-radius: 6px;
     font-family: inherit;
-    font-size: var(--hsa-text-sm);
+    /* 16px, not --hsa-text-sm: iOS Safari zooms in on any field smaller than that. */
+    font-size: var(--hsa-text-base);
+    line-height: 1.25;
     color: var(--hsa-ink);
     background-color: var(--hsa-surface);
+    color-scheme: light;
 }
 
-/* The Event Type dropdown: the site's native select look (auth.css .form select). */
-.event-codes-page .event-type-select { cursor: pointer; }
-.event-codes-page .event-type-select:focus { border-color: var(--hsa-teal-500); box-shadow: 0 0 0 3px rgba(21, 87, 118, 0.15); }
+/* Native select, closed: the site's teal field with a teal chevron (see
+   docs/research/event-codes-select-and-date-ui.md). */
+.event-codes-page .event-type-select {
+    appearance: none;
+    padding-right: 38px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23155776' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+}
+.event-codes-page .event-type-select:invalid,
+.event-codes-page .event-type-select:has(option[value=""]:checked) { color: var(--hsa-muted); }
+.event-codes-page .event-type-select:focus {
+    border-color: var(--hsa-teal-500);
+    box-shadow: 0 0 0 3px rgba(21, 87, 118, 0.15);
+}
+
+/* Where the browser supports a customizable select (Chrome 135+, Safari 27+),
+   the open list is drawn in the page too: a rounded teal panel, tier headings,
+   the chosen type ticked. Everywhere else the rules above still apply. */
+@supports (appearance: base-select) {
+    .event-codes-page .event-type-select,
+    .event-codes-page .event-type-select::picker(select) { appearance: base-select; }
+    .event-codes-page .event-type-select { align-items: center; background-image: none; padding-right: 12px; }
+    .event-codes-page .event-type-select::picker-icon {
+        content: "";
+        width: 12px;
+        height: 8px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23155776' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center;
+        transition: rotate .15s ease;
+    }
+    .event-codes-page .event-type-select:open::picker-icon { rotate: 180deg; }
+    .event-codes-page .event-type-select::picker(select) {
+        max-height: min(440px, 60vh);
+        margin-top: 4px;
+        padding: 6px;
+        border: 1.5px solid var(--hsa-teal-600);
+        border-radius: 10px;
+        background: var(--hsa-surface);
+        box-shadow: 0 12px 28px rgba(15, 76, 100, 0.22);
+    }
+    .event-codes-page .event-type-select optgroup {
+        padding: 10px 10px 4px;
+        font-size: var(--hsa-text-xs);
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--hsa-teal-700);
+    }
+    .event-codes-page .event-type-select optgroup + optgroup { margin-top: 4px; border-top: 1px solid var(--hsa-border-light); }
+    .event-codes-page .event-type-select option {
+        margin: 2px -4px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        font-size: var(--hsa-text-sm);
+        font-weight: 400;
+        letter-spacing: normal;
+        text-transform: none;
+        color: var(--hsa-ink);
+        cursor: pointer;
+    }
+    .event-codes-page .event-type-select option[value=""] { color: var(--hsa-muted); }
+    .event-codes-page .event-type-select option:is(:hover, :focus-visible) { background: var(--hsa-teal-100); outline: none; }
+    .event-codes-page .event-type-select option:checked { font-weight: 700; color: var(--hsa-teal-700); }
+    .event-codes-page .event-type-select option::checkmark { color: var(--hsa-teal-600); }
+}
 
 .event-codes-page .link-button {
     padding: 4px 6px;
@@ -1208,7 +1274,7 @@
 .event-codes-page .code-row { border-bottom: 1px solid var(--hsa-border-light); background: var(--hsa-surface); }
 .event-codes-page .code-row__main {
     display: grid;
-    grid-template-columns: 110px 140px minmax(0, 1fr) 190px 64px;
+    grid-template-columns: 110px 140px minmax(0, 1fr) 190px 96px;
     gap: 12px;
     align-items: center;
     width: 100%;
@@ -1226,7 +1292,7 @@
 .event-codes-page .code-row.is-open .code-row__main { background: var(--hsa-teal-100); }
 .event-codes-page .code-row__date { color: var(--hsa-muted); }
 .event-codes-page .code-row__code { overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: var(--hsa-teal-700); }
-.event-codes-page .code-row__count { text-align: right; font-variant-numeric: tabular-nums; }
+.event-codes-page .code-row__count { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .event-codes-page .code-row__count small { color: var(--hsa-muted); }
 
 .event-codes-page .tier-chip {
@@ -1279,11 +1345,40 @@
 }
 .event-codes-page .code-edit__save:hover { background: var(--hsa-teal-800); border: none; box-shadow: none; }
 .event-codes-page .code-edit__delete { margin-left: auto; }
+/* Delete's "are you sure", in place of the action buttons. */
+.event-codes-page .code-edit__confirm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1.5px solid var(--hsa-danger-border);
+    border-radius: 6px;
+    background: var(--hsa-danger-bg);
+}
+.event-codes-page .code-edit__confirm p { flex: 1 1 200px; margin: 0; font-size: var(--hsa-text-sm); color: var(--hsa-danger-strong); }
+.event-codes-page .code-edit__confirm-delete {
+    padding: 9px 16px;
+    border: none;
+    border-radius: 6px;
+    background: var(--hsa-danger);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+.event-codes-page .code-edit__confirm-delete:hover { background: var(--hsa-danger-strong); border: none; box-shadow: none; }
 
 @media (max-width: 800px) {
     .event-codes-page { padding: 12px 16px 0; }
     .event-codes-page .quick-add { position: static; }
     .event-codes-page .quick-add :is(input, select, .quick-add__submit) { flex: 1 1 100%; }
+    /* Code and date share a row so the band isn't as tall. */
+    .event-codes-page .quick-add :is(.quick-add__code, .quick-add__date) { flex: 1 1 calc(50% - 4px); min-width: 0; }
+    /* Thumb-sized targets: 44px, Apple's and WCAG 2.5.5's size. */
+    .event-codes-page :is(input:not([type="checkbox"], [type="radio"]), select) { min-height: 44px; }
+    .event-codes-page :is(.quick-add__submit, .code-edit__save, .code-edit__confirm-delete) { min-height: 44px; }
+    .event-codes-page .link-button { min-height: 44px; padding: 10px 8px; }
+    .event-codes-page .code-facets label { min-height: 44px; padding: 0; }
     .event-codes-page__body { grid-template-columns: minmax(0, 1fr); gap: 12px; }
     .event-codes-page .code-facets-toggle { display: inline-block; justify-self: start; }
     .event-codes-page .code-facets { display: none; position: static; }
@@ -1300,9 +1395,184 @@
     .event-codes-page .code-row__date { grid-area: date; }
     .event-codes-page .code-row .tier-chip { grid-area: type; justify-self: end; }
     .event-codes-page .code-row__detail { padding-left: 8px; }
-    .event-codes-page .code-edit__fields label,
+    .event-codes-page .code-edit__fields :is(label, .date-picker),
     .event-codes-page .code-edit__fields :is(input, select) { width: 100%; }
-    .event-codes-page .code-edit__fields label { flex: 1 1 100%; }
+    .event-codes-page .code-edit__fields :is(label, .date-picker) { flex: 1 1 100%; }
+}
+
+/* Date picker (DatePicker.tsx, React Aria; see
+   docs/research/event-codes-date-picker.md). The field looks like the other
+   inputs; the calendar is portalled to <body>, so it's scoped by its own class.
+   The base-layer button look is reset on every button in both. */
+:where(.date-picker, .date-picker__popover) :where(button, button:hover, button:active) {
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+.event-codes-page .date-picker { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.event-codes-page .date-picker__label { margin: 0; font-size: var(--hsa-text-sm); font-weight: 600; color: var(--hsa-ink); }
+.event-codes-page .date-picker__field {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 42px;
+    padding: 0 4px 0 10px;
+    border: 1.5px solid var(--hsa-teal-600);
+    border-radius: 6px;
+    background: var(--hsa-surface);
+    cursor: pointer;
+    transition: border-color .12s, box-shadow .12s;
+}
+.event-codes-page .quick-add .date-picker__field { border-color: transparent; }
+.event-codes-page .date-picker__field[data-hovered] { border-color: var(--hsa-teal-500); }
+.event-codes-page .date-picker__field[data-focus-within] {
+    border-color: var(--hsa-teal-500);
+    box-shadow: 0 0 0 3px rgba(21, 87, 118, 0.15);
+}
+.event-codes-page .date-picker__input {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    /* 16px so iOS doesn't zoom in on a segment. */
+    font-size: var(--hsa-text-base);
+    font-variant-numeric: tabular-nums;
+    color: var(--hsa-ink);
+    white-space: nowrap;
+}
+.event-codes-page .date-picker__segment { padding: 1px; border-radius: 3px; outline: none; caret-color: transparent; }
+.event-codes-page .date-picker__segment[data-type="literal"] { padding: 0; color: var(--hsa-muted); }
+.event-codes-page .date-picker__segment[data-placeholder] { color: var(--hsa-muted); }
+/* Mark the segment being typed into only when the keyboard is in use: a click
+   (which opens the calendar) leaves the numbers plain. */
+.event-codes-page .date-picker__field[data-focus-visible] .date-picker__segment[data-focused] { background: var(--hsa-teal-600); color: #fff; }
+.event-codes-page .date-picker__button {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    color: var(--hsa-teal-600);
+}
+.event-codes-page .date-picker__button[data-hovered],
+.event-codes-page .date-picker__button[data-pressed] { background: var(--hsa-teal-100); }
+.event-codes-page .date-picker__button[data-focus-visible] { outline: 3px solid var(--hsa-teal-400); outline-offset: 1px; }
+.event-codes-page .quick-add__more .date-picker { flex-direction: row; align-items: center; gap: 8px; }
+.event-codes-page .quick-add__more .date-picker__label { color: #fff; font-weight: 400; }
+.event-codes-page .quick-add__more .date-picker__field { width: 170px; }
+
+.date-picker__popover {
+    padding: 12px;
+    border: 1.5px solid var(--hsa-teal-600);
+    border-radius: 10px;
+    background: var(--hsa-surface);
+    box-shadow: 0 12px 32px rgba(15, 76, 100, 0.22);
+    font-family: var(--hsa-font-body);
+    color: var(--hsa-ink);
+    outline: none;
+}
+.date-picker__dialog { outline: none; }
+.date-picker__header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.date-picker__month { margin: 0; font-size: var(--hsa-text-base); font-weight: 700; color: var(--hsa-teal-700); }
+.date-picker__popover .date-picker__nav {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--hsa-teal-600);
+}
+.date-picker__popover .date-picker__nav[data-hovered] { background: var(--hsa-teal-100); }
+.date-picker__popover .date-picker__nav[data-focus-visible] { outline: 3px solid var(--hsa-teal-400); outline-offset: 1px; }
+.date-picker__grid { width: auto; margin: 0; border-collapse: separate; border-spacing: 2px; box-shadow: none; }
+.date-picker__grid :is(thead, tr, tr:hover) { background: none; }
+.date-picker__grid th {
+    padding: 4px 0;
+    border: none;
+    background: none;
+    font-size: var(--hsa-text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--hsa-muted);
+}
+.date-picker__grid td { padding: 0; border: none; background: none; }
+.date-picker__day {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: var(--hsa-text-sm);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    outline: none;
+    transition: background-color .1s, transform .1s;
+}
+.date-picker__day[data-outside-month] { visibility: hidden; }
+.date-picker__day[data-hovered] { background: var(--hsa-teal-100); }
+.date-picker__day[data-pressed] { transform: scale(.92); }
+/* Today: a teal ring. The picked day: solid teal. */
+.date-picker__day[data-today] { box-shadow: inset 0 0 0 1.5px var(--hsa-teal-500); font-weight: 700; color: var(--hsa-teal-700); }
+.date-picker__day[data-selected] { background: var(--hsa-teal-600); color: #fff; font-weight: 700; }
+.date-picker__day[data-focus-visible] { outline: 3px solid var(--hsa-teal-400); outline-offset: 1px; }
+.date-picker__shortcuts {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--hsa-teal-100);
+}
+.date-picker__popover .date-picker__shortcut {
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--hsa-teal-100);
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    color: var(--hsa-teal-700);
+    transition: background-color .1s, transform .1s;
+}
+.date-picker__popover .date-picker__shortcut[data-hovered] { background: #cde6f7; }
+.date-picker__popover .date-picker__shortcut[data-pressed] { transform: scale(.95); }
+.date-picker__popover .date-picker__shortcut[data-focus-visible] { outline: 3px solid var(--hsa-teal-400); outline-offset: 2px; }
+.date-picker__popover .date-picker__shortcut--clear { margin-left: auto; background: none; color: var(--hsa-danger); }
+.date-picker__popover .date-picker__shortcut--clear[data-hovered] { background: var(--hsa-danger-bg); }
+
+/* A short open: fade and slide a few px. Nothing moves with reduced motion on. */
+@media (prefers-reduced-motion: no-preference) {
+    .date-picker__popover[data-entering] { animation: date-picker-in .15s ease-out; }
+    .date-picker__popover[data-exiting] { animation: date-picker-in .1s ease-in reverse; }
+}
+@keyframes date-picker-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Phones: a 44px field like the other inputs. */
+@media (max-width: 800px) {
+    .event-codes-page .date-picker__field { height: 44px; }
+}
+
+/* Touch screens: thumb-sized days, arrows and chips. */
+@media (pointer: coarse) {
+    .date-picker__day { width: 44px; height: 44px; font-size: var(--hsa-text-base); }
+    .date-picker__popover .date-picker__nav { width: 44px; height: 44px; }
+    .date-picker__popover .date-picker__shortcut { min-height: 44px; padding: 10px 16px; }
+}
+/* Seven 44px days don't fit a 320px phone. */
+@media (pointer: coarse) and (max-width: 359px) {
+    .date-picker__popover { padding: 8px; }
+    .date-picker__day { width: 38px; height: 38px; }
 }
 
 /* One-time admin export at the bottom of the page */
