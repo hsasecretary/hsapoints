@@ -2,7 +2,10 @@
 // fields (docs/adr/0002-attendance-ledger-calculated-on-read.md, #68).
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 import { assertFails, assertSucceeds, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { collection, deleteDoc, deleteField, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import {
+    addDoc, collection, deleteDoc, deleteField, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where,
+} from 'firebase/firestore';
+import { buildPointRequest } from './lib/pointRequests';
 import { EBOARD, MEMBER, OTHER_MEMBER, memberDoc, seed, signedInAs, startEmulator } from './test/emulator';
 
 let env: RulesTestEnvironment;
@@ -158,5 +161,29 @@ describe('the E-Board-only member fields', () => {
         await assertFails(updateDoc(ref, { absenceLog: deleteField() }));
         // Other fields still save around it.
         await assertSucceeds(updateDoc(ref, { strikes: 1 }));
+    });
+});
+
+describe('pointRequests', () => {
+    /** A request as the Submit Point Request form saves it (#71). */
+    function pendingRequest(email: string) {
+        const built = buildPointRequest(
+            { typeChoiceId: 'gbm', codeId: 'GBM1', eventTypeId: 'gbm', eventDate: '2026-09-25', eventName: '', note: '', hours: 1, makeupFor: [], photo: 'data:image/jpeg;base64,x' },
+            { email, codes: [{ id: 'GBM1', eventTypeId: 'gbm', eventDate: '2026-09-25', event: 'GBM 1' }], today: '2026-10-01' },
+        );
+        if (built.ok === false) throw new Error(built.error);
+        return { ...built.data, submittedAt: serverTimestamp() };
+    }
+
+    it('lets a Member submit their own request for review', async () => {
+        const db = signedInAs(env, MEMBER);
+        await assertSucceeds(addDoc(collection(db, 'pointRequests'), pendingRequest(MEMBER)));
+    });
+
+    it("won't let a Member submit a request as someone else, or one that's already reviewed", async () => {
+        const db = signedInAs(env, MEMBER);
+        await assertFails(addDoc(collection(db, 'pointRequests'), pendingRequest(OTHER_MEMBER)));
+        await assertFails(addDoc(collection(db, 'pointRequests'), { ...pendingRequest(MEMBER), status: 'approved' }));
+        await assertFails(addDoc(collection(db, 'pointRequests'), { ...pendingRequest(MEMBER), reviewedBy: MEMBER }));
     });
 });

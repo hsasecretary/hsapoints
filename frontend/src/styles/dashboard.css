@@ -653,14 +653,287 @@
         max-height: 200px;
     }
 }
-.point-request .form-group label[for*="activityType"]:after,
-.point-request .form-group label[for*="customActivityName"]:after,
-.point-request .form-group label[for*="description"]:after,
-.point-request .form-group label[for*="date"]:after,
-.point-request .form-group label[for*="pointsRequested"]:after,
-.point-request .form-group label[for*="imageUpload"]:after {
+.point-request .form-group label[for="eventName"]:after,
+.point-request .form-group label[for="eventDate"]:after,
+.point-request .form-group label[for="hours"]:after,
+.point-request .form-group label[for="note"]:after,
+.point-request .form-group label[for="imageUpload"]:after {
     content: ' *';
     color: #dc3545;
+}
+
+/* ---- Submit Point Request, variant C (PointRequestForm.tsx) ------------------------ */
+
+/* Title with the Strikes button beside it. */
+.point-request .point-request__head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.point-request .strikes-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1.5px solid var(--hsa-teal-700);
+    border-radius: 999px;
+    color: var(--hsa-teal-700);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.point-request .strikes-button__count {
+    min-width: 24px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: var(--hsa-teal-700);
+    color: #fff;
+    text-align: center;
+}
+
+/* Red at 3 or more open Strikes. */
+.point-request .strikes-button.is-at-risk {
+    border-color: var(--hsa-danger);
+    color: var(--hsa-danger);
+}
+
+.point-request .strikes-button.is-at-risk .strikes-button__count {
+    background: var(--hsa-danger);
+}
+
+/* One question of the form: a legend and its bubbles. */
+.point-request .request-step {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+}
+
+.point-request .request-step legend {
+    margin-bottom: 10px;
+    color: var(--hsa-ink);
+    font-size: var(--hsa-text-base);
+    font-weight: 700;
+}
+
+.point-request .request-step__group + .request-step__group,
+.point-request .request-step__group + .bubbles {
+    margin-top: 14px;
+}
+
+.point-request .request-step__group h4 {
+    margin: 0 0 8px;
+    color: var(--hsa-muted);
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+}
+
+.point-request .request-step__search {
+    width: 100%;
+    margin-bottom: 14px;
+}
+
+.point-request .bubbles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* A pill button; pressed = picked. */
+.point-request .bubble {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 1.5px solid #94a3b8;
+    border-radius: 999px;
+    background: var(--hsa-surface);
+    color: var(--hsa-ink);
+    font: inherit;
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.point-request .bubble:hover {
+    border-color: var(--hsa-teal-700);
+}
+
+.point-request .bubble.is-selected {
+    background: var(--hsa-teal-700);
+    border-color: var(--hsa-teal-700);
+    color: #fff;
+}
+
+.point-request .bubble:focus-visible {
+    outline: 3px solid rgba(15, 76, 100, 0.35);
+    outline-offset: 2px;
+}
+
+.point-request .tag,
+.strikes-page .tag {
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--hsa-surface-sunken);
+    color: var(--hsa-ink-soft);
+    font-size: var(--hsa-text-xs);
+    font-weight: 600;
+}
+
+.point-request .tag--strike,
+.strikes-page .tag--strike {
+    background: var(--hsa-danger-bg);
+    color: var(--hsa-danger-strong);
+}
+
+.point-request .bubble.is-selected .tag {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.point-request .field-error {
+    color: var(--hsa-danger);
+    font-size: var(--hsa-text-sm);
+}
+
+.point-request .request-preview {
+    padding: 14px 16px;
+    border-left: 4px solid var(--hsa-teal-600);
+    border-radius: 6px;
+    background: var(--hsa-teal-100);
+}
+
+.point-request .request-preview h4 {
+    margin: 0 0 6px;
+    color: var(--hsa-teal-700);
+}
+
+.point-request .request-preview p,
+.point-request .request-preview ul {
+    margin: 0;
+}
+
+.point-request .request-preview ul {
+    margin-top: 6px;
+    padding-left: 20px;
+}
+
+/* ---- Strikes page  (pages/strikes/Strikes.tsx) ------------------------------------ */
+
+.strikes-page {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px 16px 40px;
+}
+
+.strikes-page .strikes-card {
+    margin: 16px 0 28px;
+    padding: 20px;
+    border: 2px solid var(--hsa-teal-600);
+    border-radius: 10px;
+    background: var(--hsa-surface);
+}
+
+.strikes-page .strikes-card.is-at-risk {
+    border-color: var(--hsa-danger);
+}
+
+.strikes-page .strikes-card__count {
+    margin: 0 0 12px;
+    font-size: var(--hsa-text-lg);
+    font-weight: 600;
+}
+
+.strikes-page .strikes-card__count span {
+    font-size: var(--hsa-text-3xl);
+    font-weight: 800;
+    color: var(--hsa-teal-700);
+}
+
+.strikes-page .strikes-card.is-at-risk .strikes-card__count span {
+    color: var(--hsa-danger);
+}
+
+/* One slot per Strike, with a line after the third; grows past 3. */
+.strikes-page .strike-bar {
+    display: flex;
+    gap: 4px;
+}
+
+.strikes-page .strike-bar__slot {
+    flex: 1;
+    height: 14px;
+    border-radius: 3px;
+    background: var(--hsa-surface-sunken);
+}
+
+.strikes-page .strike-bar__slot.is-filled {
+    background: var(--hsa-teal-600);
+}
+
+.strikes-page .strikes-card.is-at-risk .strike-bar__slot.is-filled {
+    background: var(--hsa-danger);
+}
+
+.strikes-page .strike-bar__slot.is-mark {
+    box-shadow: 4px 0 0 var(--hsa-surface), 7px 0 0 var(--hsa-ink);
+}
+
+.strikes-page .strikes-card__warning {
+    margin: 14px 0 0;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: var(--hsa-danger-bg);
+    color: var(--hsa-danger-strong);
+    font-weight: 600;
+}
+
+.strikes-page .strikes-card__help {
+    margin: 12px 0 0;
+    color: var(--hsa-muted);
+    font-size: var(--hsa-text-sm);
+}
+
+.strikes-page .strikes-list ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.strikes-page .strikes-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    min-height: 48px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+}
+
+.strikes-page .strikes-list__event {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.strikes-page .strikes-list__date {
+    color: var(--hsa-muted);
+    font-weight: 400;
+}
+
+.strikes-page .strikes-list a {
+    color: var(--hsa-teal-600);
+    font-weight: 600;
 }
 
 /* ---- Cabinet points breakdown  (CabinetPoints.tsx) ------------------------------------ */

@@ -22,3 +22,8 @@ export function fromIsoDate(isoDate: string): Date {
     const [year, month, day] = isoDate.split('-').map(Number);
     return new Date(year, month - 1, day);
 }
+
+/** 'YYYY-MM-DD' as 'Sep 3'. */
+export function shortDate(isoDate: string): string {
+    return fromIsoDate(isoDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}

@@ -1,390 +1,378 @@
-import { useState } from 'react';
-import { db } from '../../../lib/firebase';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { auth, db } from '../../../lib/firebase';
 import SectionTitle from '../../../components/ui/SectionTitle';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { auth } from '../../../lib/firebase';
+import type { Code, MissedEvent } from '../../../lib/computeStanding';
+import {
+    attendanceCount, buildPointRequest, eventChoices, makeupTypeChoices, NOT_LISTED, pickerGroups, previewRequest, typeChoiceFor,
+    type RequestDraft, type TypeChoice,
+} from '../../../lib/pointRequests';
+import { eventType } from '../../../lib/rubric';
+import { currentSemester, fromIsoDate, shortDate } from '../../../lib/semester';
+import { pendingMakeups, useMemberStanding } from '../useMemberStanding';
+import PhotoField from './PhotoField';
+
+// Where the Member starts (variant C, "Start from what you owe"). General
+// Members only ever get the search.
+type Start =
+    | { kind: 'missed'; codeId: string; mode: 'attended' | 'makeup' | null }
+    | { kind: 'requirement'; eventTypeId: string }
+    | { kind: 'search' };
+
+type EventPick = { kind: 'code'; code: Code } | { kind: 'other' } | null;
+
+const emptyFields = { eventName: '', eventDate: '', note: '', hours: 1 };
+
+function Bubble({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: ReactNode }) {
+    return (
+        <button type="button" className={`bubble${selected ? ' is-selected' : ''}`} aria-pressed={selected} onClick={onClick}>
+            {children}
+        </button>
+    );
+}
 
 function PointRequestForm() {
-    const [formData, setFormData] = useState({
-        activityType: '',
-        customActivityName: '',
-        description: '',
-        date: '',
-        pointsRequested: ''
-    });
+    const email = auth.currentUser?.email?.toLowerCase();
+    const { loading, member, attendances, codes, pending, standing, today } = useMemberStanding(email);
+    const location = useLocation();
+    // The Strikes page's "Make it up" links here with the Missed Event.
+    const makeupFrom = (location.state as { makeup?: string } | null)?.makeup;
+    const formRef = useRef<HTMLDivElement>(null);
 
-    const [imageData, setImageData] = useState('');
-    const [imagePreview, setImagePreview] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [start, setStart] = useState<Start | null>(makeupFrom ? { kind: 'missed', codeId: makeupFrom, mode: null } : null);
+    const [typeChoice, setTypeChoice] = useState<TypeChoice | null>(null);
+    const [eventPick, setEventPick] = useState<EventPick>(null);
+    const [search, setSearch] = useState('');
+    const [fields, setFields] = useState(emptyFields);
+    // One per Attendance; undefined until the Member touches it.
+    const [picks, setPicks] = useState<(string | null | undefined)[]>([]);
+    const [photo, setPhoto] = useState('');
+    const [submitting, setSubmitting] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
 
-    const activityTypes = [
-        { value: 'gbm', label: 'GBM', defaultPoints: 2 },
-        { value: 'tabling', label: 'Tabling', defaultPoints: 1 },
-        { value: 'fundraiser', label: 'Fundraiser', defaultPoints: 2 },
-        { value: 'open_mlp_event', label: 'Open MLP Event', defaultPoints: 1 },
-        { value: 'affiliated_org_event', label: 'Affiliated Organization Event', defaultPoints: 1 },
-        { value: 'committee_meeting', label: 'Committee Meeting', defaultPoints: 1 },
-        { value: 'other', label: 'Other (specify)', defaultPoints: 1 }
-    ];
+    useEffect(() => {
+        if (makeupFrom) formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, [makeupFrom]);
 
-    // Compresses photos client-side to ~100KB so the website stays fast and within Firestore's 1MB limit
-    const compressImage = (file) => {
-        return new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target.result as string;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1200;
-                    const MAX_HEIGHT = 1200;
-                    let width = img.width;
-                    let height = img.height;
+    if (loading) {
+        return (
+            <div className="point-request" aria-busy="true">
+                <SectionTitle>Submit Point Request</SectionTitle>
+                <p className="description">Loading your events…</p>
+            </div>
+        );
+    }
 
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
+    const held = standing.heldToCabinetRules;
+    const from: Start | null = held ? start : { kind: 'search' };
+    const codeById = new Map(codes.map((code) => [code.id, code]));
+    const owed = standing.missedEvents.filter((missed) => missed.owed);
+    const pendingPicks = pendingMakeups(pending);
+    const missedLabel = (missed: Pick<MissedEvent, 'codeId' | 'eventTypeId' | 'eventDate'>) =>
+        `${codeById.get(missed.codeId)?.event || eventType(missed.eventTypeId)?.label} · ${shortDate(missed.eventDate)}`;
+    const semester = currentSemester(fromIsoDate(today)) === 'springPoints' ? 'spring' : 'fall';
+    const openRequirements = standing.semesterRequirements[semester].filter((requirement) => !requirement.met);
+    const missed = from?.kind === 'missed' ? owed.find((row) => row.codeId === from.codeId) : undefined;
+    const iWasThere = from?.kind === 'missed' && from.mode === 'attended' && missed;
+    const choices = typeChoice
+        ? eventChoices(typeChoice, { codes, attendances, pendingCodeIds: [...pendingPicks], today })
+        : null;
+    const notListed = typeChoice?.id === NOT_LISTED;
+    const pickedCode = iWasThere ? codeById.get(missed.codeId) : eventPick?.kind === 'code' ? eventPick.code : null;
+    const readyForDetails = Boolean(iWasThere || (typeChoice && (eventPick || choices.codeless || notListed)));
+    const perHour = Boolean(typeChoice && typeChoice.eventTypeIds.length === 1 && eventType(typeChoice.eventTypeIds[0])?.perHour);
+    const asksNote = readyForDetails && !pickedCode;
 
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
+    // Changing an earlier answer clears the ones after it.
+    const reset = (level: 'type' | 'event' | 'details') => {
+        if (level === 'type') setTypeChoice(null);
+        if (level !== 'details') setEventPick(null);
+        setFields(emptyFields);
+        setPicks([]);
+    };
+    const chooseStart = (next: Start) => {
+        setStart(next);
+        reset('type');
+        if (next.kind === 'requirement') setTypeChoice(typeChoiceFor(next.eventTypeId));
+    };
+    const chooseType = (choice: TypeChoice) => {
+        setTypeChoice(choice);
+        reset('event');
+    };
 
-                    // Compress as JPEG at 75% quality
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
-                    resolve(compressedDataUrl);
-                };
-                img.onerror = (err) => reject(err);
-            };
-            reader.onerror = (err) => reject(err);
+    const baseDraft: Omit<RequestDraft, 'makeupFor'> = {
+        typeChoiceId: iWasThere ? missed.eventTypeId : typeChoice?.id ?? null,
+        codeId: pickedCode?.id ?? null,
+        eventTypeId: pickedCode?.eventTypeId
+            ?? (typeChoice && typeChoice.eventTypeIds.length === 1 ? typeChoice.eventTypeIds[0] : null),
+        eventName: fields.eventName,
+        eventDate: pickedCode?.eventDate ?? fields.eventDate,
+        note: fields.note,
+        hours: fields.hours,
+        photo,
+    };
+    const options = { email, today };
+    // Starting from a Missed Event, the first Surplus hour makes it up
+    // unless the Member picks otherwise.
+    const firstPass = readyForDetails
+        ? previewRequest(member, attendances, codes, { ...baseDraft, makeupFor: picks.map((pick) => pick ?? null) }, options)
+        : null;
+    const defaultIndex = firstPass?.attendances.findIndex((attendance) => attendance.surplus) ?? -1;
+    const makeupFor = (firstPass?.attendances ?? [{}]).map((_, i) => {
+        if (picks[i] !== undefined) return picks[i];
+        return from?.kind === 'missed' && from.mode === 'makeup' && i === defaultIndex ? from.codeId : null;
+    });
+    const draft: RequestDraft = { ...baseDraft, makeupFor };
+    const preview = readyForDetails ? previewRequest(member, attendances, codes, draft, options) : null;
+    const knownType = eventType(draft.eventTypeId ?? '');
+
+    const setPick = (index: number, value: string | null) =>
+        setPicks((current) => {
+            const next = [...current];
+            next[index] = value;
+            return next;
         });
-    };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-
-        // Auto-populate default points based on activity
-        if (name === 'activityType') {
-            const selectedActivity = activityTypes.find(activity => activity.value === value);
-
-            if (selectedActivity) {
-                setFormData(prev => ({
-                    ...prev,
-                    activityType: value,
-                    pointsRequested: selectedActivity.defaultPoints.toString()
-                }));
-            }
-        }
-    };
-
-    const handleImageChange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // 20MB maximum file size check
-        const MAX_SIZE_MB = 20;
-        if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-            setMessage({
-                text: `File is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Please choose an image under ${MAX_SIZE_MB}MB.`,
-                type: 'error'
-            });
-            e.target.value = '';
-            return;
-        }
-
-        if (!file.type.startsWith('image/')) {
-            setMessage({
-                text: 'Please upload a valid image file (PNG, JPG, JPEG, WEBP).',
-                type: 'error'
-            });
-            e.target.value = '';
-            return;
-        }
-
-        try {
-            const compressed = await compressImage(file);
-            setImageData(compressed);
-            setImagePreview(compressed);
-            setMessage({ text: '', type: '' });
-        } catch (err) {
-            console.error('Error processing image:', err);
-            setMessage({
-                text: 'Could not process the selected image. Please try a different photo.',
-                type: 'error'
-            });
-        }
-    };
-
-    const handleClearImage = () => {
-        setImageData('');
-        setImagePreview('');
-        const fileInput = document.getElementById('imageUpload') as HTMLInputElement | null;
-        if (fileInput) fileInput.value = '';
-    };
-
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         setMessage({ text: '', type: '' });
-
+        const built = buildPointRequest(draft, { email, codes, today });
+        if (built.ok === false) {
+            setMessage({ text: built.error, type: 'error' });
+            return;
+        }
+        setSubmitting(true);
         try {
-            if (!formData.activityType) {
-                throw new Error('Please select an activity type');
-            }
-
-            if (formData.activityType === 'other' && !formData.customActivityName.trim()) {
-                throw new Error('Please specify the custom activity name');
-            }
-
-            if (!formData.description.trim()) {
-                throw new Error('Please provide a description');
-            }
-
-            if (!formData.date) {
-                throw new Error('Please select a date');
-            }
-
-            if (!formData.pointsRequested || Number(formData.pointsRequested) <= 0) {
-                throw new Error('Please enter a valid number of points');
-            }
-
-            // Photo Evidence is required
-            if (!imageData) {
-                throw new Error('Please attach photo evidence to verify your attendance');
-            }
-
-            const user = auth.currentUser;
-            if (!user) {
-                throw new Error('You must be logged in to submit a request');
-            }
-
-            const requestData = {
-                userEmail: user.email,
-                activityType: formData.activityType,
-                activityName:
-                    formData.activityType === 'other'
-                        ? formData.customActivityName
-                        : activityTypes.find(a => a.value === formData.activityType)?.label,
-                description: formData.description.trim(),
-                date: formData.date,
-                pointsRequested: parseInt(formData.pointsRequested),
-                imageData: imageData, // Saved for PointRequestReview.js
-                status: 'pending',
-                submittedAt: serverTimestamp(),
-                reviewedAt: null,
-                reviewedBy: null,
-                reviewNotes: ''
-            };
-
-            await addDoc(collection(db, 'pointRequests'), requestData);
-
-            setMessage({
-                text: 'Point request submitted successfully! You will be notified once it is reviewed.',
-                type: 'success'
-            });
-
-            // Reset Form
-            setFormData({
-                activityType: '',
-                customActivityName: '',
-                description: '',
-                date: '',
-                pointsRequested: ''
-            });
-            handleClearImage();
-
+            await addDoc(collection(db, 'pointRequests'), { ...built.data, submittedAt: serverTimestamp() });
+            setMessage({ text: 'Request sent. E-Board will review it; check My Requests for the result.', type: 'success' });
+            setStart(null);
+            reset('type');
+            setSearch('');
+            setPhoto('');
         } catch (error) {
             console.error('Error submitting request:', error);
-            setMessage({
-                text: error.message,
-                type: 'error'
-            });
+            setMessage({ text: 'Your request could not be sent. Please try again.', type: 'error' });
         } finally {
-            setLoading(false);
+            setSubmitting(false);
         }
     };
 
-    return (
-        <div className="point-request">
-            <SectionTitle>Submit Point Request</SectionTitle>
+    const term = search.trim().toLowerCase();
+    const searchGroups = pickerGroups(held)
+        .map((group) => ({ ...group, choices: group.choices.filter((choice) => choice.label.toLowerCase().includes(term)) }))
+        .filter((group) => group.choices.length > 0);
+    const typeBubbles = (list: TypeChoice[]) => list.map((choice) => (
+        <Bubble key={choice.id} selected={typeChoice?.id === choice.id} onClick={() => chooseType(choice)}>{choice.label}</Bubble>
+    ));
 
+    return (
+        <div className="point-request" ref={formRef}>
+            <div className="point-request__head">
+                <SectionTitle>Submit Point Request</SectionTitle>
+                {held && (
+                    <Link to="/strikes" className={`strikes-button${standing.openStrikes >= 3 ? ' is-at-risk' : ''}`}>
+                        Strikes <span className="strikes-button__count">{standing.openStrikes}</span>
+                    </Link>
+                )}
+            </div>
             <p className="description">
-                Use this form to request points for activities like tabling, community service,
-                or other qualifying activities.
+                Went to an event but didn't check in with its code? Send a photo and E-Board will add it.
             </p>
 
-            {message.text && (
-                <div className={`message ${message.type}`}>
-                    {message.text}
-                </div>
-            )}
+            {message.text && <div className={`message ${message.type}`} role="status">{message.text}</div>}
 
             <form onSubmit={handleSubmit} className="request-form">
-
-                <div className="form-group">
-                    <label htmlFor="activityType">Activity Type</label>
-
-                    <select
-                        id="activityType"
-                        name="activityType"
-                        value={formData.activityType}
-                        onChange={handleInputChange}
-                        required
-                    >
-                        <option value="">Select an activity type</option>
-                        {activityTypes.map(activity => (
-                            <option key={activity.value} value={activity.value}>
-                                {activity.label} ({activity.defaultPoints} point{activity.defaultPoints !== 1 ? 's' : ''})
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                {formData.activityType === 'other' && (
-                    <div className="form-group">
-                        <label htmlFor="customActivityName">Custom Activity Name</label>
-
-                        <input
-                            type="text"
-                            id="customActivityName"
-                            name="customActivityName"
-                            value={formData.customActivityName}
-                            onChange={handleInputChange}
-                            placeholder="Specify the activity"
-                            required
-                        />
-                    </div>
+                {held && (
+                    <fieldset className="request-step">
+                        <legend>What's this for?</legend>
+                        {owed.length > 0 && (
+                            <div className="request-step__group">
+                                <h4>Missed Events</h4>
+                                <div className="bubbles">
+                                    {owed.map((row) => (
+                                        <Bubble key={row.codeId} selected={from?.kind === 'missed' && from.codeId === row.codeId}
+                                            onClick={() => chooseStart({ kind: 'missed', codeId: row.codeId, mode: null })}>
+                                            {missedLabel(row)}
+                                            {row.strike && <span className="tag tag--strike">Strike</span>}
+                                            {pendingPicks.has(row.codeId) && <span className="tag">Pending review</span>}
+                                        </Bubble>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        {openRequirements.length > 0 && (
+                            <div className="request-step__group">
+                                <h4>Semester Requirements you still need</h4>
+                                <div className="bubbles">
+                                    {openRequirements.map((requirement) => (
+                                        <Bubble key={requirement.eventTypeId}
+                                            selected={from?.kind === 'requirement' && from.eventTypeId === requirement.eventTypeId}
+                                            onClick={() => chooseStart({ kind: 'requirement', eventTypeId: requirement.eventTypeId })}>
+                                            {eventType(requirement.eventTypeId)?.label}
+                                        </Bubble>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        <div className="bubbles">
+                            <Bubble selected={from?.kind === 'search'} onClick={() => chooseStart({ kind: 'search' })}>
+                                Something else
+                            </Bubble>
+                        </div>
+                    </fieldset>
                 )}
 
-                <div className="form-group">
-                    <label htmlFor="description">Description</label>
-
-                    <textarea
-                        id="description"
-                        name="description"
-                        value={formData.description}
-                        onChange={handleInputChange}
-                        placeholder="Describe the activity, location, duration, and any other relevant details"
-                        rows={4}
-                        required
-                    />
-                </div>
-
-                {/* Points are chosen by hand only for "Other"; every other activity
-                    uses its default (set when the activity type is picked). */}
-                <div className={`form-row${formData.activityType === 'other' ? '' : ' form-row--single'}`}>
-                    <div className="form-group">
-                        <label htmlFor="date">Date</label>
-
-                        <input
-                            type="date"
-                            id="date"
-                            name="date"
-                            value={formData.date}
-                            onChange={handleInputChange}
-                            max={new Date().toISOString().split('T')[0]}
-                            required
-                        />
-                    </div>
-
-                    {formData.activityType === 'other' && (
-                    <div className="form-group">
-                        <label htmlFor="pointsRequested-1" id="pointsRequested-label">Points Requested</label>
-
-                        {/* Requests are 1 or 2 points: two tap targets instead of a number box.
-                            The value is still saved as a number (parseInt on submit). */}
-                        <div className="points-choice" role="radiogroup" aria-labelledby="pointsRequested-label">
-                            {['1', '2'].map((value) => (
-                                <label
-                                    key={value}
-                                    className={`points-choice__option${formData.pointsRequested === value ? ' is-selected' : ''}`}
-                                >
-                                    <input
-                                        type="radio"
-                                        id={`pointsRequested-${value}`}
-                                        name="pointsRequested"
-                                        value={value}
-                                        checked={formData.pointsRequested === value}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                    {value} {value === '1' ? 'point' : 'points'}
-                                </label>
-                            ))}
+                {from?.kind === 'missed' && missed && (
+                    <fieldset className="request-step">
+                        <legend>{missedLabel(missed)}</legend>
+                        <div className="bubbles">
+                            <Bubble selected={from.mode === 'attended'} onClick={() => { setStart({ ...from, mode: 'attended' }); reset('type'); }}>
+                                I was there
+                            </Bubble>
+                            <Bubble selected={from.mode === 'makeup'} onClick={() => { setStart({ ...from, mode: 'makeup' }); reset('type'); }}>
+                                I made it up at another event
+                            </Bubble>
                         </div>
-                    </div>
-                    )}
-                </div>
+                    </fieldset>
+                )}
 
-                {/* Photo Evidence Upload Section */}
-                <div className="form-group">
-                    <label htmlFor="imageUpload">Photo Evidence</label>
+                {from?.kind === 'missed' && from.mode === 'makeup' && (
+                    <fieldset className="request-step">
+                        <legend>Which kind of event?</legend>
+                        <div className="bubbles">{typeBubbles(makeupTypeChoices(member, attendances, codes, options))}</div>
+                    </fieldset>
+                )}
 
-                    <input
-                        type="file"
-                        id="imageUpload"
-                        name="imageUpload"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        required
-                    />
-                    <span className="help-text">Max file size: 20MB (JPG, PNG, WEBP). Photo evidence is required for point verification.</span>
-
-                    {imagePreview && (
-                        <div className="image-preview">
-                            <h4>Image Preview:</h4>
-                            <div className="preview-container">
-                                <img src={imagePreview} alt="Evidence preview" />
-                                <button
-                                    type="button"
-                                    className="clear-image"
-                                    onClick={handleClearImage}
-                                    title="Remove image"
-                                >
-                                    ✕
-                                </button>
+                {from?.kind === 'search' && (
+                    <fieldset className="request-step">
+                        <legend>Which kind of event?</legend>
+                        <input type="search" className="request-step__search" placeholder="Search events" aria-label="Search events"
+                            value={search} onChange={(e) => setSearch(e.target.value)} />
+                        {searchGroups.map((group) => (
+                            <div key={group.label} className="request-step__group">
+                                <h4>{group.label}</h4>
+                                <div className="bubbles">{typeBubbles(group.choices)}</div>
                             </div>
+                        ))}
+                        <div className="bubbles">
+                            {typeBubbles([{ id: NOT_LISTED, label: 'Not listed', eventTypeIds: [] }])}
                         </div>
-                    )}
-                </div>
+                    </fieldset>
+                )}
 
-                <div className="form-actions">
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="submit-button"
-                    >
-                        {loading ? 'Submitting...' : 'Submit Request'}
-                    </button>
-                </div>
+                {choices && !choices.codeless && !notListed && (
+                    <fieldset className="request-step">
+                        <legend>Which event?</legend>
+                        {choices.codes.length === 0 && !choices.other && (
+                            <p className="help-text">No {typeChoice.label} events are waiting for you this year.</p>
+                        )}
+                        <div className="bubbles">
+                            {choices.codes.map((code) => (
+                                <Bubble key={code.id} selected={eventPick?.kind === 'code' && eventPick.code.id === code.id}
+                                    onClick={() => { setEventPick({ kind: 'code', code }); reset('details'); }}>
+                                    {code.event || code.id} · {shortDate(code.eventDate)}
+                                </Bubble>
+                            ))}
+                            {choices.other && (
+                                <Bubble selected={eventPick?.kind === 'other'} onClick={() => { setEventPick({ kind: 'other' }); reset('details'); }}>
+                                    Other
+                                </Bubble>
+                            )}
+                        </div>
+                    </fieldset>
+                )}
 
+                {readyForDetails && (
+                    <>
+                        {asksNote && !perHour && (
+                            <div className="form-group">
+                                <label htmlFor="eventName">Event name</label>
+                                <input id="eventName" type="text" value={fields.eventName}
+                                    onChange={(e) => setFields({ ...fields, eventName: e.target.value })} />
+                            </div>
+                        )}
+                        {asksNote && (
+                            <div className={`form-row${perHour ? '' : ' form-row--single'}`}>
+                                <div className="form-group">
+                                    <label htmlFor="eventDate">Date</label>
+                                    <input id="eventDate" type="date" max={today} value={fields.eventDate}
+                                        onChange={(e) => setFields({ ...fields, eventDate: e.target.value })} />
+                                </div>
+                                {perHour && (
+                                    <div className="form-group">
+                                        <label htmlFor="hours">Hours</label>
+                                        <input id="hours" type="number" min={1} max={12} step={1} value={fields.hours}
+                                            onChange={(e) => setFields({ ...fields, hours: Number(e.target.value) })} />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        {asksNote && (
+                            <div className="form-group">
+                                <label htmlFor="note">What did you do?</label>
+                                <textarea id="note" rows={3} value={fields.note}
+                                    onChange={(e) => setFields({ ...fields, note: e.target.value })} />
+                            </div>
+                        )}
+
+                        {held && preview?.attendances.map((attendance, i) => attendance.surplus && (
+                            <div className="form-group" key={i}>
+                                <label htmlFor={`makeup-${i}`}>
+                                    {preview.attendances.length > 1 ? `Hour ${i + 1} makes up` : 'This makes up'}
+                                </label>
+                                <select id={`makeup-${i}`} value={makeupFor[i] ?? ''} onChange={(e) => setPick(i, e.target.value || null)}>
+                                    <option value="">
+                                        Pick for me{!makeupFor[i] && attendance.makeupFor
+                                            ? ` (${missedLabel(owed.find((row) => row.codeId === attendance.makeupFor))})` : ''}
+                                    </option>
+                                    {owed.map((row) => (
+                                        <option key={row.codeId} value={row.codeId}>
+                                            {missedLabel(row)}{row.strike ? ' (Strike)' : ''}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        ))}
+
+                        <PhotoField value={photo} onChange={setPhoto} />
+
+                        <div className="request-preview" aria-live="polite">
+                            <h4>If E-Board approves it</h4>
+                            {preview ? (
+                                <>
+                                    <p>
+                                        +{preview.vePoints} VE {preview.vePoints === 1 ? 'Point' : 'Points'}
+                                        {held && ` · +${preview.cabinetPoints} Cabinet ${preview.cabinetPoints === 1 ? 'Point' : 'Points'}`}
+                                    </p>
+                                    {held && preview.covers.length > 0 && (
+                                        <ul>
+                                            {preview.covers.map((row) => (
+                                                <li key={row.codeId}>
+                                                    Makes up {missedLabel(row)}{row.strike ? ' and clears its Strike' : ''}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </>
+                            ) : knownType ? (
+                                <p>
+                                    +{knownType.vePoints * attendanceCount(draft)} VE {knownType.vePoints * attendanceCount(draft) === 1 ? 'Point' : 'Points'}
+                                    {held && '. Add the date to see what it makes up.'}
+                                </p>
+                            ) : (
+                                <p>E-Board will pick the Event Type, and its points, when they review it.</p>
+                            )}
+                        </div>
+
+                        <div className="form-actions">
+                            <button type="submit" disabled={submitting} className="submit-button">
+                                {submitting ? 'Sending…' : 'Submit Request'}
+                            </button>
+                        </div>
+                    </>
+                )}
             </form>
-
-            <div className="info-section">
-                <SectionTitle as="h3">Important Information</SectionTitle>
-
-                <ul>
-                    <li>Requests should accurately describe the activity completed</li>
-                    <li>Photo evidence must clearly show your attendance or participation</li>
-                    <li>E-board may contact you for clarification if needed</li>
-                    <li>Requests are typically reviewed within 3–5 business days</li>
-                </ul>
-            </div>
         </div>
     );
 }
