@@ -20,7 +20,7 @@ const Eboard = lazy(() => import('./pages/eboard/Eboard'));
 const EventCodesPage = lazy(() => import('./pages/eboard/EventCodesPage'));
 const PointRequestReview = lazy(() => import('./pages/eboard/PointRequestReview'));
 const UserPointsLookup = lazy(() => import('./pages/eboard/UserPointsLookup'));
-const ExcuseAbscense = lazy(() => import('./pages/eboard/ExcuseAbscense'));
+const ExcuseAbsence = lazy(() => import('./pages/eboard/excuseAbsence/ExcuseAbsence'));
 const ApprovedCabinet = lazy(() => import('./pages/eboard/ApprovedCabinet'));
 const Cabinet = lazy(() => import('./pages/cabinet/Cabinet'));
 
@@ -94,7 +94,7 @@ function App() {
                             <Route path="event-codes" element={<EventCodesPage />} />
                             <Route path="point-requests" element={<PointRequestReview />} />
                             <Route path="user-lookup" element={<UserPointsLookup />} />
-                            <Route path="excuse-absence" element={<ExcuseAbscense />} />
+                            <Route path="excuse-absence" element={<ExcuseAbsence />} />
                             <Route path="approvals" element={<ApprovedCabinet />} />
                         </Route>
                         <Route path="/forgotPassword" element={<ForgotPassword />} />

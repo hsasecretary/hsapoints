@@ -8,8 +8,8 @@ type EmailLookupProps = {
     onSelect: (email: string) => void;
 };
 
-// "UFL/SF Email Lookup" on the User Lookup page: type a first and/or last
-// name, get the 5 closest account names with their emails. Accounts are
+// The User Lookup page's only search: type a first and/or last name, get
+// the 5 closest account names with their emails. Accounts are
 // loaded once (first search) and matched in the browser, since Firestore
 // can't do fuzzy text search.
 function EmailLookup({ onSelect }: EmailLookupProps) {
@@ -58,9 +58,9 @@ function EmailLookup({ onSelect }: EmailLookupProps) {
 
     return (
         <section className="email-lookup">
-            <h2>UFL/SF Email Lookup</h2>
+            <h2>User Points Lookup</h2>
             <p className="email-lookup__subtitle">
-                Don't know their email? Search by first and last name to find it
+                Search by first and/or last name, then look up their points
             </p>
 
             <form onSubmit={handleSearch} className="search-form">
