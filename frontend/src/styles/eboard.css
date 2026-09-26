@@ -2,177 +2,8 @@
    E-Board page (/eboard)
    ======================================================================== */
 
-/* ---- Create New Event Code  (CreateCode.tsx) --------------------------------------- */
-
-/* CreateCode Modern Styles */
-.create-code-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    border: 2px solid var(--hsa-teal-600);
-}
-
-.create-code-container .create-code-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.create-code-container .create-code-header h2 {
-    color: var(--hsa-teal-600);
-    margin-bottom: 10px;
-    font-size: 28px;
-}
-
-.create-code-container .create-code-header p {
-    color: #666;
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-/* Form Styles */
-.create-code-container .create-code-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.create-code-container .checkbox-group {
-    flex-direction: column;
-    gap: 10px;
-    justify-content: center;
-}
-
-.create-code-container .checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 5px;
-    transition: background-color 0.2s;
-}
-
-.create-code-container .checkbox-label:hover {
-    background-color: var(--hsa-surface-subtle);
-}
-
-.create-code-container .checkbox-label input[type="checkbox"] {
-    width: auto;
-    margin: 0;
-    transform: scale(1.2);
-}
-
-/* Checkboxes: start at the top, flush with the other fields' left edge,
-   one consistent size, text wrapping next to the box. */
-.create-code-container .create-code-form .checkbox-group {
-    justify-content: flex-start;
-    gap: 6px;
-    padding-top: 22px;
-}
-
-.create-code-container .create-code-form .checkbox-label {
-    align-items: flex-start;
-    padding: 6px 0;
-    line-height: 1.35;
-}
-
-.create-code-container .create-code-form .checkbox-label input[type="checkbox"] {
-    flex-shrink: 0;
-    width: 18px;
-    height: 18px;
-    margin: 1px 0 0;
-    transform: none;
-    accent-color: var(--hsa-teal-600);
-}
-
-/* Voter Eligibility Info */
-.create-code-container .voter-eligibility-info {
-    background: var(--hsa-surface-subtle);
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-    text-align: center;
-    border-left: 4px solid var(--hsa-teal-600);
-}
-
-.create-code-container .eligibility-badge {
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-.create-code-container .eligibility-badge.eligible {
-    background: #28a745;
-    color: white;
-}
-
-.create-code-container .eligibility-badge.not-eligible {
-    background: #dc3545;
-    color: white;
-}
-
-.create-code-container .eligibility-note {
-    margin: 0;
-    font-size: 14px;
-    color: #666;
-    font-style: italic;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .create-code-container {
-        margin: 10px;
-        padding: 15px;
-    }
-
-    .create-code-container .create-code-form .checkbox-group {
-        padding-top: 0;
-    }
-
-    .create-code-container .create-code-header h2 {
-        font-size: 24px;
-    }
-
-    .create-code-container .create-code-header p {
-        font-size: 14px;
-    }
-}
-
-@media (max-width: 480px) {
-    .create-code-container {
-        padding: 10px;
-    }
-
-    .create-code-container .voter-eligibility-info {
-        padding: 15px;
-    }
-}
-.create-code-container .form-group label[for*="eventName"]:after,
-.create-code-container .form-group label[for*="eventCode"]:after,
-.create-code-container .form-group label[for*="category"]:after,
-.create-code-container .form-group label[for*="eventDate"]:after,
-.create-code-container .form-group label[for*="points"]:after {
-    content: ' *';
-    color: #dc3545;
-}
-
-/* Focus and hover states */
-.create-code-container .form-group input:hover,
-.create-code-container .form-group select:hover {
-    border-color: var(--hsa-teal-600);
-}
-
-/* Animation for loading state */
-
 /* ---- Pending cabinet approvals  (ApprovedCabinet.tsx) ----------------------------------- */
 
-/* Same look as Manage Event Codes (EditableCodesTable). */
 #approvedCabinetContainer.approvals {
     max-width: 1100px;
     margin: 0 auto;
@@ -1110,526 +941,6 @@
     }
 }
 
-/* ---- Manage Event Codes table  (EditableCodesTable.tsx) ------------------------------------ */
-/* EditableCodesTable Styles */
-.editable-codes-table {
-    max-width: 1600px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-/* Buttons Base */
-.editable-codes-table .refresh-button {
-    padding: 12px 22px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-    min-width: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-/* Refresh Button - High Contrast Dark Slate Blue */
-.editable-codes-table .refresh-button {
-    background: var(--hsa-teal-700);
-    color: #ffffff;
-    border: 2px solid var(--hsa-teal-700);
-}
-
-.editable-codes-table .refresh-button:hover:not(:disabled) {
-    background: var(--hsa-teal-900);
-    border-color: var(--hsa-teal-900);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-/* Disabled State: Dark text on light background (Never white on gray) */
-.editable-codes-table .refresh-button:disabled {
-    background: var(--hsa-border-light);
-    color: var(--hsa-muted-light);
-    border-color: var(--hsa-border);
-    cursor: not-allowed;
-    opacity: 0.85;
-    box-shadow: none;
-    transform: none;
-}
-
-/* Enhanced focus states for accessibility */
-.editable-codes-table .refresh-button:focus {
-    outline: 3px solid #0284c7;
-    outline-offset: 2px;
-}
-
-.editable-codes-table .voter-eligible-label {
-    font-weight: 700;
-}
-
-/* Table Container */
-.editable-codes-table .table-container {
-    background: var(--hsa-surface);
-    border-radius: 10px;
-    overflow-x: auto;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    border: 2px solid var(--hsa-teal-700);
-}
-
-.editable-codes-table .codes-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    color: var(--hsa-ink);
-}
-
-.editable-codes-table .codes-table th {
-    background: var(--hsa-teal-700);
-    color: #ffffff;
-    padding: 14px 12px;
-    text-align: left;
-    font-weight: 700;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.editable-codes-table .codes-table td {
-    padding: 12px 10px;
-    border-bottom: 1px solid var(--hsa-border);
-    vertical-align: middle;
-}
-
-.editable-codes-table .codes-table tr.even {
-    background-color: var(--hsa-surface-subtle);
-}
-
-.editable-codes-table .codes-table tr.odd {
-    background-color: var(--hsa-surface);
-}
-
-.editable-codes-table .codes-table tr:hover {
-    background-color: var(--hsa-surface-sunken);
-}
-
-.editable-codes-table .code-id {
-    font-family: var(--hsa-font-mono);
-    font-weight: 700;
-    color: var(--hsa-teal-700);
-    min-width: 80px;
-}
-
-/* Edit Inputs in Table */
-.editable-codes-table .edit-input,
-.editable-codes-table .edit-select {
-    padding: 6px 8px;
-    border: 1.5px solid var(--hsa-teal-700);
-    border-radius: 4px;
-    font-size: 13px;
-    color: var(--hsa-ink);
-    width: 100%;
-    min-width: 100px;
-}
-
-.editable-codes-table .edit-input:focus,
-.editable-codes-table .edit-select:focus {
-    outline: none;
-    border-color: var(--hsa-teal-900);
-    box-shadow: 0 0 0 2px rgba(15, 76, 100, 0.2);
-}
-
-.editable-codes-table .points-input {
-    max-width: 80px;
-}
-
-/* Badges - Accessible High Contrast */
-.editable-codes-table .badge {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 700;
-    text-align: center;
-    display: inline-block;
-    min-width: 44px;
-}
-
-.editable-codes-table .badge-yes {
-    background-color: var(--hsa-success-bg);
-    color: var(--hsa-success-strong);
-    border: 1px solid var(--hsa-success-border);
-}
-
-.editable-codes-table .badge-no {
-    background-color: var(--hsa-danger-bg);
-    color: var(--hsa-danger-strong);
-    border: 1px solid var(--hsa-danger-border);
-}
-
-/* Action Buttons inside rows */
-.editable-codes-table .actions-cell {
-    text-align: center;
-    white-space: nowrap;
-}
-
-.editable-codes-table .edit-btn,
-.editable-codes-table .delete-btn,
-.editable-codes-table .save-btn,
-.editable-codes-table .cancel-btn {
-    padding: 6px 12px;
-    margin: 0 3px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 700;
-    min-width: 0;
-    min-height: 0;
-    transition: all 0.2s;
-}
-
-.editable-codes-table .edit-btn {
-    background: #0f5b7a;
-    color: #ffffff;
-    border: 1px solid #0f5b7a;
-}
-
-.editable-codes-table .edit-btn:hover {
-    background: #0a3d52;
-}
-
-.editable-codes-table .delete-btn {
-    background: var(--hsa-danger);
-    color: #ffffff;
-    border: 1px solid var(--hsa-danger);
-}
-
-.editable-codes-table .delete-btn:hover {
-    background: var(--hsa-danger-strong);
-}
-
-.editable-codes-table .save-btn {
-    background: var(--hsa-success);
-    color: #ffffff;
-    border: 1px solid var(--hsa-success);
-}
-
-.editable-codes-table .save-btn:hover {
-    background: var(--hsa-success-strong);
-}
-
-.editable-codes-table .cancel-btn {
-    background: var(--hsa-muted);
-    color: #ffffff;
-    border: 1px solid var(--hsa-muted);
-}
-
-.editable-codes-table .cancel-btn:hover {
-    background: var(--hsa-ink-soft);
-}
-
-/* No Codes Message */
-.editable-codes-table .no-codes {
-    text-align: center;
-    padding: 40px;
-    color: var(--hsa-ink-soft);
-    font-weight: 600;
-    font-size: 16px;
-    border-top: 2px solid var(--hsa-border);
-}
-
-/* Accessibility Focus */
-.editable-codes-table .edit-btn:focus,
-.editable-codes-table .delete-btn:focus,
-.editable-codes-table .save-btn:focus,
-.editable-codes-table .cancel-btn:focus {
-    outline: 2px solid var(--hsa-teal-700);
-    outline-offset: 2px;
-}
-
-/* ------------------------------------------------------------------------
-   Search / filter bar
------------------------------------------------------------------------- */
-.editable-codes-table .codes-filters {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
-    grid-template-areas:
-        "search category refresh"
-        "count count count";
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.editable-codes-table .codes-filters .codes-search { grid-area: search; }
-.editable-codes-table .codes-filters .codes-category-filter { grid-area: category; }
-.editable-codes-table .codes-filters .codes-refresh { grid-area: refresh; }
-.editable-codes-table .codes-filters .codes-count { grid-area: count; }
-
-.editable-codes-table .codes-filters .codes-refresh {
-    min-width: 0;
-    height: 100%;
-    padding: 0 18px;
-    white-space: nowrap;
-}
-
-.editable-codes-table .codes-filters .codes-search,
-.editable-codes-table .codes-filters .codes-category-filter {
-    width: 100%;
-    margin: 0;
-    padding: 10px 12px;
-    border: 1.5px solid #94a3b8;
-    border-radius: 6px;
-    font-size: 15px;
-    font-family: inherit;
-    color: var(--hsa-ink);
-    background-color: var(--hsa-surface);
-}
-
-.editable-codes-table .codes-filters .codes-search:focus,
-.editable-codes-table .codes-filters .codes-category-filter:focus {
-    outline: none;
-    border-color: var(--hsa-teal-700);
-    box-shadow: 0 0 0 3px rgba(15, 76, 100, 0.2);
-}
-
-.editable-codes-table .codes-count {
-    grid-column: 1 / -1;
-    margin: 0;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--hsa-muted);
-}
-
-/* Phone-only pieces */
-.editable-codes-table .codes-table .cell-toggle,
-.editable-codes-table .codes-table .btn-label {
-    display: none;
-}
-
-/* ------------------------------------------------------------------------
-   Phones: each code is a compact row (Code / Event / Points / ▸).
-   Tap it to expand the rest of the fields and the Edit / Delete buttons.
------------------------------------------------------------------------- */
-@media (max-width: 768px) {
-    .editable-codes-table .codes-filters {
-        grid-template-columns: minmax(0, 1fr) auto;
-        grid-template-areas:
-            "search refresh"
-            "category category"
-            "count count";
-    }
-
-    .editable-codes-table .table-container {
-        overflow: visible;
-        border: none;
-        background: transparent;
-        box-shadow: none;
-    }
-
-    .editable-codes-table .codes-table,
-    .editable-codes-table .codes-table tbody {
-        display: block;
-    }
-
-    /* Eboard.css styles every <table> with a shadow and top margin */
-    .editable-codes-table .codes-table {
-        box-shadow: none;
-        margin-top: 0;
-    }
-
-    .editable-codes-table .codes-table thead {
-        display: none;
-    }
-
-    .editable-codes-table .codes-table tr,
-    .editable-codes-table .codes-table tr.even,
-    .editable-codes-table .codes-table tr.odd {
-        display: grid;
-        grid-template-columns: auto minmax(0, 1fr) auto auto;
-        align-items: center;
-        column-gap: 10px;
-        padding: 10px 12px;
-        margin-bottom: 8px;
-        background: var(--hsa-surface);
-        border: 1.5px solid var(--hsa-border);
-        border-radius: 8px;
-        cursor: pointer;
-    }
-
-    .editable-codes-table .codes-table tr:hover {
-        background: var(--hsa-surface-subtle);
-    }
-
-    .editable-codes-table .codes-table tr.expanded {
-        border-color: var(--hsa-teal-700);
-    }
-
-    .editable-codes-table .codes-table td {
-        display: block;
-        padding: 0;
-        border: none;
-    }
-
-    /* Summary line */
-    .editable-codes-table .codes-table .code-id {
-        grid-row: 1;
-        grid-column: 1;
-        font-size: 13px;
-    }
-
-    .editable-codes-table .codes-table .cell-event {
-        grid-row: 1;
-        grid-column: 2;
-        font-weight: 600;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .editable-codes-table .codes-table tr.expanded .cell-event {
-        white-space: normal;
-    }
-
-    .editable-codes-table .codes-table .cell-points {
-        grid-row: 1;
-        grid-column: 3;
-        font-weight: 700;
-        color: var(--hsa-teal-700);
-        white-space: nowrap;
-    }
-
-    .editable-codes-table .codes-table tr:not(.editing) .cell-points::after {
-        content: " pts";
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--hsa-muted-light);
-    }
-
-    .editable-codes-table .codes-table .cell-toggle {
-        display: block;
-        grid-row: 1;
-        grid-column: 4;
-    }
-
-    .editable-codes-table .codes-table .toggle-btn,
-    .editable-codes-table .codes-table .toggle-btn:hover {
-        min-width: 0;
-        min-height: 0;
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        border: none;
-        border-radius: 6px;
-        background: transparent;
-        box-shadow: none;
-        color: var(--hsa-teal-700);
-        font-size: 28px;
-        line-height: 1;
-        transition: transform 0.15s ease;
-    }
-
-    .editable-codes-table .codes-table tr.expanded .toggle-btn {
-        transform: rotate(90deg);
-    }
-
-    .editable-codes-table .codes-table .toggle-btn:hover {
-        background: var(--hsa-border-light);
-    }
-
-    /* Details: hidden until the row is expanded */
-    .editable-codes-table .codes-table .cell-detail {
-        display: none;
-        grid-column: 1 / -1;
-    }
-
-    .editable-codes-table .codes-table tr.expanded .cell-detail {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        padding: 8px 0;
-        border-top: 1px solid #eef2f6;
-    }
-
-    .editable-codes-table .codes-table tr.expanded .cell-detail[data-label]::before {
-        content: attr(data-label);
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--hsa-muted);
-    }
-
-    .editable-codes-table .codes-table tr.expanded .actions-cell {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        padding-top: 12px;
-    }
-
-    .editable-codes-table .codes-table .actions-cell button {
-        margin: 0;
-        padding: 10px;
-        font-size: 14px;
-    }
-
-    .editable-codes-table .codes-table .btn-label {
-        display: inline;
-    }
-
-    /* Editing: every field full-width with its label above it */
-    .editable-codes-table .codes-table tr.expanded.editing {
-        cursor: default;
-    }
-
-    .editable-codes-table .codes-table tr.expanded.editing td {
-        grid-column: 1 / -1;
-        grid-row: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 4px;
-        padding: 6px 0;
-        border-top: none;
-    }
-
-    .editable-codes-table .codes-table tr.expanded.editing td[data-label]::before {
-        content: attr(data-label);
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--hsa-muted);
-    }
-
-    .editable-codes-table .codes-table tr.expanded.editing td input[type="checkbox"] {
-        align-self: flex-start;
-        width: 20px;
-        height: 20px;
-    }
-
-    .editable-codes-table .codes-table tr.expanded.editing td.actions-cell {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        padding-top: 12px;
-    }
-
-    .editable-codes-table .codes-table tr.expanded.editing td.cell-toggle {
-        display: none;
-    }
-
-    /* Full width, and drop the base input[type="text"] left margin (index.css) */
-    /* Full width,
-    and drop the base input[type="text"] left margin (index.css) */
-    .editable-codes-table .codes-table .edit-input,
-    .editable-codes-table .codes-table .edit-select {
-        width: 100%;
-        max-width: none;
-        min-width: 0;
-        margin: 0;
-        font-size: 15px;
-        padding: 8px 10px;
-    }
-}
-
 /* ---- User lookup: cabinet points line above Cabinet Events  (UserPointsLookup.tsx) */
 .user-points-lookup .lookup-cabinet-points {
     margin: 0 0 12px;
@@ -1747,83 +1058,251 @@
     }
 }
 
-/* ---- List of Codes card  (EditableCodesTable.tsx) ---------------------- */
-.editable-codes-table .codes-card {
-    padding: 20px;
-    background: var(--hsa-surface);
-    border: 2px solid var(--hsa-teal-600);
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+/* ---- Event Codes page  (EventCodesPage.tsx, pages/eboard/eventCodes/) --
+   A sticky quick-add row over a facet sidebar and the codes list. */
+.event-codes-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 12px 20px 0;
 }
 
-@media (max-width: 600px) {
-    .editable-codes-table .codes-card {
-        padding: 14px 10px;
-    }
+.event-codes-page button { font: inherit; min-width: 0; min-height: 0; }
+
+.event-codes-page :is(input, select, button):focus-visible {
+    outline: 3px solid var(--hsa-teal-400);
+    outline-offset: 2px;
 }
 
-/* ---- Create New Event Code toggle  (EventCodesPage.tsx) ----------------- */
-.create-code-toggle {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    margin: 8px 0 16px;
-}
-
-.create-code-toggle .create-code-toggle__button {
-    min-width: 0;
-    min-height: 0;
-    padding: 12px 26px;
-    border: 2px solid var(--hsa-success);
-    border-radius: 8px;
-    background: var(--hsa-success);
-    color: #ffffff;
+.event-codes-page :is(input:not([type="checkbox"], [type="radio"]), select) {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    padding: 10px 12px;
+    border: 1.5px solid var(--hsa-teal-600);
+    border-radius: 6px;
     font-family: inherit;
-    font-size: 16px;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-ink);
+    background-color: var(--hsa-surface);
+}
+
+/* The Event Type dropdown: the site's native select look (auth.css .form select). */
+.event-codes-page .event-type-select { cursor: pointer; }
+.event-codes-page .event-type-select:focus { border-color: var(--hsa-teal-500); box-shadow: 0 0 0 3px rgba(21, 87, 118, 0.15); }
+
+.event-codes-page .link-button {
+    padding: 4px 6px;
+    border: none;
+    background: none;
+    color: var(--hsa-teal-600);
+    font-weight: 600;
+    font-size: var(--hsa-text-sm);
+    text-decoration: underline;
+    cursor: pointer;
+    box-shadow: none;
+}
+.event-codes-page .link-button:hover { background: none; border: none; box-shadow: none; color: var(--hsa-teal-800); }
+.event-codes-page .link-button--danger { color: var(--hsa-danger); }
+.event-codes-page .link-button--danger:hover { color: var(--hsa-danger-strong); }
+
+/* Quick-add row: sticks under the site header while the list scrolls. */
+.event-codes-page .quick-add {
+    position: sticky;
+    top: 84px;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    width: auto;
+    margin: 0;
+    padding: 12px;
+    background: var(--hsa-teal-700);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(15, 76, 100, 0.2);
+}
+.event-codes-page .quick-add :is(input, select) { border-color: transparent; }
+.event-codes-page .quick-add__name { flex: 2 1 200px; }
+.event-codes-page .quick-add__code { flex: 0 1 140px; font-weight: 700; letter-spacing: .04em; }
+.event-codes-page .quick-add__date { flex: 0 1 160px; }
+.event-codes-page .quick-add .event-type-select { flex: 1 1 240px; }
+.event-codes-page .quick-add__submit {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    background: var(--hsa-surface);
+    color: var(--hsa-teal-700);
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-    transition: background-color 0.2s, transform 0.2s;
 }
-
-.create-code-toggle .create-code-toggle__button:hover {
-    background: var(--hsa-success-strong);
-    border-color: var(--hsa-success-strong);
-    transform: translateY(-1px);
-}
-
-.create-code-toggle .create-code-toggle__button[aria-expanded="true"] {
-    background: var(--hsa-muted);
-    border-color: var(--hsa-muted);
-}
-
-.create-code-toggle__done {
+.event-codes-page .quick-add__submit:hover { background: var(--hsa-teal-100); border: none; box-shadow: none; }
+.event-codes-page .quick-add .link-button,
+.event-codes-page .quick-add .link-button:hover { color: #fff; }
+.event-codes-page .quick-add__more {
+    display: flex;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
     margin: 0;
-    color: var(--hsa-success);
-    font-weight: 700;
+    color: #fff;
+    font-size: var(--hsa-text-sm);
+    font-weight: 400;
 }
+.event-codes-page .quick-add__status { flex-basis: 100%; color: var(--hsa-teal-100); font-size: var(--hsa-text-sm); }
+.event-codes-page .quick-add__status .type-facts { color: #fff; }
+.event-codes-page .quick-add__error { color: #fecaca; font-weight: 600; }
 
-/* Smooth open/close: animates the row height from 0 to the form's height */
-.collapsible {
+/* Tier / Cabinet / VE / Semester: label over value, spaced out. */
+.event-codes-page .type-facts { display: flex; flex-wrap: wrap; gap: 10px 32px; margin: 4px 0 0; }
+.event-codes-page .type-facts div { display: flex; flex-direction: column; gap: 2px; }
+.event-codes-page .type-facts dt { font-size: var(--hsa-text-xs); text-transform: uppercase; letter-spacing: .06em; opacity: .8; }
+.event-codes-page .type-facts dd { margin: 0; font-weight: 700; }
+
+/* Facet sidebar + list */
+.event-codes-page__body {
     display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 0.3s ease;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 24px;
+    margin-top: 20px;
+    align-items: start;
 }
-
-.collapsible.is-open {
-    grid-template-rows: 1fr;
-    margin-bottom: 20px;
+.event-codes-page .code-facets-toggle { display: none; }
+.event-codes-page .code-facets {
+    position: sticky;
+    top: 200px;
+    /* Scrolls on its own when taller than the space under the add row. */
+    max-height: calc(100vh - 220px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
-
-.collapsible__inner {
-    overflow: hidden;
-    min-height: 0;
+.event-codes-page .code-facets input[type="search"] { width: 100%; }
+.event-codes-page .code-facets fieldset { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; border: none; }
+.event-codes-page .code-facets legend { margin-bottom: 4px; font-weight: 700; font-size: var(--hsa-text-sm); color: var(--hsa-ink); }
+.event-codes-page .code-facets label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 2px 0;
+    font-size: var(--hsa-text-sm);
+    font-weight: 400;
+    color: var(--hsa-ink);
+    cursor: pointer;
 }
+.event-codes-page .code-facets label span { margin-left: auto; color: var(--hsa-muted); font-variant-numeric: tabular-nums; }
+.event-codes-page .code-facets label.is-zero { color: var(--hsa-muted-light); }
+.event-codes-page .code-facets label.is-earlier { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--hsa-border-light); }
+.event-codes-page .code-facets .link-button { align-self: flex-start; }
 
-/* ---- Event Codes page frame  (EventCodesPage.tsx) ---------------------- */
-.event-codes-page {
-    padding-top: 12px;
+.event-codes-page .code-list__note { margin: 0 0 8px; color: var(--hsa-muted); font-size: var(--hsa-text-sm); }
+.event-codes-page .code-list__empty { padding: 24px; text-align: center; color: var(--hsa-muted); }
+.event-codes-page .code-block + .code-block { margin-top: 28px; }
+.event-codes-page .code-block__title { margin: 0 0 8px; text-align: left; font-size: var(--hsa-text-xl); color: var(--hsa-teal-700); }
+.event-codes-page .code-block__title span { font-size: var(--hsa-text-base); font-weight: 400; color: var(--hsa-muted); }
+.event-codes-page .code-week h3 { margin: 16px 0 4px; text-align: left; font-size: var(--hsa-text-xs); font-weight: 600; color: var(--hsa-muted); }
+.event-codes-page .code-week ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--hsa-border); }
+
+.event-codes-page .code-row { border-bottom: 1px solid var(--hsa-border-light); background: var(--hsa-surface); }
+.event-codes-page .code-row__main {
+    display: grid;
+    grid-template-columns: 110px 140px minmax(0, 1fr) 190px 64px;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+    padding: 10px 8px;
+    border: none;
+    border-radius: 0;
+    background: none;
+    color: inherit;
+    font-size: var(--hsa-text-sm);
+    text-align: left;
+    box-shadow: none;
+    cursor: pointer;
+}
+.event-codes-page .code-row__main:hover { background: var(--hsa-surface-subtle); border: none; box-shadow: none; }
+.event-codes-page .code-row.is-open .code-row__main { background: var(--hsa-teal-100); }
+.event-codes-page .code-row__date { color: var(--hsa-muted); }
+.event-codes-page .code-row__code { overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: var(--hsa-teal-700); }
+.event-codes-page .code-row__count { text-align: right; font-variant-numeric: tabular-nums; }
+.event-codes-page .code-row__count small { color: var(--hsa-muted); }
+
+.event-codes-page .tier-chip {
+    justify-self: start;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: var(--hsa-text-xs);
+    font-weight: 600;
+    white-space: nowrap;
+}
+.event-codes-page .tier-chip--core { background: var(--hsa-teal-700); color: #fff; border: 1.5px solid var(--hsa-teal-700); }
+.event-codes-page .tier-chip--semester { background: var(--hsa-surface); color: var(--hsa-teal-700); border: 1.5px solid var(--hsa-teal-400); }
+.event-codes-page .tier-chip--additional { background: var(--hsa-surface); color: var(--hsa-muted); border: 1.5px dashed var(--hsa-muted-light); }
+.event-codes-page .tier-chip--none { background: var(--hsa-danger-bg); color: var(--hsa-danger-strong); border: 1.5px solid var(--hsa-danger-border); }
+
+/* An opened row: check-in count first, then the edit form. */
+.event-codes-page .code-row__detail { padding: 12px 8px 16px 130px; background: var(--hsa-teal-100); }
+.event-codes-page .code-row__checked-in { display: flex; align-items: baseline; gap: 10px; margin: 0 0 12px; }
+.event-codes-page .code-row__checked-in strong {
+    font-family: var(--hsa-font-display);
+    font-size: var(--hsa-text-3xl);
+    line-height: 1;
+    color: var(--hsa-teal-700);
+}
+.event-codes-page .code-row__checked-in span { color: var(--hsa-ink-soft); }
+.event-codes-page .code-edit { width: auto; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.event-codes-page .code-edit__fields { display: flex; flex-wrap: wrap; gap: 12px 16px; }
+.event-codes-page .code-edit__fields label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    color: var(--hsa-ink);
+}
+.event-codes-page .code-edit__fields small { font-weight: 400; color: var(--hsa-muted); }
+.event-codes-page .code-edit .type-facts { color: var(--hsa-ink); }
+.event-codes-page .code-edit__note { margin: 0; font-size: var(--hsa-text-sm); color: var(--hsa-ink-soft); }
+.event-codes-page .code-edit__error { margin: 0; font-size: var(--hsa-text-sm); font-weight: 600; color: var(--hsa-danger); }
+.event-codes-page .code-edit__actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.event-codes-page .code-edit__save {
+    padding: 9px 20px;
+    border: none;
+    border-radius: 6px;
+    background: var(--hsa-teal-600);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+.event-codes-page .code-edit__save:hover { background: var(--hsa-teal-800); border: none; box-shadow: none; }
+.event-codes-page .code-edit__delete { margin-left: auto; }
+
+@media (max-width: 800px) {
+    .event-codes-page { padding: 12px 16px 0; }
+    .event-codes-page .quick-add { position: static; }
+    .event-codes-page .quick-add :is(input, select, .quick-add__submit) { flex: 1 1 100%; }
+    .event-codes-page__body { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .event-codes-page .code-facets-toggle { display: inline-block; justify-self: start; }
+    .event-codes-page .code-facets { display: none; position: static; }
+    .event-codes-page .code-facets.is-open { display: flex; }
+    .event-codes-page .code-row__main {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: "code count" "event event" "date type";
+        gap: 4px 12px;
+        min-height: 48px;
+    }
+    .event-codes-page .code-row__code { grid-area: code; }
+    .event-codes-page .code-row__count { grid-area: count; }
+    .event-codes-page .code-row__event { grid-area: event; }
+    .event-codes-page .code-row__date { grid-area: date; }
+    .event-codes-page .code-row .tier-chip { grid-area: type; justify-self: end; }
+    .event-codes-page .code-row__detail { padding-left: 8px; }
+    .event-codes-page .code-edit__fields label,
+    .event-codes-page .code-edit__fields :is(input, select) { width: 100%; }
+    .event-codes-page .code-edit__fields label { flex: 1 1 100%; }
 }
 
 /* One-time admin export at the bottom of the page */
