@@ -161,7 +161,21 @@ export function previewRequest(
         ...(draft.codeId ? { codeId: draft.codeId } : {}),
         ...(draft.makeupFor[i] ? { makeupFor: draft.makeupFor[i] } : {}),
     }));
-    const options = { today, viewingAsCabinet };
+    return standingChange(member, attendances, codes, wouldBe, { today, viewingAsCabinet });
+}
+
+/**
+ * What adding `wouldBe` to a Member's Attendance changes: the points it
+ * earns, whether each one is Surplus and what it makes up, and the Missed
+ * Events it closes. Shared by Submit Point Request and E-Board's review.
+ */
+export function standingChange(
+    member: Member,
+    attendances: Attendance[],
+    codes: Code[],
+    wouldBe: Attendance[],
+    options: { today: string; viewingAsCabinet?: boolean },
+): RequestPreview {
     const before = computeStanding(member, attendances, rubric, codes, options);
     const after = computeStanding(member, [...attendances, ...wouldBe], rubric, codes, options);
     const stillOwed = new Set(after.missedEvents.filter((missed) => missed.owed).map((missed) => missed.codeId));
