@@ -200,7 +200,7 @@ const openImageModal = (request) => {
                                         <strong>Code:</strong> {request.codeId}
                                     </div>
                                 )}
-                                {request.hours && (
+                                {request.hours > 0 && (
                                     <div className="detail-row">
                                         <strong>Hours:</strong> {request.hours}
                                     </div>

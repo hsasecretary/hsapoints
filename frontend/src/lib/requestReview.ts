@@ -156,11 +156,13 @@ export async function approveRequest(db: Firestore, requestId: string, decision:
         if (request.status !== 'pending') return ALREADY_REVIEWED;
         const userRef = doc(db, 'users', request.userEmail.toLowerCase());
         const member = ((await tx.get(userRef)).data() ?? {}) as Member;
-        const codeRef = decision.codeId ? doc(db, 'codes', decision.codeId) : null;
+        // Code IDs are uppercase doc IDs, but a few older rows were stored in mixed case.
+        const codeId = decision.codeId?.toUpperCase() ?? null;
+        const codeRef = codeId ? doc(db, 'codes', codeId) : null;
         const codeData = codeRef && (await tx.get(codeRef)).data();
-        const code = codeData ? ({ id: decision.codeId, ...codeData } as Code) : null;
+        const code = codeData ? ({ id: codeId, ...codeData } as Code) : null;
 
-        const planned = approvalAttendances(request, code, decision, member);
+        const planned = approvalAttendances(request, code, { ...decision, codeId }, member);
         if (!planned.ok) return planned;
         const refs = planned.attendances.map((attendance) => doc(db, 'attendances', attendance.id));
         const exists = await Promise.all(refs.map(async (ref) => (await tx.get(ref)).exists()));
@@ -182,7 +184,8 @@ export async function approveRequest(db: Firestore, requestId: string, decision:
         });
         if (code && created.length) tx.update(codeRef, { attendeeCount: increment(1) });
         if (created.length) {
-            tx.update(userRef, legacyCredit(request.date, vePoints * created.length, code ? code.id : null));
+            // A code's date wins over the one on the request.
+            tx.update(userRef, legacyCredit(planned.attendances[0].data.eventDate, vePoints * created.length, code ? code.id : null));
         }
         return { ok: true } as const;
     });

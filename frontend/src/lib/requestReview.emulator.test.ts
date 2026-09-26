@@ -76,6 +76,18 @@ describe('approving a Point Request', () => {
         expect(await readPastRules(env, 'codes/SALSA')).toMatchObject({ attendeeCount: 5 });
     });
 
+    it("finds a code named in mixed case, and credits the old counters to the code's Semester", async () => {
+        await seed(env, {
+            'codes/WINTER': { event: 'Winter Mixer', eventTypeId: 'hsa-programming', eventDate: '2027-01-15', attendeeCount: 0 },
+            'pointRequests/winter': pending({ codeId: 'Winter', eventTypeId: 'hsa-programming', date: '2026-12-01' }),
+        });
+        const decision = { eventTypeId: 'hsa-programming', codeId: 'Winter', makeupFor: [null] };
+
+        expect(await approveRequest(signedInAs(env, EBOARD), 'winter', decision, EBOARD)).toEqual({ ok: true });
+        expect(await readPastRules(env, `attendances/${MEMBER}__WINTER`)).toMatchObject({ codeId: 'WINTER', eventDate: '2027-01-15' });
+        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ fallPoints: 0, springPoints: 1 });
+    });
+
     it("writes nothing new when the Member already redeemed the code, so it can't double count", async () => {
         await seed(env, {
             [`attendances/${MEMBER}__SALSA`]: { email: MEMBER, eventTypeId: 'hsa-programming', eventDate: '2026-10-20', source: 'code', codeId: 'SALSA' },
