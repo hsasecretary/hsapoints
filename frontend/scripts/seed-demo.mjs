@@ -16,6 +16,7 @@ const PASSWORD = 'hsa-demo-2026';
 
 const CABINET = 'cabinet.demo@ufl.edu';
 const GENERAL = 'general.demo@ufl.edu';
+const EBOARD = 'eboard.demo@ufl.edu';
 
 // Fall 2026. Dated around 2026-09-26: the last two Core Events are upcoming
 // until October.
@@ -76,10 +77,28 @@ const docs = Object.fromEntries([
         pointsRequested: 2, status: 'pending', reviewedAt: null, reviewedBy: null, reviewNotes: '',
         submittedAt: serverTimestamp(),
     }],
+    // Three Tabling hours for E-Board's review (#72): the first fills the
+    // Semester Requirement, the other two are Make-ups.
+    ['pointRequests/demo-pending-tabling', {
+        userEmail: CABINET, codeId: null, typeChoiceId: 'tabling', eventTypeId: 'tabling',
+        activityName: 'Turlington table', date: '2026-09-23', description: 'Tabled for the fundraiser', hours: 3,
+        makeupFor: [null, null, 'CT3'], imageData: '', pointsRequested: 3, status: 'pending', reviewedAt: null,
+        reviewedBy: null, reviewNotes: '', submittedAt: serverTimestamp(),
+    }],
 
     // General Member: search only, no Strikes.
     [`users/${GENERAL}`, user(GENERAL, 'Gabi', {})],
     ...['GBM1', 'OPA1', 'EXT1', 'GBM4'].map((id) => attended(GENERAL, id)),
+    // "Not listed": E-Board picks the Event Type, attaches it to PROG1, or makes it an Adjustment.
+    ['pointRequests/demo-pending-not-listed', {
+        userEmail: GENERAL, codeId: null, typeChoiceId: 'not-listed', eventTypeId: null,
+        activityName: 'Salsa night setup', date: '2026-09-12', description: 'Helped set up the dance floor', makeupFor: [null],
+        imageData: '', pointsRequested: 0, status: 'pending', reviewedAt: null, reviewedBy: null, reviewNotes: '',
+        submittedAt: serverTimestamp(),
+    }],
+
+    // E-Board: reviews the requests above on /eboard/point-requests.
+    [`users/${EBOARD}`, user(EBOARD, 'Eva', { involvement: 'eboard', eboard: true, position: 'secretary' })],
 ]);
 
 async function createAccount(email) {
@@ -99,7 +118,7 @@ await env.withSecurityRulesDisabled(async (context) => {
     const db = context.firestore();
     for (const [path, data] of Object.entries(docs)) await setDoc(doc(db, path), data);
 });
-for (const email of [CABINET, GENERAL]) await createAccount(email);
+for (const email of [CABINET, GENERAL, EBOARD]) await createAccount(email);
 await env.cleanup();
 
-console.log(`Seeded ${Object.keys(docs).length} docs. Sign in as ${CABINET} or ${GENERAL} (password in this file).`);
+console.log(`Seeded ${Object.keys(docs).length} docs. Sign in as ${CABINET}, ${GENERAL} or ${EBOARD} (password in this file).`);

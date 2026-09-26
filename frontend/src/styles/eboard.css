@@ -941,6 +941,166 @@
     }
 }
 
+/* Review panel (pointRequests/ReviewPanel.tsx): confirm the Event Type,
+   attach a code, Make-up picks, the effect preview, and the decision. */
+.point-request-review .review-open-button {
+    flex: 1;
+}
+
+.point-request-review .review-notice {
+    margin: 0 0 16px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: var(--hsa-success-bg);
+    border: 1px solid var(--hsa-success-border);
+    color: var(--hsa-success-strong);
+    font-weight: 700;
+}
+
+.point-request-review .review-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-top: 14px;
+    border-top: 2px solid var(--hsa-surface-sunken);
+}
+
+.point-request-review .review-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    min-width: 0;
+}
+
+.point-request-review .review-field label,
+.point-request-review .review-field legend {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--hsa-ink);
+    padding: 0;
+}
+
+.point-request-review .review-required {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--hsa-danger);
+}
+
+.point-request-review .review-field select,
+.point-request-review .review-field input,
+.point-request-review .review-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 10px;
+    border: 1.5px solid #94a3b8;
+    border-radius: 6px;
+    font: inherit;
+    font-size: 14px;
+    color: var(--hsa-ink);
+    background: var(--hsa-surface);
+}
+
+.point-request-review .review-field select:disabled {
+    background: var(--hsa-surface-sunken);
+    color: var(--hsa-muted);
+}
+
+.point-request-review .review-hint {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--hsa-muted);
+}
+
+.point-request-review .review-makeup-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+}
+
+.point-request-review .review-makeup-row span {
+    flex: none;
+    width: 52px;
+    font-size: 13px;
+    color: var(--hsa-ink-soft);
+}
+
+.point-request-review .review-effect {
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: var(--hsa-teal-100);
+    border-left: 4px solid var(--hsa-teal-600);
+    font-size: 13.5px;
+    color: var(--hsa-ink);
+}
+
+.point-request-review .review-effect__title {
+    margin: 0 0 4px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--hsa-teal-700);
+}
+
+.point-request-review .review-effect__points {
+    margin: 0;
+    font-weight: 800;
+    font-size: 15px;
+}
+
+.point-request-review .review-effect ul {
+    margin: 8px 0 0;
+    padding-left: 18px;
+}
+
+.point-request-review .review-effect li + li {
+    margin-top: 4px;
+}
+
+.point-request-review .review-modes {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 8px;
+    background: var(--hsa-surface-sunken);
+}
+
+.point-request-review .review-mode {
+    flex: 1;
+    min-height: 40px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--hsa-ink-soft);
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.point-request-review .review-mode.is-active {
+    background: var(--hsa-surface);
+    color: var(--hsa-teal-700);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);
+}
+
+.point-request-review .review-panel > .approve-button,
+.point-request-review .review-field .approve-button,
+.point-request-review .review-field .deny-button {
+    flex: none;
+    margin-top: 4px;
+}
+
+.point-request-review .review-error {
+    margin: 0;
+    color: var(--hsa-danger);
+    font-weight: 700;
+    font-size: 14px;
+}
+
 /* ---- User lookup: cabinet points line above Cabinet Events  (UserPointsLookup.tsx) */
 .user-points-lookup .lookup-cabinet-points {
     margin: 0 0 12px;

@@ -1,13 +1,43 @@
 import { useState, useEffect } from 'react';
 import { db } from '../../lib/firebase';
-import { collection, getDocs, doc, updateDoc, serverTimestamp, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import type { Code } from '../../lib/computeStanding';
+import { NOT_LISTED } from '../../lib/pointRequests';
+import type { ReviewRequest } from '../../lib/requestReview';
+import { eventType } from '../../lib/rubric';
+import ReviewPanel from './pointRequests/ReviewPanel';
+
+type StoredRequest = ReviewRequest & {
+    userName: string;
+    activityName?: string;
+    description?: string;
+    pointsRequested?: number;
+    status: 'pending' | 'approved' | 'denied';
+    submittedAt: Date;
+    reviewedAt?: { toDate(): Date } | null;
+    reviewedBy?: string | null;
+    reviewNotes?: string;
+    adjustment?: { points: number; note: string };
+    [image: string]: unknown;
+};
+
+// What the Member picked, in words: an Event Type, a group such as OPA
+// (E-Board confirms which), or "Not listed".
+function memberPick(request: StoredRequest): string {
+    if (request.eventTypeId) return eventType(request.eventTypeId)?.label ?? request.eventTypeId;
+    if (request.typeChoiceId === NOT_LISTED) return 'Not listed (you pick)';
+    if (request.typeChoiceId === 'opa') return 'OPA (you pick which)';
+    return 'None (sent before Event Types)';
+}
 
 function PointRequestReview() {
-    const [requests, setRequests] = useState([]);
+    const [requests, setRequests] = useState<StoredRequest[]>([]);
+    const [codes, setCodes] = useState<Code[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('pending');
     const [selectedImage, setSelectedImage] = useState(null);
-    const [processingRequest, setProcessingRequest] = useState(null);
+    const [reviewing, setReviewing] = useState<string | null>(null);
+    const [notice, setNotice] = useState('');
 
     useEffect(() => {
         fetchRequests();
@@ -16,37 +46,37 @@ function PointRequestReview() {
     const fetchRequests = async () => {
         try {
             setLoading(true);
-            const requestsCollection = collection(db, 'pointRequests');
-            const requestsSnapshot = await getDocs(requestsCollection);
-            
-            const requestsData = [];
-            for (const docSnap of requestsSnapshot.docs) {
-                const data = docSnap.data();
-                
-                // Get user's name from users collection
-                let userName = 'Unknown User';
-                try {
-                    const userDocRef = doc(db, 'users', data.userEmail);
-                    const userDocSnap = await getDoc(userDocRef);
-                    if (userDocSnap.exists()) {
-                        const userData = userDocSnap.data();
-                        userName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
-                    }
-                } catch (error) {
-                    console.error('Error fetching user data for', data.userEmail, error);
-                }
+            const [requestsSnapshot, codesSnapshot] = await Promise.all([
+                getDocs(collection(db, 'pointRequests')),
+                getDocs(collection(db, 'codes')),
+            ]);
+            setCodes(codesSnapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Code));
 
-                requestsData.push({
+            // One read per Member, not per request.
+            const emails = [...new Set(requestsSnapshot.docs.map((d) => String(d.data().userEmail)))];
+            const names = new Map(await Promise.all(emails.map(async (email) => {
+                try {
+                    const userData = (await getDoc(doc(db, 'users', email.toLowerCase()))).data();
+                    return [email, userData ? `${userData.firstName || ''} ${userData.lastName || ''}`.trim() : 'Unknown User'] as const;
+                } catch (error) {
+                    console.error('Error fetching user data for', email, error);
+                    return [email, 'Unknown User'] as const;
+                }
+            })));
+
+            const requestsData = requestsSnapshot.docs.map((docSnap) => {
+                const data = docSnap.data();
+                return {
                     id: docSnap.id,
                     ...data,
-                    userName,
-                    submittedAt: data.submittedAt?.toDate() || new Date()
-                });
-            }
-            
+                    userName: names.get(String(data.userEmail)),
+                    submittedAt: data.submittedAt?.toDate() || new Date(),
+                } as StoredRequest;
+            });
+
             // Sort by submission date (newest first)
-            requestsData.sort((a, b) => b.submittedAt - a.submittedAt);
-            
+            requestsData.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
+
             setRequests(requestsData);
         } catch (error) {
             console.error('Error fetching requests:', error);
@@ -55,89 +85,23 @@ function PointRequestReview() {
         }
     };
 
-    const filteredRequests = requests.filter(request => 
+    const filteredRequests = requests.filter(request =>
         filter === 'all' || request.status === filter
     );
 
-    const handleApprove = async (requestId) => {
-        if (processingRequest) return;
-        
-        const confirmed = window.confirm('Are you sure you want to approve this request? Points will be awarded to the user.');
-        if (!confirmed) return;
-
-        try {
-            setProcessingRequest(requestId);
-            const request = requests.find(r => r.id === requestId);
-            
-            // Update the request status
-            await updateDoc(doc(db, 'pointRequests', requestId), {
-                status: 'approved',
-                reviewedAt: serverTimestamp(),
-                reviewedBy: 'E-Board',
-                reviewNotes: 'Request approved and points awarded'
-            });
-
-            // Award points to the user
-            const userDocRef = doc(db, 'users', request.userEmail);
-            const userDocSnap = await getDoc(userDocRef);
-            
-            if (userDocSnap.exists()) {
-                const userData = userDocSnap.data();
-                const currentPoints = userData.springPoints || 0; // Assuming spring semester
-                const newPoints = currentPoints + request.pointsRequested;
-                
-                await updateDoc(userDocRef, {
-                    springPoints: newPoints,
-                    // Also update the "other" category
-                    otherPoints: (userData.otherPoints || 0) + request.pointsRequested
-                });
-            }
-
-            // Refresh the requests list
-            await fetchRequests();
-            
-            alert(`Request approved! ${request.pointsRequested} points have been awarded to ${request.userName}.`);
-        } catch (error) {
-            console.error('Error approving request:', error);
-            alert('Error approving request. Please try again.');
-        } finally {
-            setProcessingRequest(null);
-        }
-    };
-
-    const handleDeny = async (requestId) => {
-        if (processingRequest) return;
-        
-        const reason = window.prompt('Please provide a reason for denying this request:');
-        if (!reason) return;
-
-        try {
-            setProcessingRequest(requestId);
-            
-            await updateDoc(doc(db, 'pointRequests', requestId), {
-                status: 'denied',
-                reviewedAt: serverTimestamp(),
-                reviewedBy: 'E-Board',
-                reviewNotes: reason
-            });
-
-            await fetchRequests();
-            alert('Request has been denied.');
-        } catch (error) {
-            console.error('Error denying request:', error);
-            alert('Error denying request. Please try again.');
-        } finally {
-            setProcessingRequest(null);
-        }
+    const handleReviewed = async (message: string) => {
+        setReviewing(null);
+        setNotice(message);
+        await fetchRequests();
     };
 
     const getImageSource = (request) => {
-    return request.imageData || 
-           request.imageUrl || 
-           request.photoUrl || 
-           request.photoURL || 
-           request.imageURL || 
-           request.image || 
+    return request.imageData ||
+           request.imageUrl ||
+           request.photoUrl ||
+           request.photoURL ||
+           request.imageURL ||
+           request.image ||
            null;
 };
 
@@ -173,7 +137,7 @@ const openImageModal = (request) => {
         }).format(date);
     };
 
-    if (loading) {
+    if (loading && requests.length === 0) {
         return (
             <div className="point-request-review">
                 <div className="loading-message">Loading point requests...</div>
@@ -184,7 +148,7 @@ const openImageModal = (request) => {
     return (
         <div className="point-request-review">
             <h2>Point Request Review</h2>
-            
+
             <div className="filter-section">
                 <label>Filter by status:</label>
                 <select value={filter} onChange={(e) => setFilter(e.target.value)}>
@@ -197,6 +161,8 @@ const openImageModal = (request) => {
                     Refresh
                 </button>
             </div>
+
+            {notice && <p className="review-notice" role="status">{notice}</p>}
 
             {filteredRequests.length === 0 ? (
                 <div className="no-requests">
@@ -211,7 +177,7 @@ const openImageModal = (request) => {
                                     <h3>{request.userName}</h3>
                                     <p className="email">{request.userEmail}</p>
                                 </div>
-                                <div 
+                                <div
                                     className="status-badge"
                                     style={{ backgroundColor: getStatusColor(request.status) }}
                                 >
@@ -227,20 +193,37 @@ const openImageModal = (request) => {
                                     <strong>Date:</strong> {request.date}
                                 </div>
                                 <div className="detail-row">
-                                    <strong>Points Requested:</strong> {request.pointsRequested}
+                                    <strong>Event Type:</strong> {memberPick(request)}
                                 </div>
+                                {request.codeId && (
+                                    <div className="detail-row">
+                                        <strong>Code:</strong> {request.codeId}
+                                    </div>
+                                )}
+                                {request.hours && (
+                                    <div className="detail-row">
+                                        <strong>Hours:</strong> {request.hours}
+                                    </div>
+                                )}
+                                {request.status !== 'pending' && (
+                                    <div className="detail-row">
+                                        <strong>Points:</strong> {request.pointsRequested}
+                                    </div>
+                                )}
                                 <div className="detail-row">
                                     <strong>Submitted:</strong> {formatDate(request.submittedAt)}
                                 </div>
-                                <div className="description">
-                                    <strong>Description:</strong>
-                                    <p>{request.description}</p>
-                                </div>
+                                {request.description && (
+                                    <div className="description">
+                                        <strong>Description:</strong>
+                                        <p>{request.description}</p>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="request-image">
                                 {getImageSource(request) ? (
-                                    <button 
+                                    <button
                                         type="button"
                                         onClick={() => openImageModal(request)}
                                         className="view-image-button"
@@ -248,15 +231,15 @@ const openImageModal = (request) => {
                                         📷 View Photo Evidence
                                     </button>
                                 ) : (
-                                    <button 
+                                    <button
                                         type="button"
                                         disabled
                                         className="view-image-button"
-                                        style={{ 
-                                            backgroundColor: '#e2e8f0', 
-                                            color: '#64748b', 
-                                            border: '1.5px solid #cbd5e1', 
-                                            cursor: 'not-allowed' 
+                                        style={{
+                                            backgroundColor: '#e2e8f0',
+                                            color: '#64748b',
+                                            border: '1.5px solid #cbd5e1',
+                                            cursor: 'not-allowed'
                                         }}
                                     >
                                         🚫 No Photo Attached
@@ -264,24 +247,16 @@ const openImageModal = (request) => {
                                 )}
                             </div>
 
-                            {request.status === 'pending' && (
+                            {request.status === 'pending' && (reviewing === request.id ? (
+                                <ReviewPanel request={request} codes={codes} onReviewed={handleReviewed} />
+                            ) : (
                                 <div className="request-actions">
-                                    <button
-                                        onClick={() => handleApprove(request.id)}
-                                        disabled={processingRequest === request.id}
-                                        className="approve-button"
-                                    >
-                                        {processingRequest === request.id ? 'Processing...' : '✓ Approve'}
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeny(request.id)}
-                                        disabled={processingRequest === request.id}
-                                        className="deny-button"
-                                    >
-                                        {processingRequest === request.id ? 'Processing...' : '✗ Deny'}
+                                    <button type="button" className="refresh-button review-open-button"
+                                        onClick={() => { setReviewing(request.id); setNotice(''); }}>
+                                        Review
                                     </button>
                                 </div>
-                            )}
+                            ))}
 
                             {request.status !== 'pending' && (
                                 <div className="review-info">
@@ -291,6 +266,11 @@ const openImageModal = (request) => {
                                     <div className="detail-row">
                                         <strong>Reviewed by:</strong> {request.reviewedBy || 'N/A'}
                                     </div>
+                                    {request.adjustment && (
+                                        <div className="detail-row">
+                                            <strong>Adjustment:</strong> {request.adjustment.points} points
+                                        </div>
+                                    )}
                                     {request.reviewNotes && (
                                         <div className="detail-row">
                                             <strong>Notes:</strong> {request.reviewNotes}
