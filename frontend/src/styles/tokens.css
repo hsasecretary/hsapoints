@@ -54,6 +54,12 @@
     --hsa-success-bg: #dcfce7;
     --hsa-success-border: #86efac;
 
+    /* ---- Goal ------------------------------------------------------------
+       Marks a goal reached: the stretch of the VE bar past 15 and the
+       "You reached 15" lines (#59). */
+    --hsa-gold-700: #8a6113;      /* 5.53:1 on white */
+    --hsa-gold-50: #fdf6e3;
+
     /* ---- Type ------------------------------------------------------------
        Montserrat does both jobs for now, as it did before. It is drawn
        from Buenos Aires street signage, which suits this organisation

@@ -53,6 +53,21 @@ function PointRequestForm() {
         cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, [showStrikes]);
 
+    // Arriving from Overview's "Make up event" (?makeup={CODE}): start on that
+    // Missed Event, already set to make it up, so the Member only picks the
+    // Additional Event and adds a photo.
+    const makeupParam = params.get('makeup');
+    useEffect(() => {
+        if (loading || !makeupParam) return;
+        setStart({ kind: 'missed', codeId: makeupParam, path: 'makeup' });
+        setChoice(null);
+        setFieldsState(emptyFields());
+        const updated = new URLSearchParams(params);
+        updated.delete('makeup');
+        setParams(updated, { replace: true });
+        cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, [loading, makeupParam]);
+
     if (loading) {
         return (
             <div className="point-request req" aria-busy="true">

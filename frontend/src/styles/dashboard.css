@@ -2,26 +2,9 @@
    Member dashboard (/dashboard) and Cabinet page (/cabinet)
    ======================================================================== */
 
-/* ---- Dashboard page shell, attendance box, points cards  (Dashboard.tsx, Attendance.tsx, CabinetPoints.tsx) ---------- */
+/* ---- Cabinet points cards  (CabinetPoints.tsx) ---------- */
 
-.formDash {
-    /* Full-width white page under the header: no grey gap or sides. Content
-       inside keeps its own max-width and stays centred. Plain block flow
-       (not flex) so children always stack full-width, one per row — the
-       wrap-into-columns flex layout this used to have let "My Information"/
-       "Points Summary" and "Submit Point Request" end up side by side once
-       both had their own centred max-width. */
-    background-color: var(--hsa-surface);
-    width: 100%;
-    margin: 0;
-    padding: 24px 16px 32px;
-    flex: 1 0 auto;
-    display: block;
-}
 
-#dash {
-    width: 100%;
-}
 
 #pointsForm {
     width: 100%;
@@ -51,107 +34,8 @@
     text-align: center;
 }
 
-/* Typed codes show in capitals, but keep the placeholder in normal case */
-.attendanceForm #code::placeholder {
-    text-transform: none;
-}
-
-.attendanceForm {
-    display: block;
-    background-color: #80beda58;
-    border: 2px solid var(--hsa-teal-600);
-    width: calc(100% - 30px);
-    margin: 15px;
-    border-radius: 5px;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1), 0 6px 20px 0 rgba(0,0,0,0.19);
-}
-
-#attendanceInput {
-    max-width: 800px;
-    margin: auto;
-    padding: 10px;
-}
-
-/* ---- Event code controls  (EventCodeForm.tsx) ----
-   These were seven inline style={{}} objects, which meant the site's most-used
-   button rendered as raw browser chrome while every other form on the site used
-   .submit-button. Same controls, in CSS, so they can be themed and focused. */
-.attendanceForm .attendance-intro {
-    text-align: center;
-    color: #4a5568;
-    margin-bottom: 20px;
-}
-
-.attendanceForm .attendance-message {
-    text-align: center;
-}
-
-.attendanceForm .attendance-code-form {
-    width: 80%;
-    margin: auto;
-    padding-bottom: 20px;
-}
-
-.attendanceForm .attendance-code-form .form-group {
-    margin-bottom: 20px;
-}
-
-.attendanceForm .attendance-code-input {
-    width: 100%;
-    box-sizing: border-box;
-    font-size: 1.3rem;
-    padding: 12px;
-    border: 2px solid #155776;
-    border-radius: 5px;
-    text-align: center;
-    text-transform: uppercase;
-    transition: border-color 0.2s ease;
-}
-
-/* Replaces an onFocus handler that wrote #6db0cf (~2:1 on white) straight onto
-   element.style, where no stylesheet could ever override it. */
-.attendanceForm .attendance-code-input:focus-visible {
-    outline: 3px solid #0f4c64;
-    outline-offset: 2px;
-    border-color: #0f4c64;
-}
-
-.attendanceForm .attendance-hint {
-    font-size: 0.9em;
-    color: #4a5568;
-    margin-top: 5px;
-    text-align: center;
-}
-
-.attendanceForm .attendance-submit {
-    font-size: 1.1rem;
-    padding: 14px 32px;
-    min-height: 44px;   /* tap target */
-}
-
-.attendanceForm .attendance-submit:focus-visible {
-    outline: 3px solid #082f3f;
-    outline-offset: 3px;
-}
-
-/* White on base.css's #ccc disabled fill is ~1.6:1. #64748b is 4.78:1 — a
-   disabled control is exempt from AA, but "Submitting..." should be legible. */
-.attendanceForm .attendance-submit:disabled {
-    background: #64748b;
-    color: #fff;
-}
-
-/* .submit-button:disabled pulses to signal a pending submit, but this button is
-   also disabled whenever the box is empty — an idle field shouldn't throb. */
-.attendanceForm .attendance-submit:disabled:not(.is-loading) {
-    animation: none;
-}
-
 /* Enhanced Mobile Responsiveness */
 @media only screen and (max-width: 768px) {
-    .formDash {
-        padding: 16px 10px 24px;
-    }
 
     #pointsForm {
         flex-direction: column;
@@ -163,21 +47,9 @@
         margin: 0 0 10px;
         min-width: unset;
     }
-
-    .attendanceForm {
-        width: calc(100% - 20px);
-        margin: 10px;
-    }
-
-    #attendanceInput {
-        padding: 5px;
-    }
 }
 
 @media only screen and (max-width: 500px) {
-    .formDash {
-        padding: 12px 6px 20px;
-    }
 
     .subForm h3,
     .pointsSubForm h3,
@@ -197,37 +69,13 @@
         margin: 0 0 8px;
         padding: 10px;
     }
-
-    .attendanceForm {
-        width: calc(100% - 10px);
-        margin: 8px 5px;
-        padding: 8px;
-    }
-
-    /* 80% of a 375px screen leaves the code box ~290px wide for no reason. */
-    .attendanceForm .attendance-code-form {
-        width: 100%;
-    }
-
-    #attendanceInput {
-        padding: 0;
-    }
 }
 
 @media only screen and (max-width: 360px) {
-    .formDash {
-        padding: 10px 4px 16px;
-    }
 
     .pointsSubForm {
         padding: 8px;
         margin: 0 0 5px;
-    }
-
-    .attendanceForm {
-        width: calc(100% - 6px);
-        margin: 5px 3px;
-        padding: 5px;
     }
 
     .subForm h3,
@@ -241,7 +89,6 @@
 /* ---- My Points (scoped to .user-points-lookup, shared with E-Board's member lookup)  (Points.tsx) ---- */
 
 /* Increases the width of 
-
 
 .hide 
 {
@@ -258,14 +105,6 @@
 .user-points-lookup h2 {
     font-size: 1.5em;
     margin: 10px 0;
-}
-
-/* The attendance form sits between Points Summary and Points by Category;
-   line it up with the cards around it. */
-.user-points-lookup .attendanceForm {
-    width: auto;
-    margin: 0;
-    padding: 20px 20px 4px;
 }
 
 .user-points-lookup .user-info-card,
@@ -317,16 +156,6 @@
     .user-points-lookup .points-grid {
         grid-template-columns: 1fr 1fr !important;
         gap: 10px !important;
-    }
-
-    /* On a phone the one thing a member opens this site to do is enter a code.
-       .user-results is a flex column, so order: -1 lifts the form to the top
-       without changing the DOM (desktop keeps its Points Summary -> code order).
-       The --hsa-order overrides re-sync the animations.css reveal stagger,
-       which is keyed to :nth-child() and doesn't follow visual order. */
-    .user-points-lookup .user-results > .attendanceForm {
-        order: -1;
-        --hsa-order: 0;
     }
 
     .user-points-lookup .user-results > .user-info-card {
@@ -996,4 +825,553 @@ with the my requests tab. ---------- */
     .point-request-section .tab-button {
         font-size: 14px;
     }
+}
+/* ---- Overview  (Dashboard.tsx and sections/: EventCodeForm, PointsSummary,
+   MakeUpList, PointsAndEvents; guide/Explainer) — #57 layout C as revised,
+   #59 variant A. Scoped to .overview / .guide / .requests-page / .explainer. ---- */
+
+.overview,
+.guide,
+.requests-page {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+    text-align: left;
+    color: var(--hsa-ink);
+    font-family: var(--hsa-font-body);
+}
+
+.overview *,
+.overview *::before,
+.overview *::after {
+    box-sizing: border-box;
+}
+
+.overview button {
+    font-family: inherit;
+    margin: 0;
+    min-width: 0;
+}
+
+.overview button:focus-visible,
+.overview input:focus-visible,
+.overview summary:focus-visible,
+.overview a:focus-visible {
+    outline: 3px solid rgba(15, 76, 100, .4);
+    outline-offset: 2px;
+}
+
+.overview .overview__title,
+.guide .guide__title,
+.requests-page .requests-page__title {
+    margin: 0 0 16px;
+    font-family: var(--hsa-font-display);
+    font-size: var(--hsa-text-2xl);
+    line-height: 1.15;
+    color: var(--hsa-teal-700);
+    text-align: left;
+}
+
+.overview .overview__loading,
+.guide .guide__loading {
+    color: var(--hsa-muted);
+}
+
+.overview .ov-h2 {
+    margin: 0 0 4px;
+    font-size: var(--hsa-text-lg);
+    color: var(--hsa-teal-700);
+    text-align: left;
+}
+
+/* The large, filled code box */
+.overview .ov-code {
+    width: 100%;
+    max-width: none;
+    margin: 0 0 22px;
+    padding: 18px;
+    border-radius: 14px;
+    background: var(--hsa-teal-700);
+    box-shadow: 0 8px 22px rgba(8, 47, 63, .22);
+}
+
+.overview .ov-code__label {
+    display: block;
+    margin: 0 0 12px;
+    padding: 0;
+    font-weight: 700;
+    font-size: var(--hsa-text-lg);
+    color: #fff;
+}
+
+.overview .ov-code__row {
+    display: flex;
+    gap: 8px;
+}
+
+.overview .ov-code__row input {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 14px;
+    border: 1.5px solid transparent;
+    border-radius: 8px;
+    font-size: var(--hsa-text-lg);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.overview .ov-code__row input::placeholder {
+    letter-spacing: normal;
+    text-transform: none;
+}
+
+.overview .ov-code__row button {
+    min-height: 48px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: 8px;
+    background: #fbbf24;
+    color: var(--hsa-teal-900);
+    font-weight: 700;
+    font-size: var(--hsa-text-base);
+    cursor: pointer;
+}
+
+.overview .ov-code__row button:disabled {
+    background: rgba(255, 255, 255, .18);
+    color: rgba(255, 255, 255, .85);
+    cursor: default;
+}
+
+.overview .ov-code__row button:focus-visible {
+    outline-color: #fbbf24;
+}
+
+.overview .ov-code__hint {
+    margin: 8px 0 0;
+    font-size: var(--hsa-text-xs);
+    color: rgba(255, 255, 255, .85);
+}
+
+.overview .ov-code__msg {
+    margin: 8px 0 0;
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    color: #fecaca;
+}
+
+.overview .ov-code__msg:empty {
+    display: none;
+}
+
+.overview .ov-code__msg.is-ok {
+    color: #bbf7d0;
+}
+
+/* Total Points: big number and a single-colour bar to the goal */
+.overview .ov-score__num {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0 0 10px;
+}
+
+.overview .ov-score__num strong {
+    font-family: var(--hsa-font-display);
+    font-size: 64px;
+    line-height: .9;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--hsa-teal-700);
+}
+
+.overview .ov-score__num span {
+    font-size: var(--hsa-text-lg);
+    font-weight: 600;
+    color: var(--hsa-ink-soft);
+}
+
+.overview .ov-score__track {
+    position: relative;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--hsa-surface-sunken);
+    overflow: hidden;
+}
+
+.overview .ov-score__fill,
+.overview .ov-score__pending {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: 999px;
+}
+
+.overview .ov-score__fill {
+    background: var(--hsa-teal-600);
+}
+
+/* Striped, with a dark edge for WCAG's 3:1 non-text contrast */
+.overview .ov-score__pending {
+    background: repeating-linear-gradient(-45deg, #f5c26b 0 5px, #fde8b8 5px 10px);
+    box-shadow: inset 0 0 0 2px #b45309;
+}
+
+.overview .ov-score__over {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-radius: 0 999px 999px 0;
+    background: var(--hsa-gold-700);
+}
+
+.overview .ov-score__goal {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    margin-left: -1.5px;
+    background: #fff;
+}
+
+.overview .ov-score__meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px 16px;
+    margin-top: 8px;
+}
+
+.overview .ov-score__left {
+    flex: 1 1 16em;
+    margin: 0;
+    font-weight: 600;
+    color: var(--hsa-ink-soft);
+}
+
+.overview .ov-score__left.is-reached {
+    color: var(--hsa-gold-700);
+}
+
+.overview .ov-score__events {
+    margin: 0;
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    color: var(--hsa-muted);
+}
+
+.overview .ov-pending {
+    margin: 10px 0 0;
+    padding: 8px 12px;
+    border-left: 3px solid #f5c26b;
+    background: #fffbeb;
+    color: #78350f;
+    font-size: var(--hsa-text-sm);
+}
+
+/* Cabinet view: Missed Events to make up */
+.overview .ov-makeups {
+    margin-top: 24px;
+}
+
+.overview .ov-makeups__sub {
+    margin: 0 0 8px;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-muted);
+}
+
+.overview .ov-makeups ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.overview .ov-makeups li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+}
+
+.overview .ov-makeups__name {
+    font-weight: 600;
+}
+
+.overview .ov-makeups__name small {
+    display: block;
+    font-weight: 400;
+    font-size: var(--hsa-text-xs);
+    color: var(--hsa-muted);
+}
+
+.overview .ov-makeups__btn {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1.5px solid #b45309;
+    border-radius: 999px;
+    background: #fffbeb;
+    color: #78350f;
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.overview .ov-makeups__btn:hover {
+    background: #fef3c7;
+}
+
+.overview .ov-makeups__pending {
+    flex: none;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #fef3c7;
+    color: #78350f;
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+}
+
+/* The two bubbles, opening in place */
+.overview .ov-bubbles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 22px 0 0;
+}
+
+.overview .ov-bubbles button {
+    min-height: 44px;
+    padding: 10px 16px;
+    border: 1.5px solid var(--hsa-teal-700);
+    border-radius: 999px;
+    background: var(--hsa-surface);
+    color: var(--hsa-teal-700);
+    font-weight: 700;
+    font-size: var(--hsa-text-sm);
+    cursor: pointer;
+}
+
+.overview .ov-bubbles button::after {
+    content: ' \25BE';
+}
+
+.overview .ov-bubbles button.is-on {
+    background: var(--hsa-teal-700);
+    color: #fff;
+}
+
+.overview .ov-bubbles button.is-on::after {
+    content: ' \25B4';
+}
+
+.overview .ov-panel {
+    margin-top: 12px;
+    padding: 16px;
+    border: 1px solid var(--hsa-border);
+    border-radius: 12px;
+    background: var(--hsa-surface);
+    animation: ov-open .18s ease-out;
+}
+
+@keyframes ov-open {
+    from { opacity: 0; transform: translateY(-4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .overview .ov-panel { animation: none; }
+}
+
+.overview .ov-empty {
+    margin: 0;
+    color: var(--hsa-muted);
+}
+
+/* Points & events: switch, category dropdowns, events by date */
+.overview .ov-seg {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 14px;
+    border-radius: 10px;
+    background: var(--hsa-surface-sunken);
+}
+
+.overview .ov-seg button {
+    flex: 1;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--hsa-ink-soft);
+    font-weight: 700;
+    font-size: var(--hsa-text-sm);
+    cursor: pointer;
+}
+
+.overview .ov-seg button.is-on {
+    background: var(--hsa-surface);
+    color: var(--hsa-teal-700);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .12);
+}
+
+.overview .ov-cats {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--hsa-border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--hsa-surface);
+}
+
+.overview .ov-cat + .ov-cat {
+    border-top: 1px solid var(--hsa-border-light);
+}
+
+.overview .ov-cat summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+}
+
+.overview .ov-cat summary::-webkit-details-marker {
+    display: none;
+}
+
+.overview .ov-cat summary::after {
+    content: '\25BE';
+    margin-left: 6px;
+    color: var(--hsa-muted);
+}
+
+.overview .ov-cat[open] summary::after {
+    content: '\25B4';
+}
+
+.overview .ov-cat summary > span:first-child {
+    flex: 1;
+}
+
+.overview .ov-cat__count {
+    margin-left: 4px;
+    font-size: var(--hsa-text-xs);
+    font-weight: 600;
+    color: var(--hsa-muted);
+}
+
+.overview .ov-cat__pts {
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    color: var(--hsa-teal-700);
+}
+
+.overview .ov-cat ul {
+    margin: 0;
+    padding: 0 14px 12px;
+    list-style: none;
+}
+
+.overview .ov-cat li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-ink-soft);
+}
+
+.overview .ov-events {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--hsa-border-light);
+}
+
+.overview .ov-events li {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 10px;
+    align-items: start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+}
+
+.overview .ov-events__date {
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    color: var(--hsa-teal-700);
+}
+
+.overview .ov-events__name {
+    font-weight: 600;
+}
+
+.overview .ov-events__name small {
+    display: block;
+    font-weight: 400;
+    font-size: var(--hsa-text-xs);
+    color: var(--hsa-muted);
+}
+
+.overview .ov-events__pts {
+    text-align: right;
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    color: var(--hsa-teal-600);
+}
+
+.overview .ov-events li.ov-events__line {
+    display: block;
+    margin: 6px 0;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--hsa-gold-50);
+    color: var(--hsa-gold-700);
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+}
+
+/* How points work (#49), in the bubble and on /guide */
+.explainer {
+    max-width: 60ch;
+    line-height: 1.6;
+    text-align: left;
+}
+
+.explainer .explainer__lead {
+    font-weight: 700;
+    font-size: var(--hsa-text-lg);
+}
+
+.explainer .explainer__gloss {
+    font-style: italic;
+    color: var(--hsa-ink-soft);
+}
+
+.explainer ol {
+    padding-left: 20px;
+}
+
+.explainer li {
+    margin-bottom: 8px;
+}
+
+.explainer > :first-child {
+    margin-top: 0;
+}
+
+.explainer > :last-child {
+    margin-bottom: 0;
 }

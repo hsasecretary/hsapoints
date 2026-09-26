@@ -53,6 +53,8 @@ function SiteHeader({ signedIn, eboard, cabinet = false }: SiteHeaderProps) {
     const nav: NavItem[] = [
         { label: 'UF HSA', href: UFHSA_URL },
         { label: 'Dashboard', to: '/dashboard' },
+        { label: 'Requests', to: '/requests' },
+        { label: 'Guide', to: '/guide' },
         { label: 'Calendar', href: CALENDAR_URL },
     ];
 

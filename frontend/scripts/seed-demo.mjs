@@ -17,6 +17,7 @@ const PASSWORD = 'hsa-demo-2026';
 const CABINET = 'cabinet.demo@ufl.edu';
 const GENERAL = 'general.demo@ufl.edu';
 const EBOARD = 'eboard.demo@ufl.edu';
+const MLP_SPRING = 'mlp.demo@ufl.edu';
 
 // Fall 2026. Dated around 2026-09-26: the last two Core Events are upcoming
 // until October.
@@ -99,8 +100,15 @@ const docs = Object.fromEntries([
         submittedAt: serverTimestamp(),
     }],
 
-    // E-Board: reviews the requests above on /eboard/point-requests.
+    // MLP Spring member: a goal of 8 VE Points, not 15 (6 so far).
+    [`users/${MLP_SPRING}`, user(MLP_SPRING, 'Mateo', { involvement: 'mlp', mlpCohort: 'spring' })],
+    ...['GBM1', 'GBM2', 'FUND1'].map((id) => attended(MLP_SPRING, id)),
+
+    // E-Board: reviews the requests above on /eboard/point-requests. Held to
+    // the General goal of 15 and past it (16), so the Overview shows gold.
     [`users/${EBOARD}`, user(EBOARD, 'Eva', { involvement: 'eboard', eboard: true, position: 'secretary' })],
+    ...['GBM1', 'GBM2', 'OPA1', 'GBM3', 'PROG1', 'FUND1', 'AFF1', 'HLSA1', 'SERV1', 'SOLID1', 'GBM4']
+        .map((id) => attended(EBOARD, id)),
 ]);
 
 async function createAccount(email) {
@@ -120,7 +128,7 @@ await env.withSecurityRulesDisabled(async (context) => {
     const db = context.firestore();
     for (const [path, data] of Object.entries(docs)) await setDoc(doc(db, path), data);
 });
-for (const email of [CABINET, GENERAL, EBOARD]) await createAccount(email);
+for (const email of [CABINET, GENERAL, EBOARD, MLP_SPRING]) await createAccount(email);
 await env.cleanup();
 
-console.log(`Seeded ${Object.keys(docs).length} docs. Sign in as ${CABINET}, ${GENERAL} or ${EBOARD} (password in this file).`);
+console.log(`Seeded ${Object.keys(docs).length} docs. Sign in as ${CABINET}, ${GENERAL}, ${EBOARD} or ${MLP_SPRING} (password in this file).`);
