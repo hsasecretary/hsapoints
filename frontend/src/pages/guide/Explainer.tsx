@@ -1,16 +1,13 @@
 // "How points work", worded in #49: version A for General and MLP Members,
 // version B for Cabinet Members and E-Board. Shown in the Overview's How it
 // works bubble and on the Guide page (/guide).
+import type { Member } from '../../lib/computeStanding';
+import { isHeldToCabinetRules } from '../../lib/members';
 
-type ExplainerProps = {
-    /** Version B: Cabinet Members and E-Board. */
-    cabinet: boolean;
-    /** The Member joined MLP in the spring, so their goal is 8. */
-    mlpSpring?: boolean;
-};
-
-function Explainer({ cabinet, mlpSpring = false }: ExplainerProps) {
-    if (cabinet) {
+/** The explainer for this Member's role. */
+function Explainer({ member }: { member: Member }) {
+    const mlpSpring = member.mlpCohort === 'spring';
+    if (isHeldToCabinetRules(member) || member.eboard === true) {
         return (
             <div className="explainer">
                 <p className="explainer__lead">Enter the code at each event to earn points. There are three things to do:</p>

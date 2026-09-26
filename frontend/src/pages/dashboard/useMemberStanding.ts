@@ -6,9 +6,6 @@ import type { MemberRequest } from '../../lib/pointsOverview';
 import { rubric } from '../../lib/rubric';
 import { academicYear, toIsoDate } from '../../lib/semester';
 
-/** A pointRequests/{id} doc still waiting on E-Board. */
-export type PendingRequest = MemberRequest;
-
 export type MemberStanding = {
     loading: boolean;
     member: Member | null;
@@ -18,7 +15,8 @@ export type MemberStanding = {
     codes: Code[];
     /** Every Point Request the Member has sent, whatever its status. */
     requests: MemberRequest[];
-    pending: PendingRequest[];
+    /** The requests still waiting on E-Board. */
+    pending: MemberRequest[];
     standing: Standing | null;
     today: string;
 };
@@ -96,6 +94,6 @@ export function useMemberStanding(email: string | null | undefined): MemberStand
 }
 
 /** The Missed Events a pending request already names, as "I was there" or a Make-up pick. */
-export function pendingMakeups(pending: PendingRequest[]): Set<string> {
+export function pendingMakeups(pending: MemberRequest[]): Set<string> {
     return new Set(pending.flatMap((request) => [request.codeId, ...(request.makeupFor ?? [])]).filter(Boolean));
 }

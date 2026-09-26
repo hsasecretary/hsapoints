@@ -7,7 +7,8 @@ import PointsAndEvents from './sections/PointsAndEvents';
 import PointsSummary from './sections/PointsSummary';
 import { pendingMakeups, useMemberStanding } from './useMemberStanding';
 
-type Bubble = 'points' | 'how';
+const BUBBLES = ['points', 'how'] as const;
+type Bubble = (typeof BUBBLES)[number];
 
 // /dashboard, the Overview (#57 as revised, #59 variant A), top to bottom:
 //   EventCodeForm   — the large code box
@@ -19,7 +20,7 @@ type Bubble = 'points' | 'how';
 function Dashboard({ email }: { email: string }) {
     const { loading, member, attendances, codes, requests, pending, standing } = useMemberStanding(email);
     const [params, setParams] = useSearchParams();
-    const open = params.get('open') as Bubble | null;
+    const open = BUBBLES.find((bubble) => bubble === params.get('open')) ?? null;
 
     const toggle = (bubble: Bubble) => {
         const next = new URLSearchParams(params);
@@ -59,7 +60,7 @@ function Dashboard({ email }: { email: string }) {
                     )}
                     {open === 'how' && (
                         <section id="ov-panel-how" className="ov-panel" aria-label="How it works">
-                            <Explainer cabinet={standing.heldToCabinetRules || member?.eboard === true} mlpSpring={standing.veGoal === 8} />
+                            <Explainer member={member} />
                         </section>
                     )}
                 </>

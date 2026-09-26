@@ -1,5 +1,5 @@
 /* ========================================================================
-   Member dashboard (/dashboard) and Cabinet page (/cabinet)
+   Member pages (/dashboard, /requests, /guide) and Cabinet page (/cabinet)
    ======================================================================== */
 
 /* ---- Cabinet points cards  (CabinetPoints.tsx) ---------- */
@@ -933,7 +933,7 @@ with the my requests tab. ---------- */
     padding: 0 22px;
     border: 0;
     border-radius: 8px;
-    background: #fbbf24;
+    background: var(--hsa-accent);
     color: var(--hsa-teal-900);
     font-weight: 700;
     font-size: var(--hsa-text-base);
@@ -947,7 +947,7 @@ with the my requests tab. ---------- */
 }
 
 .overview .ov-code__row button:focus-visible {
-    outline-color: #fbbf24;
+    outline-color: var(--hsa-accent);
 }
 
 .overview .ov-code__hint {
@@ -1015,8 +1015,8 @@ with the my requests tab. ---------- */
 
 /* Striped, with a dark edge for WCAG's 3:1 non-text contrast */
 .overview .ov-score__pending {
-    background: repeating-linear-gradient(-45deg, #f5c26b 0 5px, #fde8b8 5px 10px);
-    box-shadow: inset 0 0 0 2px #b45309;
+    background: repeating-linear-gradient(-45deg, var(--hsa-warm-stripe) 0 5px, var(--hsa-warm-stripe-light) 5px 10px);
+    box-shadow: inset 0 0 0 2px var(--hsa-warm-edge);
 }
 
 .overview .ov-score__over {
@@ -1066,9 +1066,9 @@ with the my requests tab. ---------- */
 .overview .ov-pending {
     margin: 10px 0 0;
     padding: 8px 12px;
-    border-left: 3px solid #f5c26b;
-    background: #fffbeb;
-    color: #78350f;
+    border-left: 3px solid var(--hsa-warm-stripe);
+    background: var(--hsa-warm-bg);
+    color: var(--hsa-warm-ink);
     font-size: var(--hsa-text-sm);
 }
 
@@ -1115,10 +1115,10 @@ with the my requests tab. ---------- */
     align-items: center;
     min-height: 44px;
     padding: 0 14px;
-    border: 1.5px solid #b45309;
+    border: 1.5px solid var(--hsa-warm-edge);
     border-radius: 999px;
-    background: #fffbeb;
-    color: #78350f;
+    background: var(--hsa-warm-bg);
+    color: var(--hsa-warm-ink);
     font-size: var(--hsa-text-sm);
     font-weight: 700;
     text-decoration: none;
@@ -1126,15 +1126,15 @@ with the my requests tab. ---------- */
 }
 
 .overview .ov-makeups__btn:hover {
-    background: #fef3c7;
+    background: var(--hsa-warm-bg-strong);
 }
 
 .overview .ov-makeups__pending {
     flex: none;
     padding: 3px 10px;
     border-radius: 999px;
-    background: #fef3c7;
-    color: #78350f;
+    background: var(--hsa-warm-bg-strong);
+    color: var(--hsa-warm-ink);
     font-size: var(--hsa-text-xs);
     font-weight: 700;
 }

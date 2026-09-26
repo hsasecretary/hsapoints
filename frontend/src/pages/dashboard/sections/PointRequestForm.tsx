@@ -42,8 +42,8 @@ function PointRequestForm() {
     const cardRef = useRef<HTMLDivElement>(null);
     const showStrikes = params.get('view') === 'strikes';
 
-    // The card sits below the rest of the dashboard: keep it in view when
-    // switching between the form and the Strikes view.
+    // The card sits below the Requests tabs: keep it in view when switching
+    // between the form and the Strikes view.
     const firstRender = useRef(true);
     useEffect(() => {
         if (firstRender.current) {
@@ -59,9 +59,13 @@ function PointRequestForm() {
     const makeupParam = params.get('makeup');
     useEffect(() => {
         if (loading || !makeupParam) return;
-        setStart({ kind: 'missed', codeId: makeupParam, path: 'makeup' });
-        setChoice(null);
-        setFieldsState(emptyFields());
+        // Only a Missed Event still owed a Make-up; a stale link just opens the form.
+        const missed = standing.missedEvents.find((row) => row.owed && row.codeId === makeupParam);
+        if (missed) {
+            setStart({ kind: 'missed', codeId: missed.codeId, path: 'makeup' });
+            setChoice(null);
+            setFieldsState(emptyFields());
+        }
         const updated = new URLSearchParams(params);
         updated.delete('makeup');
         setParams(updated, { replace: true });

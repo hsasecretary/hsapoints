@@ -22,7 +22,7 @@ function PointsSummary({ overview }: { overview: PointsOverview }) {
                 <span>{reached ? '' : `of ${goal} `}Total Points</span>
             </p>
             <div className="ov-score__track" role="progressbar" aria-valuemin={0} aria-valuemax={goal}
-                aria-valuenow={total} aria-label="Total Points">
+                aria-valuenow={Math.min(total, goal)} aria-valuetext={`${total} of ${goal} Total Points`} aria-label="Total Points">
                 {pendingPoints > 0 && <div className="ov-score__pending" style={{ width: percent(total + pendingPoints) }} />}
                 <div className="ov-score__fill" style={{ width: percent(Math.min(total, goal)) }} />
                 {total > goal && <div className="ov-score__over" style={{ left: percent(goal), width: percent(total - goal) }} />}
