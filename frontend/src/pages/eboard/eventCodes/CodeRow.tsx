@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { db } from '../../../lib/firebase';
 import { deleteCode, updateCode, type CodeRow as Code } from '../../../lib/eventCodes';
 import { eventType } from '../../../lib/rubric';
-import DateField from './DateField';
+import DatePicker from './DatePicker';
 import EventTypeSelect from './EventTypeSelect';
 import TypeFacts from './TypeFacts';
 
@@ -100,15 +100,11 @@ function CodeEditForm({ code, onDone }: { code: Code; onDone: () => void }) {
                 <label htmlFor={fieldId('event')}>Event name
                     <input id={fieldId('event')} value={edit.event} onChange={(e) => set('event', e.target.value)} />
                 </label>
-                <label htmlFor={fieldId('date')}>Date
-                    <DateField id={fieldId('date')} value={edit.eventDate} onChange={(e) => set('eventDate', e.target.value)} />
-                </label>
+                <DatePicker label="Date" value={edit.eventDate} onChange={(iso) => set('eventDate', iso)} />
                 <label htmlFor={fieldId('type')}>Event Type
                     <EventTypeSelect id={fieldId('type')} value={edit.eventTypeId} onChange={(id) => set('eventTypeId', id)} />
                 </label>
-                <label htmlFor={fieldId('graphic')}>Graphic posted
-                    <DateField id={fieldId('graphic')} value={edit.graphicDate} onChange={(e) => set('graphicDate', e.target.value)} />
-                </label>
+                <DatePicker label="Graphic posted" optional value={edit.graphicDate} onChange={(iso) => set('graphicDate', iso)} />
             </div>
             <TypeFacts eventTypeId={edit.eventTypeId} eventDate={edit.eventDate} />
             {code.category && !code.eventTypeId && (
