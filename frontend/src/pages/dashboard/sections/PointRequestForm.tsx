@@ -10,7 +10,7 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../../../lib/firebase';
 import { AT_RISK_STRIKES } from '../../../lib/computeStanding';
 import {
-    attendanceCount, buildPointRequest, eventChoices, makeupTypeChoices, missedEventName, NOT_LISTED, pickerGroups,
+    attendanceCount, buildPointRequest, eventChoices, missedEventName, NOT_LISTED, pickerGroups,
     previewRequest, typeChoiceFor, type RequestDraft, type TypeChoice,
 } from '../../../lib/pointRequests';
 import { eventType, tierLabels } from '../../../lib/rubric';
@@ -121,14 +121,16 @@ function PointRequestForm() {
     const options = { email, today };
     // Only a Surplus Attendance can be a Make-up. Starting from a Missed
     // Event, the first Surplus one makes up that miss; any others (more
-    // Tabling hours) get their own pick.
+    // Tabling hours) get their own pick. If none looks Surplus from here the
+    // first still names the miss, since the Member may know of an extra one
+    // the ledger doesn't show yet; E-Board settles it on review.
     const firstPass = choice ? previewRequest(member, attendances, codes, { ...baseDraft, makeupFor: fields.picks }, options) : null;
-    const fixedIndex = from?.kind === 'missed' && from.path === 'makeup'
-        ? firstPass?.attendances.findIndex((attendance) => attendance.surplus) ?? -1
+    const fixedIndex = from?.kind === 'missed' && from.path === 'makeup' && firstPass
+        ? Math.max(0, firstPass.attendances.findIndex((attendance) => attendance.surplus))
         : -1;
     const makeupFor = Array.from({ length: count }, (_, i) => {
-        if (!firstPass?.attendances[i]?.surplus) return null;
         if (i === fixedIndex) return from.kind === 'missed' ? from.codeId : null;
+        if (!firstPass?.attendances[i]?.surplus) return null;
         return fields.picks[i] ?? null;
     });
     const draft: RequestDraft = { ...baseDraft, makeupFor };
@@ -193,7 +195,20 @@ function PointRequestForm() {
     );
 
     let lead: React.ReactNode = null;
-    if (from?.kind === 'missed' && startMiss && from.path === null) {
+    if (from?.kind === 'missed' && startMiss && pendingPicks.has(from.codeId)) {
+        // One request per Missed Event: a second would ask E-Board to credit it twice.
+        lead = (
+            <div className="req-fork">
+                <p className="req-c__lead">
+                    You missed <strong>{startMiss.name}</strong> on {shortDate(startMiss.eventDate)}{startMiss.strike ? ' and got a Strike' : ''}.
+                </p>
+                <p className="req-pending" role="status">
+                    <strong>Awaiting point request approval</strong>
+                    <span>You already sent a request for this event. Check My Requests for E-Board's decision.</span>
+                </p>
+            </div>
+        );
+    } else if (from?.kind === 'missed' && startMiss && from.path === null) {
         lead = (
             <div className="req-fork">
                 <p className="req-c__lead">
@@ -217,7 +232,8 @@ function PointRequestForm() {
         lead = (
             <>
                 <p className="req-c__lead">Making up <strong>{startMiss.name}</strong>{startMiss.strike ? ' and its Strike' : ''}.</p>
-                {typePicker([{ label: '', choices: makeupTypeChoices(member, attendances, codes, options) }], false)}
+                <p className="req-hint">Pick what you went to. It makes up the miss if it was an extra (Surplus) event; E-Board checks when they review it.</p>
+                {typePicker(pickerGroups(true), true)}
             </>
         );
     } else if (from?.kind === 'missed' && startMiss && from.path === 'attended') {
@@ -302,7 +318,7 @@ function PointRequestForm() {
                 <div className="req-c__form">
                     {!from && <p className="req-c__empty">Start from a Missed Event or something you still need this Semester.</p>}
                     {lead}
-                    {choice && (from?.kind !== 'missed' || from.path !== null) && (
+                    {choice && (from?.kind !== 'missed' || (from.path !== null && !pendingPicks.has(from.codeId))) && (
                         <>
                             <EventDetails choice={choice} choices={choices} fields={fields} set={set} owed={cabinet ? owed : []} today={today} />
                             {cabinet && makeupFor.map((_, i) => firstPass?.attendances[i]?.surplus && i !== fixedIndex && (

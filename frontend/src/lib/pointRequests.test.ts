@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Attendance, Code, Member } from './computeStanding';
 import {
-    buildPointRequest, eventChoices, makeupTypeChoices, NOT_LISTED, pickerGroups, previewRequest, type RequestDraft,
+    buildPointRequest, eventChoices, NOT_LISTED, pickerGroups, previewRequest, type RequestDraft,
     type TypeChoice,
 } from './pointRequests';
 
@@ -214,15 +214,5 @@ describe('buildPointRequest', () => {
         ['more hours than a day', draft({ typeChoiceId: 'tabling', eventTypeId: 'tabling', eventName: 'Table', eventDate: '2026-10-02', note: 'x', hours: 9 }), 'Enter whole hours, from 1 to 8.'],
     ])('refuses a request with %s', (_, request, error) => {
         expect(buildPointRequest(request, context)).toEqual({ ok: false, error });
-    });
-});
-
-describe('makeupTypeChoices', () => {
-    it('offers only the Event Types that would be Surplus today: Additional Events, a Semester Requirement already met, HLHM after the first, and Tabling (its second hour is Surplus)', () => {
-        const opa = code('OPA1', 'opa-general', '2026-09-10');
-        const hlhm = code('HLHM1', 'hlhm', '2026-09-20');
-        const choices = makeupTypeChoices(cabinetMember, [attended(opa), attended(hlhm)], [opa, hlhm], { email: EMAIL, today: TODAY });
-
-        expect(choices.map((choice) => choice.id)).toEqual(['hlhm', 'opa-general', 'tabling', 'external-social', 'mlp-open', 'crash']);
     });
 });
