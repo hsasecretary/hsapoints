@@ -7,31 +7,14 @@ import EventsAttendedList from '../../components/members/EventsAttendedList';
 import EmailLookup from './EmailLookup';
 
 function UserPointsLookup() {
-    const [searchEmail, setSearchEmail] = useState('');
     const [userPoints, setUserPoints] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [eventBreakdown, setEventBreakdown] = useState([]);
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        lookUp(searchEmail);
-    };
-
-    // From the UFL/SF Email Lookup: fill in the email and run the lookup.
-    const lookUpFromName = (email) => {
-        setSearchEmail(email);
-        lookUp(email);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
+    // Runs for the member picked in the name search.
     const lookUp = async (searchEmail) => {
-        if (!searchEmail.trim()) {
-            setError('Please enter an email address');
-            return;
-        }
-
         setLoading(true);
         setError('');
         setUserPoints(null);
@@ -114,14 +97,6 @@ function UserPointsLookup() {
         }
     };
 
-    const clearSearch = () => {
-        setSearchEmail('');
-        setUserPoints(null);
-        setUserInfo(null);
-        setError('');
-        setEventBreakdown([]);
-    };
-
     // Cabinet-category events get their own section (like the Dashboard)
     const cabinetEvents = eventBreakdown.filter((event) => event.category === 'Cabinet');
     const generalEvents = eventBreakdown.filter((event) => event.category !== 'Cabinet');
@@ -129,34 +104,9 @@ function UserPointsLookup() {
 
     return (
         <div className="user-points-lookup">
-            <h2>User Points Lookup</h2>
-            <p style={{textAlign: 'center', color: '#666', marginBottom: '20px'}}>
-                Enter a user's email to view their detailed points breakdown
-            </p>
-
-            <form onSubmit={handleSearch} className="search-form">
-                <div className="search-input-group">
-                    <input
-                        type="email"
-                        value={searchEmail}
-                        onChange={(e) => setSearchEmail(e.target.value)}
-                        placeholder="Enter UFL/SF email (e.g., user@ufl.edu)"
-                        className="search-input"
-                        disabled={loading}
-                    />
-                    <button type="submit" disabled={loading} className="search-button">
-                        {loading ? 'Searching...' : 'Search'}
-                    </button>
-                    {(userPoints || error) && (
-                        <button type="button" onClick={clearSearch} className="clear-button">
-                            Clear
-                        </button>
-                    )}
-                </div>
-                {error && <p className="error-message">{error}</p>}
-            </form>
-
-            <EmailLookup onSelect={lookUpFromName} />
+            <EmailLookup onSelect={lookUp} />
+            {loading && <p className="lookup-cabinet-points">Loading points…</p>}
+            {error && <p className="error-message">{error}</p>}
 
             {userInfo && userPoints && (
                 <div className="user-results">

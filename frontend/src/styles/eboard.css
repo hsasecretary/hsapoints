@@ -195,28 +195,129 @@
     }
 }
 
-/* ---- Excuse absence  (ExcuseAbscense.tsx) ---------------------------------------------- */
+/* ---- Excuse Absence  (excuseAbsence/ExcuseAbsence.tsx) ---------------------------------
+   Variant A of the #48 prototype. Strikes drawn as slanted tally strokes, red
+   from the third (probation risk). State colours: red = open Strike, amber =
+   excused / needs a Make-up, green = made up, slate = closed by E-Board. */
 
-.excuse-absence .excuse-absence__form h3 {
-    margin-top: 0;
+.eap { max-width: 1100px; margin: 0 auto; padding: 20px 16px; text-align: left; color: var(--hsa-ink); font-family: var(--hsa-font-body); }
+.eap * { box-sizing: border-box; }
+.eap h3, .eap h4 { margin: 0; color: var(--hsa-teal-700); text-align: left; }
+.eap h3 { font-size: var(--hsa-text-xl); }
+.eap h4 { font-size: var(--hsa-text-base); margin: 24px 0 10px; }
+.eap .eap-title { margin: 0 0 16px; font-size: var(--hsa-text-3xl); color: var(--hsa-teal-700); text-align: left; }
+.eap .eap-muted { color: var(--hsa-muted); font-weight: 400; font-size: var(--hsa-text-sm); }
+.eap .eap-empty { color: var(--hsa-muted); margin: 8px 0; font-size: var(--hsa-text-sm); list-style: none; }
+.eap .eap-error { color: var(--hsa-danger); margin: 0; font-size: var(--hsa-text-sm); }
+.eap .eap-done { margin: 12px 0 0; padding: 8px 12px; border-radius: 6px; background: var(--hsa-success-bg); color: var(--hsa-success-strong); font-size: var(--hsa-text-sm); }
+.eap .eap-risk { margin: 12px 0; padding: 10px 12px; border-left: 4px solid var(--hsa-danger); background: var(--hsa-danger-bg); color: var(--hsa-danger-strong); font-weight: 600; font-size: var(--hsa-text-sm); }
+
+.eap input[type=text], .eap textarea {
+    width: 100%; margin: 0; padding: 10px 12px; border: 1.5px solid var(--hsa-border); border-radius: 6px;
+    font: inherit; font-size: var(--hsa-text-base); background: var(--hsa-surface); color: var(--hsa-ink);
 }
+.eap button { font-family: inherit; margin: 0; min-height: 0; }
+.eap :focus-visible { outline: 3px solid rgba(15, 76, 100, 0.35); outline-offset: 2px; }
 
-.excuse-absence .excuse-absence__form .user-info-grid {
-    margin-bottom: 16px;
+.eap .eap-btn {
+    padding: 8px 14px; border: 1.5px solid var(--hsa-teal-700); border-radius: 6px; background: var(--hsa-surface);
+    color: var(--hsa-teal-700); font-weight: 600; font-size: var(--hsa-text-sm); cursor: pointer; width: auto;
 }
+.eap .eap-btn:hover { background: var(--hsa-teal-100); }
+.eap .eap-btn:disabled { opacity: 0.6; cursor: default; }
+.eap .eap-btn--primary { background: var(--hsa-teal-700); color: #fff; }
+.eap .eap-btn--primary:hover { background: var(--hsa-teal-800); }
+.eap .eap-btn--sm { padding: 4px 10px; font-size: var(--hsa-text-xs); }
+.eap .eap-btn.is-on { background: var(--hsa-teal-700); color: #fff; }
 
-.excuse-absence .excuse-absence__form .form-group {
-    margin-bottom: 12px;
+.eap .eap-tag {
+    display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--hsa-border);
+    background: var(--hsa-surface-sunken); color: var(--hsa-ink-soft); font-size: var(--hsa-text-xs); font-weight: 600; vertical-align: middle;
 }
+.eap .eap-tag--excused { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
 
-.excuse-absence .excuse-absence__actions {
-    margin-top: 8px;
+/* Strike tally */
+.eap .eap-tally { display: inline-flex; align-items: center; gap: 5px; height: 22px; }
+.eap .eap-tally__mark { display: inline-block; width: 4px; height: 100%; border-radius: 2px; background: var(--hsa-ink-soft); transform: skewX(-10deg); }
+.eap .eap-tally__mark.is-risk { background: var(--hsa-danger); }
+.eap .eap-tally__zero { font-weight: 700; color: var(--hsa-success); }
+.eap .eap-tally--sm { height: 16px; gap: 3px; }
+.eap .eap-tally--sm .eap-tally__mark { width: 3px; }
+.eap .eap-tally--lg { height: 34px; gap: 7px; }
+.eap .eap-tally--lg .eap-tally__mark { width: 6px; }
+.eap .eap-tally--lg .eap-tally__zero { font-size: var(--hsa-text-2xl); }
+
+/* At risk (3+ Strikes), for the Chief of Staff */
+.eap .eap-risk-list { margin-bottom: 20px; padding: 12px 14px; border: 1px solid var(--hsa-danger-border); border-radius: 8px; background: var(--hsa-surface); }
+.eap .eap-risk-list h3 { font-size: var(--hsa-text-base); color: var(--hsa-danger-strong); margin-bottom: 6px; }
+.eap .eap-risk-list ul { list-style: none; margin: 0; padding: 0; }
+.eap .eap-risk-list button {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 8px;
+    border: 0; border-top: 1px solid var(--hsa-border-light); background: none; text-align: left; cursor: pointer; color: var(--hsa-ink); font-size: var(--hsa-text-sm);
 }
+.eap .eap-risk-list li:first-child button { border-top: 0; }
+.eap .eap-risk-list button:hover { background: var(--hsa-danger-bg); }
 
-/* The step-2 card is a <form>; make it full width like the lookup's cards */
-.excuse-absence .excuse-absence__form {
-    width: auto;
-    margin: 0;
+/* Name search */
+.eap .eap-search { position: relative; margin-bottom: 20px; }
+.eap .eap-search input { font-size: var(--hsa-text-lg); padding: 14px 16px; border-color: var(--hsa-teal-700); }
+.eap .eap-results { list-style: none; margin: 4px 0 0; padding: 4px; border: 1px solid var(--hsa-border); border-radius: 8px; background: var(--hsa-surface); box-shadow: 0 8px 24px rgba(15, 23, 42, .12); }
+.eap .eap-results button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; padding: 10px 12px; border: 0; background: none; text-align: left; cursor: pointer; border-radius: 6px; color: var(--hsa-ink); font-size: var(--hsa-text-base); }
+.eap .eap-results button:hover { background: var(--hsa-teal-100); }
+
+/* Member header */
+.eap .eap-who { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; padding-bottom: 16px; border-bottom: 2px solid var(--hsa-teal-700); }
+.eap .eap-who p { margin: 4px 0 0; }
+.eap .eap-counts { display: flex; gap: 28px; margin: 0; }
+.eap .eap-counts dt { font-size: var(--hsa-text-xs); color: var(--hsa-muted); font-weight: 600; }
+.eap .eap-counts dd { margin: 4px 0 0; }
+.eap .eap-num { font-size: var(--hsa-text-2xl); font-weight: 700; line-height: 34px; }
+
+/* Year timeline + history */
+.eap .eap-cols { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 32px; }
+.eap .eap-timeline { list-style: none; margin: 0; padding: 0; }
+.eap .eap-row {
+    display: grid; grid-template-columns: 64px 1fr auto; column-gap: 12px; row-gap: 4px; align-items: baseline;
+    padding: 10px 0 10px 14px; border-left: 3px solid var(--hsa-border-light); position: relative;
+}
+.eap .eap-row::before { content: ''; position: absolute; left: -7px; top: 15px; width: 11px; height: 11px; border-radius: 50%; background: var(--hsa-border); }
+.eap .eap-row.is-attended { color: var(--hsa-muted); }
+.eap .eap-row.is-future { color: var(--hsa-muted-light); font-style: italic; }
+.eap .eap-row.is-future::before { background: var(--hsa-surface); border: 2px solid var(--hsa-border); }
+.eap .eap-row.is-strike::before { background: var(--hsa-danger); }
+.eap .eap-row.is-strike { background: linear-gradient(90deg, var(--hsa-danger-bg), transparent 70%); }
+.eap .eap-row.is-open::before { background: #f59e0b; }
+.eap .eap-row.is-madeup::before { background: var(--hsa-success); }
+.eap .eap-row.is-closed::before { background: var(--hsa-muted); }
+.eap .eap-row__date { font-variant-numeric: tabular-nums; font-size: var(--hsa-text-sm); white-space: nowrap; }
+.eap .eap-row__name { font-weight: 600; }
+.eap .eap-row__state { font-size: var(--hsa-text-sm); font-weight: 600; text-align: right; }
+.eap .is-strike .eap-row__state { color: var(--hsa-danger-strong); }
+.eap .is-madeup .eap-row__state { color: var(--hsa-success); }
+.eap .eap-row__detail, .eap .eap-row__actions, .eap .eap-row__confirm { grid-column: 2 / -1; font-size: var(--hsa-text-sm); }
+.eap .eap-row__actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+
+/* Reason box + effect, before saving */
+.eap .eap-confirm { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; padding: 12px; border-radius: 8px; background: var(--hsa-surface-subtle); border: 1px solid var(--hsa-border-light); }
+.eap .eap-confirm__label { display: flex; flex-direction: column; gap: 6px; margin: 0; font-weight: 700; font-size: var(--hsa-text-sm); color: var(--hsa-teal-700); }
+.eap .eap-effects { font-size: var(--hsa-text-sm); color: var(--hsa-ink-soft); }
+.eap .eap-effects__label { font-weight: 700; font-size: var(--hsa-text-xs); color: var(--hsa-muted); }
+.eap .eap-effects ul { margin: 2px 0 0; padding-left: 18px; }
+.eap .eap-confirm__buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* History */
+.eap .eap-history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.eap .eap-history__item { padding: 8px 0 8px 12px; border-left: 3px solid var(--hsa-border); font-size: var(--hsa-text-sm); }
+.eap .eap-history__item.is-excused { border-color: #f59e0b; }
+.eap .eap-history__item.is-strike-removed { border-color: var(--hsa-danger); }
+.eap .eap-history__item.is-closed { border-color: var(--hsa-muted); }
+.eap .eap-history__note { color: var(--hsa-ink-soft); margin-top: 2px; overflow-wrap: anywhere; }
+.eap .eap-history__meta { color: var(--hsa-muted); font-size: var(--hsa-text-xs); margin-top: 2px; overflow-wrap: anywhere; }
+
+@media (max-width: 760px) {
+    .eap .eap-cols { grid-template-columns: 1fr; }
+    .eap .eap-row { grid-template-columns: 52px 1fr; }
+    .eap .eap-row__state { grid-column: 2; text-align: left; }
 }
 
 /* ---- Member points lookup (scoped to .user-points-lookup)  (UserPointsLookup.tsx) -------- */

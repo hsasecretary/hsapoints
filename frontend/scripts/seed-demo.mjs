@@ -66,9 +66,11 @@ const docs = Object.fromEntries([
     // Cabinet Member: misses CT1, GBM2, RETREAT, GBM3, CT3 and HLSA1.
     // OPA2 is Surplus and makes up CT1 (the oldest Strike), CT3 is excused
     // (owed, no Strike), and a pending request names GBM3. That leaves 4 open
-    // Strikes: at risk.
+    // Strikes: at risk. On Excuse Absence, excusing CT1 moves OPA2 onto GBM2.
     [`users/${CABINET}`, user(CABINET, 'Cara', {
-        involvement: 'cabinet', cabinet: 'programming', approved: true, excusals: [{ codeId: 'CT3' }],
+        involvement: 'cabinet', cabinet: 'programming', approved: true,
+        excusals: [{ codeId: 'CT3', note: 'Excuse Form: exam', by: EBOARD, at: '2026-09-12T15:00:00.000Z' }],
+        absenceLog: [{ kind: 'excused', codeId: 'CT3', note: 'Excuse Form: exam', by: EBOARD, at: '2026-09-12T15:00:00.000Z' }],
     })],
     ...['ORIENT', 'GBM1', 'CT2', 'OPA1', 'CT4', 'OPA2', 'GBM4', 'CT5'].map((id) => attended(CABINET, id)),
     ['pointRequests/demo-pending-makeup', {
