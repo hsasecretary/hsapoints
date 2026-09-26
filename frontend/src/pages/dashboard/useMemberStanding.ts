@@ -2,11 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { collection, doc, getDocs, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { computeStanding, type Attendance, type Code, type Member, type Standing } from '../../lib/computeStanding';
+import type { MemberRequest } from '../../lib/pointsOverview';
 import { rubric } from '../../lib/rubric';
 import { academicYear, toIsoDate } from '../../lib/semester';
-
-/** A pointRequests/{id} doc still waiting on E-Board. */
-export type PendingRequest = { id: string; codeId?: string | null; makeupFor?: (string | null)[] };
 
 export type MemberStanding = {
     loading: boolean;
@@ -15,7 +13,10 @@ export type MemberStanding = {
     attendances: Attendance[];
     /** This school year's codes. */
     codes: Code[];
-    pending: PendingRequest[];
+    /** Every Point Request the Member has sent, whatever its status. */
+    requests: MemberRequest[];
+    /** The requests still waiting on E-Board. */
+    pending: MemberRequest[];
     standing: Standing | null;
     today: string;
 };
@@ -29,7 +30,7 @@ export function useMemberStanding(email: string | null | undefined): MemberStand
     const [member, setMember] = useState<Member | null>(null);
     const [attendances, setAttendances] = useState<Attendance[] | null>(null);
     const [codes, setCodes] = useState<Code[] | null>(null);
-    const [pending, setPending] = useState<PendingRequest[]>([]);
+    const [requests, setRequests] = useState<MemberRequest[]>([]);
 
     useEffect(() => {
         if (!email) return undefined;
@@ -51,9 +52,18 @@ export function useMemberStanding(email: string | null | undefined): MemberStand
                     setAttendances([]);
                 }),
             onSnapshot(query(collection(db, 'pointRequests'), where('userEmail', '==', memberEmail)),
-                (snap) => setPending(snap.docs
-                    .filter((d) => d.data().status === 'pending')
-                    .map((d) => ({ id: d.id, codeId: d.data().codeId, makeupFor: d.data().makeupFor }))),
+                (snap) => setRequests(snap.docs.map((d) => {
+                    const data = d.data();
+                    return {
+                        id: d.id,
+                        activityName: data.activityName,
+                        date: data.date,
+                        status: data.status,
+                        pointsRequested: data.pointsRequested,
+                        codeId: data.codeId,
+                        makeupFor: data.makeupFor,
+                    };
+                })),
                 (error) => console.error('Error loading point requests:', error)),
         ];
         getDocs(collection(db, 'codes'))
@@ -69,12 +79,14 @@ export function useMemberStanding(email: string | null | undefined): MemberStand
         () => (member && attendances && codes ? computeStanding(member, attendances, rubric, codes, { today }) : null),
         [member, attendances, codes, today],
     );
+    const pending = useMemo(() => requests.filter((request) => request.status === 'pending'), [requests]);
 
     return {
         loading: !standing,
         member,
         attendances: attendances ?? [],
         codes: codes ?? [],
+        requests,
         pending,
         standing,
         today,
@@ -82,6 +94,6 @@ export function useMemberStanding(email: string | null | undefined): MemberStand
 }
 
 /** The Missed Events a pending request already names, as "I was there" or a Make-up pick. */
-export function pendingMakeups(pending: PendingRequest[]): Set<string> {
+export function pendingMakeups(pending: MemberRequest[]): Set<string> {
     return new Set(pending.flatMap((request) => [request.codeId, ...(request.makeupFor ?? [])]).filter(Boolean));
 }

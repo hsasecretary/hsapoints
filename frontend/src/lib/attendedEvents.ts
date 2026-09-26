@@ -1,10 +1,9 @@
 // Turning a member's `eventCodes` array into the events they attended.
 //
-// Both the member dashboard (PointsOverview) and the E-Board User Lookup used
-// to do this by downloading the whole `codes` collection and filtering it in
-// the browser, which costs one Firestore read per event code ever created —
-// every dashboard load, growing every semester. Here we fetch only the codes
-// the member actually redeemed.
+// The E-Board User Lookup used to do this by downloading the whole `codes`
+// collection and filtering it in the browser, which costs one Firestore read
+// per event code ever created, growing every semester. Here we fetch only the
+// codes the member actually redeemed.
 import { collection, documentId, getDocs, query, where } from 'firebase/firestore';
 import { db } from './firebase';
 import { eventType } from './rubric';

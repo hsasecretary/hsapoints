@@ -7,6 +7,8 @@ import SiteHeader from './components/layout/SiteHeader';
 import Footer from './components/layout/Footer';
 import NotFound from './pages/NotFound';
 import ForgotPassword from './pages/auth/ForgotPassword';
+import Requests from './pages/requests/Requests';
+import Guide from './pages/guide/Guide';
 
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import { onAuthStateChanged} from 'firebase/auth';
@@ -86,7 +88,9 @@ function App() {
                         <Route path="/" element={<Navigate to="/login" />} />
                         <Route path="/signup" element={userEmail ? <Navigate to="/dashboard" replace /> : <SignUp />} />
                         <Route path="/login" element={userEmail ? <Navigate to="/dashboard" replace /> : <Login />} />
-                        <Route path="/dashboard" element={userEmail ? <Dashboard cabinet={isCabinetMember} email={userEmail} /> : <Navigate to="/login" />} />
+                        <Route path="/dashboard" element={userEmail ? <Dashboard email={userEmail} /> : <Navigate to="/login" />} />
+                        <Route path="/requests" element={userEmail ? <Requests /> : <Navigate to="/login" />} />
+                        <Route path="/guide" element={userEmail ? <Guide email={userEmail} /> : <Navigate to="/login" />} />
                         <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember} /> : <Navigate to="/login" />} />
                         {/* E-Board tools, one page each (list in pages/eboard/eboardTools.ts) */}
                         <Route path="/eboard" element={userEmail ? <Eboard eboard={isEboard} /> : <Navigate to="/login" />}>
