@@ -4,6 +4,7 @@ import { createCode, suggestCode } from '../../../lib/eventCodes';
 import { eventType } from '../../../lib/rubric';
 import { toIsoDate } from '../../../lib/semester';
 import EventTypeSelect from './EventTypeSelect';
+import DateField from './DateField';
 import TypeFacts from './TypeFacts';
 
 const blank = { event: '', code: '', eventDate: '', eventTypeId: '', graphicDate: '' };
@@ -55,7 +56,7 @@ function QuickAdd() {
                 }} />
             <input aria-label="Code" placeholder="CODE" className="quick-add__code" value={row.code}
                 onChange={(e) => { set('code', e.target.value.toUpperCase()); setCodeTyped(true); }} />
-            <input aria-label="Event date" type="date" className="quick-add__date" value={row.eventDate}
+            <DateField aria-label="Event date" className="quick-add__date" value={row.eventDate}
                 onChange={(e) => set('eventDate', e.target.value)} />
             <EventTypeSelect value={row.eventTypeId} onChange={(id) => set('eventTypeId', id)} />
             <button type="submit" className="quick-add__submit" disabled={saving}>{saving ? 'Adding…' : 'Add code'}</button>
@@ -65,8 +66,8 @@ function QuickAdd() {
             </button>
             {more && (
                 <label id="quick-add-more" className="quick-add__more">
-                    Graphic posted (optional, for reference only)
-                    <input type="date" value={row.graphicDate} onChange={(e) => set('graphicDate', e.target.value)} />
+                    Graphic posted
+                    <DateField value={row.graphicDate} onChange={(e) => set('graphicDate', e.target.value)} />
                 </label>
             )}
             <div className="quick-add__status" role="status">

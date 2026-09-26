@@ -1081,14 +1081,90 @@
     border: 1.5px solid var(--hsa-teal-600);
     border-radius: 6px;
     font-family: inherit;
-    font-size: var(--hsa-text-sm);
+    /* 16px, not --hsa-text-sm: iOS Safari zooms in on any field smaller than that. */
+    font-size: var(--hsa-text-base);
+    line-height: 1.25;
     color: var(--hsa-ink);
     background-color: var(--hsa-surface);
+    color-scheme: light;
 }
 
-/* The Event Type dropdown: the site's native select look (auth.css .form select). */
-.event-codes-page .event-type-select { cursor: pointer; }
-.event-codes-page .event-type-select:focus { border-color: var(--hsa-teal-500); box-shadow: 0 0 0 3px rgba(21, 87, 118, 0.15); }
+/* Native select and date fields, closed: the site's teal field with a teal
+   chevron / calendar icon. What opens stays the browser's or phone's own
+   picker (see docs/research/event-codes-select-and-date-ui.md). */
+.event-codes-page .event-type-select {
+    appearance: none;
+    padding-right: 38px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23155776' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+}
+.event-codes-page .event-type-select:invalid,
+.event-codes-page .event-type-select:has(option[value=""]:checked) { color: var(--hsa-muted); }
+.event-codes-page :is(.event-type-select, input[type="date"]):focus {
+    border-color: var(--hsa-teal-500);
+    box-shadow: 0 0 0 3px rgba(21, 87, 118, 0.15);
+}
+.event-codes-page input[type="date"] { cursor: pointer; }
+.event-codes-page input[type="date"]::-webkit-calendar-picker-indicator {
+    margin-left: 6px;
+    padding: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: .7;
+}
+.event-codes-page input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; background-color: var(--hsa-teal-100); }
+
+/* Where the browser supports a customizable select (Chrome 135+, Safari 27+),
+   the open list is drawn in the page too: a rounded teal panel, tier headings,
+   the chosen type ticked. Everywhere else the rules above still apply. */
+@supports (appearance: base-select) {
+    .event-codes-page .event-type-select,
+    .event-codes-page .event-type-select::picker(select) { appearance: base-select; }
+    .event-codes-page .event-type-select { align-items: center; background-image: none; padding-right: 12px; }
+    .event-codes-page .event-type-select::picker-icon {
+        content: "";
+        width: 12px;
+        height: 8px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23155776' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center;
+        transition: rotate .15s ease;
+    }
+    .event-codes-page .event-type-select:open::picker-icon { rotate: 180deg; }
+    .event-codes-page .event-type-select::picker(select) {
+        max-height: min(440px, 60vh);
+        margin-top: 4px;
+        padding: 6px;
+        border: 1.5px solid var(--hsa-teal-600);
+        border-radius: 10px;
+        background: var(--hsa-surface);
+        box-shadow: 0 12px 28px rgba(15, 76, 100, 0.22);
+    }
+    .event-codes-page .event-type-select optgroup {
+        padding: 10px 10px 4px;
+        font-size: var(--hsa-text-xs);
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--hsa-teal-700);
+    }
+    .event-codes-page .event-type-select optgroup + optgroup { margin-top: 4px; border-top: 1px solid var(--hsa-border-light); }
+    .event-codes-page .event-type-select option {
+        margin: 2px -4px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        font-size: var(--hsa-text-sm);
+        font-weight: 400;
+        letter-spacing: normal;
+        text-transform: none;
+        color: var(--hsa-ink);
+        cursor: pointer;
+    }
+    .event-codes-page .event-type-select option[value=""] { color: var(--hsa-muted); }
+    .event-codes-page .event-type-select option:is(:hover, :focus-visible) { background: var(--hsa-teal-100); outline: none; }
+    .event-codes-page .event-type-select option:checked { font-weight: 700; color: var(--hsa-teal-700); }
+    .event-codes-page .event-type-select option::checkmark { color: var(--hsa-teal-600); }
+}
 
 .event-codes-page .link-button {
     padding: 4px 6px;
@@ -1208,7 +1284,7 @@
 .event-codes-page .code-row { border-bottom: 1px solid var(--hsa-border-light); background: var(--hsa-surface); }
 .event-codes-page .code-row__main {
     display: grid;
-    grid-template-columns: 110px 140px minmax(0, 1fr) 190px 64px;
+    grid-template-columns: 110px 140px minmax(0, 1fr) 190px 96px;
     gap: 12px;
     align-items: center;
     width: 100%;
@@ -1226,7 +1302,7 @@
 .event-codes-page .code-row.is-open .code-row__main { background: var(--hsa-teal-100); }
 .event-codes-page .code-row__date { color: var(--hsa-muted); }
 .event-codes-page .code-row__code { overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: var(--hsa-teal-700); }
-.event-codes-page .code-row__count { text-align: right; font-variant-numeric: tabular-nums; }
+.event-codes-page .code-row__count { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .event-codes-page .code-row__count small { color: var(--hsa-muted); }
 
 .event-codes-page .tier-chip {
@@ -1279,11 +1355,41 @@
 }
 .event-codes-page .code-edit__save:hover { background: var(--hsa-teal-800); border: none; box-shadow: none; }
 .event-codes-page .code-edit__delete { margin-left: auto; }
+/* Delete's "are you sure", in place of the action buttons. */
+.event-codes-page .code-edit__confirm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1.5px solid var(--hsa-danger-border);
+    border-radius: 6px;
+    background: var(--hsa-danger-bg);
+}
+.event-codes-page .code-edit__confirm p { flex: 1 1 200px; margin: 0; font-size: var(--hsa-text-sm); color: var(--hsa-danger-strong); }
+.event-codes-page .code-edit__confirm-delete {
+    padding: 9px 16px;
+    border: none;
+    border-radius: 6px;
+    background: var(--hsa-danger);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+.event-codes-page .code-edit__confirm-delete:hover { background: var(--hsa-danger-strong); border: none; box-shadow: none; }
 
 @media (max-width: 800px) {
     .event-codes-page { padding: 12px 16px 0; }
     .event-codes-page .quick-add { position: static; }
     .event-codes-page .quick-add :is(input, select, .quick-add__submit) { flex: 1 1 100%; }
+    /* Code and date share a row so the band isn't as tall. */
+    .event-codes-page .quick-add :is(.quick-add__code, .quick-add__date) { flex: 1 1 calc(50% - 4px); min-width: 0; }
+    /* Thumb-sized targets: 44px, Apple's and WCAG 2.5.5's size. */
+    .event-codes-page :is(input:not([type="checkbox"], [type="radio"]), select) { min-height: 44px; }
+    .event-codes-page input[type="date"] { height: 44px; }
+    .event-codes-page :is(.quick-add__submit, .code-edit__save, .code-edit__confirm-delete) { min-height: 44px; }
+    .event-codes-page .link-button { min-height: 44px; padding: 10px 8px; }
+    .event-codes-page .code-facets label { min-height: 44px; padding: 0; }
     .event-codes-page__body { grid-template-columns: minmax(0, 1fr); gap: 12px; }
     .event-codes-page .code-facets-toggle { display: inline-block; justify-self: start; }
     .event-codes-page .code-facets { display: none; position: static; }
