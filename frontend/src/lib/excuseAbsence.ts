@@ -78,14 +78,18 @@ export function actionsFor(missed: MissedEvent): AbsenceActionKind[] {
 
 export type Applied = { ok: true; patch: AbsenceFacts } | { ok: false; error: string };
 
+/** Shown when a change that needs a reason has none. */
+export const REASON_REQUIRED = "Write a reason. It's kept in the history.";
+
 /**
  * The facts after `action`, plus its absenceLog entry. Excusing a miss
- * drops any removed Strike on it, since an excused miss has no Strike.
- * Refuses a change that no longer applies (someone else already made it).
+ * leaves any removed Strike on it in place, so undoing the excuse brings
+ * back exactly what the History says. Refuses a change that no longer
+ * applies (someone else already made it).
  */
 export function applyAbsenceAction(member: AbsenceMember, action: AbsenceAction, by: string, at: string): Applied {
     const note = action.note.trim();
-    if (NEEDS_REASON.includes(action.kind) && !note) return { ok: false, error: "Write a reason. It's kept in the history." };
+    if (NEEDS_REASON.includes(action.kind) && !note) return { ok: false, error: REASON_REQUIRED };
 
     const key = codeKey(action.codeId);
     const has = (list: { codeId: string }[]) => list.some((entry) => codeKey(entry.codeId) === key);
@@ -100,7 +104,7 @@ export function applyAbsenceAction(member: AbsenceMember, action: AbsenceAction,
     switch (action.kind) {
         case 'excuse':
             applies = !has(excusals);
-            facts = { excusals: [...excusals, { codeId: action.codeId, note, by, at }], strikeRemovals: without(strikeRemovals), missedEventOverrides };
+            facts = { excusals: [...excusals, { codeId: action.codeId, note, by, at }], strikeRemovals, missedEventOverrides };
             break;
         case 'unexcuse':
             applies = has(excusals);
@@ -171,14 +175,12 @@ export function atRiskMembers<T extends { standing: Standing | null }>(rows: T[]
         .sort((a, b) => b.standing.openStrikes - a.standing.openStrikes);
 }
 
-export type SaveResult = Applied;
-
 /**
  * Saves one action on a Member's Missed Event: reads their facts and writes
  * the new ones in one transaction, so two E-Board members can't overwrite
  * each other's changes or the log.
  */
-export async function saveAbsenceAction(db: Firestore, email: string, action: AbsenceAction, by: string): Promise<SaveResult> {
+export async function saveAbsenceAction(db: Firestore, email: string, action: AbsenceAction, by: string): Promise<Applied> {
     const userRef = doc(db, 'users', email.toLowerCase());
     return runTransaction(db, async (tx) => {
         const snap = await tx.get(userRef);
@@ -187,6 +189,20 @@ export async function saveAbsenceAction(db: Firestore, email: string, action: Ab
         if (applied.ok) tx.update(userRef, applied.patch);
         return applied;
     });
+}
+
+/**
+ * The fact holding a Missed Event in its current state, whose note or
+ * reason the page shows: its override, else its removed Strike, else its
+ * excusal.
+ */
+export function factFor(member: AbsenceMember, missed: MissedEvent): { note: string } | undefined {
+    const key = codeKey(missed.codeId);
+    const find = <T extends { codeId: string }>(list: T[] | undefined) => list?.find((entry) => codeKey(entry.codeId) === key);
+    if (missed.overridden) return { note: find(member.missedEventOverrides)?.reason ?? '' };
+    if (missed.excused) return { note: find(member.excusals)?.note ?? '' };
+    if (missed.strikeRemoved) return { note: find(member.strikeRemovals)?.reason ?? '' };
+    return undefined;
 }
 
 /** Code IDs are uppercase doc IDs, but a few older rows were stored in mixed case. */

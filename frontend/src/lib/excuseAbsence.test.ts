@@ -108,12 +108,17 @@ describe('applyAbsenceAction', () => {
         expect(applyAbsenceAction({}, act(kind, 'CT1', '  '), BY, AT)).toEqual({ ok: false, error: expect.stringMatching(/reason/i) });
     });
 
-    it('drops a removed Strike when the miss is excused, since an excused miss has no Strike to remove', () => {
+    it('keeps a removed Strike through an excuse and its undo, so the History still matches', () => {
         const member: AbsenceMember = { strikeRemovals: [{ codeId: 'CT1', reason: 'Appeal', by: BY, at: AT }] };
 
-        const result = applyAbsenceAction(member, act('excuse', 'CT1'), BY, AT);
+        const excused = applyAbsenceAction(member, act('excuse', 'CT1'), BY, AT);
+        if (excused.ok === false) throw new Error(excused.error);
+        const undone = applyAbsenceAction(excused.patch, act('unexcuse', 'CT1'), BY, AT);
 
-        expect(result.ok && result.patch.strikeRemovals).toEqual([]);
+        expect(excused.patch.strikeRemovals).toEqual(member.strikeRemovals);
+        expect(undone.ok && undone.patch.strikeRemovals).toEqual(member.strikeRemovals);
+        const [missed] = standingOf({ ...cabinetMember, ...(undone.ok ? undone.patch : {}) }).missedEvents;
+        expect(missed.strike).toBe(false);
     });
 
     it("refuses a change that's already been made, e.g. by another E-Board member", () => {

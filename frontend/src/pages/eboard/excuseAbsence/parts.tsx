@@ -1,9 +1,9 @@
 // Pieces of the Excuse Absence page: the Strike tally, the history, and the
 // reason box that shows an action's effect before it's saved.
 import { useState } from 'react';
-import type { Attendance, Code } from '../../../lib/computeStanding';
+import { AT_RISK_STRIKES, type Attendance, type Code } from '../../../lib/computeStanding';
 import {
-    ACTION_LABEL, LOG_TEXT, NEEDS_REASON, previewAbsenceAction,
+    ACTION_LABEL, LOG_TEXT, NEEDS_REASON, previewAbsenceAction, REASON_REQUIRED,
     type AbsenceAction, type AbsenceActionKind, type AbsenceEffect, type AbsenceLogEntry,
 } from '../../../lib/excuseAbsence';
 import { isHeldToCabinetRules } from '../../../lib/members';
@@ -47,14 +47,14 @@ export function StrikeTally({ count, size = 'md' }: { count: number; size?: 'sm'
     return (
         <span className={`eap-tally eap-tally--${size}`} role="img" aria-label={`${count} open Strike${count === 1 ? '' : 's'}`}>
             {count === 0 ? <span className="eap-tally__zero">0</span> : Array.from({ length: count }, (_, i) => (
-                <span key={i} className={`eap-tally__mark${i >= 2 ? ' is-risk' : ''}`} />
+                <span key={i} className={`eap-tally__mark${i >= AT_RISK_STRIKES - 1 ? ' is-risk' : ''}`} />
             ))}
         </span>
     );
 }
 
 export function RiskNote({ strikes }: { strikes: number }) {
-    if (strikes < 3) return null;
+    if (strikes < AT_RISK_STRIKES) return null;
     return <p className="eap-risk">At risk of probation: {strikes} open Strikes. Needs a meeting with the Chief of Staff.</p>;
 }
 
@@ -140,7 +140,7 @@ export function ConfirmAction({ member, attendances, codes, today, kind, codeId,
                     autoFocus
                 />
             </label>
-            {tried && missing && <p className="eap-error">Write a reason. It's kept in the history.</p>}
+            {tried && missing && <p className="eap-error">{REASON_REQUIRED}</p>}
             <div className="eap-effects" aria-live="polite">
                 <span className="eap-effects__label">If you save this</span>
                 <ul>{effectLines(effect, attendances, codes).map((line) => <li key={line}>{line}</li>)}</ul>

@@ -5,13 +5,13 @@
 import { useMemo, useState } from 'react';
 import { auth, db } from '../../../lib/firebase';
 import type { CoreEvent, MissedEvent } from '../../../lib/computeStanding';
-import { actionsFor, ACTION_LABEL, atRiskMembers, saveAbsenceAction, type AbsenceAction, type AbsenceActionKind } from '../../../lib/excuseAbsence';
+import { actionsFor, ACTION_LABEL, atRiskMembers, factFor, saveAbsenceAction, type AbsenceAction, type AbsenceActionKind } from '../../../lib/excuseAbsence';
 import { findMembersByName } from '../../../lib/nameSearch';
 import { shortDate } from '../../../lib/semester';
 import {
     attendanceLabel, codeLabel, codeName, ConfirmAction, displayName, History, RiskNote, roleLine, StrikeTally,
 } from './parts';
-import { useRoster, type RosterRow } from './useRoster';
+import { useRoster, type Roster, type RosterRow } from './useRoster';
 
 type MissState = 'strike' | 'open' | 'madeup' | 'closed';
 
@@ -141,7 +141,7 @@ function ExcuseAbsence() {
 
 function MemberYear({ row, roster, pending, saved, onPick, onCancel, onSave }: {
     row: RosterRow;
-    roster: ReturnType<typeof useRoster>;
+    roster: Roster;
     pending: { kind: AbsenceActionKind; codeId: string } | null;
     saved: string;
     onPick: (kind: AbsenceActionKind, codeId: string) => void;
@@ -154,16 +154,6 @@ function MemberYear({ row, roster, pending, saved, onPick, onCancel, onSave }: {
     const held = standing.heldToCabinetRules;
     const owed = standing.missedEvents.filter((missed) => missed.owed).length;
     const unused = standing.surplus.filter((surplus) => !surplus.makeupFor);
-
-    // The note E-Board left on whatever holds a miss in its current state.
-    const noteFor = (missed: MissedEvent) => {
-        const find = <T extends { codeId: string }>(list: T[] | undefined) =>
-            list?.find((entry) => entry.codeId.toUpperCase() === missed.codeId.toUpperCase());
-        if (missed.overridden) return find(member.missedEventOverrides)?.reason;
-        if (missed.strikeRemoved) return find(member.strikeRemovals)?.reason;
-        if (missed.excused) return find(member.excusals)?.note;
-        return undefined;
-    };
 
     const attendedRow = (event: CoreEvent) => {
         const state = event.status === 'attended' ? 'Attended'
@@ -212,7 +202,7 @@ function MemberYear({ row, roster, pending, saved, onPick, onCancel, onSave }: {
                                     const missed = standing.missedEvents.find((m) => m.codeId === event.codeId);
                                     if (!missed) return attendedRow(event);
                                     const state = missState(missed);
-                                    const note = noteFor(missed);
+                                    const fact = factFor(member, missed);
                                     const madeUpBy = missed.madeUpBy && attendances.find((a) => a.id === missed.madeUpBy);
                                     return (
                                         <li key={event.codeId} className={`eap-row is-${state}`}>
@@ -226,8 +216,8 @@ function MemberYear({ row, roster, pending, saved, onPick, onCancel, onSave }: {
                                             {madeUpBy && (
                                                 <span className="eap-row__detail">Covered by {attendanceLabel(madeUpBy, codes)}</span>
                                             )}
-                                            {note !== undefined && (
-                                                <span className="eap-row__detail eap-muted">“{note || 'No note'}”</span>
+                                            {fact && (
+                                                <span className="eap-row__detail eap-muted">“{fact.note || 'No note'}”</span>
                                             )}
                                             <span className="eap-row__actions">
                                                 {actionsFor(missed).map((kind) => {
