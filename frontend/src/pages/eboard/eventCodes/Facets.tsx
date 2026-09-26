@@ -1,6 +1,5 @@
-import { eventType, type Tier } from '../../../lib/rubric';
+import { codeableTypes, eventType, tierLabels, tiers } from '../../../lib/rubric';
 import { filterCodes, NO_EVENT_TYPE, semesterLabel, type CodeFilters, type CodeRow } from '../../../lib/eventCodes';
-import { CODEABLE_TYPES, TIERS, TIER_LABEL } from './EventTypeSelect';
 
 type FacetsProps = {
     codes: CodeRow[];
@@ -56,18 +55,18 @@ function Facets({ codes, filters, onChange, today, semesters, open }: FacetsProp
             </fieldset>
             <fieldset>
                 <legend>Tier</legend>
-                {TIERS.map((tier: Tier) => (
+                {tiers.map((tier) => (
                     <label key={tier}>
                         <input type="checkbox" checked={filters.tiers.includes(tier)}
                             onChange={() => set({ tiers: toggle(filters.tiers, tier) })} />
-                        {TIER_LABEL[tier]}s
+                        {tierLabels[tier]}s
                         <span>{count('tiers', (code) => typeOf(code)?.tier === tier)}</span>
                     </label>
                 ))}
             </fieldset>
             <fieldset>
                 <legend>Event Type</legend>
-                {CODEABLE_TYPES.filter((type) => filters.tiers.length === 0 || filters.tiers.includes(type.tier)).map((type) => {
+                {codeableTypes.filter((type) => filters.tiers.length === 0 || filters.tiers.includes(type.tier)).map((type) => {
                     const n = count('eventTypeIds', (code) => code.eventTypeId === type.id);
                     return (
                         <label key={type.id} className={n === 0 ? 'is-zero' : ''}>

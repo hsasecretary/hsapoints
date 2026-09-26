@@ -7,6 +7,8 @@
 // the member actually redeemed.
 import { collection, documentId, getDocs, query, where } from 'firebase/firestore';
 import { db } from './firebase';
+import { eventType } from './rubric';
+import { currentSemester, fromIsoDate } from './semester';
 
 export type AttendedEvent = {
     code: string;
@@ -16,6 +18,12 @@ export type AttendedEvent = {
     semester: string;
     eventDate: string;
     voterEligible: boolean;
+    /**
+     * A code with only an Event Type: redeeming it added its VE Points to
+     * `otherPoints` (redeemCode's legacyCounters), so they're shown here but
+     * not summed again.
+     */
+    inOtherPoints: boolean;
     attended: true;
 };
 
@@ -47,25 +55,39 @@ export async function fetchAttendedEvents(eventCodes: string[] | undefined): Pro
     const events: AttendedEvent[] = [];
     for (const snapshot of snapshots) {
         for (const docSnap of snapshot.docs) {
-            const data = docSnap.data();
-            events.push({
-                code: docSnap.id.toUpperCase(),
-                event: data.event,
-                category: data.category,
-                points: data.points,
-                semester: data.semester,
-                eventDate: data.eventDate,
-                voterEligible: data.voterEligible,
-                attended: true,
-            });
+            events.push(attendedEventFromCode(docSnap.id, docSnap.data()));
         }
     }
 
     return events.sort((a, b) => new Date(b.eventDate).getTime() - new Date(a.eventDate).getTime());
 }
 
+/**
+ * One `codes` doc as an attended event. Codes made on the rebuilt Event Codes
+ * page (#70) store only an Event Type, so their points, category and Semester
+ * come from the rubric and the date. Temporary: the cut-over (#78) replaces
+ * this dashboard.
+ */
+export function attendedEventFromCode(codeId: string, data: Record<string, any>): AttendedEvent {
+    const type = data.points === undefined ? eventType(data.eventTypeId ?? '') : undefined;
+    return {
+        code: codeId.toUpperCase(),
+        event: data.event,
+        category: type ? type.label : data.category,
+        points: type ? type.vePoints : data.points,
+        semester: type ? currentSemester(fromIsoDate(data.eventDate)) : data.semester,
+        eventDate: data.eventDate,
+        voterEligible: type ? type.vePoints > 0 : data.voterEligible,
+        inOtherPoints: Boolean(type),
+        attended: true,
+    };
+}
+
 /** Voter-eligible points: the eligible events attended, plus uncategorized `otherPoints`. */
 export function sumVoterEligiblePoints(events: AttendedEvent[], otherPoints: number): number {
-    const fromEvents = events.reduce((sum, e) => (e.voterEligible ? sum + (e.points || 0) : sum), 0);
+    const fromEvents = events.reduce(
+        (sum, e) => (e.voterEligible && !e.inOtherPoints ? sum + (e.points || 0) : sum),
+        0,
+    );
     return fromEvents + (otherPoints || 0);
 }

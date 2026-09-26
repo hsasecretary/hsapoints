@@ -4,7 +4,7 @@
 // The Firestore functions take the instance so tests can run them against
 // the emulator.
 import {
-    collection, deleteField, doc, getDocs, limit, query, runTransaction, where, writeBatch, type Firestore,
+    collection, deleteField, doc, getDocs, limit, query, runTransaction, updateDoc, where, writeBatch, type Firestore,
 } from 'firebase/firestore';
 import { eventType, type Tier } from './rubric';
 import { currentSemester, fromIsoDate, toIsoDate } from './semester';
@@ -67,16 +67,26 @@ export async function createCode(db: Firestore, form: CodeForm): Promise<{ ok: t
 export async function updateCode(db: Firestore, codeId: string, edit: CodeEdit): Promise<SaveResult> {
     const error = checkDetails(edit);
     if (error) return { ok: false, error };
-    const attendance = await getDocs(query(collection(db, 'attendances'), where('codeId', '==', codeId)));
-    const batch = writeBatch(db);
-    batch.update(doc(db, 'codes', codeId), {
+    // The code first, then its Attendance. Firestore can't query inside a
+    // transaction, so this order closes the race with a check-in: one that
+    // commits after the code write copies the new values (redeemCode reads
+    // the code in its transaction, which retries if the code changed), and
+    // one that committed before it is found by the query below.
+    await updateDoc(doc(db, 'codes', codeId), {
         ...codeDetails(edit),
         graphicDate: edit.graphicDate || deleteField(),
     });
-    for (const snap of attendance.docs) {
-        batch.update(snap.ref, { eventTypeId: edit.eventTypeId, eventDate: edit.eventDate });
+    const attendance = await getDocs(query(collection(db, 'attendances'), where('codeId', '==', codeId)));
+    const stale = attendance.docs.filter((snap) =>
+        snap.data().eventTypeId !== edit.eventTypeId || snap.data().eventDate !== edit.eventDate);
+    // A batch holds at most 500 writes. If one fails, saving again finishes the move.
+    for (let i = 0; i < stale.length; i += 500) {
+        const batch = writeBatch(db);
+        for (const snap of stale.slice(i, i + 500)) {
+            batch.update(snap.ref, { eventTypeId: edit.eventTypeId, eventDate: edit.eventDate });
+        }
+        await batch.commit();
     }
-    await batch.commit();
     return { ok: true };
 }
 
