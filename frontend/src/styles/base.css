@@ -9,6 +9,13 @@ html, body {
   overflow-x: hidden;
 }
 
+/* Sticky bars must never cover the focused element (WCAG 2.4.11).
+   SiteHeader measures its own height into --site-header-height; layout.css
+   adds the phone tab bar's scroll-padding-bottom. */
+html {
+  scroll-padding-top: calc(var(--site-header-height, 72px) + 8px);
+}
+
 /* Read by screen readers, not shown. */
 .visually-hidden {
   position: absolute;

@@ -7,6 +7,8 @@ import { isHeldToCabinetRules } from './members';
 
 export type View = 'general' | 'cabinet';
 
+export const VIEWS: View[] = ['general', 'cabinet'];
+
 export const VIEW_LABELS: Record<View, string> = {
     general: 'General Member',
     cabinet: 'Cabinet Member',
@@ -24,8 +26,8 @@ export function ownView(member: Member): View {
 }
 
 /** The view to show: the picked one, if the Member may switch; else their own. */
-export function effectiveView(member: Member, picked: View | null): View {
-    return picked && canSwitchView(member) ? picked : ownView(member);
+export function effectiveView({ own, canSwitch }: { own: View; canSwitch: boolean }, picked: View | null): View {
+    return picked && canSwitch ? picked : own;
 }
 
 /** The Member as the picked view sees them, for computeStanding and the

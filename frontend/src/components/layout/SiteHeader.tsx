@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type 
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
-import { VIEW_LABELS, type View } from '../../lib/viewAs';
+import { VIEW_LABELS, VIEWS } from '../../lib/viewAs';
 import { EBOARD_TOOLS } from '../../pages/eboard/eboardTools';
 import { isNavItemActive, navItems, type NavIcon, type NavItem } from './navItems';
 import { useViewAs } from './ViewAsContext';
@@ -63,7 +63,7 @@ function SiteHeader({ signedIn, eboard, cabinetView }: SiteHeaderProps) {
                     {signedIn && (
                         <>
                             <nav className="site-header__nav" aria-label="Main">
-                                {items.map((item) => item.icon === 'eboard'
+                                {items.map((item) => item.section
                                     ? <EboardMenu key={item.to} active={isNavItemActive(item, pathname)} />
                                     : (
                                         <NavLink key={item.to} to={item.to} className="site-header__link">
@@ -179,7 +179,7 @@ function AccountMenu() {
                 {canSwitch && (
                     <fieldset className="site-header__views">
                         <legend>View as</legend>
-                        {(['general', 'cabinet'] as View[]).map((option) => (
+                        {VIEWS.map((option) => (
                             <label key={option} className="site-header__view">
                                 <input
                                     type="radio"

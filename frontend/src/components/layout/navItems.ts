@@ -1,5 +1,5 @@
 // The main nav's pages, in one fixed order for everyone (WCAG 3.2.3):
-// Dashboard · Requirements (Cabinet view) · Requests · Guide · E-Board
+// Dashboard · Requirements (Cabinet Member view) · Requests · Guide · E-Board
 // (E-Board). The desktop links and the phone tab bar both render this list.
 
 export type NavIcon = 'dashboard' | 'requirements' | 'requests' | 'guide' | 'eboard';
@@ -8,7 +8,8 @@ export type NavItem = {
     label: string;
     to: string;
     icon: NavIcon;
-    /** Also active on every page under `to` (E-Board's tools). */
+    /** Has pages under `to` (E-Board's tools): active on all of them, and a
+     *  dropdown of them on desktop. */
     section?: boolean;
 };
 

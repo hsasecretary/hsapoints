@@ -11,7 +11,7 @@ import Requests from './pages/requests/Requests';
 import Guide from './pages/guide/Guide';
 import Requirements from './pages/requirements/Requirements';
 import { ViewAsContext, type ViewAsState } from './components/layout/ViewAsContext';
-import { canSwitchView, ownView, type View } from './lib/viewAs';
+import { canSwitchView, effectiveView, ownView, type View } from './lib/viewAs';
 
 import React, { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged} from 'firebase/auth';
@@ -93,7 +93,7 @@ function App() {
         return () => unsubscribe();
     }, [userEmail]);
 
-    const view = picked && canSwitch ? picked : own;
+    const view = effectiveView({ own, canSwitch }, picked);
     const viewAs = useMemo<ViewAsState>(() => ({
         own,
         view,

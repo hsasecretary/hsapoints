@@ -32,14 +32,15 @@ describe('ownView', () => {
 
 describe('effectiveView', () => {
     it('is the Own View until another view is picked', () => {
-        expect(effectiveView(eboard, null)).toBe('general');
-        expect(effectiveView(eboard, 'cabinet')).toBe('cabinet');
-        expect(effectiveView(tester, 'general')).toBe('general');
+        const as = (member: Member) => ({ own: ownView(member), canSwitch: canSwitchView(member) });
+        expect(effectiveView(as(eboard), null)).toBe('general');
+        expect(effectiveView(as(eboard), 'cabinet')).toBe('cabinet');
+        expect(effectiveView(as(tester), 'general')).toBe('general');
     });
 
     it('ignores a pick from a Member who may not switch', () => {
-        expect(effectiveView(general, 'cabinet')).toBe('general');
-        expect(effectiveView(cabinet, 'general')).toBe('cabinet');
+        expect(effectiveView({ own: ownView(general), canSwitch: false }, 'cabinet')).toBe('general');
+        expect(effectiveView({ own: ownView(cabinet), canSwitch: false }, 'general')).toBe('cabinet');
     });
 });
 

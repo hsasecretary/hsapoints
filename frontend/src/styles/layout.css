@@ -6,12 +6,6 @@
    ≥600px: logo + title, the page links, E-Board ▾, Account ▾ (top right).
    <600px: logo + Account on top, the pages in the bottom tab bar below. */
 
-/* Sticky bars must never cover the focused element (WCAG 2.4.11).
-   SiteHeader measures its own height into --site-header-height. */
-html {
-    scroll-padding-top: calc(var(--site-header-height, 72px) + 8px);
-}
-
 .site-header {
     position: sticky;
     top: 0;
