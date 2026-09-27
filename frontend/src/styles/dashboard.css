@@ -874,6 +874,44 @@ with the my requests tab. ---------- */
     text-align: left;
 }
 
+/* My information: name, email, account type under "Hi, {name}" */
+.overview .overview__info {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px 20px;
+    margin: -8px 0 20px;
+    font-size: var(--hsa-text-sm);
+    text-align: left;
+}
+
+.overview .overview__info > div {
+    display: flex;
+    gap: 6px;
+    min-width: 0;
+}
+
+.overview .overview__info dt {
+    font-weight: 600;
+    color: var(--hsa-teal-700);
+}
+
+.overview .overview__info dt::after {
+    content: ':';
+}
+
+.overview .overview__info dd {
+    margin: 0;
+    color: var(--hsa-muted);
+    overflow-wrap: anywhere;
+}
+
+/* Phones: one pair per line */
+@media (max-width: 560px) {
+    .overview .overview__info {
+        flex-direction: column;
+    }
+}
+
 .overview .overview__loading,
 .guide .guide__loading {
     color: var(--hsa-muted);
