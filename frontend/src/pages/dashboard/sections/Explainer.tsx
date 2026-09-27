@@ -7,7 +7,10 @@ import { isHeldToCabinetRules } from '../../../lib/members';
 /** The explainer for this Member's role. */
 function Explainer({ member }: { member: Member }) {
     const mlpSpring = member.mlpCohort === 'spring';
-    if (isHeldToCabinetRules(member) || member.eboard === true) {
+    // A previewed view (withView) sets heldToCabinetRules and wins over E-Board.
+    const previewed = (member as { heldToCabinetRules?: boolean }).heldToCabinetRules;
+    const cabinetVersion = typeof previewed === 'boolean' ? previewed : isHeldToCabinetRules(member) || member.eboard === true;
+    if (cabinetVersion) {
         return (
             <div className="explainer">
                 <p className="explainer__lead">Enter the code at each event to earn points. There are three things to do:</p>

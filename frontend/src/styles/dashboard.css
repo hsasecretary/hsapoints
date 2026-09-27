@@ -1517,6 +1517,7 @@ with the my requests tab. ---------- */
     max-width: 60ch;
     line-height: 1.6;
     text-align: left;
+    text-wrap: pretty; /* no one-word last lines */
 }
 
 .explainer .explainer__lead {
