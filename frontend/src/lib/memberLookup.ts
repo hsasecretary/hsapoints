@@ -45,9 +45,13 @@ export type LookupRow = {
     requestId: string | null;
     approvedBy: string | null;
     approvedOn: string | null;
-    /** A Removed Check-in: its points are what it had earned, left out of every total. */
-    removed: { reason: string; by: string; on: string } | null;
+    /** A Removed Check-in or a revoked Point Request: its points are what it
+     *  had earned, left out of every total. */
+    takenBack: TakenBack | null;
 };
+
+/** Who took a row's points back, when and why. */
+export type TakenBack = { kind: 'removed' | 'revoked'; reason: string; by: string | null; on: string | null };
 
 export type LookupLedger = {
     /** Newest first; an Adjustment with no date goes last. */
@@ -56,7 +60,7 @@ export type LookupLedger = {
     vePoints: number;
     /** Equal to the standing's Cabinet Points. */
     cabinetPoints: number;
-    /** Rows that count: all but Removed Check-ins. */
+    /** Rows that count: all but those taken back. */
     counted: number;
     /** How many rows are Adjustments. */
     adjustments: number;
@@ -103,7 +107,7 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
             codeId: attendance.codeId ? code?.id ?? attendance.codeId.toUpperCase() : null,
             requestId: attendance.requestId ?? null,
             ...reviewOf(attendance.requestId),
-            removed: null,
+            takenBack: null,
         });
     }
     (member.adjustments ?? []).forEach((adjustment, i) => {
@@ -118,7 +122,7 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
             codeId: null,
             requestId: adjustment.requestId ?? null,
             ...(adjustment.by ? { approvedBy: adjustment.by, approvedOn: adjustment.date ?? null } : reviewOf(adjustment.requestId)),
-            removed: null,
+            takenBack: null,
         });
     });
     for (const removed of removedThisYear(member, attendances, today)) {
@@ -135,12 +139,33 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
             requestId: null,
             approvedBy: null,
             approvedOn: null,
-            removed: { reason: removed.reason, by: removed.by, on: removed.on },
+            takenBack: { kind: 'removed', reason: removed.reason, by: removed.by, on: removed.on },
+        });
+    }
+    const { start, end } = academicYear(today);
+    for (const request of requests) {
+        if (!request.revoked || !request.date || request.date < start || request.date > end) continue;
+        const type = request.adjustment ? undefined : eventType(request.eventTypeId);
+        // The same number of Attendances as it earned VE Points for (a Tabling request's hours).
+        const count = type?.vePoints ? request.revoked.points / type.vePoints : 1;
+        rows.set(`revoked:${request.id}`, {
+            id: `revoked-${request.id}`,
+            name: request.activityName || 'Point Request',
+            date: request.date,
+            eventType: type?.label ?? 'Adjustment',
+            source: request.adjustment ? 'adjustment' : 'request',
+            vePoints: request.revoked.points,
+            cabinetPoints: (type?.cabinetPoints ?? 0) * count,
+            codeId: request.codeId ? request.codeId.toUpperCase() : null,
+            requestId: request.id,
+            approvedBy: request.revoked.approvedBy,
+            approvedOn: null,
+            takenBack: { kind: 'revoked', reason: request.reviewNotes ?? '', by: request.reviewedBy ?? null, on: request.reviewedOn ?? null },
         });
     }
 
     const sorted = [...rows.values()].sort((a, b) => byDateNewestFirst(a, b) || b.id.localeCompare(a.id));
-    const counted = sorted.filter((row) => !row.removed);
+    const counted = sorted.filter((row) => !row.takenBack);
     return {
         rows: sorted,
         counted: counted.length,

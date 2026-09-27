@@ -12,7 +12,7 @@ import { auth, db } from '../../lib/firebase';
 import type { Attendance, Code, Standing } from '../../lib/computeStanding';
 import {
     checkInRemovalEffect, lookupLedger, lookupRequests, lookupSummary, missedEventRows, MISSED_STATE_LABEL, SOURCE_LABEL,
-    type LookupLedger, type LookupRequest, type LookupRow, type LookupSummary, type RemovalEffect, type StandingFacts,
+    type LookupLedger, type LookupRequest, type LookupRow, type LookupSummary, type RemovalEffect, type StandingFacts, type TakenBack,
 } from '../../lib/memberLookup';
 import { roleLine } from '../../lib/members';
 import { displayName } from '../../lib/nameSearch';
@@ -218,13 +218,16 @@ function CabinetDetail({ email, standing, codes, attendances, summary }: {
     );
 }
 
+const TAKEN_BACK_LABEL: Record<TakenBack['kind'], string> = { removed: 'Removed Check-in', revoked: 'Revoked Point Request' };
+
 type PointsFilter = 'all' | 'codes' | 'requests' | 'adjustments';
 
 const FILTERS: { value: PointsFilter; label: string; keep: (row: LookupRow) => boolean }[] = [
     { value: 'all', label: 'All', keep: () => true },
     { value: 'codes', label: 'Codes', keep: (row) => Boolean(row.codeId) },
     { value: 'requests', label: 'Point Requests', keep: (row) => row.source === 'request' || Boolean(row.requestId) },
-    { value: 'adjustments', label: 'Adjustments', keep: (row) => row.source === 'adjustment' },
+    // Every change E-Board made by hand: Adjustments, Removed Check-ins and revoked requests.
+    { value: 'adjustments', label: 'Adjustments', keep: (row) => row.source === 'adjustment' || Boolean(row.takenBack) },
 ];
 
 function Points({ ledger, cabinet, email, standingFacts }: { ledger: LookupLedger; cabinet: boolean; email: string; standingFacts: StandingFacts }) {
@@ -269,24 +272,24 @@ function Points({ ledger, cabinet, email, standingFacts }: { ledger: LookupLedge
             {rows.length === 0 ? <p className="ulk-muted">{filter === 'all' ? 'No points this school year yet.' : 'Nothing here this school year.'}</p> : (
                 <ul className="ulk-list">
                     {rows.map((row) => (
-                        <li key={row.id} className={`ulk-row${row.removed ? ' is-removed' : ''}`}>
+                        <li key={row.id} className={`ulk-row${row.takenBack ? ' is-taken-back' : ''}`}>
                             <span className="ulk-row__date">{dateText(row.date)}</span>
                             <span className="ulk-row__name">
-                                {row.removed ? <s>{row.name}</s> : row.name}
+                                {row.takenBack ? <s>{row.name}</s> : row.name}
                                 {row.codeId && <code className="ulk-code">{row.codeId}</code>}
                                 <span className="ulk-row__detail">
-                                    <span className={`ulk-tag ulk-tag--${row.removed ? 'removed' : row.source}`}>{row.removed ? 'Removed Check-in' : SOURCE_LABEL[row.source]}</span>
+                                    <span className={`ulk-tag ulk-tag--${row.takenBack ? 'taken-back' : row.source}`}>{row.takenBack ? TAKEN_BACK_LABEL[row.takenBack.kind] : SOURCE_LABEL[row.source]}</span>
                                     {row.source !== 'adjustment' && ` ${row.eventType}${row.hours ? `, ${row.hours} hours` : ''}`}
                                     {row.approvedBy && ` · ${row.vePoints < 0 ? 'Taken away' : 'Approved'} by ${row.approvedBy}${row.approvedOn ? `, ${shortDate(row.approvedOn)}` : ''}`}
-                                    {row.removed && ` · Removed by ${row.removed.by}, ${shortDate(row.removed.on)}`}
+                                    {row.takenBack && ` · ${row.takenBack.kind === 'removed' ? 'Removed' : 'Revoked'}${row.takenBack.by ? ` by ${row.takenBack.by}` : ''}${row.takenBack.on ? `, ${shortDate(row.takenBack.on)}` : ''}`}
                                 </span>
-                                {row.removed && <span className="ulk-row__detail ulk-note">“{row.removed.reason}”</span>}
+                                {row.takenBack?.reason && <span className="ulk-row__detail ulk-note">“{row.takenBack.reason}”</span>}
                             </span>
                             <span className="ulk-row__end ulk-num">
-                                {row.removed ? <s>+{row.vePoints} VE</s> : <>{row.vePoints > 0 ? '+' : ''}{row.vePoints} VE</>}
-                                {cabinet && <small>{row.removed ? <s>{row.cabinetPoints} Cabinet</s> : `${row.cabinetPoints} Cabinet`}</small>}
+                                {row.takenBack ? <s>+{row.vePoints} VE</s> : <>{row.vePoints > 0 ? '+' : ''}{row.vePoints} VE</>}
+                                {cabinet && <small>{row.takenBack ? <s>{row.cabinetPoints} Cabinet</s> : `${row.cabinetPoints} Cabinet`}</small>}
                             </span>
-                            {removing && row.source === 'code' && !row.removed && (
+                            {removing && row.source === 'code' && !row.takenBack && (
                                 <div className="ulk-row__form">
                                     <RemoveCheckInForm email={email} row={row} cabinet={cabinet} standingFacts={standingFacts} onRemoved={setMessage} />
                                 </div>

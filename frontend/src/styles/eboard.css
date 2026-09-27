@@ -473,8 +473,9 @@
 .ulk .ulk-switch { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: var(--hsa-text-sm); font-weight: 600; cursor: pointer; }
 .ulk .ulk-switch input { width: 18px; height: 18px; margin: 0; accent-color: var(--hsa-danger); }
 .ulk .ulk-points-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 16px; }
-.ulk .ulk-row.is-removed { color: var(--hsa-muted); border-left-color: var(--hsa-danger-border); }
-.ulk .ulk-tag--removed { background: var(--hsa-danger-bg); border-color: var(--hsa-danger-border); color: var(--hsa-danger-strong); }
+/* A Removed Check-in or revoked Point Request: crossed out, counted nowhere. */
+.ulk .ulk-row.is-taken-back { color: var(--hsa-muted); border-left-color: var(--hsa-danger-border); }
+.ulk .ulk-tag--taken-back { background: var(--hsa-danger-bg); border-color: var(--hsa-danger-border); color: var(--hsa-danger-strong); }
 .ulk .ulk-row__form { grid-column: 2 / -1; margin-top: 6px; }
 .ulk .ulk-row__form textarea { max-width: 420px; }
 

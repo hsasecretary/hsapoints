@@ -120,8 +120,8 @@ describe('Removed Check-ins on the ledger', () => {
         const member: Member = { ...generalMember, removedCheckIns: { GBM2: removedGbm2 } };
         const ledger = lookupLedger({ member, attendances: [attended(gbm1)], codes: [gbm1, gbm2], requests: [], today: TODAY });
 
-        expect(ledger.rows.map((row) => [row.name, row.codeId, row.vePoints, row.removed])).toEqual([
-            ['GBM 2', 'GBM2', 2, { reason: "Used a friend's code", by: 'vp@ufl.edu', on: '2026-09-20' }],
+        expect(ledger.rows.map((row) => [row.name, row.codeId, row.vePoints, row.takenBack])).toEqual([
+            ['GBM 2', 'GBM2', 2, { kind: 'removed', reason: "Used a friend's code", by: 'vp@ufl.edu', on: '2026-09-20' }],
             ['GBM 1', 'GBM1', 2, null],
         ]);
         expect(ledger.vePoints).toBe(2);
@@ -140,7 +140,33 @@ describe('Removed Check-ins on the ledger', () => {
         const member: Member = { ...generalMember, removedCheckIns: { GBM2: removedGbm2, OLD: lastYear } };
         const rows = lookupLedger({ member, attendances: [{ ...attended(gbm2, 'request'), requestId: 'r9' }], codes: [gbm2], requests: [], today: TODAY }).rows;
 
-        expect(rows.map((row) => [row.name, row.removed])).toEqual([['GBM 2', null]]);
+        expect(rows.map((row) => [row.name, row.takenBack])).toEqual([['GBM 2', null]]);
+    });
+});
+
+describe('revoked Point Requests on the ledger', () => {
+    const revoked: MemberRequest = {
+        id: 'r5', activityName: 'Empanada Sale', date: '2026-09-14', status: 'denied', codeId: 'EMP1', eventTypeId: 'hsa-fundraising',
+        reviewedBy: 'pres@ufl.edu', reviewedOn: '2026-09-21', reviewNotes: 'Approved by mistake', revoked: { approvedBy: 'vp@ufl.edu', points: 2 },
+    };
+
+    it('lists one crossed out with what it had earned, who approved and who revoked it, left out of the total', () => {
+        const ledger = lookupLedger({ member: cabinetMember, attendances: [attended(gbm1)], codes: [gbm1, empanadas], requests: [revoked], today: TODAY });
+
+        expect(ledger.rows[0]).toMatchObject({
+            name: 'Empanada Sale', source: 'request', codeId: 'EMP1', requestId: 'r5', vePoints: 2, cabinetPoints: 1, approvedBy: 'vp@ufl.edu',
+            takenBack: { kind: 'revoked', reason: 'Approved by mistake', by: 'pres@ufl.edu', on: '2026-09-21' },
+        });
+        expect(ledger.vePoints).toBe(2);
+        expect(ledger.codes).toEqual({ redeemed: 1, byRequest: 0 });
+    });
+
+    it('gives a revoked Adjustment no Cabinet Points, and skips one from another school year', () => {
+        const adjustment: MemberRequest = { ...revoked, id: 'r6', codeId: null, eventTypeId: null, adjustment: { points: 3, note: 'Gala' }, revoked: { approvedBy: null, points: 3 } };
+        const lastYear: MemberRequest = { ...revoked, id: 'r7', date: '2025-09-14' };
+        const rows = lookupLedger({ member: cabinetMember, attendances: [], codes: [], requests: [adjustment, lastYear], today: TODAY }).rows;
+
+        expect(rows.map((row) => [row.requestId, row.source, row.vePoints, row.cabinetPoints])).toEqual([['r6', 'adjustment', 3, 0]]);
     });
 });
 
