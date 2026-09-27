@@ -403,7 +403,7 @@
 .ulk .ulk-stat__value--pair { display: flex; flex-direction: column; font-size: var(--hsa-text-lg); }
 .ulk .ulk-stat__note { font-size: var(--hsa-text-sm); color: var(--hsa-muted); }
 .ulk .is-met .ulk-stat__note { color: var(--hsa-success-strong); font-weight: 600; }
-.ulk .is-risk .ulk-stat__note { color: var(--hsa-danger-strong); font-weight: 700; }
+.ulk .ulk-stat__note--risk { color: var(--hsa-danger-strong); font-weight: 700; }
 .ulk .ulk-stat__pending { font-size: var(--hsa-text-sm); margin-top: 4px; }
 
 .ulk .ulk-panel { background: var(--hsa-surface); border: 1px solid var(--hsa-border); border-radius: 10px; padding: 0 16px; }
@@ -426,7 +426,8 @@
 }
 .ulk .ulk-row.is-strike { border-left-color: var(--hsa-danger); background: linear-gradient(90deg, var(--hsa-danger-bg), transparent 70%); }
 .ulk .ulk-row.is-open { border-left-color: #f59e0b; }
-.ulk .ulk-row.is-closed { color: var(--hsa-muted); }
+.ulk .ulk-row.is-closed, .ulk .ulk-row.is-madeup { color: var(--hsa-muted); }
+.ulk .ulk-row.is-madeup { border-left-color: var(--hsa-success); }
 .ulk .ulk-row.is-pending { border-left-color: #f59e0b; }
 .ulk .ulk-row--total { font-weight: 800; border-top: 2px solid var(--hsa-ink-soft); }
 .ulk .ulk-row__date { font-variant-numeric: tabular-nums; font-size: var(--hsa-text-sm); color: var(--hsa-muted); white-space: nowrap; }
@@ -445,6 +446,7 @@
 .ulk .ulk-row__name > .ulk-tag { margin-left: 6px; vertical-align: middle; }
 .ulk .ulk-tag--code { background: var(--hsa-teal-100); border-color: var(--hsa-teal-400); color: var(--hsa-teal-800); }
 .ulk .ulk-tag--request { background: var(--hsa-success-bg); border-color: var(--hsa-success-border); color: var(--hsa-success-strong); }
+.ulk .ulk-tag--eboard { background: var(--hsa-surface-sunken); border-color: var(--hsa-ink-soft); color: var(--hsa-ink); }
 .ulk .ulk-tag--adjustment, .ulk .ulk-tag--excused { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
 
 .ulk .ulk-status { padding: 1px 10px; border-radius: 999px; font-size: var(--hsa-text-xs); font-weight: 700; border: 1px solid; }

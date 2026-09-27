@@ -8,7 +8,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
-import { lookupLedger, lookupRequests, lookupSummary, missedEventRows, SOURCE_LABEL, type LookupSummary } from '../../lib/memberLookup';
+import type { Attendance, Code, Standing } from '../../lib/computeStanding';
+import {
+    lookupLedger, lookupRequests, lookupSummary, missedEventRows, MISSED_STATE_LABEL, SOURCE_LABEL,
+    type LookupLedger, type LookupRequest, type LookupSummary,
+} from '../../lib/memberLookup';
 import { roleLine } from '../../lib/members';
 import { displayName } from '../../lib/nameSearch';
 import { eventType } from '../../lib/rubric';
@@ -29,8 +33,12 @@ const RULES_TEXT: Record<LookupSummary['rules'], string> = {
     exempt: 'E-Board: exempt from Cabinet requirements',
 };
 
+function plural(n: number, word: string) {
+    return `${n} ${word}${n === 1 ? '' : 's'}`;
+}
+
 function pts(n: number) {
-    return `${n} point${n === 1 ? '' : 's'}`;
+    return plural(n, 'point');
 }
 
 function dateText(isoDate: string) {
@@ -95,9 +103,9 @@ function MemberDetail({ member: profile }: { member: LookupMember }) {
 
             {loading || !summary ? <p className="ulk-muted">Loading points…</p> : (
                 <>
-                    <Standing summary={summary} />
+                    <StandingStrip summary={summary} />
                     {summary.rules === 'cabinet' && (
-                        <CabinetDetail email={profile.email} standing={standing} codes={codes} summary={summary} />
+                        <CabinetDetail email={profile.email} standing={standing} codes={codes} attendances={attendances} summary={summary} />
                     )}
                     <Points ledger={ledger} cabinet={summary.rules === 'cabinet'} />
                     <Requests rows={requestRows} />
@@ -107,7 +115,7 @@ function MemberDetail({ member: profile }: { member: LookupMember }) {
     );
 }
 
-function Standing({ summary }: { summary: LookupSummary }) {
+function StandingStrip({ summary }: { summary: LookupSummary }) {
     const left = summary.veGoal - summary.vePoints;
     return (
         <section className="ulk-strip" aria-label="Standing this school year">
@@ -117,7 +125,7 @@ function Standing({ summary }: { summary: LookupSummary }) {
                 <span className="ulk-stat__note">{summary.veReached ? 'Voter eligible' : `${pts(left)} to go`}</span>
                 {summary.pendingCount > 0 && (
                     <a className="ulk-stat__pending" href="#ulk-requests" title="Pending Point Requests are not counted until approved">
-                        +{summary.pendingPoints} pending ({summary.pendingCount} request{summary.pendingCount === 1 ? '' : 's'})
+                        +{summary.pendingPoints} pending ({plural(summary.pendingCount, 'request')})
                     </a>
                 )}
             </div>
@@ -133,9 +141,8 @@ function Standing({ summary }: { summary: LookupSummary }) {
                     <div className={`ulk-stat ${summary.atRisk ? 'is-risk' : ''}`}>
                         <span className="ulk-stat__label">Open Strikes</span>
                         <span className="ulk-stat__value">{summary.openStrikes}</span>
-                        <span className="ulk-stat__note">
-                            {summary.atRisk ? 'At risk of probation' : `${summary.missedOwed} Missed Event${summary.missedOwed === 1 ? '' : 's'} to make up`}
-                        </span>
+                        {summary.atRisk && <span className="ulk-stat__note ulk-stat__note--risk">At risk of probation</span>}
+                        <span className="ulk-stat__note">{plural(summary.missedOwed, 'Missed Event')} to make up</span>
                     </div>
                     <div className="ulk-stat">
                         <span className="ulk-stat__label">Semester Requirements</span>
@@ -147,17 +154,25 @@ function Standing({ summary }: { summary: LookupSummary }) {
                     </div>
                 </>
             )}
+            {summary.rules === 'exempt' && (
+                <div className="ulk-stat">
+                    <span className="ulk-stat__label">Cabinet requirements</span>
+                    <span className="ulk-stat__value">Exempt</span>
+                    <span className="ulk-stat__note">E-Board is not held to Core Events, Semester Requirements or Strikes</span>
+                </div>
+            )}
         </section>
     );
 }
 
-function CabinetDetail({ email, standing, codes, summary }: {
+function CabinetDetail({ email, standing, codes, attendances, summary }: {
     email: string;
-    standing: NonNullable<ReturnType<typeof useMemberStanding>['standing']>;
-    codes: ReturnType<typeof useMemberStanding>['codes'];
+    standing: Standing;
+    codes: Code[];
+    attendances: Attendance[];
     summary: LookupSummary;
 }) {
-    const missed = missedEventRows(standing, codes);
+    const missed = missedEventRows(standing, codes, attendances);
     const unmet = (['fall', 'spring'] as const).map((semester) => ({
         semester,
         rows: standing.semesterRequirements[semester].filter((req) => !req.met),
@@ -166,7 +181,9 @@ function CabinetDetail({ email, standing, codes, summary }: {
         <details className="ulk-panel" open={summary.missedOwed > 0}>
             <summary>
                 <h4>Missed Events and Semester Requirements</h4>
-                <span className="ulk-muted">{summary.missedOwed} to make up, {missed.length - summary.missedOwed} made up or closed</span>
+                <span className="ulk-muted">
+                    {summary.missedOwed} to make up of {missed.length}: {summary.missedExcused} excused, {summary.missedUnexcused} unexcused
+                </span>
             </summary>
             <p className="ulk-panel__link">
                 <Link to={`/eboard/excuse-absence?member=${encodeURIComponent(email)}`}>Open in Excuse Absence</Link> to excuse, remove a Strike or close a Missed Event.
@@ -174,13 +191,14 @@ function CabinetDetail({ email, standing, codes, summary }: {
             {missed.length === 0 ? <p className="ulk-muted">No Missed Events this year.</p> : (
                 <ul className="ulk-list">
                     {missed.map((row) => (
-                        <li key={row.codeId} className={`ulk-row is-${row.strike ? 'strike' : row.open ? 'open' : 'closed'}`}>
+                        <li key={row.codeId} className={`ulk-row is-${row.state}`}>
                             <span className="ulk-row__date">{shortDate(row.eventDate)}</span>
                             <span className="ulk-row__name">
                                 {row.name}
                                 {row.excused && <span className="ulk-tag ulk-tag--excused">Excused</span>}
+                                {row.madeUpBy && <span className="ulk-row__detail">Made up by {row.madeUpBy.name}, {shortDate(row.madeUpBy.date)}</span>}
                             </span>
-                            <span className="ulk-row__end">{row.state}</span>
+                            <span className="ulk-row__end">{MISSED_STATE_LABEL[row.state]}</span>
                         </li>
                     ))}
                 </ul>
@@ -195,7 +213,7 @@ function CabinetDetail({ email, standing, codes, summary }: {
     );
 }
 
-function Points({ ledger, cabinet }: { ledger: ReturnType<typeof lookupLedger>; cabinet: boolean }) {
+function Points({ ledger, cabinet }: { ledger: LookupLedger; cabinet: boolean }) {
     return (
         <details className="ulk-panel" open>
             <summary>
@@ -232,7 +250,7 @@ function Points({ ledger, cabinet }: { ledger: ReturnType<typeof lookupLedger>; 
                         </li>
                     </ul>
                     {ledger.adjustments > 0 && (
-                        <p className="ulk-muted">Includes {ledger.adjustments} Adjustment{ledger.adjustments === 1 ? '' : 's'} from E-Board.</p>
+                        <p className="ulk-muted">Includes {plural(ledger.adjustments, 'Adjustment')} from E-Board.</p>
                     )}
                 </>
             )}
@@ -240,7 +258,7 @@ function Points({ ledger, cabinet }: { ledger: ReturnType<typeof lookupLedger>; 
     );
 }
 
-function Requests({ rows }: { rows: ReturnType<typeof lookupRequests> }) {
+function Requests({ rows }: { rows: LookupRequest[] }) {
     const pending = rows.filter((row) => row.status === 'pending').length;
     return (
         <details className="ulk-panel" id="ulk-requests" open>

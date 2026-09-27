@@ -155,6 +155,8 @@ describe('lookupSummary', () => {
             openStrikes: 1,
             atRisk: false,
             missedOwed: 2,
+            missedExcused: 1,
+            missedUnexcused: 1,
             requirements: { fall: { met: 1, total: 9 }, spring: { met: 0, total: 9 } },
         });
     });
@@ -164,13 +166,15 @@ describe('missedEventRows', () => {
     it('lists open Missed Events first, then made up and closed, each in words', () => {
         const codes = [gbm1, cabThu, gbm2];
         const member: Member = { ...cabinetMember, excusals: [{ codeId: 'CT1' }], missedEventOverrides: [{ codeId: 'GBM2' }] };
-        const standing = standingOf(member, [attended(empanadas), attended(code('EMP2', 'hsa-fundraising', '2026-09-09'))], [...codes, empanadas]);
-        const rows = missedEventRows(standing, codes);
+        const emp2 = code('EMP2', 'hsa-fundraising', '2026-09-09', 'Bake Sale');
+        const attendances = [attended(empanadas), attended(emp2)];
+        const standing = standingOf(member, attendances, [...codes, empanadas, emp2]);
+        const rows = missedEventRows(standing, [...codes, emp2], attendances);
 
-        expect(rows.map((row) => [row.name, row.state, row.excused])).toEqual([
-            ['Cabinet Thursday 1', 'Missed, needs a Make-up', true],
-            ['GBM 1', 'Made up', false],
-            ['GBM 2', 'Closed by E-Board', false],
+        expect(rows.map((row) => [row.name, row.state, row.excused, row.madeUpBy?.name ?? null])).toEqual([
+            ['Cabinet Thursday 1', 'open', true, null],
+            ['GBM 1', 'madeup', false, 'Bake Sale'],
+            ['GBM 2', 'closed', false, null],
         ]);
     });
 });

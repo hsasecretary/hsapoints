@@ -8,6 +8,16 @@ import type { MemberRequest } from './pointsOverview';
 import { eventType } from './rubric';
 import { academicYear } from './semester';
 
+/** Codes by upper-cased ID: a few older rows were stored in mixed case. */
+function codesById(codes: Code[]): Map<string, Code> {
+    return new Map(codes.map((row) => [row.id.toUpperCase(), row]));
+}
+
+/** Newest first; a row with no date goes last. */
+function byDateNewestFirst(a: { date: string }, b: { date: string }): number {
+    return (b.date || '0000').localeCompare(a.date || '0000');
+}
+
 export type PointSource = Attendance['source'] | 'adjustment';
 
 export const SOURCE_LABEL: Record<PointSource, string> = {
@@ -52,7 +62,7 @@ export function lookupLedger({ member, attendances, codes, requests }: {
     codes: Code[];
     requests: MemberRequest[];
 }): LookupLedger {
-    const codeById = new Map(codes.map((row) => [row.id.toUpperCase(), row]));
+    const codeById = codesById(codes);
     const requestById = new Map(requests.map((request) => [request.id, request]));
     const reviewOf = (requestId: string | undefined) => {
         const request = requestId ? requestById.get(requestId) : undefined;
@@ -99,8 +109,7 @@ export function lookupLedger({ member, attendances, codes, requests }: {
         });
     });
 
-    const sorted = [...rows.values()].sort((a, b) =>
-        (b.date || '0000').localeCompare(a.date || '0000') || b.id.localeCompare(a.id));
+    const sorted = [...rows.values()].sort((a, b) => byDateNewestFirst(a, b) || b.id.localeCompare(a.id));
     return {
         rows: sorted,
         vePoints: sorted.reduce((sum, row) => sum + row.vePoints, 0),
@@ -157,7 +166,7 @@ export function lookupRequests(requests: MemberRequest[], today: string): Lookup
             };
         })
         .sort((a, b) => Number(b.status === 'pending') - Number(a.status === 'pending')
-            || (b.date || '0000').localeCompare(a.date || '0000') || a.id.localeCompare(b.id));
+            || byDateNewestFirst(a, b) || a.id.localeCompare(b.id));
 }
 
 export type LookupSummary = {
@@ -175,6 +184,9 @@ export type LookupSummary = {
     atRisk: boolean;
     /** Missed Events still needing a Make-up. */
     missedOwed: number;
+    /** Every Missed Event this year, split by whether E-Board excused it. */
+    missedExcused: number;
+    missedUnexcused: number;
     /** Semester Requirements met out of those not waived. */
     requirements: Record<Semester, { met: number; total: number }>;
 };
@@ -197,41 +209,57 @@ export function lookupSummary(member: Member, standing: Standing, requests: Memb
         openStrikes: standing.openStrikes,
         atRisk: standing.openStrikes >= AT_RISK_STRIKES,
         missedOwed: standing.missedEvents.filter((missed) => missed.owed).length,
+        missedExcused: standing.missedEvents.filter((missed) => missed.excused).length,
+        missedUnexcused: standing.missedEvents.filter((missed) => !missed.excused).length,
         requirements: { fall: requirementsOf('fall'), spring: requirementsOf('spring') },
     };
 }
+
+export type MissedState = 'strike' | 'open' | 'madeup' | 'closed';
+
+/** In display order: open Strikes, other open misses, Make-ups, then closed. */
+export const MISSED_STATE_LABEL: Record<MissedState, string> = {
+    strike: 'Missed, Strike',
+    open: 'Missed, needs a Make-up',
+    madeup: 'Made up',
+    closed: 'Closed by E-Board',
+};
+
+const STATE_ORDER = Object.keys(MISSED_STATE_LABEL) as MissedState[];
 
 export type MissedEventRow = {
     codeId: string;
     name: string;
     eventDate: string;
-    state: 'Missed, Strike' | 'Missed, needs a Make-up' | 'Made up' | 'Closed by E-Board';
-    /** Still needs a Make-up. */
-    open: boolean;
-    strike: boolean;
+    state: MissedState;
     excused: boolean;
+    /** The event that made it up, or null. */
+    madeUpBy: { name: string; date: string } | null;
 };
 
-const STATE_ORDER: MissedEventRow['state'][] = ['Missed, Strike', 'Missed, needs a Make-up', 'Made up', 'Closed by E-Board'];
-
-function missedState(missed: MissedEvent): MissedEventRow['state'] {
-    if (missed.overridden) return 'Closed by E-Board';
-    if (missed.madeUpBy) return 'Made up';
-    return missed.strike ? 'Missed, Strike' : 'Missed, needs a Make-up';
+function missedState(missed: MissedEvent): MissedState {
+    if (missed.overridden) return 'closed';
+    if (missed.madeUpBy) return 'madeup';
+    return missed.strike ? 'strike' : 'open';
 }
 
-/** A Cabinet Member's Missed Events: open ones first (Strikes before excused), then made up, then closed; oldest first within each. */
-export function missedEventRows(standing: Standing, codes: Code[]): MissedEventRow[] {
-    const codeById = new Map(codes.map((row) => [row.id.toUpperCase(), row]));
+/** A Cabinet Member's Missed Events: open ones first (Strikes before the rest), then Make-ups, then closed; oldest first within each. */
+export function missedEventRows(standing: Standing, codes: Code[], attendances: Attendance[]): MissedEventRow[] {
+    const codeById = codesById(codes);
+    const attendanceById = new Map(attendances.map((attendance) => [attendance.id, attendance]));
+    const nameOf = (codeId: string | undefined, eventTypeId: string) =>
+        (codeId && codeById.get(codeId.toUpperCase())?.event) || eventType(eventTypeId)?.label || codeId || 'Event';
     return standing.missedEvents
-        .map((missed) => ({
-            codeId: missed.codeId,
-            name: codeById.get(missed.codeId.toUpperCase())?.event || eventType(missed.eventTypeId)?.label || missed.codeId,
-            eventDate: missed.eventDate,
-            state: missedState(missed),
-            open: missed.owed,
-            strike: missed.strike,
-            excused: missed.excused,
-        }))
+        .map((missed) => {
+            const cover = missed.madeUpBy ? attendanceById.get(missed.madeUpBy) : undefined;
+            return {
+                codeId: missed.codeId,
+                name: nameOf(missed.codeId, missed.eventTypeId),
+                eventDate: missed.eventDate,
+                state: missedState(missed),
+                excused: missed.excused,
+                madeUpBy: cover ? { name: nameOf(cover.codeId, cover.eventTypeId), date: cover.eventDate } : null,
+            };
+        })
         .sort((a, b) => STATE_ORDER.indexOf(a.state) - STATE_ORDER.indexOf(b.state) || a.eventDate.localeCompare(b.eventDate));
 }

@@ -36,9 +36,10 @@ function strikesText(count: number) {
 
 function ExcuseAbsence() {
     const roster = useRoster();
-    // ?member={email} (from User Lookup) opens that Member.
-    const [params] = useSearchParams();
-    const [email, setEmail] = useState<string | null>(params.get('member')?.toLowerCase() ?? null);
+    // The open Member lives in ?member={email}, so User Lookup can link straight to one.
+    const [params, setParams] = useSearchParams();
+    const email = params.get('member')?.toLowerCase() ?? null;
+    const setEmail = (next: string) => setParams({ member: next });
     const [pending, setPending] = useState<{ kind: AbsenceActionKind; codeId: string } | null>(null);
     const [saved, setSaved] = useState('');
 
