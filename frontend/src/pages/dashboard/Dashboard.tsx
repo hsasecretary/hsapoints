@@ -1,5 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
+import { isGeneralMember } from '../../lib/members';
 import { pointsOverview } from '../../lib/pointsOverview';
+import { formatAccountType } from '../../lib/roles';
 import Explainer from '../guide/Explainer';
 import EventCodeForm from './sections/EventCodeForm';
 import MakeUpList from './sections/MakeUpList';
@@ -11,6 +13,7 @@ const BUBBLES = ['points', 'how'] as const;
 type Bubble = (typeof BUBBLES)[number];
 
 // /dashboard, the Overview (#57 as revised, #59 variant A), top to bottom:
+//   My information  — name, email, account type (as the old My Information card)
 //   EventCodeForm   — the large code box
 //   PointsSummary   — Total Points toward the goal, events attended, pending requests
 //   MakeUpList      — Cabinet view only: Missed Events to make up
@@ -28,12 +31,26 @@ function Dashboard({ email }: { email: string }) {
         setParams(next, { replace: true });
     };
 
-    const firstName = (member as { firstName?: string } | null)?.firstName;
+    const profile = member as { firstName?: string; lastName?: string; cabinet?: string; eboard?: boolean; involvement?: string } | null;
+    const firstName = profile?.firstName;
     const overview = standing ? pointsOverview({ member, standing, attendances, codes, requests }) : null;
 
     return (
         <div className="overview">
             <h1 className="overview__title">{firstName ? `Hi, ${firstName}` : 'Dashboard'}</h1>
+            {profile && (
+                <dl className="overview__info" aria-label="My information">
+                    <div><dt>Name</dt><dd>{[profile.firstName, profile.lastName].filter(Boolean).join(' ') || 'N/A'}</dd></div>
+                    <div><dt>Email</dt><dd>{email}</dd></div>
+                    <div>
+                        <dt>Account Type</dt>
+                        <dd>
+                            {formatAccountType(profile.cabinet)}
+                            {!isGeneralMember(profile) && ` (E-Board: ${profile.eboard ? 'Yes' : 'No'})`}
+                        </dd>
+                    </div>
+                </dl>
+            )}
             <div className="overview__code"><EventCodeForm /></div>
 
             {loading ? <p className="overview__loading" role="status">Loading your points…</p> : (
