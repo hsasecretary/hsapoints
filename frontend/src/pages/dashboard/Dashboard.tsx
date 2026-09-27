@@ -1,12 +1,13 @@
 import { useSearchParams } from 'react-router-dom';
+import { useViewOverride } from '../../components/layout/ViewAsContext';
 import { isGeneralMember } from '../../lib/members';
 import { CABINET_POINTS_GOAL } from '../../lib/computeStanding';
 import { pointsOverview } from '../../lib/pointsOverview';
 import { requirementsBoard } from '../../lib/requirementsBoard';
 import { formatAccountType } from '../../lib/roles';
-import Explainer from '../guide/Explainer';
 import CabinetGoal from './sections/CabinetGoal';
 import EventCodeForm from './sections/EventCodeForm';
+import Explainer from './sections/Explainer';
 import MakeUpList from './sections/MakeUpList';
 import PointsAndEvents from './sections/PointsAndEvents';
 import PointsSummary from './sections/PointsSummary';
@@ -20,13 +21,14 @@ type Bubble = (typeof BUBBLES)[number];
 //   EventCodeForm   — the large code box
 //   PointsSummary   — Total Points toward the goal, events attended, pending requests
 //   CabinetGoal     — Cabinet view only: Cabinet Points toward 20
-//   MakeUpList      — Cabinet view only: Missed Events to make up
 //   bubbles         — "Points & events" (PointsAndEvents) and "How it works"
 //                     (Explainer), each opening in place (?open=points|how); in
-//                     the Cabinet view "By category" is the Event Type table
+//                     the Cabinet view "By category" is the Event Type table.
+//                     Above the make-up list so they're seen.
+//   MakeUpList      — Cabinet view only: Missed Events to make up
 // Every number comes from computeStanding via useMemberStanding.
 function Dashboard({ email }: { email: string }) {
-    const { loading, member, attendances, codes, requests, pending, standing, today } = useMemberStanding(email);
+    const { loading, member, attendances, codes, requests, pending, standing, today } = useMemberStanding(email, useViewOverride());
     const [params, setParams] = useSearchParams();
     const open = BUBBLES.find((bubble) => bubble === params.get('open')) ?? null;
 
@@ -63,9 +65,6 @@ function Dashboard({ email }: { email: string }) {
                 <>
                     <PointsSummary overview={overview} />
                     {standing.heldToCabinetRules && <CabinetGoal points={standing.cabinetPoints} goal={CABINET_POINTS_GOAL} />}
-                    {standing.heldToCabinetRules && (
-                        <MakeUpList standing={standing} codes={codes} pendingPicks={pendingMakeups(pending)} />
-                    )}
 
                     <div className="ov-bubbles">
                         <button type="button" className={open === 'points' ? 'is-on' : ''} aria-expanded={open === 'points'}
@@ -86,6 +85,9 @@ function Dashboard({ email }: { email: string }) {
                         <section id="ov-panel-how" className="ov-panel" aria-label="How it works">
                             <Explainer member={member} />
                         </section>
+                    )}
+                    {standing.heldToCabinetRules && (
+                        <MakeUpList standing={standing} codes={codes} pendingPicks={pendingMakeups(pending)} />
                     )}
                 </>
             )}

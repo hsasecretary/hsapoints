@@ -2,6 +2,60 @@
    E-Board page (/eboard)
    ======================================================================== */
 
+/* ---- E-Board tools landing page (EboardHome.tsx) ---------------------- */
+
+.eboard-home {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 28px 16px 40px;
+}
+
+.eboard-home__title {
+    margin: 0 0 16px;
+    color: var(--hsa-teal-700);
+    font-size: var(--hsa-text-2xl);
+}
+
+.eboard-home__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.eboard-home__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 56px;
+    padding: 0 18px;
+    background: var(--hsa-surface);
+    border: 1px solid var(--hsa-border);
+    border-radius: 10px;
+    color: var(--hsa-ink);
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.eboard-home__link:hover {
+    border-color: var(--hsa-teal-600);
+    background: var(--hsa-teal-100);
+}
+
+.eboard-home__link:focus-visible {
+    outline: 3px solid var(--hsa-teal-600);
+    outline-offset: 2px;
+}
+
+.eboard-home__link span {
+    color: var(--hsa-teal-600);
+    font-size: 22px;
+}
+
 /* ---- Pending cabinet approvals  (ApprovedCabinet.tsx) ----------------------------------- */
 
 #approvedCabinetContainer.approvals {

@@ -7,6 +7,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { useViewOverride } from '../../../components/layout/ViewAsContext';
 import { auth, db } from '../../../lib/firebase';
 import { AT_RISK_STRIKES } from '../../../lib/computeStanding';
 import {
@@ -31,7 +32,7 @@ const NOT_LISTED_CHOICE: TypeChoice = { id: NOT_LISTED, label: 'Not listed', eve
 
 function PointRequestForm() {
     const email = auth.currentUser?.email?.toLowerCase();
-    const { loading, member, attendances, codes, pending, standing, today } = useMemberStanding(email);
+    const { loading, member, attendances, codes, pending, standing, today } = useMemberStanding(email, useViewOverride());
     const [start, setStart] = useState<Start>(null);
     const [choice, setChoice] = useState<TypeChoice | null>(null);
     const [query, setQuery] = useState('');
