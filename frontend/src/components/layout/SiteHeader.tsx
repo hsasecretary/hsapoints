@@ -21,13 +21,15 @@ type SiteHeaderProps = {
 };
 
 // The one navbar (#76, docs/research/dashboard-navbar.md).
-//   ≥600px: logo, the page links (navItems.ts) and Account ▾.
-//   <600px: logo and Account on top; the pages move to a fixed bottom tab bar.
+//   ≥600px: logo, the page links (navItems.ts), E-Board ▾ and Account ▾.
+//   <600px: logo and Account on top; the pages move to a fixed bottom tab bar
+//           and the E-Board tools into Account ▾.
 // Account ▾ holds "View as" (E-Board and Web-team Testers), the E-Board tools
-// (E-Board) and Log out. While another view is previewed, a banner under the
+// (E-Board, phones only) and Log out. While another view is previewed, a banner under the
 // bar says so on every page.
 function SiteHeader({ signedIn, eboard, cabinetView }: SiteHeaderProps) {
     const headerRef = useRef<HTMLElement>(null);
+    const { pathname } = useLocation();
     const items = navItems({ cabinetView });
 
     // Sticky bars must not cover the focused element (WCAG 2.4.11): the
@@ -67,6 +69,7 @@ function SiteHeader({ signedIn, eboard, cabinetView }: SiteHeaderProps) {
                                         {item.label}
                                     </NavLink>
                                 ))}
+                                {eboard && <EboardMenu active={pathname === '/eboard' || pathname.startsWith('/eboard/')} />}
                             </nav>
                             <AccountMenu eboard={eboard} />
                         </>
@@ -109,8 +112,46 @@ function useDisclosure() {
     return { open, setOpen, rootRef, buttonRef, onKeyDown };
 }
 
+/** E-Board ▾ (≥600px): the tools from eboardTools.ts. Active on /eboard/*. */
+function EboardMenu({ active }: { active: boolean }) {
+    const { open, setOpen, rootRef, buttonRef, onKeyDown } = useDisclosure();
+
+    return (
+        <div ref={rootRef} className="site-header__dropdown" onKeyDown={onKeyDown}>
+            <button
+                ref={buttonRef}
+                type="button"
+                className={`site-header__link${active ? ' is-active' : ''}`}
+                aria-expanded={open}
+                aria-controls="eboard-menu"
+                onClick={() => setOpen((v) => !v)}
+            >
+                E-Board <Caret />
+            </button>
+            <div id="eboard-menu" className="site-header__panel" hidden={!open}>
+                <EboardToolLinks />
+            </div>
+        </div>
+    );
+}
+
+function EboardToolLinks() {
+    return (
+        <ul>
+            {EBOARD_TOOLS.map((tool) => (
+                <li key={tool.path}>
+                    <NavLink to={`/eboard/${tool.path}`} className="site-header__panel-link">
+                        {tool.label}
+                    </NavLink>
+                </li>
+            ))}
+        </ul>
+    );
+}
+
 /** Account ▾, top right: "View as" for those who can switch, the E-Board
- *  tools for E-Board, and Log out. */
+ *  tools for E-Board on phones (E-Board ▾ has them on wider screens), and
+ *  Log out. */
 function AccountMenu({ eboard }: { eboard: boolean }) {
     const { open, setOpen, rootRef, buttonRef, onKeyDown } = useDisclosure();
     const { own, view, canSwitch, setView } = useViewAs();
@@ -164,15 +205,7 @@ function AccountMenu({ eboard }: { eboard: boolean }) {
                 {eboard && (
                     <nav className="site-header__tools" aria-labelledby="account-eboard">
                         <h2 id="account-eboard" className="site-header__group">E-Board</h2>
-                        <ul>
-                            {EBOARD_TOOLS.map((tool) => (
-                                <li key={tool.path}>
-                                    <NavLink to={`/eboard/${tool.path}`} className="site-header__panel-link">
-                                        {tool.label}
-                                    </NavLink>
-                                </li>
-                            ))}
-                        </ul>
+                        <EboardToolLinks />
                     </nav>
                 )}
                 <button type="button" className="site-header__logout" onClick={logout}>

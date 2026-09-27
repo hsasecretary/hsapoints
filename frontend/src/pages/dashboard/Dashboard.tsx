@@ -21,10 +21,11 @@ type Bubble = (typeof BUBBLES)[number];
 //   EventCodeForm   — the large code box
 //   PointsSummary   — Total Points toward the goal, events attended, pending requests
 //   CabinetGoal     — Cabinet view only: Cabinet Points toward 20
-//   MakeUpList      — Cabinet view only: Missed Events to make up
 //   bubbles         — "Points & events" (PointsAndEvents) and "How it works"
 //                     (Explainer), each opening in place (?open=points|how); in
-//                     the Cabinet view "By category" is the Event Type table
+//                     the Cabinet view "By category" is the Event Type table.
+//                     Above the make-up list so they're seen.
+//   MakeUpList      — Cabinet view only: Missed Events to make up
 // Every number comes from computeStanding via useMemberStanding.
 function Dashboard({ email }: { email: string }) {
     const { loading, member, attendances, codes, requests, pending, standing, today } = useMemberStanding(email, useViewOverride());
@@ -64,9 +65,6 @@ function Dashboard({ email }: { email: string }) {
                 <>
                     <PointsSummary overview={overview} />
                     {standing.heldToCabinetRules && <CabinetGoal points={standing.cabinetPoints} goal={CABINET_POINTS_GOAL} />}
-                    {standing.heldToCabinetRules && (
-                        <MakeUpList standing={standing} codes={codes} pendingPicks={pendingMakeups(pending)} />
-                    )}
 
                     <div className="ov-bubbles">
                         <button type="button" className={open === 'points' ? 'is-on' : ''} aria-expanded={open === 'points'}
@@ -87,6 +85,9 @@ function Dashboard({ email }: { email: string }) {
                         <section id="ov-panel-how" className="ov-panel" aria-label="How it works">
                             <Explainer member={member} />
                         </section>
+                    )}
+                    {standing.heldToCabinetRules && (
+                        <MakeUpList standing={standing} codes={codes} pendingPicks={pendingMakeups(pending)} />
                     )}
                 </>
             )}

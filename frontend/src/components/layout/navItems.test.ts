@@ -12,7 +12,7 @@ describe('navItems', () => {
         expect(labels({ cabinetView: true })).toEqual(['Dashboard', 'Requirements', 'Requests']);
     });
 
-    it('leaves E-Board out: its tools are in the Account menu', () => {
+    it('leaves E-Board out: SiteHeader adds it (E-Board ▾, or the Account menu on phones)', () => {
         expect(navItems({ cabinetView: true }).map((item) => item.to)).not.toContain('/eboard');
     });
 });
