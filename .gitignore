@@ -54,3 +54,6 @@ CLAUDE.md
 # Logs
 logs
 *.log
+
+# Re-scoring migration inputs and outputs (member data)
+scripts/migration/
