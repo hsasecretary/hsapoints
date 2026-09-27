@@ -9,6 +9,8 @@ import NotFound from './pages/NotFound';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import Requests from './pages/requests/Requests';
 import Guide from './pages/guide/Guide';
+import Requirements from './pages/requirements/Requirements';
+import { isHeldToCabinetRules } from './lib/members';
 
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import { onAuthStateChanged} from 'firebase/auth';
@@ -30,6 +32,7 @@ function App() {
     const [userEmail, setUserEmail] = useState(null);
     const [isEboard, setIsEboard] = useState(false);
     const [isCabinetMember, setIsCabinetMember] = useState(false);
+    const [heldToCabinetRules, setHeldToCabinetRules] = useState(false);
     const [loading, setLoading] = useState(true);
     const [rolesLoaded, setRolesLoaded] = useState(false);
 
@@ -51,6 +54,7 @@ function App() {
         if (!userEmail) {
             setIsEboard(false);
             setIsCabinetMember(false);
+            setHeldToCabinetRules(false);
             setRolesLoaded(false);
             return;
         }
@@ -63,12 +67,14 @@ function App() {
                 const data = userDocSnap.exists() ? userDocSnap.data() : null;
                 setIsEboard(data?.eboard === true);
                 setIsCabinetMember(data?.approved === true && data?.cabinet !== "none");
+                setHeldToCabinetRules(data ? isHeldToCabinetRules(data) : false);
                 setRolesLoaded(true);
             },
             (error) => {
                 console.error("Failed to load user roles:", error);
                 setIsEboard(false);
                 setIsCabinetMember(false);
+                setHeldToCabinetRules(false);
                 setRolesLoaded(true);
             }
         );
@@ -82,13 +88,14 @@ function App() {
                 <div>Loading...</div>
             ) : (
                 <div className="app-shell">
-                    <SiteHeader signedIn={!!userEmail} eboard={isEboard} cabinet={isCabinetMember} />
+                    <SiteHeader signedIn={!!userEmail} eboard={isEboard} cabinet={isCabinetMember} requirements={heldToCabinetRules} />
                     <Suspense fallback={<div className="route-loading" role="status">Loading...</div>}>
                     <Routes>
                         <Route path="/" element={<Navigate to="/login" />} />
                         <Route path="/signup" element={userEmail ? <Navigate to="/dashboard" replace /> : <SignUp />} />
                         <Route path="/login" element={userEmail ? <Navigate to="/dashboard" replace /> : <Login />} />
                         <Route path="/dashboard" element={userEmail ? <Dashboard email={userEmail} /> : <Navigate to="/login" />} />
+                        <Route path="/requirements" element={!userEmail ? <Navigate to="/login" /> : heldToCabinetRules ? <Requirements email={userEmail} /> : <Navigate to="/dashboard" replace />} />
                         <Route path="/requests" element={userEmail ? <Requests /> : <Navigate to="/login" />} />
                         <Route path="/guide" element={userEmail ? <Guide email={userEmail} /> : <Navigate to="/login" />} />
                         <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember} /> : <Navigate to="/login" />} />

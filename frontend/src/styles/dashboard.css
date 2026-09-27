@@ -832,7 +832,8 @@ with the my requests tab. ---------- */
 
 .overview,
 .guide,
-.requests-page {
+.requests-page,
+.requirements-page {
     box-sizing: border-box;
     width: 100%;
     max-width: 720px;
@@ -845,11 +846,15 @@ with the my requests tab. ---------- */
 
 .overview *,
 .overview *::before,
-.overview *::after {
+.overview *::after,
+.requirements-page *,
+.requirements-page *::before,
+.requirements-page *::after {
     box-sizing: border-box;
 }
 
-.overview button {
+.overview button,
+.requirements-page button {
     font-family: inherit;
     margin: 0;
     min-width: 0;
@@ -858,14 +863,17 @@ with the my requests tab. ---------- */
 .overview button:focus-visible,
 .overview input:focus-visible,
 .overview summary:focus-visible,
-.overview a:focus-visible {
+.overview a:focus-visible,
+.requirements-page button:focus-visible,
+.requirements-page a:focus-visible {
     outline: 3px solid rgba(15, 76, 100, .4);
     outline-offset: 2px;
 }
 
 .overview .overview__title,
 .guide .guide__title,
-.requests-page .requests-page__title {
+.requests-page .requests-page__title,
+.requirements-page .requirements-page__title {
     margin: 0 0 16px;
     font-family: var(--hsa-font-display);
     font-size: var(--hsa-text-2xl);
@@ -913,7 +921,8 @@ with the my requests tab. ---------- */
 }
 
 .overview .overview__loading,
-.guide .guide__loading {
+.guide .guide__loading,
+.requirements-page .requirements-page__loading {
     color: var(--hsa-muted);
 }
 
@@ -1379,6 +1388,460 @@ with the my requests tab. ---------- */
     color: var(--hsa-gold-700);
     font-size: var(--hsa-text-xs);
     font-weight: 700;
+}
+
+/* Cabinet view: Cabinet Points toward 20 */
+.overview .ov-cabinet {
+    margin-top: 20px;
+}
+
+.overview .ov-cabinet__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    color: var(--hsa-ink-soft);
+}
+
+.overview .ov-cabinet__top strong {
+    color: var(--hsa-teal-700);
+}
+
+.overview .ov-cabinet__track {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--hsa-surface-sunken);
+    overflow: hidden;
+}
+
+.overview .ov-cabinet__fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--hsa-teal-600);
+}
+
+.overview .ov-cabinet__note {
+    margin: 6px 0 0;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-muted);
+}
+
+.overview .ov-cabinet__note.is-reached {
+    font-weight: 600;
+    color: var(--hsa-teal-700);
+}
+
+/* Cabinet view: "By category" as a table of Event Types */
+.overview .ov-types {
+    width: 100%;
+    border: 1px solid var(--hsa-border);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--hsa-surface);
+    box-shadow: none;
+    font-size: var(--hsa-text-sm);
+}
+
+.overview .ov-types th,
+.overview .ov-types td {
+    padding: 9px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+    font-size: var(--hsa-text-sm);
+    text-align: right;
+    vertical-align: top;
+    background: none;
+    color: var(--hsa-ink);
+}
+
+.overview .ov-types th:first-child {
+    text-align: left;
+}
+
+.overview .ov-types th:not(:first-child),
+.overview .ov-types td {
+    width: 64px;
+}
+
+.overview .ov-types thead th {
+    background: var(--hsa-surface-sunken);
+    font-size: var(--hsa-text-xs);
+    color: var(--hsa-ink-soft);
+}
+
+.overview .ov-types tbody th button {
+    min-height: 32px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--hsa-teal-700);
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+}
+
+.overview .ov-types tbody th button::after {
+    content: ' \25BE';
+    color: var(--hsa-muted);
+}
+
+.overview .ov-types tr.is-open th button::after {
+    content: ' \25B4';
+}
+
+.overview .ov-types .ov-types__sub td {
+    width: auto;
+    padding-left: 22px;
+    text-align: left;
+    background: var(--hsa-surface-subtle);
+}
+
+.overview .ov-types .ov-types__sub span {
+    display: block;
+    font-weight: 600;
+}
+
+.overview .ov-types small {
+    font-size: var(--hsa-text-xs);
+    font-weight: 400;
+    color: var(--hsa-muted);
+}
+
+.overview .ov-types tfoot th,
+.overview .ov-types tfoot td {
+    border-bottom: 0;
+    border-top: 2px solid var(--hsa-teal-700);
+    font-weight: 800;
+}
+
+/* ---- Requirements (requirements/: CoreEvents, SemesterGrid) —
+   #58, #75. Warm, never red, for anything still to make up.
+   Scoped to .requirements-page. ---- */
+
+.requirements-page .rq-h2 {
+    margin: 28px 0 10px;
+    font-size: var(--hsa-text-lg);
+    color: var(--hsa-teal-700);
+    text-align: left;
+}
+
+.requirements-page .rq-empty {
+    margin: 0;
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-over {
+    margin: -4px 0 12px;
+    padding: 10px 14px;
+    border-left: 4px solid var(--hsa-warm-edge);
+    border-radius: 6px;
+    background: var(--hsa-warm-bg);
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-warm-ink);
+}
+
+/* Tier 1: the lead line, then the Missed Events to make up */
+.requirements-page .rq-lead {
+    margin: 0 0 12px;
+    font-weight: 700;
+    color: var(--hsa-success);
+}
+
+.requirements-page .rq-lead.is-owed {
+    color: var(--hsa-warm-ink);
+}
+
+.requirements-page .rq-makeup {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1.5px solid var(--hsa-warm-edge);
+    border-radius: 999px;
+    background: var(--hsa-warm-bg);
+    color: var(--hsa-warm-ink);
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.requirements-page .rq-makeup:hover {
+    background: var(--hsa-warm-bg-strong);
+}
+
+.requirements-page .rq-pending {
+    flex: none;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--hsa-warm-bg-strong);
+    color: var(--hsa-warm-ink);
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+}
+
+/* Tier 2: Fall | Spring grid */
+.requirements-page .rq-grid {
+    width: 100%;
+    border: 1px solid var(--hsa-border);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--hsa-surface);
+    box-shadow: none;
+    font-size: var(--hsa-text-sm);
+}
+
+.requirements-page .rq-grid th,
+.requirements-page .rq-grid td {
+    padding: 9px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+    font-size: var(--hsa-text-sm);
+    text-align: left;
+    vertical-align: top;
+    background: none;
+    color: var(--hsa-ink);
+}
+
+.requirements-page .rq-grid tbody tr:last-child > * {
+    border-bottom: 0;
+}
+
+.requirements-page .rq-grid thead th {
+    background: var(--hsa-surface-sunken);
+    font-size: var(--hsa-text-xs);
+    color: var(--hsa-ink-soft);
+}
+
+.requirements-page .rq-grid small {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-grid tbody th {
+    font-weight: 600;
+}
+
+.requirements-page .rq-grid td {
+    width: 30%;
+}
+
+.requirements-page .rq-grid td.is-done {
+    font-weight: 800;
+    color: var(--hsa-success);
+}
+
+.requirements-page .rq-grid td.is-done small {
+    color: var(--hsa-ink-soft);
+}
+
+.requirements-page .rq-grid td.is-pending small {
+    font-weight: 600;
+    color: var(--hsa-warm-ink);
+}
+
+.requirements-page .rq-grid td.is-later {
+    background: var(--hsa-surface-subtle);
+}
+
+.requirements-page .rq-hole {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--hsa-border);
+    border-radius: 50%;
+}
+
+/* To make up */
+.requirements-page .rq-hint {
+    margin: 8px 0 0;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.requirements-page .rq-cards li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1.5px solid var(--hsa-warm-stripe);
+    border-radius: 12px;
+    background: var(--hsa-surface);
+}
+
+.requirements-page .rq-cards__what {
+    font-weight: 700;
+}
+
+.requirements-page .rq-cards__what small {
+    display: block;
+    font-size: var(--hsa-text-xs);
+    font-weight: 400;
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-chip {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--hsa-warm-bg-strong);
+    color: var(--hsa-warm-ink);
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+    vertical-align: 1px;
+}
+
+.requirements-page .rq-bank {
+    margin: 12px 0 0;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--hsa-teal-100);
+    color: var(--hsa-teal-800);
+    font-size: var(--hsa-text-sm);
+}
+
+/* What's next, then the whole year folded away. Done rows stay plain. */
+.requirements-page .rq-next {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-ink-soft);
+}
+
+.requirements-page .rq-next li + li {
+    margin-top: 4px;
+}
+
+.requirements-page .rq-all {
+    margin-top: 14px;
+    border: 1px solid var(--hsa-border);
+    border-radius: 10px;
+    background: var(--hsa-surface);
+}
+
+.requirements-page .rq-all summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    min-height: 44px;
+    list-style: none;
+    padding: 10px 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.requirements-page .rq-all summary::-webkit-details-marker {
+    display: none;
+}
+
+.requirements-page .rq-all summary::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    margin: 0 4px 0 2px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform .15s;
+}
+
+.requirements-page .rq-all[open] summary::before {
+    transform: rotate(45deg);
+}
+
+.requirements-page .rq-all summary small {
+    margin-left: auto;
+
+    font-weight: 500;
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-all[open] summary {
+    border-bottom: 1px solid var(--hsa-border-light);
+}
+
+.requirements-page .rq-all__month {
+    padding: 10px 14px 4px;
+}
+
+.requirements-page .rq-all__month h3 {
+    margin: 0 0 4px;
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--hsa-muted);
+    text-align: left;
+}
+
+.requirements-page .rq-all__month ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.requirements-page .rq-all__month li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2px 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+    font-size: var(--hsa-text-sm);
+}
+
+.requirements-page .rq-all__month li:last-child {
+    border-bottom: 0;
+}
+
+.requirements-page .rq-all__month li small {
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-all__status {
+    color: var(--hsa-ink-soft);
+}
+
+.requirements-page .rq-all__month li.is-open .rq-all__status {
+    font-weight: 700;
+    color: var(--hsa-warm-ink);
+}
+
+.requirements-page .rq-all__month li.is-upcoming .rq-all__status {
+    color: var(--hsa-muted);
+}
+
+@media (max-width: 420px) {
+    .requirements-page .rq-cards li {
+        grid-template-columns: 1fr;
+    }
+
+    .requirements-page .rq-makeup {
+        justify-content: center;
+    }
 }
 
 /* How points work (#49), in the bubble and on /guide */
