@@ -82,6 +82,27 @@ describe('lookupLedger', () => {
         expect(ledger.rows[0]).toMatchObject({ name: 'Turlington tabling', vePoints: 3, cabinetPoints: 3, hours: 3 });
     });
 
+    it('names the code behind each row, and counts the codes redeemed and how many came through a Point Request', () => {
+        const salsa = code('SALSA', 'hsa-programming', '2026-09-12', 'Noche de Salsa');
+        const attendances = [attended(gbm1), { ...attended(salsa, 'request'), requestId: 's1' }, requested('t1', 'tabling', '2026-09-05'), attended(gbm2, 'eboard')];
+        const ledger = lookupLedger({ member: generalMember, attendances, codes: [gbm1, gbm2, salsa], requests: [] });
+
+        expect(ledger.rows.map((row) => [row.name, row.codeId, row.source])).toEqual([
+            ['Noche de Salsa', 'SALSA', 'request'],
+            ['GBM 2', 'GBM2', 'eboard'],
+            ['Tabling', null, 'request'],
+            ['GBM 1', 'GBM1', 'code'],
+        ]);
+        expect(ledger.codes).toEqual({ redeemed: 3, byRequest: 1 });
+    });
+
+    it('says who took points away', () => {
+        const member: Member = { ...generalMember, adjustments: [{ points: -2, note: "Used a friend's code", date: '2026-09-20', by: 'vp@ufl.edu' }] };
+        const [row] = lookupLedger({ member, attendances: [], codes: [], requests: [] }).rows;
+
+        expect(row).toMatchObject({ vePoints: -2, approvedBy: 'vp@ufl.edu', approvedOn: '2026-09-20', codeId: null });
+    });
+
     it('adds up Cabinet Points to match the standing', () => {
         const attendances = [attended(gbm1), attended(empanadas), attended(cabThu)];
         const codes = [gbm1, empanadas, cabThu];
@@ -119,6 +140,24 @@ describe('lookupRequests', () => {
         expect(rows.get('a')).toMatchObject({ statusLabel: 'Approved', points: 2, pointsLabel: 'credited', eventType: 'HSA Fundraising', reviewedBy: 'vp@ufl.edu', reviewedOn: '2026-09-02' });
         expect(rows.get('c')).toMatchObject({ statusLabel: 'Denied', points: 0, pointsLabel: 'credited', notes: 'No photo' });
         expect(rows.get('f')).toMatchObject({ eventType: 'Adjustment', points: 2 });
+    });
+
+    it('calls a revoked request Revoked, with what it had earned and who approved it', () => {
+        const revoked: MemberRequest = {
+            id: 'r', date: '2026-09-05', status: 'denied', pointsRequested: 3, reviewedBy: 'pres@ufl.edu', reviewedOn: '2026-09-21',
+            reviewNotes: 'Approved by mistake', revoked: { approvedBy: 'vp@ufl.edu', points: 3 },
+        };
+        expect(lookupRequests([revoked], TODAY)[0]).toMatchObject({
+            status: 'denied', statusLabel: 'Revoked', points: 0, reviewedBy: 'pres@ufl.edu', notes: 'Approved by mistake', revoked: { approvedBy: 'vp@ufl.edu', points: 3 },
+        });
+    });
+
+    it('lets E-Board revoke only an approved request with something to take back', () => {
+        const withAttendance = requests.map((request) => (request.id === 'a' ? { ...request, attendanceIds: ['m__req-a'] } : request));
+        const rows = new Map(lookupRequests(withAttendance, TODAY).map((row) => [row.id, row.revocable]));
+        // e: approved on the old review page, so its points are only in the old counters.
+        const old = lookupRequests([{ id: 'e', date: '2026-09-01', status: 'approved', pointsRequested: 1 }], TODAY)[0];
+        expect([rows.get('a'), rows.get('f'), rows.get('b'), rows.get('c'), old.revocable]).toEqual([true, true, false, false, false]);
     });
 });
 

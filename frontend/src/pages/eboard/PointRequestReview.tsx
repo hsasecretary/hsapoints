@@ -3,10 +3,13 @@ import { useSearchParams } from 'react-router-dom';
 import { db } from '../../lib/firebase';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import type { Code } from '../../lib/computeStanding';
+import { canRevoke } from '../../lib/memberLookup';
 import { NOT_LISTED } from '../../lib/pointRequests';
+import type { Revoked } from '../../lib/pointsOverview';
 import type { ReviewRequest } from '../../lib/requestReview';
 import { eventType } from '../../lib/rubric';
 import ReviewPanel from './pointRequests/ReviewPanel';
+import RevokeForm from './pointRequests/RevokeForm';
 
 type StoredRequest = ReviewRequest & {
     userName: string;
@@ -19,6 +22,9 @@ type StoredRequest = ReviewRequest & {
     reviewedBy?: string | null;
     reviewNotes?: string;
     adjustment?: { points: number; note: string };
+    attendanceIds?: string[];
+    /** Set when E-Board took back its approval. */
+    revoked?: Revoked;
     [image: string]: unknown;
 };
 
@@ -204,7 +210,7 @@ const openImageModal = (request) => {
                                     className="status-badge"
                                     style={{ backgroundColor: getStatusColor(request.status) }}
                                 >
-                                    {request.status.toUpperCase()}
+                                    {request.revoked ? 'REVOKED' : request.status.toUpperCase()}
                                 </div>
                             </div>
 
@@ -230,7 +236,7 @@ const openImageModal = (request) => {
                                 )}
                                 {request.status !== 'pending' && (
                                     <div className="detail-row">
-                                        <strong>Points:</strong> {request.pointsRequested}
+                                        <strong>Points:</strong> {request.revoked ? `0 (had earned ${request.revoked.points})` : request.pointsRequested}
                                     </div>
                                 )}
                                 <div className="detail-row">
@@ -294,10 +300,18 @@ const openImageModal = (request) => {
                                             <strong>Adjustment:</strong> {request.adjustment.points} points
                                         </div>
                                     )}
+                                    {request.revoked && (
+                                        <div className="detail-row">
+                                            <strong>Approved by:</strong> {request.revoked.approvedBy || 'N/A'}, then revoked
+                                        </div>
+                                    )}
                                     {request.reviewNotes && (
                                         <div className="detail-row">
                                             <strong>Notes:</strong> {request.reviewNotes}
                                         </div>
+                                    )}
+                                    {canRevoke(request) && (
+                                        <RevokeForm requestId={request.id} points={request.pointsRequested} onRevoked={handleReviewed} />
                                     )}
                                 </div>
                             )}

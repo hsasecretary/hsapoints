@@ -2,23 +2,26 @@
 // behind it and where it came from, and their Point Requests with who
 // reviewed them. One scrolling page (docs/research/user-lookup-eboard-ux.md);
 // numbers come from computeStanding through lib/memberLookup.ts, so they
-// match the Member's own dashboard. Read-only: Strikes are changed on
-// Excuse Absence and requests on Point Request Review, each linked from here.
+// match the Member's own dashboard. E-Board can take points away and revoke
+// an approved request here; Strikes are changed on Excuse Absence and pending
+// requests reviewed on Point Request Review, each linked from here.
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { auth, db } from '../../lib/firebase';
 import type { Attendance, Code, Standing } from '../../lib/computeStanding';
 import {
     lookupLedger, lookupRequests, lookupSummary, missedEventRows, MISSED_STATE_LABEL, SOURCE_LABEL,
-    type LookupLedger, type LookupRequest, type LookupSummary,
+    type LookupLedger, type LookupRequest, type LookupRow, type LookupSummary,
 } from '../../lib/memberLookup';
 import { roleLine } from '../../lib/members';
+import { deductPoints } from '../../lib/requestReview';
 import { displayName } from '../../lib/nameSearch';
 import { eventType } from '../../lib/rubric';
 import { shortDate } from '../../lib/semester';
 import MemberSearch from '../../components/members/MemberSearch';
 import { useMemberStanding } from '../dashboard/useMemberStanding';
+import RevokeForm from './pointRequests/RevokeForm';
 
 type LookupMember = Parameters<typeof roleLine>[0] & {
     email: string;
@@ -107,7 +110,7 @@ function MemberDetail({ member: profile }: { member: LookupMember }) {
                     {summary.rules === 'cabinet' && (
                         <CabinetDetail email={profile.email} standing={standing} codes={codes} attendances={attendances} summary={summary} />
                     )}
-                    <Points ledger={ledger} cabinet={summary.rules === 'cabinet'} />
+                    <Points ledger={ledger} cabinet={summary.rules === 'cabinet'} email={profile.email} today={today} />
                     <Requests rows={requestRows} />
                 </>
             )}
@@ -213,33 +216,55 @@ function CabinetDetail({ email, standing, codes, attendances, summary }: {
     );
 }
 
-function Points({ ledger, cabinet }: { ledger: LookupLedger; cabinet: boolean }) {
+type PointsFilter = 'all' | 'codes' | 'requests' | 'adjustments';
+
+const FILTERS: { value: PointsFilter; label: string; keep: (row: LookupRow) => boolean }[] = [
+    { value: 'all', label: 'All', keep: () => true },
+    { value: 'codes', label: 'Codes', keep: (row) => Boolean(row.codeId) },
+    { value: 'requests', label: 'Point Requests', keep: (row) => row.source === 'request' || Boolean(row.requestId) },
+    { value: 'adjustments', label: 'Adjustments', keep: (row) => row.source === 'adjustment' },
+];
+
+function Points({ ledger, cabinet, email, today }: { ledger: LookupLedger; cabinet: boolean; email: string; today: string }) {
+    const [filter, setFilter] = useState<PointsFilter>('all');
+    const rows = ledger.rows.filter(FILTERS.find((option) => option.value === filter).keep);
     return (
         <details className="ulk-panel" open>
             <summary>
                 <h4>Points ({ledger.rows.length})</h4>
-                <span className="ulk-muted">Newest first</span>
+                <span className="ulk-muted">
+                    {plural(ledger.codes.redeemed, 'code')} redeemed, {ledger.codes.byRequest} through a Point Request
+                </span>
             </summary>
-            {ledger.rows.length === 0 ? <p className="ulk-muted">No points this school year yet.</p> : (
-                <>
-                    <ul className="ulk-list">
-                        {ledger.rows.map((row) => (
-                            <li key={row.id} className="ulk-row">
-                                <span className="ulk-row__date">{dateText(row.date)}</span>
-                                <span className="ulk-row__name">
-                                    {row.name}
-                                    <span className="ulk-row__detail">
-                                        <span className={`ulk-tag ulk-tag--${row.source}`}>{SOURCE_LABEL[row.source]}</span>
-                                        {row.source !== 'adjustment' && ` ${row.eventType}${row.hours ? `, ${row.hours} hours` : ''}`}
-                                        {row.approvedBy && ` · Approved by ${row.approvedBy}${row.approvedOn ? `, ${shortDate(row.approvedOn)}` : ''}`}
-                                    </span>
+            <div className="ulk-filters" role="group" aria-label="Show">
+                {FILTERS.map((option) => (
+                    <button key={option.value} type="button" aria-pressed={filter === option.value}
+                        className={`ulk-filter${filter === option.value ? ' is-active' : ''}`} onClick={() => setFilter(option.value)}>
+                        {option.label}
+                    </button>
+                ))}
+            </div>
+            {rows.length === 0 ? <p className="ulk-muted">{filter === 'all' ? 'No points this school year yet.' : 'Nothing here this school year.'}</p> : (
+                <ul className="ulk-list">
+                    {rows.map((row) => (
+                        <li key={row.id} className="ulk-row">
+                            <span className="ulk-row__date">{dateText(row.date)}</span>
+                            <span className="ulk-row__name">
+                                {row.name}
+                                {row.codeId && <code className="ulk-code">{row.codeId}</code>}
+                                <span className="ulk-row__detail">
+                                    <span className={`ulk-tag ulk-tag--${row.source}`}>{SOURCE_LABEL[row.source]}</span>
+                                    {row.source !== 'adjustment' && ` ${row.eventType}${row.hours ? `, ${row.hours} hours` : ''}`}
+                                    {row.approvedBy && ` · ${row.vePoints < 0 ? 'Taken away' : 'Approved'} by ${row.approvedBy}${row.approvedOn ? `, ${shortDate(row.approvedOn)}` : ''}`}
                                 </span>
-                                <span className="ulk-row__end ulk-num">
-                                    {row.vePoints > 0 ? '+' : ''}{row.vePoints} VE
-                                    {cabinet && <small>{row.cabinetPoints} Cabinet</small>}
-                                </span>
-                            </li>
-                        ))}
+                            </span>
+                            <span className="ulk-row__end ulk-num">
+                                {row.vePoints > 0 ? '+' : ''}{row.vePoints} VE
+                                {cabinet && <small>{row.cabinetPoints} Cabinet</small>}
+                            </span>
+                        </li>
+                    ))}
+                    {filter === 'all' && (
                         <li className="ulk-row ulk-row--total">
                             <span className="ulk-row__date" />
                             <span className="ulk-row__name">Total</span>
@@ -248,13 +273,68 @@ function Points({ ledger, cabinet }: { ledger: LookupLedger; cabinet: boolean })
                                 {cabinet && <small>{ledger.cabinetPoints} Cabinet</small>}
                             </span>
                         </li>
-                    </ul>
-                    {ledger.adjustments > 0 && (
-                        <p className="ulk-muted">Includes {plural(ledger.adjustments, 'Adjustment')} from E-Board.</p>
                     )}
-                </>
+                </ul>
             )}
+            {ledger.adjustments > 0 && filter === 'all' && (
+                <p className="ulk-muted">Includes {plural(ledger.adjustments, 'Adjustment')} from E-Board.</p>
+            )}
+            <TakeAway email={email} today={today} />
         </details>
+    );
+}
+
+// Taking points off for something that happened: a negative Adjustment.
+// A request approved by mistake is revoked under Point Requests instead.
+function TakeAway({ email, today }: { email: string; today: string }) {
+    const [open, setOpen] = useState(false);
+    const [points, setPoints] = useState('');
+    const [note, setNote] = useState('');
+    const [saving, setSaving] = useState(false);
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
+
+    const save = async () => {
+        setSaving(true);
+        setError('');
+        try {
+            const result = await deductPoints(db, email, { points: Number(points), note }, auth.currentUser?.email ?? 'E-Board', today);
+            if ('error' in result) setError(result.error);
+            else {
+                setOpen(false);
+                setPoints('');
+                setNote('');
+                setMessage(`Took away ${pts(Number(points))}.`);
+            }
+        } catch (err) {
+            console.error('Error taking points away:', err);
+            setError("Couldn't save it. Try again.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    if (!open) {
+        return (
+            <p className="ulk-takeaway">
+                <button type="button" className="danger-form__open" onClick={() => { setOpen(true); setMessage(''); }}>Take away points</button>
+                {message && <span role="status">{message}</span>}
+            </p>
+        );
+    }
+    return (
+        <div className="danger-form ulk-takeaway-form">
+            <p className="danger-form__hint">For something that happened, such as using someone else's code. To undo an approval, revoke the request under Point Requests.</p>
+            <label htmlFor="ulk-takeaway-points">Points to take away</label>
+            <input id="ulk-takeaway-points" type="number" min={1} step={1} inputMode="numeric" value={points} onChange={(e) => setPoints(e.target.value)} />
+            <label htmlFor="ulk-takeaway-note">Reason (the Member sees this)</label>
+            <textarea id="ulk-takeaway-note" rows={2} value={note} onChange={(e) => setNote(e.target.value)} />
+            {error && <p className="danger-form__error" role="alert">{error}</p>}
+            <div className="danger-form__actions">
+                <button type="button" className="danger-form__cancel" disabled={saving} onClick={() => { setOpen(false); setError(''); }}>Cancel</button>
+                <button type="button" className="danger-form__confirm" disabled={saving} onClick={save}>{saving ? 'Saving…' : 'Take away'}</button>
+            </div>
+        </div>
     );
 }
 
@@ -277,14 +357,20 @@ function Requests({ rows }: { rows: LookupRequest[] }) {
                                     {row.eventType} · {pts(row.points)} {row.pointsLabel}
                                     {row.reviewedBy && ` · ${row.statusLabel} by ${row.reviewedBy}${row.reviewedOn ? `, ${shortDate(row.reviewedOn)}` : ''}`}
                                 </span>
+                                {row.revoked && (
+                                    <span className="ulk-row__detail">
+                                        Had earned {pts(row.revoked.points)}{row.revoked.approvedBy ? `, approved by ${row.revoked.approvedBy}` : ''}
+                                    </span>
+                                )}
                                 {row.notes && <span className="ulk-row__detail ulk-note">“{row.notes}”</span>}
                             </span>
                             <span className="ulk-row__end">
-                                <span className={`ulk-status ulk-status--${row.status}`}>{row.statusLabel}</span>
+                                <span className={`ulk-status ulk-status--${row.revoked ? 'revoked' : row.status}`}>{row.statusLabel}</span>
                                 {row.status === 'pending' && (
                                     <Link to={`/eboard/point-requests?request=${encodeURIComponent(row.id)}`}>Review</Link>
                                 )}
                             </span>
+                            {row.revocable && <div className="ulk-row__revoke"><RevokeForm requestId={row.id} points={row.points} /></div>}
                         </li>
                     ))}
                 </ul>

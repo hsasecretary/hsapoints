@@ -554,3 +554,63 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--hsa-muted);
   font-size: var(--hsa-text-sm);
 }
+
+/* A small form that takes points away: revoking an approved Point Request
+   (pages/eboard/pointRequests/RevokeForm.tsx) and User Lookup's "Take away
+   points". A red outline button opens it; Cancel and a red confirm close it. */
+.danger-form__open {
+  min-width: 0;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1.5px solid var(--hsa-danger);
+  border-radius: 6px;
+  background: var(--hsa-surface);
+  color: var(--hsa-danger-strong);
+  font: inherit;
+  font-size: var(--hsa-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.danger-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--hsa-danger-border);
+  border-radius: 8px;
+  background: var(--hsa-danger-bg);
+  font-size: var(--hsa-text-sm);
+  text-align: left;
+}
+
+.danger-form label { font-weight: 700; }
+
+.danger-form input,
+.danger-form textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--hsa-border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.danger-form__hint { margin: 0; color: var(--hsa-ink-soft); }
+.danger-form__error { margin: 0; color: var(--hsa-danger-strong); }
+.danger-form__actions { display: flex; gap: 8px; }
+
+.danger-form__cancel,
+.danger-form__confirm {
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 6px;
+  font: inherit;
+  font-size: var(--hsa-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.danger-form__cancel { border: 1px solid var(--hsa-border); background: var(--hsa-surface); color: var(--hsa-ink); }
+.danger-form__confirm { border: 1px solid var(--hsa-danger); background: var(--hsa-danger); color: #ffffff; }
+.danger-form__cancel:disabled, .danger-form__confirm:disabled { opacity: 0.6; cursor: not-allowed; }

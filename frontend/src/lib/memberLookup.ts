@@ -4,7 +4,7 @@
 // every number comes from computeStanding and the rubric, never from a
 // stored counter, so it always matches the Member's own dashboard.
 import { AT_RISK_STRIKES, CABINET_POINTS_GOAL, type Attendance, type Code, type Member, type MissedEvent, type Semester, type Standing } from './computeStanding';
-import type { MemberRequest } from './pointsOverview';
+import type { MemberRequest, Revoked } from './pointsOverview';
 import { eventType } from './rubric';
 import { academicYear } from './semester';
 
@@ -40,6 +40,8 @@ export type LookupRow = {
     cabinetPoints: number;
     /** Tabling hours, when more than one Attendance makes up the row. */
     hours?: number;
+    /** The code checked in with, whether by the Member, a Point Request or E-Board. */
+    codeId: string | null;
     requestId: string | null;
     approvedBy: string | null;
     approvedOn: string | null;
@@ -54,6 +56,8 @@ export type LookupLedger = {
     cabinetPoints: number;
     /** How many rows are Adjustments. */
     adjustments: number;
+    /** Codes counted this year, and how many of those a Point Request added. */
+    codes: { redeemed: number; byRequest: number };
 };
 
 export function lookupLedger({ member, attendances, codes, requests }: {
@@ -91,6 +95,7 @@ export function lookupLedger({ member, attendances, codes, requests }: {
             source: attendance.source,
             vePoints: type?.vePoints ?? 0,
             cabinetPoints: type?.cabinetPoints ?? 0,
+            codeId: attendance.codeId ? code?.id ?? attendance.codeId.toUpperCase() : null,
             requestId: attendance.requestId ?? null,
             ...reviewOf(attendance.requestId),
         });
@@ -104,8 +109,9 @@ export function lookupLedger({ member, attendances, codes, requests }: {
             source: 'adjustment',
             vePoints: adjustment.points || 0,
             cabinetPoints: 0,
+            codeId: null,
             requestId: adjustment.requestId ?? null,
-            ...reviewOf(adjustment.requestId),
+            ...(adjustment.by ? { approvedBy: adjustment.by, approvedOn: adjustment.date ?? null } : reviewOf(adjustment.requestId)),
         });
     });
 
@@ -115,6 +121,10 @@ export function lookupLedger({ member, attendances, codes, requests }: {
         vePoints: sorted.reduce((sum, row) => sum + row.vePoints, 0),
         cabinetPoints: sorted.reduce((sum, row) => sum + row.cabinetPoints, 0),
         adjustments: sorted.filter((row) => row.source === 'adjustment').length,
+        codes: {
+            redeemed: sorted.filter((row) => row.codeId).length,
+            byRequest: sorted.filter((row) => row.codeId && row.source === 'request').length,
+        },
     };
 }
 
@@ -135,8 +145,11 @@ export type LookupRequest = {
     eventType: string;
     reviewedBy: string | null;
     reviewedOn: string | null;
-    /** The deny reason, or an Adjustment's note. */
+    /** The deny or revoke reason, or an Adjustment's note. */
     notes: string;
+    /** Approved as an Attendance or an Adjustment, so E-Board can still take it back. */
+    revocable: boolean;
+    revoked: Revoked | null;
 };
 
 /**
@@ -156,17 +169,24 @@ export function lookupRequests(requests: MemberRequest[], today: string): Lookup
                 name: request.activityName || 'Point Request',
                 date: request.date ?? '',
                 status,
-                statusLabel: STATUS_LABEL[status],
+                statusLabel: request.revoked ? 'Revoked' : STATUS_LABEL[status],
                 points: status === 'denied' ? 0 : request.pointsRequested ?? 0,
                 pointsLabel: status === 'pending' ? 'requested' : 'credited',
                 eventType: type,
                 reviewedBy: request.reviewedBy ?? null,
                 reviewedOn: request.reviewedOn ?? null,
                 notes: request.reviewNotes ?? '',
+                revocable: canRevoke(request),
+                revoked: request.revoked ?? null,
             };
         })
         .sort((a, b) => Number(b.status === 'pending') - Number(a.status === 'pending')
             || byDateNewestFirst(a, b) || a.id.localeCompare(b.id));
+}
+
+/** Approved on the old review page, a request's points are only in the old counters: nothing to take back. */
+export function canRevoke(request: Pick<MemberRequest, 'status' | 'adjustment' | 'attendanceIds'>): boolean {
+    return request.status === 'approved' && Boolean(request.adjustment || request.attendanceIds);
 }
 
 export type LookupSummary = {

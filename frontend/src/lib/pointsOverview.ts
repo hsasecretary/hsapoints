@@ -6,6 +6,9 @@
 import type { Attendance, Code, Member, Standing } from './computeStanding';
 import { eventType, rubric } from './rubric';
 
+/** What a revoked request had earned, and who had approved it. */
+export type Revoked = { approvedBy: string | null; points: number };
+
 /** A pointRequests/{id} doc of the Member's, as the dashboard reads it. */
 export type MemberRequest = {
     id: string;
@@ -26,6 +29,10 @@ export type MemberRequest = {
     reviewNotes?: string;
     /** Approved as an Adjustment instead of an Attendance. */
     adjustment?: { points: number; note: string };
+    /** The Attendances approving it wrote; missing if approved on the old review page. */
+    attendanceIds?: string[];
+    /** Set when E-Board took back an approval: it is denied now. */
+    revoked?: Revoked;
 };
 
 export type Group = { key: string; name: string };

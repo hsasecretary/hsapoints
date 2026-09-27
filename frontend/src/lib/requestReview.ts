@@ -4,7 +4,7 @@
 // and CRASH event arrives here, since neither gets a code. The Firestore
 // functions take the instance so tests can run them against the emulator.
 import {
-    arrayUnion, doc, increment, runTransaction, serverTimestamp, type DocumentReference, type Firestore,
+    arrayRemove, arrayUnion, doc, increment, runTransaction, serverTimestamp, type DocumentReference, type Firestore,
 } from 'firebase/firestore';
 import type { Attendance, Code, Member } from './computeStanding';
 import { isHeldToCabinetRules } from './members';
@@ -231,6 +231,73 @@ export async function adjustRequest(db: Firestore, requestId: string, form: Adju
             // requestId keeps two identical Adjustments from collapsing into one.
             adjustments: arrayUnion({ points: form.points, note, date: request.date, requestId }),
             ...legacyCredit(request.date, form.points, null),
+        });
+        return { ok: true } as const;
+    });
+}
+
+/**
+ * Takes back an approved request E-Board shouldn't have approved: deletes the
+ * Attendances approving it wrote (never one the Member made by redeeming the
+ * code themselves), or the Adjustment it added, and marks it denied with the
+ * reason, so the Member sees why. `revoked` keeps who approved it and what it
+ * had earned.
+ */
+export async function revokeRequest(db: Firestore, requestId: string, reason: string, reviewer: string): Promise<ReviewResult> {
+    const note = reason.trim();
+    if (!note) return { ok: false, error: 'Say why, so the Member knows.' };
+    const requestRef = doc(db, 'pointRequests', requestId);
+    return runTransaction(db, async (tx) => {
+        const request = (await tx.get(requestRef)).data();
+        if (request?.status !== 'approved') return { ok: false, error: 'Only an approved request can be revoked. Refresh to see it.' };
+        // Approved on the old review page: its points are only in the old counters.
+        if (!request.adjustment && !request.attendanceIds) {
+            return { ok: false, error: 'This was approved before Attendances, so there is nothing to take back. Use Take away points on User Lookup.' };
+        }
+        const userRef = doc(db, 'users', String(request.userEmail).toLowerCase());
+        const refs = ((request.attendanceIds ?? []) as string[]).map((id) => doc(db, 'attendances', id));
+        const snaps = await Promise.all(refs.map((ref) => tx.get(ref)));
+        const ours = snaps.filter((snap) => snap.exists() && snap.data().source === 'request' && snap.data().requestId === requestId);
+        const adjustments = request.adjustment ? (((await tx.get(userRef)).data()?.adjustments ?? []) as { requestId?: string }[]) : [];
+
+        ours.forEach((snap) => tx.delete(snap.ref));
+        const codeId = ours.find((snap) => snap.data().codeId)?.data().codeId as string | undefined;
+        if (codeId) tx.update(doc(db, 'codes', codeId), { attendeeCount: increment(-1) });
+        // What approval credited: the Event Type's points for each Attendance it wrote.
+        const earned = request.adjustment ? request.adjustment.points
+            : ours.length * (eventType(ours[0]?.data().eventTypeId)?.vePoints ?? 0);
+        tx.update(requestRef, {
+            status: 'denied',
+            reviewedAt: serverTimestamp(),
+            reviewedBy: reviewer,
+            reviewNotes: note,
+            revoked: { approvedBy: request.reviewedBy ?? null, points: earned },
+        });
+        const eventDate = ours[0]?.data().eventDate ?? request.date;
+        tx.update(userRef, {
+            ...(request.adjustment ? { adjustments: adjustments.filter((adjustment) => adjustment.requestId !== requestId) } : {}),
+            ...(earned ? legacyCredit(eventDate, -earned, null) : {}),
+            ...(codeId ? { eventCodes: arrayRemove(codeId) } : {}),
+        });
+        return { ok: true } as const;
+    });
+}
+
+/**
+ * Takes points off a Member for something that happened, as a negative
+ * Adjustment dated `today` that says who took them and why.
+ */
+export async function deductPoints(db: Firestore, email: string, form: AdjustmentForm, reviewer: string, today: string): Promise<ReviewResult> {
+    const note = form.note.trim();
+    if (!Number.isInteger(form.points) || form.points <= 0) return { ok: false, error: 'Enter the points to take away as a whole number above 0.' };
+    if (!note) return { ok: false, error: 'Say why, so the Member knows.' };
+    const userRef = doc(db, 'users', email.toLowerCase());
+    // Appended, not arrayUnion: two identical deductions on one day are two deductions.
+    return runTransaction(db, async (tx) => {
+        const adjustments = (await tx.get(userRef)).data()?.adjustments ?? [];
+        tx.update(userRef, {
+            adjustments: [...adjustments, { points: -form.points, note, date: today, by: reviewer }],
+            ...legacyCredit(today, -form.points, null),
         });
         return { ok: true } as const;
     });

@@ -3,7 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { collection, getDocs, query, where, type Firestore } from 'firebase/firestore';
 import { EBOARD, MEMBER, memberDoc, readPastRules, seed, signedInAs, startEmulator } from '../test/emulator';
-import { adjustRequest, approveRequest, denyRequest } from './requestReview';
+import { adjustRequest, approveRequest, deductPoints, denyRequest, revokeRequest } from './requestReview';
 
 let env: RulesTestEnvironment;
 
@@ -126,5 +126,97 @@ describe('turning a Point Request into an Adjustment', () => {
         });
         expect(await readPastRules(env, 'pointRequests/mixer')).toMatchObject({ status: 'approved', adjustment: { points: 2, note: 'Helped run the mixer' } });
         expect(await attendanceIds()).toEqual([]);
+    });
+});
+
+describe('revoking an approved Point Request', () => {
+    it('removes its Attendances, takes back the old counters, and marks it denied with the reason', async () => {
+        const db = signedInAs(env, EBOARD);
+        await approveRequest(db, 'tabling', tablingDecision, EBOARD);
+
+        expect(await revokeRequest(db, 'tabling', ' Approved by mistake ', EBOARD)).toEqual({ ok: true });
+        expect(await attendanceIds()).toEqual([]);
+        expect(await readPastRules(env, 'pointRequests/tabling')).toMatchObject({
+            status: 'denied', reviewedBy: EBOARD, reviewNotes: 'Approved by mistake', revoked: { approvedBy: EBOARD, points: 3 },
+        });
+        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ fallPoints: 0, otherPoints: 0 });
+    });
+
+    it("un-counts the code's check-in, but leaves a check-in the Member made themselves", async () => {
+        const db = signedInAs(env, EBOARD);
+        await approveRequest(db, 'salsa', { eventTypeId: 'hsa-programming', codeId: 'SALSA', makeupFor: [null] }, EBOARD);
+        expect(await revokeRequest(db, 'salsa', 'Wrong person', EBOARD)).toEqual({ ok: true });
+        expect(await readPastRules(env, 'codes/SALSA')).toMatchObject({ attendeeCount: 4 });
+        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ eventCodes: [] });
+
+        await seed(env, {
+            [`attendances/${MEMBER}__SALSA`]: { email: MEMBER, eventTypeId: 'hsa-programming', eventDate: '2026-10-20', source: 'code', codeId: 'SALSA' },
+            'pointRequests/salsa2': pending({ codeId: 'SALSA', eventTypeId: 'hsa-programming', date: '2026-10-20', status: 'approved',
+                attendanceIds: [`${MEMBER}__SALSA`], pointsRequested: 0 }),
+        });
+        expect(await revokeRequest(db, 'salsa2', 'Duplicate', EBOARD)).toEqual({ ok: true });
+        expect(await attendanceIds()).toEqual([`${MEMBER}__SALSA`]);
+    });
+
+    it("takes an Adjustment made from it off the Member's adjustments", async () => {
+        const db = signedInAs(env, EBOARD);
+        await adjustRequest(db, 'mixer', { points: 2, note: 'Helped run the mixer' }, EBOARD);
+
+        expect(await revokeRequest(db, 'mixer', 'Did not help', EBOARD)).toEqual({ ok: true });
+        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ adjustments: [], otherPoints: 0 });
+        expect(await readPastRules(env, 'pointRequests/mixer')).toMatchObject({ status: 'denied', revoked: { points: 2 } });
+    });
+
+    it('refuses a request approved before Attendances, since it has nothing to take back', async () => {
+        await seed(env, { 'pointRequests/old': pending({ status: 'approved', pointsRequested: 2 }) });
+
+        expect(await revokeRequest(signedInAs(env, EBOARD), 'old', 'Mistake', EBOARD)).toMatchObject({ ok: false });
+        expect(await readPastRules(env, 'pointRequests/old')).toMatchObject({ status: 'approved' });
+    });
+
+    it('needs a reason, and only revokes an approved request', async () => {
+        const db = signedInAs(env, EBOARD);
+        expect((await revokeRequest(db, 'mixer', 'x', EBOARD)).ok).toBe(false);
+        await approveRequest(db, 'tabling', tablingDecision, EBOARD);
+        expect((await revokeRequest(db, 'tabling', '  ', EBOARD)).ok).toBe(false);
+        expect(await attendanceIds()).toHaveLength(3);
+    });
+
+    it('is E-Board only', async () => {
+        await approveRequest(signedInAs(env, EBOARD), 'tabling', tablingDecision, EBOARD);
+        await expect(revokeRequest(signedInAs(env, MEMBER), 'tabling', 'Mine', MEMBER)).rejects.toThrow();
+    });
+});
+
+describe('taking points away', () => {
+    it('adds a negative Adjustment dated today, saying who took them and why', async () => {
+        expect(await deductPoints(signedInAs(env, EBOARD), MEMBER, { points: 2, note: " Used a friend's code " }, EBOARD, '2026-10-25')).toEqual({ ok: true });
+
+        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({
+            adjustments: [{ points: -2, note: "Used a friend's code", date: '2026-10-25', by: EBOARD }],
+            fallPoints: -2,
+            otherPoints: -2,
+        });
+    });
+
+    it('keeps two identical deductions on one day as two', async () => {
+        const db = signedInAs(env, EBOARD);
+        const form = { points: 1, note: 'Late' };
+        await deductPoints(db, MEMBER, form, EBOARD, '2026-10-25');
+        await deductPoints(db, MEMBER, form, EBOARD, '2026-10-25');
+
+        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ adjustments: [{ points: -1 }, { points: -1 }], otherPoints: -2 });
+    });
+
+    it('needs a whole number above 0 and a reason', async () => {
+        const db = signedInAs(env, EBOARD);
+        expect((await deductPoints(db, MEMBER, { points: 0, note: 'x' }, EBOARD, '2026-10-25')).ok).toBe(false);
+        expect((await deductPoints(db, MEMBER, { points: 1.5, note: 'x' }, EBOARD, '2026-10-25')).ok).toBe(false);
+        expect((await deductPoints(db, MEMBER, { points: 1, note: '' }, EBOARD, '2026-10-25')).ok).toBe(false);
+        expect(await readPastRules(env, `users/${MEMBER}`)).not.toHaveProperty('adjustments');
+    });
+
+    it('is E-Board only', async () => {
+        await expect(deductPoints(signedInAs(env, MEMBER), MEMBER, { points: 1, note: 'x' }, MEMBER, '2026-10-25')).rejects.toThrow();
     });
 });

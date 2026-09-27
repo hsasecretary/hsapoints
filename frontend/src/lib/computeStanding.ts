@@ -21,8 +21,8 @@ export type Member = {
     excusals?: { codeId: string }[];
     strikeRemovals?: { codeId: string }[];
     missedEventOverrides?: { codeId: string }[];
-    /** `requestId` when E-Board turned a Point Request into it. */
-    adjustments?: { points: number; note?: string; date?: string; requestId?: string }[];
+    /** `requestId` when E-Board turned a Point Request into it; `by` when E-Board took points away on User Lookup. */
+    adjustments?: { points: number; note?: string; date?: string; requestId?: string; by?: string }[];
 };
 
 /** An attendances/{id} doc, with its doc ID as `id`. */

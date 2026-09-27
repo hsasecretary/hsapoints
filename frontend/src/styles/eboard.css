@@ -453,12 +453,34 @@
 .ulk .ulk-status--pending { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
 .ulk .ulk-status--approved { background: var(--hsa-success-bg); border-color: var(--hsa-success-border); color: var(--hsa-success-strong); }
 .ulk .ulk-status--denied { background: var(--hsa-danger-bg); border-color: var(--hsa-danger-border); color: var(--hsa-danger-strong); }
+.ulk .ulk-status--revoked { background: var(--hsa-surface-sunken); border-color: var(--hsa-danger-border); color: var(--hsa-danger-strong); }
+
+/* The code a row came from, beside its name. */
+.ulk .ulk-code {
+    margin-left: 6px; padding: 0 6px; border-radius: 4px; background: var(--hsa-surface-sunken);
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: var(--hsa-text-xs); font-weight: 600; color: var(--hsa-ink-soft);
+}
+
+/* All / Codes / Point Requests / Adjustments above the points list. */
+.ulk .ulk-filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+.ulk .ulk-filter {
+    min-width: 0; min-height: 32px; padding: 0 12px; border: 1px solid var(--hsa-border); border-radius: 999px;
+    background: var(--hsa-surface); color: var(--hsa-ink-soft); font: inherit; font-size: var(--hsa-text-sm); font-weight: 600; cursor: pointer;
+}
+.ulk .ulk-filter.is-active { background: var(--hsa-teal-700); border-color: var(--hsa-teal-700); color: #ffffff; }
+
+.ulk .ulk-takeaway { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 0 0; font-size: var(--hsa-text-sm); }
+.ulk .ulk-takeaway-form { margin-top: 12px; }
+.ulk .ulk-takeaway-form textarea { max-width: 360px; }
+.ulk .ulk-takeaway-form input { max-width: 120px; }
+.ulk .ulk-row__revoke { grid-column: 2 / -1; margin-top: 6px; }
 
 /* Phones: two-line rows, the date above the name and the points beside it. */
 @media (max-width: 600px) {
     .ulk .ulk-row { grid-template-columns: 1fr auto; row-gap: 2px; }
     .ulk .ulk-row__date { grid-column: 1 / -1; }
     .ulk .ulk-row--total .ulk-row__date { display: none; }
+    .ulk .ulk-row__revoke { grid-column: 1 / -1; }
     .ulk .ulk-facts__wide { grid-column: 1 / -1; }
     .ulk .ulk-stat { padding: 12px; }
     .ulk .ulk-stat__value { font-size: var(--hsa-text-2xl); }
@@ -982,7 +1004,10 @@
 }
 
 .point-request-review .review-mode {
-    flex: 1;
+    /* Sized by their labels and sharing what's left, so "Adjustment" stays inside a narrow card. */
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 4px;
     min-height: 40px;
     border: none;
     border-radius: 6px;
@@ -992,6 +1017,9 @@
     font-size: 14px;
     cursor: pointer;
 }
+
+.point-request-review .review-info .danger-form,
+.point-request-review .review-info .danger-form__open { margin-top: 10px; }
 
 .point-request-review .review-mode.is-active {
     background: var(--hsa-surface);

@@ -55,7 +55,7 @@ A Member's claim, with photo proof, that they attended an event, usually one who
 _Avoid_: Manual points
 
 **Adjustment**:
-Points E-Board added by hand that don't trace back to any event, carried with a note of why.
+Points E-Board added or took away by hand that don't trace back to any event, carried with a note of why. Taking points away for something a Member did is a negative Adjustment; undoing a Point Request approved by mistake is revoking it, not an Adjustment.
 
 **Cabinet Points**:
 The points a Cabinet Member earns toward Graduating Cabinet — each Event Type's cabinet value (a GBM is worth 1 Cabinet Point).
