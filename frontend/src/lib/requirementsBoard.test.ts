@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { computeStanding, type Attendance, type Code, type Member } from './computeStanding';
 import type { MemberRequest } from './pointsOverview';
-import { requirementsBoard } from './requirementsBoard';
+import { requirementsBoard, tileStatus, type Tile } from './requirementsBoard';
 import { rubric } from './rubric';
 
 const cabinetMember: Member = { cabinet: 'programming', approved: true, eboard: false, heldToCabinetRules: true };
@@ -38,7 +38,6 @@ describe('requirementsBoard', () => {
         const sep = b.months.find((month) => month.label === 'Sep');
         const tile = sep.tiles.find((t) => t.key === 'CT2');
         expect(tile).toMatchObject({ name: 'Cabinet Thursday Wk 2', state: 'open', strike: true });
-        expect(b.firstOpen).toBe('CT2');
         expect(b.toMakeUp).toEqual([{ codeId: 'CT2', name: 'Cabinet Thursday Wk 2', date: '2026-09-04', strike: true, pending: false }]);
         expect(b.openStrikes).toBe(1);
     });
@@ -63,7 +62,6 @@ describe('requirementsBoard', () => {
             detail: { kind: 'madeup', by: 'Mixer with HSO', byDate: '2026-09-21', clearedStrike: true },
         });
         expect(b.months[2].tiles[0]).toMatchObject({ key: 'GBM4', state: 'upcoming' });
-        expect(b.firstOpen).toBeNull();
         expect(b.toMakeUp).toEqual([]);
     });
 
@@ -183,5 +181,36 @@ describe('requirementsBoard', () => {
         const b = board({ attendances: [attended(social)], codes: [social], today: '2026-09-25' });
 
         expect(b.byType.rows[0].events[0].did).toBe('Extra. It will make up your next miss');
+    });
+
+    it('sums up Tier 1: attended out of past Core Events, the next one, and the HLHM deadline', () => {
+        const orientation = code('ORI', 'cabinet-orientation', '2026-07-30', 'Cabinet Orientation');
+        const thursday = code('CT1', 'cabinet-thursday', '2026-08-28', 'Cabinet Thursday Wk 1');
+        const gbm = code('GBM4', 'gbm', '2026-10-08', 'GBM 4');
+        const gbm5 = code('GBM5', 'gbm', '2026-11-05', 'GBM 5');
+        const paint = code('HL1', 'hlhm', '2026-10-10', 'HLHM Paint Night');
+        const social = code('MIX', 'external-social', '2026-09-21', 'Mixer with HSO');
+        const b = board({
+            attendances: [attended(orientation), attended(social)],
+            codes: [orientation, thursday, gbm, gbm5, paint, social],
+            today: '2026-09-25',
+        });
+
+        // The made-up Thursday counts as past but not attended; HLHM isn't due yet.
+        expect(b.core).toEqual({ attended: 1, past: 2, next: { name: 'GBM 4', date: '2026-10-08' }, hlhmBy: '2026-10-10' });
+    });
+
+    it("says each Core Event's status in words, so no colour key is needed", () => {
+        const tile = (detail: Tile['detail']): Tile => ({ key: 'K', name: 'GBM 1', date: '2026-09-10', state: 'done', strike: false, hlhm: false, detail });
+
+        expect(tileStatus(tile({ kind: 'attended' }))).toBe('Attended');
+        expect(tileStatus(tile({ kind: 'upcoming' }))).toBe('Coming up');
+        expect(tileStatus(tile({ kind: 'open', strike: true }))).toBe('Missed, to make up');
+        expect(tileStatus(tile({ kind: 'closed' }))).toBe('Missed, nothing to make up');
+        expect(tileStatus(tile({ kind: 'madeup', by: 'Mixer', byDate: '2026-09-21', clearedStrike: true })))
+            .toBe('Made up by Mixer on Sep 21, which cleared its Strike');
+        expect(tileStatus(tile({ kind: 'madeup', by: 'Mixer', byDate: '2026-09-21', clearedStrike: false }))).toBe('Made up by Mixer on Sep 21');
+        expect(tileStatus(tile({ kind: 'hlhm-open', by: '2026-10-10' }))).toBe('Go to any one by Oct 10');
+        expect(tileStatus(tile({ kind: 'hlhm-done', name: 'HLHM Paint Night', date: '2026-09-20' }))).toBe('Attended HLHM Paint Night');
     });
 });

@@ -1,5 +1,5 @@
-// What the Requirements page shows a Cabinet Member (#58 variant D, #75): the
-// year board of Core Events by month, the Fall | Spring Semester Requirement
+// What the Requirements page shows a Cabinet Member (#58, #75): Tier 1 as a
+// short summary with the full year of Core Events by month behind it, the Fall | Spring Semester Requirement
 // grid, the Missed Events still to make up, and "By category" as a table of
 // Event Types where each event says what it did. Pure, so it's tested without
 // Firestore; every fact comes from computeStanding. Members see whether a miss
@@ -17,7 +17,7 @@ import {
 import type { MemberRequest } from './pointsOverview';
 import { missedEventName } from './pointRequests';
 import { eventType, rubric } from './rubric';
-import { academicYear, fromIsoDate, semesterOf } from './semester';
+import { academicYear, fromIsoDate, semesterOf, shortDate } from './semester';
 
 export type TileState = 'done' | 'madeup' | 'open' | 'upcoming';
 
@@ -67,8 +67,8 @@ export type TypeRow = { key: string; name: string; cabinetPoints: number; vePoin
 
 export type RequirementsBoard = {
     months: { label: string; tiles: Tile[] }[];
-    /** The first open miss, which starts selected. */
-    firstOpen: string | null;
+    /** Tier 1 in one line: past Core Events attended (made-up misses don't count), the next one, and HLHM's deadline if it's still open. */
+    core: { attended: number; past: number; next: { name: string; date: string } | null; hlhmBy: string | null };
     grid: { fall: SemesterColumn; spring: SemesterColumn; rows: GridRow[] };
     /** Oldest first. */
     toMakeUp: OwedMiss[];
@@ -256,7 +256,12 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
 
     return {
         months,
-        firstOpen: tiles.find((tile) => tile.state === 'open')?.key ?? null,
+        core: {
+            attended: tiles.filter((tile) => tile.state === 'done').length,
+            past: tiles.filter((tile) => tile.state !== 'upcoming').length,
+            next: tiles.filter((tile) => tile.state === 'upcoming' && !tile.hlhm).map(({ name, date }) => ({ name, date }))[0] ?? null,
+            hlhmBy: tiles.flatMap((tile) => (tile.detail.kind === 'hlhm-open' ? [tile.detail.by] : []))[0] ?? null,
+        },
         grid,
         toMakeUp,
         openStrikes: standing.openStrikes,
@@ -273,6 +278,26 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
             },
         },
     };
+}
+
+/** A Core Event's status in words, so the list needs no colour key. */
+export function tileStatus({ detail }: Tile): string {
+    switch (detail.kind) {
+        case 'attended':
+            return 'Attended';
+        case 'upcoming':
+            return 'Coming up';
+        case 'open':
+            return 'Missed, to make up';
+        case 'closed':
+            return 'Missed, nothing to make up';
+        case 'madeup':
+            return `Made up by ${detail.by} on ${shortDate(detail.byDate)}${detail.clearedStrike ? ', which cleared its Strike' : ''}`;
+        case 'hlhm-open':
+            return `Go to any one by ${shortDate(detail.by)}`;
+        case 'hlhm-done':
+            return `Attended ${detail.name}`;
+    }
 }
 
 /** Whether a miss carried a Strike before it was made up (a made-up miss has `strike` false). */
