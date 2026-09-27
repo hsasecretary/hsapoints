@@ -123,6 +123,9 @@ export type StandingOptions = {
 /** Open Strikes at which a Cabinet Member is at risk of probation and must meet with the Chief of Staff. */
 export const AT_RISK_STRIKES = 3;
 
+/** Cabinet Points to be a Graduating Cabinet Member: a target, not a cap. */
+export const CABINET_POINTS_GOAL = 20;
+
 /** One HLHM event a year fills its Core Event; any beyond it is surplus. */
 const HLHM = 'hlhm';
 

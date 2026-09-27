@@ -1,6 +1,8 @@
 import { Fragment, useState } from 'react';
 import type { LedgerEntry, PointsOverview } from '../../../lib/pointsOverview';
+import type { RequirementsBoard } from '../../../lib/requirementsBoard';
 import { shortDate } from '../../../lib/semester';
+import EventTypeTable from './EventTypeTable';
 
 const pointsLabel = (points: number) => (points ? `${points} ${Math.abs(points) === 1 ? 'point' : 'points'}` : 'No points');
 const signed = (points: number) => `${points > 0 ? '+' : ''}${points}`;
@@ -8,8 +10,9 @@ const dateLabel = (entry: LedgerEntry) => (entry.date ? shortDate(entry.date) : 
 
 // What the Overview's "Points & events" bubble opens (#59 variant A): a
 // switch between groups that each drop down to their events, and every
-// event newest first with a line where the Member reached the goal.
-function PointsAndEvents({ overview }: { overview: PointsOverview }) {
+// event newest first with a line where the Member reached the goal. In the
+// Cabinet view "By category" is the Event Type table instead (#58 variant D).
+function PointsAndEvents({ overview, byType }: { overview: PointsOverview; byType?: RequirementsBoard['byType'] }) {
     const [byDate, setByDate] = useState(false);
 
     if (overview.ledger.length === 0) {
@@ -42,7 +45,7 @@ function PointsAndEvents({ overview }: { overview: PointsOverview }) {
                         </Fragment>
                     ))}
                 </ul>
-            ) : (
+            ) : byType ? <EventTypeTable byType={byType} /> : (
                 <div className="ov-cats">
                     {overview.groups.map((group) => (
                         <details key={group.key} className="ov-cat">

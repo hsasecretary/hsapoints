@@ -832,7 +832,8 @@ with the my requests tab. ---------- */
 
 .overview,
 .guide,
-.requests-page {
+.requests-page,
+.requirements-page {
     box-sizing: border-box;
     width: 100%;
     max-width: 720px;
@@ -865,7 +866,8 @@ with the my requests tab. ---------- */
 
 .overview .overview__title,
 .guide .guide__title,
-.requests-page .requests-page__title {
+.requests-page .requests-page__title,
+.requirements-page .requirements-page__title {
     margin: 0 0 16px;
     font-family: var(--hsa-font-display);
     font-size: var(--hsa-text-2xl);
@@ -913,7 +915,8 @@ with the my requests tab. ---------- */
 }
 
 .overview .overview__loading,
-.guide .guide__loading {
+.guide .guide__loading,
+.requirements-page .requirements-page__loading {
     color: var(--hsa-muted);
 }
 
@@ -1379,6 +1382,572 @@ with the my requests tab. ---------- */
     color: var(--hsa-gold-700);
     font-size: var(--hsa-text-xs);
     font-weight: 700;
+}
+
+/* Cabinet view: Cabinet Points toward 20 */
+.overview .ov-cabinet {
+    margin-top: 20px;
+}
+
+.overview .ov-cabinet__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    color: var(--hsa-ink-soft);
+}
+
+.overview .ov-cabinet__top strong {
+    color: var(--hsa-teal-700);
+}
+
+.overview .ov-cabinet__track {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--hsa-surface-sunken);
+    overflow: hidden;
+}
+
+.overview .ov-cabinet__fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--hsa-teal-600);
+}
+
+.overview .ov-cabinet__note {
+    margin: 6px 0 0;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-muted);
+}
+
+.overview .ov-cabinet__note.is-reached {
+    font-weight: 600;
+    color: var(--hsa-teal-700);
+}
+
+/* Cabinet view: "By category" as a table of Event Types */
+.overview .ov-types {
+    width: 100%;
+    border: 1px solid var(--hsa-border);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--hsa-surface);
+    box-shadow: none;
+    font-size: var(--hsa-text-sm);
+}
+
+.overview .ov-types th,
+.overview .ov-types td {
+    padding: 9px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+    font-size: var(--hsa-text-sm);
+    text-align: right;
+    vertical-align: top;
+    background: none;
+    color: var(--hsa-ink);
+}
+
+.overview .ov-types th:first-child {
+    text-align: left;
+}
+
+.overview .ov-types th:not(:first-child),
+.overview .ov-types td {
+    width: 64px;
+}
+
+.overview .ov-types thead th {
+    background: var(--hsa-surface-sunken);
+    font-size: var(--hsa-text-xs);
+    color: var(--hsa-ink-soft);
+}
+
+.overview .ov-types tbody th button {
+    min-height: 32px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--hsa-teal-700);
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+}
+
+.overview .ov-types tbody th button::after {
+    content: ' \25BE';
+    color: var(--hsa-muted);
+}
+
+.overview .ov-types tr.is-open th button::after {
+    content: ' \25B4';
+}
+
+.overview .ov-types .ov-types__sub td {
+    width: auto;
+    padding-left: 22px;
+    text-align: left;
+    background: var(--hsa-surface-subtle);
+}
+
+.overview .ov-types .ov-types__sub span {
+    display: block;
+    font-weight: 600;
+}
+
+.overview .ov-types small {
+    font-size: var(--hsa-text-xs);
+    font-weight: 400;
+    color: var(--hsa-muted);
+}
+
+.overview .ov-types tfoot th,
+.overview .ov-types tfoot td {
+    border-bottom: 0;
+    border-top: 2px solid var(--hsa-teal-700);
+    font-weight: 800;
+}
+
+/* ---- Requirements (requirements/: YearBoard, SemesterGrid, ToMakeUp) —
+   #58 variant D, #75. Warm, never red, for anything still to make up.
+   Scoped to .requirements-page. ---- */
+
+.requirements-page *,
+.requirements-page *::before,
+.requirements-page *::after {
+    box-sizing: border-box;
+}
+
+.requirements-page button {
+    font-family: inherit;
+    margin: 0;
+    min-width: 0;
+}
+
+.requirements-page button:focus-visible,
+.requirements-page a:focus-visible {
+    outline: 3px solid rgba(15, 76, 100, .4);
+    outline-offset: 2px;
+}
+
+.requirements-page .rq-h2 {
+    margin: 28px 0 10px;
+    font-size: var(--hsa-text-lg);
+    color: var(--hsa-teal-700);
+    text-align: left;
+}
+
+.requirements-page .rq-empty {
+    margin: 0;
+    color: var(--hsa-muted);
+}
+
+/* Status boxes: to make up, and the Strike slots */
+.requirements-page .rq-status {
+    display: flex;
+    gap: 10px;
+}
+
+.requirements-page .rq-status > div {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--hsa-border);
+    border-radius: 12px;
+    background: var(--hsa-surface);
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    color: var(--hsa-ink-soft);
+}
+
+.requirements-page .rq-status > div.is-over {
+    border-color: var(--hsa-warm-stripe);
+    background: var(--hsa-warm-bg);
+    color: var(--hsa-warm-ink);
+}
+
+.requirements-page .rq-status__big {
+    font-size: var(--hsa-text-2xl);
+    font-weight: 800;
+    line-height: 1;
+    color: var(--hsa-warm-edge);
+}
+
+.requirements-page .rq-slots {
+    display: inline-flex;
+    gap: 4px;
+}
+
+.requirements-page .rq-slots span {
+    width: 12px;
+    height: 22px;
+    border: 2px solid var(--hsa-warm-stripe);
+    border-radius: 3px;
+}
+
+.requirements-page .rq-slots span.is-on {
+    border-color: var(--hsa-warm-edge);
+    background: var(--hsa-warm-edge);
+}
+
+.requirements-page .rq-over {
+    margin: 8px 0 0;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-warm-ink);
+}
+
+/* Tier 1: tiles by month */
+.requirements-page .rq-board {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.requirements-page .rq-month {
+    display: grid;
+    grid-template-columns: 38px 1fr;
+    gap: 8px;
+    align-items: start;
+}
+
+.requirements-page .rq-month__label {
+    padding-top: 12px;
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 6px;
+}
+
+.requirements-page .rq-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-height: 48px;
+    padding: 9px 18px 9px 10px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: left;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+}
+
+.requirements-page .rq-tile small {
+    font-size: 11px;
+    font-weight: 500;
+    opacity: .9;
+}
+
+.requirements-page .rq-tile.is-done {
+    background: var(--hsa-teal-700);
+    color: #fff;
+}
+
+.requirements-page .rq-tile.is-madeup {
+    border-color: var(--hsa-teal-400);
+    background: var(--hsa-teal-100);
+    color: var(--hsa-teal-800);
+}
+
+.requirements-page .rq-tile.is-open {
+    border-color: var(--hsa-warm-stripe);
+    background: var(--hsa-warm-bg);
+    color: var(--hsa-warm-ink);
+}
+
+.requirements-page .rq-tile.is-upcoming {
+    border: 2px dashed var(--hsa-border);
+    background: transparent;
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-tile.has-strike::after {
+    content: '';
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--hsa-warm-edge);
+}
+
+.requirements-page .rq-tile[aria-pressed="true"] {
+    outline: 3px solid var(--hsa-ink);
+    outline-offset: 1px;
+}
+
+.requirements-page .rq-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--hsa-text-xs);
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-legend li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.requirements-page .rq-legend li::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+}
+
+.requirements-page .rq-legend li.is-done::before {
+    background: var(--hsa-teal-700);
+}
+
+.requirements-page .rq-legend li.is-madeup::before {
+    border-color: var(--hsa-teal-400);
+    background: var(--hsa-teal-100);
+}
+
+.requirements-page .rq-legend li.is-open::before {
+    border-color: var(--hsa-warm-stripe);
+    background: var(--hsa-warm-bg);
+}
+
+.requirements-page .rq-legend li.has-strike::before {
+    width: 8px;
+    height: 8px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--hsa-warm-edge);
+}
+
+.requirements-page .rq-legend li.is-upcoming::before {
+    border: 2px dashed var(--hsa-border);
+}
+
+.requirements-page .rq-detail {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--hsa-border);
+    border-radius: 10px;
+    background: var(--hsa-surface);
+    font-size: var(--hsa-text-sm);
+}
+
+.requirements-page .rq-detail p {
+    margin: 0;
+}
+
+.requirements-page .rq-detail__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 12px;
+}
+
+.requirements-page .rq-detail__row p {
+    flex: 1 1 200px;
+}
+
+.requirements-page .rq-makeup {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1.5px solid var(--hsa-warm-edge);
+    border-radius: 999px;
+    background: var(--hsa-warm-bg);
+    color: var(--hsa-warm-ink);
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.requirements-page .rq-makeup:hover {
+    background: var(--hsa-warm-bg-strong);
+}
+
+.requirements-page .rq-pending {
+    flex: none;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--hsa-warm-bg-strong);
+    color: var(--hsa-warm-ink);
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+}
+
+/* Tier 2: Fall | Spring grid */
+.requirements-page .rq-grid {
+    width: 100%;
+    border: 1px solid var(--hsa-border);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--hsa-surface);
+    box-shadow: none;
+    font-size: var(--hsa-text-sm);
+}
+
+.requirements-page .rq-grid th,
+.requirements-page .rq-grid td {
+    padding: 9px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+    font-size: var(--hsa-text-sm);
+    text-align: left;
+    vertical-align: top;
+    background: none;
+    color: var(--hsa-ink);
+}
+
+.requirements-page .rq-grid tbody tr:last-child > * {
+    border-bottom: 0;
+}
+
+.requirements-page .rq-grid thead th {
+    background: var(--hsa-surface-sunken);
+    font-size: var(--hsa-text-xs);
+    color: var(--hsa-ink-soft);
+}
+
+.requirements-page .rq-grid small {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-grid tbody th {
+    font-weight: 600;
+}
+
+.requirements-page .rq-grid td {
+    width: 30%;
+}
+
+.requirements-page .rq-grid td.is-done {
+    font-weight: 800;
+    color: var(--hsa-success);
+}
+
+.requirements-page .rq-grid td.is-done small {
+    color: var(--hsa-ink-soft);
+}
+
+.requirements-page .rq-grid td.is-pending small {
+    font-weight: 600;
+    color: var(--hsa-warm-ink);
+}
+
+.requirements-page .rq-grid td.is-later {
+    background: var(--hsa-surface-subtle);
+}
+
+.requirements-page .rq-hole {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--hsa-border);
+    border-radius: 50%;
+}
+
+/* To make up */
+.requirements-page .rq-hint {
+    margin: -4px 0 10px;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.requirements-page .rq-cards li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1.5px solid var(--hsa-warm-stripe);
+    border-radius: 12px;
+    background: var(--hsa-surface);
+}
+
+.requirements-page .rq-cards__what {
+    font-weight: 700;
+}
+
+.requirements-page .rq-cards__what small {
+    display: block;
+    font-size: var(--hsa-text-xs);
+    font-weight: 400;
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-chip {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--hsa-warm-bg-strong);
+    color: var(--hsa-warm-ink);
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+    vertical-align: 1px;
+}
+
+.requirements-page .rq-caught-up {
+    margin: 0;
+    font-weight: 600;
+    color: var(--hsa-success);
+}
+
+.requirements-page .rq-bank {
+    margin: 12px 0 0;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--hsa-teal-100);
+    color: var(--hsa-teal-800);
+    font-size: var(--hsa-text-sm);
+}
+
+@media (max-width: 420px) {
+    .requirements-page .rq-status {
+        flex-direction: column;
+    }
+
+    .requirements-page .rq-cards li {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* How points work (#49), in the bubble and on /guide */

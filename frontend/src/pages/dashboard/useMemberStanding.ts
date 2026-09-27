@@ -61,6 +61,7 @@ export function useMemberStanding(email: string | null | undefined): MemberStand
                         status: data.status,
                         pointsRequested: data.pointsRequested,
                         codeId: data.codeId,
+                        eventTypeId: data.eventTypeId,
                         makeupFor: data.makeupFor,
                     };
                 })),

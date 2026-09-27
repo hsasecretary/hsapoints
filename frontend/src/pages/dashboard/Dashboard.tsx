@@ -1,8 +1,11 @@
 import { useSearchParams } from 'react-router-dom';
 import { isGeneralMember } from '../../lib/members';
+import { CABINET_POINTS_GOAL } from '../../lib/computeStanding';
 import { pointsOverview } from '../../lib/pointsOverview';
+import { requirementsBoard } from '../../lib/requirementsBoard';
 import { formatAccountType } from '../../lib/roles';
 import Explainer from '../guide/Explainer';
+import CabinetGoal from './sections/CabinetGoal';
 import EventCodeForm from './sections/EventCodeForm';
 import MakeUpList from './sections/MakeUpList';
 import PointsAndEvents from './sections/PointsAndEvents';
@@ -16,12 +19,14 @@ type Bubble = (typeof BUBBLES)[number];
 //   My information  — name, email, account type (as the old My Information card)
 //   EventCodeForm   — the large code box
 //   PointsSummary   — Total Points toward the goal, events attended, pending requests
+//   CabinetGoal     — Cabinet view only: Cabinet Points toward 20
 //   MakeUpList      — Cabinet view only: Missed Events to make up
 //   bubbles         — "Points & events" (PointsAndEvents) and "How it works"
-//                     (Explainer), each opening in place (?open=points|how)
+//                     (Explainer), each opening in place (?open=points|how); in
+//                     the Cabinet view "By category" is the Event Type table
 // Every number comes from computeStanding via useMemberStanding.
 function Dashboard({ email }: { email: string }) {
-    const { loading, member, attendances, codes, requests, pending, standing } = useMemberStanding(email);
+    const { loading, member, attendances, codes, requests, pending, standing, today } = useMemberStanding(email);
     const [params, setParams] = useSearchParams();
     const open = BUBBLES.find((bubble) => bubble === params.get('open')) ?? null;
 
@@ -34,6 +39,7 @@ function Dashboard({ email }: { email: string }) {
     const profile = member as { firstName?: string; lastName?: string; cabinet?: string; eboard?: boolean; involvement?: string } | null;
     const firstName = profile?.firstName;
     const overview = standing ? pointsOverview({ member, standing, attendances, codes, requests }) : null;
+    const board = standing?.heldToCabinetRules ? requirementsBoard({ member, standing, attendances, codes, requests, today }) : null;
 
     return (
         <div className="overview">
@@ -56,6 +62,7 @@ function Dashboard({ email }: { email: string }) {
             {loading ? <p className="overview__loading" role="status">Loading your points…</p> : (
                 <>
                     <PointsSummary overview={overview} />
+                    {standing.heldToCabinetRules && <CabinetGoal points={standing.cabinetPoints} goal={CABINET_POINTS_GOAL} />}
                     {standing.heldToCabinetRules && (
                         <MakeUpList standing={standing} codes={codes} pendingPicks={pendingMakeups(pending)} />
                     )}
@@ -72,7 +79,7 @@ function Dashboard({ email }: { email: string }) {
                     </div>
                     {open === 'points' && (
                         <section id="ov-panel-points" className="ov-panel" aria-label="Points & events">
-                            <PointsAndEvents overview={overview} />
+                            <PointsAndEvents overview={overview} byType={board?.byType} />
                         </section>
                     )}
                     {open === 'how' && (

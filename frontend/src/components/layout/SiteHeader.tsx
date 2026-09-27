@@ -20,11 +20,13 @@ type SiteHeaderProps = {
     eboard: boolean;
     /** Cabinet members get the temporary Cabinet Points link. */
     cabinet?: boolean;
+    /** Members held to the Cabinet rules get the Requirements page. */
+    requirements?: boolean;
 };
 
 // Top bar on every page: logo + title (links to /dashboard), the nav links
 // and Logout. Below 900px the links and Logout collapse into a menu button.
-function SiteHeader({ signedIn, eboard, cabinet = false }: SiteHeaderProps) {
+function SiteHeader({ signedIn, eboard, cabinet = false, requirements = false }: SiteHeaderProps) {
     const [open, setOpen] = useState(false);
     const [eboardMenuOpen, setEboardMenuOpen] = useState(false);
     const headerRef = useRef<HTMLElement>(null);
@@ -53,6 +55,7 @@ function SiteHeader({ signedIn, eboard, cabinet = false }: SiteHeaderProps) {
     const nav: NavItem[] = [
         { label: 'UF HSA', href: UFHSA_URL },
         { label: 'Dashboard', to: '/dashboard' },
+        ...(requirements ? [{ label: 'Requirements', to: '/requirements' }] : []),
         { label: 'Requests', to: '/requests' },
         { label: 'Guide', to: '/guide' },
         { label: 'Calendar', href: CALENDAR_URL },

@@ -15,6 +15,8 @@ export type MemberRequest = {
     status?: string;
     pointsRequested?: number;
     codeId?: string | null;
+    /** The Event Type the Member picked, or null for "Not listed". */
+    eventTypeId?: string | null;
     makeupFor?: (string | null)[];
 };
 
