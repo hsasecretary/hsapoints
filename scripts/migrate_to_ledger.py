@@ -47,11 +47,13 @@ import argparse
 import datetime as dt
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
 
 import pandas as pd
+from google.cloud.firestore import Increment
 
 import ledger_plan as plan
 
@@ -500,8 +502,14 @@ def apply_plan(db, the_plan):
         writes.append(("update", db.collection("codes").document(cid), {"eventTypeId": type_id}))
     for cid, code in sorted(the_plan["newCodes"].items()):
         writes.append(("set", db.collection("codes").document(cid), code))
+    folded = {}
     for aid, doc in sorted(the_plan["attendances"].items()):
         writes.append(("create", db.collection("attendances").document(aid), doc))
+        if doc["source"] == "request" and doc.get("codeId") and doc["codeId"] not in the_plan["newCodes"]:
+            folded[doc["codeId"]] = folded.get(doc["codeId"], 0) + 1
+    # As approving a request for a code does (lib/requestReview.ts), so revoking it later evens out.
+    for cid, count in sorted(folded.items()):
+        writes.append(("update", db.collection("codes").document(cid), {"attendeeCount": Increment(count)}))
     for email, patch in sorted(the_plan["patches"].items()):
         writes.append(("update", db.collection("users").document(email), patch))
     for rid, patch in sorted(the_plan["requestUpdates"].items()):
@@ -515,7 +523,7 @@ def apply_plan(db, the_plan):
     return len(writes)
 
 
-def new_code_writes(data, the_plan):
+def drop_unchanged_retro_codes(data, the_plan):
     """Drop retroactive codes that already exist unchanged, so a re-apply writes nothing."""
     for cid in list(the_plan["newCodes"]):
         current = data["codes"].get(cid)
@@ -532,7 +540,6 @@ def main():
     parser.add_argument("--today", type=dt.date.fromisoformat, default=dt.date.today())
     args = parser.parse_args()
 
-    import os
     import firebase_admin
     from firebase_admin import credentials, firestore
     if os.environ.get("FIRESTORE_EMULATOR_HOST"):
@@ -570,8 +577,14 @@ def main():
     sheet, reviewed_by, signed_on = read_review()
     if args.apply and not (reviewed_by and signed_on):
         sys.exit("The review sheet is not signed (Sign-off: Reviewed by and Date). Nothing written.")
-    the_plan = build_plan(data, sheet, rubric, signed_on or args.today.isoformat(), year_start)
-    new_code_writes(data, the_plan)
+    if signed_on:
+        try:
+            dt.date.fromisoformat(signed_on)
+        except ValueError:
+            sys.exit(f"Sign-off Date {signed_on!r} is not YYYY-MM-DD. Nothing written.")
+    # The sign-off date stamps every override, so re-applies write the same values.
+    the_plan = build_plan(data, sheet, rubric, signed_on or "unsigned", year_start)
+    drop_unchanged_retro_codes(data, the_plan)
 
     diff = build_diff(data, the_plan, rubric, args.today, year_start)
     with pd.ExcelWriter(DIFF, engine="openpyxl") as writer:
