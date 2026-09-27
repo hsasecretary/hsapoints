@@ -3,7 +3,7 @@
    ======================================================================== */
 
 /* ---- Site header (SiteHeader.tsx) ---------------------------------------
-   ≥600px: logo + title, the page links, E-Board ▾, Account ▾ (top right).
+   ≥600px: logo + title, the page links, Account ▾ (top right).
    <600px: logo + Account on top, the pages in the bottom tab bar below. */
 
 .site-header {
@@ -74,7 +74,7 @@
     box-shadow: none;
 }
 
-/* Page links and the E-Board toggle: 44px tall targets. The active page gets
+/* Page links: 44px tall targets. The active page gets
    an underline and bold text as well as the brighter colour. */
 .site-header__link {
     position: relative;
@@ -133,8 +133,7 @@
     outline-offset: 2px;
 }
 
-/* E-Board ▾ and Account ▾ panels (disclosures, not role="menu") */
-.site-header__dropdown,
+/* Account ▾ panel (a disclosure, not role="menu") */
 .site-header__account {
     position: relative;
 }
@@ -150,6 +149,9 @@
     border-radius: 10px;
     box-shadow: 0 10px 24px rgba(15, 23, 42, 0.3);
     z-index: 110;
+    /* View as + the E-Board tools can outgrow a short screen: scroll inside */
+    max-height: calc(100vh - var(--site-header-height, 72px) - 16px);
+    overflow-y: auto;
 }
 
 .site-header__panel[hidden] {
@@ -253,13 +255,28 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 }
 
-.site-header__views legend {
+/* The Account panel's E-Board tools, between View as and Log out */
+.site-header__tools {
+    margin: 0 0 8px;
+    padding: 0 0 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.site-header__views legend,
+.site-header .site-header__group {
     padding: 4px 12px 6px;
     color: rgba(255, 255, 255, 0.8);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+}
+
+.site-header .site-header__group {
+    margin: 0;
+    font-family: inherit;
+    line-height: normal;
+    text-align: left;
 }
 
 .site-header__view {
@@ -363,8 +380,8 @@
     display: none;
 }
 
-/* Narrow desktop: drop the title so all five links still fit on one line */
-@media (max-width: 1040px) {
+/* Narrow desktop: drop the title so the links and Account fit on one line */
+@media (max-width: 820px) {
     .site-header__title {
         display: none;
     }
@@ -382,41 +399,6 @@
     .site-header__link::after {
         left: 10px;
         right: 10px;
-    }
-}
-
-/* 600–759px: five links and Account only fit with tighter links and
-   Account as icon + caret (its label stays for screen readers) */
-@media (min-width: 600px) and (max-width: 759.98px) {
-    .site-header__bar {
-        gap: 8px;
-    }
-
-    .site-header__nav {
-        gap: 0;
-    }
-
-    .site-header__link {
-        padding: 0 7px;
-    }
-
-    .site-header__link::after {
-        left: 7px;
-        right: 7px;
-    }
-
-    .site-header .site-header__account-toggle {
-        gap: 4px;
-        padding: 0 10px;
-    }
-
-    .site-header__account-label {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
     }
 }
 
@@ -461,7 +443,7 @@
     }
 
     /* Equal cells when the labels fit; wider cells for long labels rather
-       than truncating them ("Requirements" at 360px with five tabs) */
+       than truncating them ("Requirements" on a narrow phone) */
     .tab-bar ul {
         display: grid;
         grid-auto-flow: column;

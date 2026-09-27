@@ -1,8 +1,8 @@
 // "How points work", worded in #49: version A for General and MLP Members,
 // version B for Cabinet Members and E-Board. Shown in the Overview's How it
-// works bubble and on the Guide page (/guide).
-import type { Member } from '../../lib/computeStanding';
-import { isHeldToCabinetRules } from '../../lib/members';
+// works bubble.
+import type { Member } from '../../../lib/computeStanding';
+import { isHeldToCabinetRules } from '../../../lib/members';
 
 /** The explainer for this Member's role. */
 function Explainer({ member }: { member: Member }) {

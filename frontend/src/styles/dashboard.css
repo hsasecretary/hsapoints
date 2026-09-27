@@ -1,5 +1,5 @@
 /* ========================================================================
-   Member pages (/dashboard, /requests, /guide) and Cabinet page (/cabinet)
+   Member pages (/dashboard, /requests) and Cabinet page (/cabinet)
    ======================================================================== */
 
 /* ---- Cabinet points cards  (CabinetPoints.tsx) ---------- */
@@ -827,11 +827,10 @@ with the my requests tab. ---------- */
     }
 }
 /* ---- Overview  (Dashboard.tsx and sections/: EventCodeForm, PointsSummary,
-   MakeUpList, PointsAndEvents; guide/Explainer) — #57 layout C as revised,
-   #59 variant A. Scoped to .overview / .guide / .requests-page / .explainer. ---- */
+   MakeUpList, PointsAndEvents, Explainer) — #57 layout C as revised,
+   #59 variant A. Scoped to .overview / .requests-page / .explainer. ---- */
 
 .overview,
-.guide,
 .requests-page,
 .requirements-page {
     box-sizing: border-box;
@@ -871,7 +870,6 @@ with the my requests tab. ---------- */
 }
 
 .overview .overview__title,
-.guide .guide__title,
 .requests-page .requests-page__title,
 .requirements-page .requirements-page__title {
     margin: 0 0 16px;
@@ -882,10 +880,13 @@ with the my requests tab. ---------- */
     text-align: left;
 }
 
-/* My information: name, email, account type under "Hi, {name}" */
+/* My information: name, email, account type under "Hi, {name}". A pair
+   that doesn't fit moves to the next line whole instead of breaking in two;
+   a value only breaks by itself when it's wider than the page (a long email
+   on a phone). */
 .overview .overview__info {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 6px 20px;
     margin: -8px 0 20px;
     font-size: var(--hsa-text-sm);
@@ -899,6 +900,8 @@ with the my requests tab. ---------- */
 }
 
 .overview .overview__info dt {
+    flex-shrink: 0;
+    white-space: nowrap;
     font-weight: 600;
     color: var(--hsa-teal-700);
 }
@@ -921,7 +924,6 @@ with the my requests tab. ---------- */
 }
 
 .overview .overview__loading,
-.guide .guide__loading,
 .requirements-page .requirements-page__loading {
     color: var(--hsa-muted);
 }

@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
 import { EBOARD_TOOLS } from './eboardTools';
 
-// /eboard: the E-Board tools as a list. The phone tab bar's E-Board tab opens
-// it, since a tab bar can't hold the desktop dropdown.
+// /eboard: the E-Board tools as a list (the same list as the Account menu's).
 function EboardHome() {
     return (
         <div className="eboard-home">

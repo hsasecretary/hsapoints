@@ -8,7 +8,6 @@ import Footer from './components/layout/Footer';
 import NotFound from './pages/NotFound';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import Requests from './pages/requests/Requests';
-import Guide from './pages/guide/Guide';
 import Requirements from './pages/requirements/Requirements';
 import { ViewAsContext, type ViewAsState } from './components/layout/ViewAsContext';
 import { canSwitchView, effectiveView, ownView, type View } from './lib/viewAs';
@@ -118,7 +117,8 @@ function App() {
                         <Route path="/dashboard" element={userEmail ? <Dashboard email={userEmail} /> : <Navigate to="/login" />} />
                         <Route path="/requirements" element={!userEmail ? <Navigate to="/login" /> : cabinetView ? <Requirements email={userEmail} /> : <Navigate to="/dashboard" replace />} />
                         <Route path="/requests" element={userEmail ? <Requests /> : <Navigate to="/login" />} />
-                        <Route path="/guide" element={userEmail ? <Guide email={userEmail} /> : <Navigate to="/login" />} />
+                        {/* The Guide page is gone; its explainer is the Overview's How it works bubble */}
+                        <Route path="/guide" element={<Navigate to="/dashboard?open=how" replace />} />
                         <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember} /> : <Navigate to="/login" />} />
                         {/* E-Board tools, one page each (list in pages/eboard/eboardTools.ts) */}
                         <Route path="/eboard" element={userEmail ? <Eboard eboard={isEboard} /> : <Navigate to="/login" />}>

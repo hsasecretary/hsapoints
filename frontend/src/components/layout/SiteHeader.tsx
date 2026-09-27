@@ -4,7 +4,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../../lib/firebase';
 import { VIEW_LABELS, VIEWS } from '../../lib/viewAs';
 import { EBOARD_TOOLS } from '../../pages/eboard/eboardTools';
-import { isNavItemActive, navItems, type NavIcon, type NavItem } from './navItems';
+import { navItems, type NavIcon, type NavItem } from './navItems';
 import { useViewAs } from './ViewAsContext';
 
 // White HSA logo. Served from our own /public rather than from the Wix CDN
@@ -21,15 +21,14 @@ type SiteHeaderProps = {
 };
 
 // The one navbar (#76, docs/research/dashboard-navbar.md).
-//   ≥600px: logo, the page links (navItems.ts), E-Board ▾ and Account ▾.
-//   <600px: logo and Account on top; the pages move to a fixed bottom tab
-//           bar, whose E-Board tab opens the /eboard landing page.
-// Account ▾ holds "View as" (E-Board and Web-team Testers) and Log out. While
-// another view is previewed, a banner under the bar says so on every page.
+//   ≥600px: logo, the page links (navItems.ts) and Account ▾.
+//   <600px: logo and Account on top; the pages move to a fixed bottom tab bar.
+// Account ▾ holds "View as" (E-Board and Web-team Testers), the E-Board tools
+// (E-Board) and Log out. While another view is previewed, a banner under the
+// bar says so on every page.
 function SiteHeader({ signedIn, eboard, cabinetView }: SiteHeaderProps) {
     const headerRef = useRef<HTMLElement>(null);
-    const { pathname } = useLocation();
-    const items = navItems({ cabinetView, eboard });
+    const items = navItems({ cabinetView });
 
     // Sticky bars must not cover the focused element (WCAG 2.4.11): the
     // header's height feeds html's scroll-padding-top (layout.css). It grows
@@ -63,22 +62,20 @@ function SiteHeader({ signedIn, eboard, cabinetView }: SiteHeaderProps) {
                     {signedIn && (
                         <>
                             <nav className="site-header__nav" aria-label="Main">
-                                {items.map((item) => item.section
-                                    ? <EboardMenu key={item.to} active={isNavItemActive(item, pathname)} />
-                                    : (
-                                        <NavLink key={item.to} to={item.to} className="site-header__link">
-                                            {item.label}
-                                        </NavLink>
-                                    ))}
+                                {items.map((item) => (
+                                    <NavLink key={item.to} to={item.to} className="site-header__link">
+                                        {item.label}
+                                    </NavLink>
+                                ))}
                             </nav>
-                            <AccountMenu />
+                            <AccountMenu eboard={eboard} />
                         </>
                     )}
                 </div>
                 {signedIn && <PreviewBanner />}
             </header>
 
-            {signedIn && <TabBar items={items} pathname={pathname} />}
+            {signedIn && <TabBar items={items} />}
         </>
     );
 }
@@ -112,39 +109,9 @@ function useDisclosure() {
     return { open, setOpen, rootRef, buttonRef, onKeyDown };
 }
 
-/** E-Board ▾ (desktop): the tools from eboardTools.ts. Active on /eboard/*. */
-function EboardMenu({ active }: { active: boolean }) {
-    const { open, setOpen, rootRef, buttonRef, onKeyDown } = useDisclosure();
-
-    return (
-        <div ref={rootRef} className="site-header__dropdown" onKeyDown={onKeyDown}>
-            <button
-                ref={buttonRef}
-                type="button"
-                className={`site-header__link site-header__toggle${active ? ' is-active' : ''}`}
-                aria-expanded={open}
-                aria-controls="eboard-menu"
-                onClick={() => setOpen((v) => !v)}
-            >
-                E-Board <Caret />
-            </button>
-            <div id="eboard-menu" className="site-header__panel" hidden={!open}>
-                <ul>
-                    {EBOARD_TOOLS.map((tool) => (
-                        <li key={tool.path}>
-                            <NavLink to={`/eboard/${tool.path}`} className="site-header__panel-link">
-                                {tool.label}
-                            </NavLink>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </div>
-    );
-}
-
-/** Account ▾, top right: "View as" for those who can switch, and Log out. */
-function AccountMenu() {
+/** Account ▾, top right: "View as" for those who can switch, the E-Board
+ *  tools for E-Board, and Log out. */
+function AccountMenu({ eboard }: { eboard: boolean }) {
     const { open, setOpen, rootRef, buttonRef, onKeyDown } = useDisclosure();
     const { own, view, canSwitch, setView } = useViewAs();
     const navigate = useNavigate();
@@ -194,6 +161,20 @@ function AccountMenu() {
                         ))}
                     </fieldset>
                 )}
+                {eboard && (
+                    <nav className="site-header__tools" aria-labelledby="account-eboard">
+                        <h2 id="account-eboard" className="site-header__group">E-Board</h2>
+                        <ul>
+                            {EBOARD_TOOLS.map((tool) => (
+                                <li key={tool.path}>
+                                    <NavLink to={`/eboard/${tool.path}`} className="site-header__panel-link">
+                                        {tool.label}
+                                    </NavLink>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+                )}
                 <button type="button" className="site-header__logout" onClick={logout}>
                     Log out
                 </button>
@@ -218,25 +199,18 @@ function PreviewBanner() {
 }
 
 /** Phone (<600px): the pages as a fixed bottom tab bar, icon + label. */
-function TabBar({ items, pathname }: { items: NavItem[]; pathname: string }) {
+function TabBar({ items }: { items: NavItem[] }) {
     return (
         <nav className="tab-bar" aria-label="Main">
             <ul>
-                {items.map((item) => {
-                    const active = isNavItemActive(item, pathname);
-                    return (
-                        <li key={item.to}>
-                            <Link
-                                to={item.to}
-                                className={`tab-bar__tab${active ? ' is-active' : ''}`}
-                                aria-current={active ? 'page' : undefined}
-                            >
-                                <span className="tab-bar__pill"><Icon name={item.icon} /></span>
-                                <span className="tab-bar__label">{item.label}</span>
-                            </Link>
-                        </li>
-                    );
-                })}
+                {items.map((item) => (
+                    <li key={item.to}>
+                        <NavLink to={item.to} className={({ isActive }) => `tab-bar__tab${isActive ? ' is-active' : ''}`}>
+                            <span className="tab-bar__pill"><Icon name={item.icon} /></span>
+                            <span className="tab-bar__label">{item.label}</span>
+                        </NavLink>
+                    </li>
+                ))}
             </ul>
         </nav>
     );
@@ -250,8 +224,6 @@ const ICON_PATHS: Record<NavIcon | 'account', ReactNode> = {
     dashboard: <><path d="M4 11.5 12 5l8 6.5" /><path d="M6 10v9h12v-9" /><path d="M10 19v-5h4v5" /></>,
     requirements: <><rect x="5" y="4" width="14" height="16" rx="2" /><path d="m8.5 9 1.5 1.5L13 7.5" /><path d="M8.5 15h7" /></>,
     requests: <><path d="M4 13h4l1.5 2.5h5L16 13h4" /><path d="M4 13 6.5 5h11L20 13v6H4z" /></>,
-    guide: <><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v15H7.5A2.5 2.5 0 0 0 5 20.5z" /><path d="M5 20.5A2.5 2.5 0 0 1 7.5 18H19v3H7.5" /></>,
-    eboard: <><rect x="4" y="7" width="16" height="12" rx="2" /><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7" /><path d="M4 12h16" /></>,
     account: <><circle cx="12" cy="8.5" r="3.5" /><path d="M5 20a7 7 0 0 1 14 0" /></>,
 };
 

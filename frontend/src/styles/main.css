@@ -4,7 +4,7 @@
    base.css      site-wide defaults, shared form pieces, utilities
    layout.css    site header, footer, 404 page (every page)
    auth.css      login / sign up / forgot password
-   dashboard.css member pages (dashboard, requirements, requests, guide) and cabinet page
+   dashboard.css member pages (dashboard, requirements, requests) and cabinet page
    eboard.css    e-board tools
    animations.css  page / tab entry animations (imported last so its
                    reveal rules win over an area file's own animation)
