@@ -21,8 +21,22 @@ export type Member = {
     excusals?: { codeId: string }[];
     strikeRemovals?: { codeId: string }[];
     missedEventOverrides?: { codeId: string }[];
-    /** `requestId` when E-Board turned a Point Request into it. */
-    adjustments?: { points: number; note?: string; date?: string; requestId?: string }[];
+    /** `requestId` when E-Board turned a Point Request into it; `by` when E-Board took points away (no longer offered). */
+    adjustments?: { points: number; note?: string; date?: string; requestId?: string; by?: string }[];
+    /** Removed Check-ins, by upper-cased code. Display only: the Attendance is already gone. */
+    removedCheckIns?: Record<string, RemovedCheckIn>;
+};
+
+/** A check-in E-Board took away, as users/{email}.removedCheckIns records it. */
+export type RemovedCheckIn = {
+    event: string;
+    eventTypeId: string;
+    /** 'YYYY-MM-DD'. */
+    eventDate: string;
+    reason: string;
+    by: string;
+    /** 'YYYY-MM-DD' it was removed. */
+    on: string;
 };
 
 /** An attendances/{id} doc, with its doc ID as `id`. */

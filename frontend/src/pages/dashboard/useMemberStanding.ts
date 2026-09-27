@@ -67,6 +67,12 @@ export function useMemberStanding(email: string | null | undefined, view: View |
                         codeId: data.codeId,
                         eventTypeId: data.eventTypeId,
                         makeupFor: data.makeupFor,
+                        reviewedBy: data.reviewedBy ?? null,
+                        reviewedOn: data.reviewedAt?.toDate ? toIsoDate(data.reviewedAt.toDate()) : null,
+                        reviewNotes: data.reviewNotes,
+                        adjustment: data.adjustment,
+                        attendanceIds: data.attendanceIds,
+                        revoked: data.revoked,
                     };
                 })),
                 (error) => console.error('Error loading point requests:', error)),

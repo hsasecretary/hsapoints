@@ -312,13 +312,6 @@
 .eap .eap-risk-list li:first-child button { border-top: 0; }
 .eap .eap-risk-list button:hover { background: var(--hsa-danger-bg); }
 
-/* Name search */
-.eap .eap-search { position: relative; margin-bottom: 20px; }
-.eap .eap-search input { font-size: var(--hsa-text-lg); padding: 14px 16px; border-color: var(--hsa-teal-700); }
-.eap .eap-results { list-style: none; margin: 4px 0 0; padding: 4px; border: 1px solid var(--hsa-border); border-radius: 8px; background: var(--hsa-surface); box-shadow: 0 8px 24px rgba(15, 23, 42, .12); }
-.eap .eap-results button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; padding: 10px 12px; border: 0; background: none; text-align: left; cursor: pointer; border-radius: 6px; color: var(--hsa-ink); font-size: var(--hsa-text-base); }
-.eap .eap-results button:hover { background: var(--hsa-teal-100); }
-
 /* Member header */
 .eap .eap-who { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; padding-bottom: 16px; border-bottom: 2px solid var(--hsa-teal-700); }
 .eap .eap-who p { margin: 4px 0 0; }
@@ -374,345 +367,127 @@
     .eap .eap-row__state { grid-column: 2; text-align: left; }
 }
 
-/* ---- Member points lookup (scoped to .user-points-lookup)  (UserPointsLookup.tsx) -------- */
+/* ---- User Lookup  (UserPointsLookup.tsx) ------------------------------------------------
+   One Member's standing, points and Point Requests on one scrolling page
+   (docs/research/user-lookup-eboard-ux.md). ulk- = user lookup. Status is
+   always in words as well as colour. */
 
-/* UserPointsLookup Styles */
-.user-points-lookup {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+.ulk { max-width: 1000px; margin: 0 auto; padding: 20px 16px; text-align: left; color: var(--hsa-ink); font-family: var(--hsa-font-body); }
+.ulk * { box-sizing: border-box; }
+.ulk h3, .ulk h4 { margin: 0; color: var(--hsa-teal-700); text-align: left; }
+.ulk h3 { font-size: var(--hsa-text-xl); }
+.ulk h4 { font-size: var(--hsa-text-base); display: inline; }
+.ulk .ulk-title { margin: 0 0 16px; font-size: var(--hsa-text-3xl); color: var(--hsa-teal-700); text-align: left; }
+.ulk .ulk-muted { color: var(--hsa-muted); font-size: var(--hsa-text-sm); margin: 8px 0; }
+.ulk .ulk-error { color: var(--hsa-danger); font-size: var(--hsa-text-sm); margin: 8px 0; }
+.ulk a { color: var(--hsa-teal-700); font-weight: 600; }
+.ulk :focus-visible { outline: 3px solid rgba(15, 76, 100, 0.35); outline-offset: 2px; }
+
+.ulk .ulk-body { margin-top: 20px; display: flex; flex-direction: column; gap: 16px; }
+.ulk .ulk-who { padding: 16px; background: var(--hsa-surface); border: 1px solid var(--hsa-border); border-radius: 10px; }
+.ulk .ulk-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px 16px; margin: 10px 0 0; }
+.ulk .ulk-facts dt { font-size: var(--hsa-text-xs); font-weight: 700; color: var(--hsa-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.ulk .ulk-facts dd { margin: 0; overflow-wrap: anywhere; }
+
+.ulk .ulk-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.ulk .ulk-stat {
+    display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; background: var(--hsa-surface);
+    border: 1px solid var(--hsa-border); border-top: 4px solid var(--hsa-teal-600); border-radius: 10px;
+}
+.ulk .ulk-stat.is-met { border-top-color: var(--hsa-success); }
+.ulk .ulk-stat.is-risk { border-top-color: var(--hsa-danger); background: var(--hsa-danger-bg); }
+.ulk .ulk-stat__label { font-size: var(--hsa-text-sm); font-weight: 700; color: var(--hsa-ink-soft); }
+.ulk .ulk-stat__label small { font-weight: 400; color: var(--hsa-muted); }
+.ulk .ulk-stat__value { font-size: var(--hsa-text-3xl); font-weight: 800; color: var(--hsa-teal-700); font-variant-numeric: tabular-nums; line-height: 1.15; }
+.ulk .ulk-stat__value small { font-size: var(--hsa-text-base); font-weight: 600; color: var(--hsa-muted); }
+.ulk .ulk-stat__value--pair { display: flex; flex-direction: column; font-size: var(--hsa-text-lg); }
+.ulk .ulk-stat__note { font-size: var(--hsa-text-sm); color: var(--hsa-muted); }
+.ulk .is-met .ulk-stat__note { color: var(--hsa-success-strong); font-weight: 600; }
+.ulk .ulk-stat__note--risk { color: var(--hsa-danger-strong); font-weight: 700; }
+.ulk .ulk-stat__pending { font-size: var(--hsa-text-sm); margin-top: 4px; }
+
+.ulk .ulk-panel { background: var(--hsa-surface); border: 1px solid var(--hsa-border); border-radius: 10px; padding: 0 16px; }
+.ulk .ulk-panel > summary {
+    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px;
+    padding: 14px 0; cursor: pointer; list-style: none;
+}
+.ulk .ulk-panel > summary::-webkit-details-marker { display: none; }
+.ulk .ulk-panel > summary h4::before { content: '▸'; display: inline-block; margin-right: 8px; transition: transform 0.15s ease; }
+.ulk .ulk-panel[open] > summary h4::before { transform: rotate(90deg); }
+.ulk .ulk-panel > summary .ulk-muted { margin: 0; }
+.ulk .ulk-panel[open] { padding-bottom: 12px; }
+.ulk .ulk-panel__link { margin: 0 0 8px; font-size: var(--hsa-text-sm); color: var(--hsa-muted); }
+.ulk .ulk-unmet { margin: 8px 0 0; font-size: var(--hsa-text-sm); }
+
+.ulk .ulk-list { list-style: none; margin: 0; padding: 0; }
+.ulk .ulk-row {
+    display: grid; grid-template-columns: 64px 1fr auto; column-gap: 12px; align-items: baseline;
+    padding: 10px 0 10px 10px; border-top: 1px solid var(--hsa-border-light); border-left: 3px solid transparent;
+}
+.ulk .ulk-row.is-strike { border-left-color: var(--hsa-danger); background: linear-gradient(90deg, var(--hsa-danger-bg), transparent 70%); }
+.ulk .ulk-row.is-open { border-left-color: #f59e0b; }
+.ulk .ulk-row.is-closed, .ulk .ulk-row.is-madeup { color: var(--hsa-muted); }
+.ulk .ulk-row.is-madeup { border-left-color: var(--hsa-success); }
+.ulk .ulk-row.is-pending { border-left-color: #f59e0b; }
+.ulk .ulk-row--total { font-weight: 800; border-top: 2px solid var(--hsa-ink-soft); }
+.ulk .ulk-row__date { font-variant-numeric: tabular-nums; font-size: var(--hsa-text-sm); color: var(--hsa-muted); white-space: nowrap; }
+.ulk .ulk-row__name { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.ulk .ulk-row__detail { display: block; font-weight: 400; font-size: var(--hsa-text-sm); color: var(--hsa-muted); }
+.ulk .ulk-note { font-style: italic; color: var(--hsa-ink-soft); }
+.ulk .ulk-row__end { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: var(--hsa-text-sm); font-weight: 600; text-align: right; }
+.ulk .ulk-row.is-strike .ulk-row__end { color: var(--hsa-danger-strong); }
+.ulk .ulk-num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ulk .ulk-num small { font-weight: 400; color: var(--hsa-muted); }
+
+.ulk .ulk-tag {
+    display: inline-block; padding: 0 8px; border-radius: 999px; border: 1px solid var(--hsa-border);
+    background: var(--hsa-surface-sunken); color: var(--hsa-ink-soft); font-size: var(--hsa-text-xs); font-weight: 600;
+}
+.ulk .ulk-row__name > .ulk-tag { margin-left: 6px; vertical-align: middle; }
+.ulk .ulk-tag--code { background: var(--hsa-teal-100); border-color: var(--hsa-teal-400); color: var(--hsa-teal-800); }
+.ulk .ulk-tag--request { background: var(--hsa-success-bg); border-color: var(--hsa-success-border); color: var(--hsa-success-strong); }
+.ulk .ulk-tag--eboard { background: var(--hsa-surface-sunken); border-color: var(--hsa-ink-soft); color: var(--hsa-ink); }
+.ulk .ulk-tag--adjustment, .ulk .ulk-tag--excused { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+
+.ulk .ulk-status { padding: 1px 10px; border-radius: 999px; font-size: var(--hsa-text-xs); font-weight: 700; border: 1px solid; }
+.ulk .ulk-status--pending { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+.ulk .ulk-status--approved { background: var(--hsa-success-bg); border-color: var(--hsa-success-border); color: var(--hsa-success-strong); }
+.ulk .ulk-status--denied { background: var(--hsa-danger-bg); border-color: var(--hsa-danger-border); color: var(--hsa-danger-strong); }
+.ulk .ulk-status--revoked { background: var(--hsa-surface-sunken); border-color: var(--hsa-danger-border); color: var(--hsa-danger-strong); }
+
+/* The code a row came from, beside its name. */
+.ulk .ulk-code {
+    margin-left: 6px; padding: 0 6px; border-radius: 4px; background: var(--hsa-surface-sunken);
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: var(--hsa-text-xs); font-weight: 600; color: var(--hsa-ink-soft);
 }
 
-.user-points-lookup h2 {
-    text-align: center;
-    color: var(--hsa-teal-600);
-    margin-bottom: 10px;
+/* All / Codes / Point Requests / Adjustments above the points list. */
+.ulk .ulk-filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+.ulk .ulk-filter {
+    min-width: 0; min-height: 32px; padding: 0 12px; border: 1px solid var(--hsa-border); border-radius: 999px;
+    background: var(--hsa-surface); color: var(--hsa-ink-soft); font: inherit; font-size: var(--hsa-text-sm); font-weight: 600; cursor: pointer;
 }
+.ulk .ulk-filter.is-active { background: var(--hsa-teal-700); border-color: var(--hsa-teal-700); color: #ffffff; }
 
-/* Search Form */
-.user-points-lookup .search-form {
-    background: var(--hsa-surface-subtle);
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    border: 2px solid var(--hsa-teal-600);
-}
+/* "Remove check-ins": off by default, so a Remove button is never one stray tap away. */
+.ulk .ulk-switch { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: var(--hsa-text-sm); font-weight: 600; cursor: pointer; }
+.ulk .ulk-switch input { width: 18px; height: 18px; margin: 0; accent-color: var(--hsa-danger); }
+.ulk .ulk-points-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 16px; }
+/* A Removed Check-in or revoked Point Request: crossed out, counted nowhere. */
+.ulk .ulk-row.is-taken-back { color: var(--hsa-muted); border-left-color: var(--hsa-danger-border); }
+.ulk .ulk-tag--taken-back { background: var(--hsa-danger-bg); border-color: var(--hsa-danger-border); color: var(--hsa-danger-strong); }
+.ulk .ulk-row__form { grid-column: 2 / -1; margin-top: 6px; }
+.ulk .ulk-row__form textarea { max-width: 420px; }
 
-.user-points-lookup .search-input-group {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.user-points-lookup .search-input {
-    flex: 1;
-    min-width: 300px;
-    padding: 12px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-.user-points-lookup .search-input:focus {
-    outline: none;
-    border-color: var(--hsa-teal-600);
-}
-
-.user-points-lookup .search-button,
-.user-points-lookup .clear-button {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.user-points-lookup .search-button {
-    background-color: var(--hsa-teal-600);
-    color: white;
-}
-
-.user-points-lookup .search-button:hover:not(:disabled) {
-    background-color: var(--hsa-teal-800);
-}
-
-.user-points-lookup .search-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.user-points-lookup .clear-button {
-    background-color: #dc3545;
-    color: white;
-}
-
-.user-points-lookup .clear-button:hover {
-    background-color: #c82333;
-}
-
-.user-points-lookup .error-message {
-    color: #dc3545;
-    text-align: center;
-    margin-top: 10px;
-    font-weight: bold;
-}
-
-/* User Results */
-.user-points-lookup .user-results {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-
-/* User Info Card */
-.user-points-lookup .user-info-card {
-    background: white;
-    border: 2px solid var(--hsa-teal-600);
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.user-points-lookup .user-info-card h3 {
-    color: var(--hsa-teal-600);
-    text-align: left;
-    margin-top: 0;
-    margin-bottom: 10px;
-    border-bottom: 2px solid var(--hsa-teal-600);
-    padding-bottom: 10px;
-}
-
-.user-points-lookup .user-info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 6px;
-}
-
-.user-points-lookup .user-info-grid div {
-    padding: 7px 10px;
-    background: var(--hsa-surface-subtle);
-    border-radius: 5px;
-    border-left: 4px solid var(--hsa-teal-600);
-}
-
-/* Points Summary */
-.user-points-lookup .points-summary {
-    background: white;
-    border: 2px solid var(--hsa-teal-600);
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.user-points-lookup .points-summary h3 {
-    color: var(--hsa-teal-600);
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.user-points-lookup .points-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-}
-
-.user-points-lookup .points-card {
-    background: var(--hsa-surface-subtle);
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-    transition: transform 0.2s;
-}
-
-.user-points-lookup .points-card:hover {
-    transform: translateY(-2px);
-}
-
-.user-points-lookup .points-card.total {
-    border-color: var(--hsa-teal-600);
-    background: linear-gradient(135deg, var(--hsa-teal-600), #1a6b8a);
-    color: white;
-}
-
-.user-points-lookup .points-card.eligible {
-    border-color: #28a745;
-    background: linear-gradient(135deg, #28a745, #34ce57);
-    color: white;
-}
-
-.user-points-lookup .points-card.not-eligible {
-    border-color: #dc3545;
-    background: linear-gradient(135deg, #dc3545, #e85563);
-    color: white;
-}
-
-.user-points-lookup .points-card h4 {
-    margin: 0 0 10px 0;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.user-points-lookup .points-value {
-    font-size: 2.5em;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.user-points-lookup .eligibility-status {
-    font-size: 12px;
-    font-weight: 600;
-}
-
-/* Category Breakdown */
-.user-points-lookup .category-breakdown {
-    background: white;
-    border: 2px solid var(--hsa-teal-600);
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.user-points-lookup .category-breakdown h3 {
-    color: var(--hsa-teal-600);
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.user-points-lookup .category-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-.user-points-lookup .category-table th,
-.user-points-lookup .category-table td {
-    padding: 12px;
-    text-align: center;
-    border: 1px solid #ddd;
-}
-
-.user-points-lookup .category-table th {
-    background-color: var(--hsa-teal-600);
-    color: white;
-    font-weight: bold;
-}
-
-.user-points-lookup .category-table tr:nth-child(even) {
-    background-color: var(--hsa-surface-subtle);
-}
-
-.user-points-lookup .category-table tr:hover {
-    background-color: var(--hsa-teal-100);
-}
-
-/* Event Breakdown */
-.user-points-lookup .event-breakdown {
-    background: white;
-    border: 2px solid var(--hsa-teal-600);
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.user-points-lookup .event-breakdown h3 {
-    color: var(--hsa-teal-600);
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.user-points-lookup .events-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    font-size: 14px;
-}
-
-.user-points-lookup .events-table th,
-.user-points-lookup .events-table td {
-    padding: 10px;
-    text-align: left;
-    border: 1px solid #ddd;
-}
-
-.user-points-lookup .events-table th {
-    background-color: var(--hsa-teal-600);
-    color: white;
-    font-weight: bold;
-    position: sticky;
-    top: 0;
-}
-
-.user-points-lookup .events-table tr:nth-child(even) {
-    background-color: var(--hsa-surface-subtle);
-}
-
-.user-points-lookup .events-table tr:hover {
-    background-color: var(--hsa-teal-100);
-}
-
-.user-points-lookup .badge-yes {
-    background-color: #28a745;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-.user-points-lookup .badge-no {
-    background-color: #dc3545;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .user-points-lookup {
-        padding: 10px;
-    }
-
-    .user-points-lookup .search-input-group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .user-points-lookup .search-input {
-        min-width: unset;
-    }
-
-    .user-points-lookup .points-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .user-points-lookup .user-info-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .user-points-lookup .events-table {
-        font-size: 12px;
-    }
-
-    .user-points-lookup .events-table th,
-    .user-points-lookup .events-table td {
-        padding: 8px 4px;
-    }
-}
-
-@media (max-width: 480px) {
-    .user-points-lookup .points-value {
-        font-size: 2em;
-    }
-
-    .user-points-lookup .events-table {
-        font-size: 10px;
-    }
+/* Phones: two-line rows, the date above the name and the points beside it. */
+@media (max-width: 600px) {
+    .ulk .ulk-row { grid-template-columns: 1fr auto; row-gap: 2px; }
+    .ulk .ulk-row__date { grid-column: 1 / -1; }
+    .ulk .ulk-row--total .ulk-row__date { display: none; }
+    .ulk .ulk-row__form { grid-column: 1 / -1; }
+    .ulk .ulk-facts__wide { grid-column: 1 / -1; }
+    .ulk .ulk-stat { padding: 12px; }
+    .ulk .ulk-stat__value { font-size: var(--hsa-text-2xl); }
 }
 
 /* ---- Review point requests  (PointRequestReview.tsx) --------------------------------------- */
@@ -822,6 +597,11 @@
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
+.point-request-review .request-card.is-linked {
+    outline: 3px solid var(--hsa-teal-600);
+    outline-offset: 2px;
+}
+
 .point-request-review .request-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
@@ -838,8 +618,11 @@
     border-bottom: 2px solid var(--hsa-surface-sunken);
 }
 
+/* text-align: the site-wide h3 default centers it, which reads as an indent
+   when the email under it is wider. */
 .point-request-review .user-info h3 {
     margin: 0 0 4px 0;
+    text-align: left;
     color: var(--hsa-teal-700);
     font-size: 18px;
     font-weight: 800;
@@ -1225,7 +1008,10 @@
 }
 
 .point-request-review .review-mode {
-    flex: 1;
+    /* Sized by their labels and sharing what's left, so "Adjustment" stays inside a narrow card. */
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 4px;
     min-height: 40px;
     border: none;
     border-radius: 6px;
@@ -1235,6 +1021,9 @@
     font-size: 14px;
     cursor: pointer;
 }
+
+.point-request-review .review-info .danger-form,
+.point-request-review .review-info .danger-form__open { margin-top: 10px; }
 
 .point-request-review .review-mode.is-active {
     background: var(--hsa-surface);
@@ -1254,123 +1043,6 @@
     color: var(--hsa-danger);
     font-weight: 700;
     font-size: 14px;
-}
-
-/* ---- User lookup: cabinet points line above Cabinet Events  (UserPointsLookup.tsx) */
-.user-points-lookup .lookup-cabinet-points {
-    margin: 0 0 12px;
-    text-align: center;
-    color: var(--hsa-muted);
-}
-
-.user-points-lookup .lookup-cabinet-points strong {
-    color: var(--hsa-teal-700);
-}
-
-/* ---- UFL/SF Email Lookup (EmailLookup.tsx, on the User Lookup page) ---- */
-.user-points-lookup .email-lookup {
-    margin-bottom: 30px;
-}
-
-.user-points-lookup .email-lookup h2 {
-    margin-bottom: 6px;
-}
-
-.user-points-lookup .email-lookup__subtitle {
-    margin: 0 0 16px;
-    text-align: center;
-    color: #666;
-}
-
-.user-points-lookup .email-lookup .search-form {
-    margin-bottom: 0;
-}
-
-/* It's a text input (a name), so undo the base input[type="text"] margin
-   and width to line up with the email box above. */
-.user-points-lookup .email-lookup .search-input {
-    width: auto;
-    max-width: none;
-    margin: 0;
-}
-
-.user-points-lookup .email-lookup__empty {
-    margin: 14px 0 0;
-    text-align: center;
-    color: #666;
-}
-
-.user-points-lookup .email-lookup__results {
-    list-style: none;
-    margin: 16px 0 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.user-points-lookup .email-lookup__result {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 14px;
-    background: var(--hsa-surface);
-    border: 1.5px solid var(--hsa-border);
-    border-radius: 8px;
-}
-
-.user-points-lookup .email-lookup__who {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-.user-points-lookup .email-lookup__name {
-    font-weight: 700;
-    color: var(--hsa-ink);
-}
-
-.user-points-lookup .email-lookup__email {
-    font-family: var(--hsa-font-mono);
-    font-size: 13px;
-    color: var(--hsa-teal-700);
-    word-break: break-all;
-}
-
-.user-points-lookup .email-lookup__use {
-    flex-shrink: 0;
-    min-width: 0;
-    min-height: 0;
-    padding: 8px 14px;
-    border: 1.5px solid var(--hsa-teal-600);
-    border-radius: 6px;
-    background: var(--hsa-surface);
-    color: var(--hsa-teal-600);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-.user-points-lookup .email-lookup__use:hover {
-    background: var(--hsa-teal-600);
-    color: #ffffff;
-    border-color: var(--hsa-teal-600);
-    box-shadow: none;
-}
-
-@media (max-width: 480px) {
-    .user-points-lookup .email-lookup__result {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .user-points-lookup .email-lookup__use {
-        width: 100%;
-        padding: 10px;
-    }
 }
 
 /* ---- Event Codes page  (EventCodesPage.tsx, pages/eboard/eventCodes/) --
@@ -1890,10 +1562,11 @@
     .date-picker__day { width: 38px; height: 38px; }
 }
 
-/* One-time admin export at the bottom of the page */
+/* One-time admin export at the bottom of the page. The big top margin keeps
+   it clear of the facet sidebar, which is sticky and ends right above it. */
 .admin-tool-card {
     max-width: 1100px;
-    margin: 10px auto 20px;
+    margin: 56px auto 20px;
     padding: 20px;
     text-align: center;
     background: var(--hsa-surface);
@@ -1930,6 +1603,6 @@
 
 @media (max-width: 600px) {
     .admin-tool-card {
-        margin: 10px 10px 20px;
+        margin: 40px 10px 20px;
     }
 }

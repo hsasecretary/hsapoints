@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { db } from '../../lib/firebase';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import type { Code } from '../../lib/computeStanding';
+import { canRevoke } from '../../lib/memberLookup';
 import { NOT_LISTED } from '../../lib/pointRequests';
+import type { Revoked } from '../../lib/pointsOverview';
 import type { ReviewRequest } from '../../lib/requestReview';
 import { eventType } from '../../lib/rubric';
 import ReviewPanel from './pointRequests/ReviewPanel';
+import RevokeForm from './pointRequests/RevokeForm';
 
 type StoredRequest = ReviewRequest & {
     userName: string;
@@ -18,6 +22,9 @@ type StoredRequest = ReviewRequest & {
     reviewedBy?: string | null;
     reviewNotes?: string;
     adjustment?: { points: number; note: string };
+    attendanceIds?: string[];
+    /** Set when E-Board took back its approval. */
+    revoked?: Revoked;
     [image: string]: unknown;
 };
 
@@ -38,10 +45,28 @@ function PointRequestReview() {
     const [selectedImage, setSelectedImage] = useState(null);
     const [reviewing, setReviewing] = useState<string | null>(null);
     const [notice, setNotice] = useState('');
+    // ?request={id} (from User Lookup) opens that request, whatever its status.
+    const [params] = useSearchParams();
+    const linkedId = params.get('request');
+    const linkedCard = useRef<HTMLDivElement>(null);
+    const [linkedShown, setLinkedShown] = useState(false);
 
     useEffect(() => {
         fetchRequests();
     }, []);
+
+    useEffect(() => {
+        if (!linkedId || linkedShown) return;
+        const linked = requests.find((request) => request.id === linkedId);
+        if (!linked) return;
+        setLinkedShown(true);
+        setFilter(linked.status);
+        if (linked.status === 'pending') setReviewing(linked.id);
+    }, [linkedId, linkedShown, requests]);
+
+    useEffect(() => {
+        if (linkedShown) linkedCard.current?.scrollIntoView({ block: 'start' });
+    }, [linkedShown]);
 
     const fetchRequests = async () => {
         try {
@@ -163,6 +188,9 @@ const openImageModal = (request) => {
             </div>
 
             {notice && <p className="review-notice" role="status">{notice}</p>}
+            {linkedId && !loading && !requests.some((request) => request.id === linkedId) && (
+                <p className="review-notice" role="status">That Point Request no longer exists.</p>
+            )}
 
             {filteredRequests.length === 0 ? (
                 <div className="no-requests">
@@ -171,7 +199,8 @@ const openImageModal = (request) => {
             ) : (
                 <div className="requests-grid">
                     {filteredRequests.map(request => (
-                        <div key={request.id} className="request-card">
+                        <div key={request.id} ref={request.id === linkedId ? linkedCard : undefined}
+                            className={`request-card${request.id === linkedId ? ' is-linked' : ''}`}>
                             <div className="request-header">
                                 <div className="user-info">
                                     <h3>{request.userName}</h3>
@@ -181,7 +210,7 @@ const openImageModal = (request) => {
                                     className="status-badge"
                                     style={{ backgroundColor: getStatusColor(request.status) }}
                                 >
-                                    {request.status.toUpperCase()}
+                                    {request.revoked ? 'REVOKED' : request.status.toUpperCase()}
                                 </div>
                             </div>
 
@@ -207,7 +236,7 @@ const openImageModal = (request) => {
                                 )}
                                 {request.status !== 'pending' && (
                                     <div className="detail-row">
-                                        <strong>Points:</strong> {request.pointsRequested}
+                                        <strong>Points:</strong> {request.revoked ? `0 (had earned ${request.revoked.points})` : request.pointsRequested}
                                     </div>
                                 )}
                                 <div className="detail-row">
@@ -271,10 +300,18 @@ const openImageModal = (request) => {
                                             <strong>Adjustment:</strong> {request.adjustment.points} points
                                         </div>
                                     )}
+                                    {request.revoked && (
+                                        <div className="detail-row">
+                                            <strong>Approved by:</strong> {request.revoked.approvedBy || 'N/A'}, then revoked
+                                        </div>
+                                    )}
                                     {request.reviewNotes && (
                                         <div className="detail-row">
                                             <strong>Notes:</strong> {request.reviewNotes}
                                         </div>
+                                    )}
+                                    {canRevoke(request) && (
+                                        <RevokeForm requestId={request.id} points={request.pointsRequested} onRevoked={handleReviewed} />
                                     )}
                                 </div>
                             )}
