@@ -38,7 +38,7 @@ function Dashboard({ email }: { email: string }) {
         setParams(next, { replace: true });
     };
 
-    const profile = member as { firstName?: string; lastName?: string; cabinet?: string; eboard?: boolean; involvement?: string } | null;
+    const profile = member as { firstName?: string; lastName?: string; cabinet?: string; eboard?: boolean; involvement?: string; webTeam?: boolean } | null;
     const firstName = profile?.firstName;
     const overview = standing ? pointsOverview({ member, standing, attendances, codes, requests }) : null;
     const board = standing?.heldToCabinetRules ? requirementsBoard({ member, standing, attendances, codes, requests, today }) : null;
@@ -53,7 +53,7 @@ function Dashboard({ email }: { email: string }) {
                     <div>
                         <dt>Account Type</dt>
                         <dd>
-                            {formatAccountType(profile.cabinet)}
+                            {profile.webTeam ? 'Web-team Tester' : formatAccountType(profile.cabinet)}
                             {!isGeneralMember(profile) && ` (E-Board: ${profile.eboard ? 'Yes' : 'No'})`}
                         </dd>
                     </div>

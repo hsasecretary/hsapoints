@@ -6,21 +6,11 @@ import {
     ACTION_LABEL, LOG_TEXT, NEEDS_REASON, previewAbsenceAction, REASON_REQUIRED,
     type AbsenceAction, type AbsenceActionKind, type AbsenceEffect, type AbsenceLogEntry,
 } from '../../../lib/excuseAbsence';
-import { isHeldToCabinetRules } from '../../../lib/members';
-import { eboardPositions, formatAccountType } from '../../../lib/roles';
 import { eventType } from '../../../lib/rubric';
 import { shortDate } from '../../../lib/semester';
 import type { RosterMember } from './useRoster';
 
-export const displayName = (m: { firstName: string; lastName: string; email: string }) =>
-    `${m.firstName} ${m.lastName}`.trim() || m.email;
-
-export function roleLine(m: RosterMember): string {
-    if (m.eboard) return `E-Board, ${eboardPositions.find((p) => p.value === m.position)?.label ?? 'member'}`;
-    if (m.webTeam) return 'Web-team Tester';
-    if (isHeldToCabinetRules(m)) return `${formatAccountType(m.cabinet)} cabinet`;
-    return m.involvement === 'mlp' ? 'MLP General Member' : 'General Member';
-}
+export { displayName } from '../../../lib/nameSearch';
 
 const findCode = (codeId: string, codes: Code[]) => codes.find((c) => c.id.toUpperCase() === codeId.toUpperCase());
 

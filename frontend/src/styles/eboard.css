@@ -312,13 +312,6 @@
 .eap .eap-risk-list li:first-child button { border-top: 0; }
 .eap .eap-risk-list button:hover { background: var(--hsa-danger-bg); }
 
-/* Name search */
-.eap .eap-search { position: relative; margin-bottom: 20px; }
-.eap .eap-search input { font-size: var(--hsa-text-lg); padding: 14px 16px; border-color: var(--hsa-teal-700); }
-.eap .eap-results { list-style: none; margin: 4px 0 0; padding: 4px; border: 1px solid var(--hsa-border); border-radius: 8px; background: var(--hsa-surface); box-shadow: 0 8px 24px rgba(15, 23, 42, .12); }
-.eap .eap-results button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; padding: 10px 12px; border: 0; background: none; text-align: left; cursor: pointer; border-radius: 6px; color: var(--hsa-ink); font-size: var(--hsa-text-base); }
-.eap .eap-results button:hover { background: var(--hsa-teal-100); }
-
 /* Member header */
 .eap .eap-who { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; padding-bottom: 16px; border-bottom: 2px solid var(--hsa-teal-700); }
 .eap .eap-who p { margin: 4px 0 0; }
@@ -389,68 +382,10 @@
     margin-bottom: 10px;
 }
 
-/* Search Form */
-.user-points-lookup .search-form {
-    background: var(--hsa-surface-subtle);
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    border: 2px solid var(--hsa-teal-600);
-}
-
-.user-points-lookup .search-input-group {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.user-points-lookup .search-input {
-    flex: 1;
-    min-width: 300px;
-    padding: 12px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-.user-points-lookup .search-input:focus {
-    outline: none;
-    border-color: var(--hsa-teal-600);
-}
-
-.user-points-lookup .search-button,
-.user-points-lookup .clear-button {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.user-points-lookup .search-button {
-    background-color: var(--hsa-teal-600);
-    color: white;
-}
-
-.user-points-lookup .search-button:hover:not(:disabled) {
-    background-color: var(--hsa-teal-800);
-}
-
-.user-points-lookup .search-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.user-points-lookup .clear-button {
-    background-color: #dc3545;
-    color: white;
-}
-
-.user-points-lookup .clear-button:hover {
-    background-color: #c82333;
+/* Name search (components/members/MemberSearch.tsx), same as Excuse Absence's */
+.user-points-lookup .user-points-lookup__search {
+    max-width: 1100px;
+    margin: 0 auto 30px;
 }
 
 .user-points-lookup .error-message {
@@ -678,15 +613,6 @@
         padding: 10px;
     }
 
-    .user-points-lookup .search-input-group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .user-points-lookup .search-input {
-        min-width: unset;
-    }
-
     .user-points-lookup .points-grid {
         grid-template-columns: 1fr;
     }
@@ -838,8 +764,11 @@
     border-bottom: 2px solid var(--hsa-surface-sunken);
 }
 
+/* text-align: the site-wide h3 default centers it, which reads as an indent
+   when the email under it is wider. */
 .point-request-review .user-info h3 {
     margin: 0 0 4px 0;
+    text-align: left;
     color: var(--hsa-teal-700);
     font-size: 18px;
     font-weight: 800;
@@ -1265,112 +1194,6 @@
 
 .user-points-lookup .lookup-cabinet-points strong {
     color: var(--hsa-teal-700);
-}
-
-/* ---- UFL/SF Email Lookup (EmailLookup.tsx, on the User Lookup page) ---- */
-.user-points-lookup .email-lookup {
-    margin-bottom: 30px;
-}
-
-.user-points-lookup .email-lookup h2 {
-    margin-bottom: 6px;
-}
-
-.user-points-lookup .email-lookup__subtitle {
-    margin: 0 0 16px;
-    text-align: center;
-    color: #666;
-}
-
-.user-points-lookup .email-lookup .search-form {
-    margin-bottom: 0;
-}
-
-/* It's a text input (a name), so undo the base input[type="text"] margin
-   and width to line up with the email box above. */
-.user-points-lookup .email-lookup .search-input {
-    width: auto;
-    max-width: none;
-    margin: 0;
-}
-
-.user-points-lookup .email-lookup__empty {
-    margin: 14px 0 0;
-    text-align: center;
-    color: #666;
-}
-
-.user-points-lookup .email-lookup__results {
-    list-style: none;
-    margin: 16px 0 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.user-points-lookup .email-lookup__result {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 14px;
-    background: var(--hsa-surface);
-    border: 1.5px solid var(--hsa-border);
-    border-radius: 8px;
-}
-
-.user-points-lookup .email-lookup__who {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-.user-points-lookup .email-lookup__name {
-    font-weight: 700;
-    color: var(--hsa-ink);
-}
-
-.user-points-lookup .email-lookup__email {
-    font-family: var(--hsa-font-mono);
-    font-size: 13px;
-    color: var(--hsa-teal-700);
-    word-break: break-all;
-}
-
-.user-points-lookup .email-lookup__use {
-    flex-shrink: 0;
-    min-width: 0;
-    min-height: 0;
-    padding: 8px 14px;
-    border: 1.5px solid var(--hsa-teal-600);
-    border-radius: 6px;
-    background: var(--hsa-surface);
-    color: var(--hsa-teal-600);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-.user-points-lookup .email-lookup__use:hover {
-    background: var(--hsa-teal-600);
-    color: #ffffff;
-    border-color: var(--hsa-teal-600);
-    box-shadow: none;
-}
-
-@media (max-width: 480px) {
-    .user-points-lookup .email-lookup__result {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .user-points-lookup .email-lookup__use {
-        width: 100%;
-        padding: 10px;
-    }
 }
 
 /* ---- Event Codes page  (EventCodesPage.tsx, pages/eboard/eventCodes/) --
@@ -1890,10 +1713,11 @@
     .date-picker__day { width: 38px; height: 38px; }
 }
 
-/* One-time admin export at the bottom of the page */
+/* One-time admin export at the bottom of the page. The big top margin keeps
+   it clear of the facet sidebar, which is sticky and ends right above it. */
 .admin-tool-card {
     max-width: 1100px;
-    margin: 10px auto 20px;
+    margin: 56px auto 20px;
     padding: 20px;
     text-align: center;
     background: var(--hsa-surface);
@@ -1930,6 +1754,6 @@
 
 @media (max-width: 600px) {
     .admin-tool-card {
-        margin: 10px 10px 20px;
+        margin: 40px 10px 20px;
     }
 }

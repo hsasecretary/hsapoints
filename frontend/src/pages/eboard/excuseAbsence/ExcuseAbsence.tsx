@@ -3,13 +3,14 @@
 // Core Events as one timeline. Each Missed Event has its actions inline, each
 // shows its effect before saving, and the history sits beside the timeline.
 import { useMemo, useState } from 'react';
+import MemberSearch from '../../../components/members/MemberSearch';
 import { auth, db } from '../../../lib/firebase';
 import type { CoreEvent, MissedEvent } from '../../../lib/computeStanding';
 import { actionsFor, ACTION_LABEL, atRiskMembers, factFor, saveAbsenceAction, type AbsenceAction, type AbsenceActionKind } from '../../../lib/excuseAbsence';
-import { findMembersByName } from '../../../lib/nameSearch';
+import { roleLine } from '../../../lib/members';
 import { shortDate } from '../../../lib/semester';
 import {
-    attendanceLabel, codeLabel, codeName, ConfirmAction, displayName, History, RiskNote, roleLine, StrikeTally,
+    attendanceLabel, codeLabel, codeName, ConfirmAction, displayName, History, RiskNote, StrikeTally,
 } from './parts';
 import { useRoster, type Roster, type RosterRow } from './useRoster';
 
@@ -34,22 +35,17 @@ function strikesText(count: number) {
 
 function ExcuseAbsence() {
     const roster = useRoster();
-    const [query, setQuery] = useState('');
     const [email, setEmail] = useState<string | null>(null);
     const [pending, setPending] = useState<{ kind: AbsenceActionKind; codeId: string } | null>(null);
     const [saved, setSaved] = useState('');
 
-    const results = useMemo(
-        () => (query.trim() ? findMembersByName(roster.rows.map((row) => row.member), query, 5) : [])
-            .map((match) => roster.rows.find((row) => row.member.email === match.email)),
-        [roster.rows, query],
-    );
+    const members = useMemo(() => roster.rows.map((r) => r.member), [roster.rows]);
+    const rowOf = (member: RosterRow['member']) => roster.rows.find((r) => r.member.email === member.email);
     const atRisk = atRiskMembers(roster.rows.filter((row) => row.standing?.heldToCabinetRules));
     const row = roster.rows.find((r) => r.member.email === email);
 
     const pick = (next: RosterRow) => {
         setEmail(next.member.email);
-        setQuery('');
         setPending(null);
         setSaved('');
     };
@@ -97,31 +93,15 @@ function ExcuseAbsence() {
                 </section>
             )}
 
-            <div className="eap-search" role="search">
-                <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search by name, e.g. Valeria Ortiz"
-                    aria-label="Search members by name"
-                    disabled={roster.loading}
-                />
-                {query.trim() && (
-                    <ul className="eap-results">
-                        {results.length === 0 && <li className="eap-empty">No member matches that name</li>}
-                        {results.map((r) => (
-                            <li key={r.member.email}>
-                                <button type="button" onClick={() => pick(r)}>
-                                    <span><strong>{displayName(r.member)}</strong> <span className="eap-muted">{r.member.email}</span></span>
-                                    <span className="eap-muted">
-                                        {roleLine(r.member)}{r.standing?.heldToCabinetRules ? `, ${strikesText(r.standing.openStrikes)}` : ''}
-                                    </span>
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-            </div>
+            <MemberSearch
+                members={members}
+                disabled={roster.loading}
+                onPick={(member) => pick(rowOf(member))}
+                detail={(member) => {
+                    const standing = rowOf(member)?.standing;
+                    return `${roleLine(member)}${standing?.heldToCabinetRules ? `, ${strikesText(standing.openStrikes)}` : ''}`;
+                }}
+            />
 
             {!row && !roster.loading && <p className="eap-empty">Find a member by name to see their Missed Events and Strikes.</p>}
             {row && (

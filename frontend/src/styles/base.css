@@ -479,3 +479,78 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 1.1rem;
   font-weight: 600;
 }
+
+/* Find a member by name (components/members/MemberSearch.tsx), on Excuse
+   Absence and User Lookup: a big search box with the closest names under it. */
+.member-search {
+  position: relative;
+  margin-bottom: 20px;
+  font-family: var(--hsa-font-body);
+  text-align: left;
+  color: var(--hsa-ink);
+}
+
+/* Two classes so a page's own `.page input[type=text]` rule can't restyle it. */
+.member-search .member-search__input[type=text] {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1.5px solid var(--hsa-teal-700);
+  border-radius: 6px;
+  font: inherit;
+  font-size: var(--hsa-text-lg);
+  background: var(--hsa-surface);
+  color: var(--hsa-ink);
+}
+
+.member-search :focus-visible {
+  outline: 3px solid rgba(15, 76, 100, 0.35);
+  outline-offset: 2px;
+}
+
+.member-search .member-search__results {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 4px;
+  border: 1px solid var(--hsa-border);
+  border-radius: 8px;
+  background: var(--hsa-surface);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .12);
+}
+
+.member-search .member-search__results button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font-family: inherit;
+  font-size: var(--hsa-text-base);
+  text-align: left;
+  color: var(--hsa-ink);
+  cursor: pointer;
+}
+
+.member-search .member-search__results button:hover {
+  background: var(--hsa-teal-100);
+}
+
+.member-search .member-search__muted {
+  color: var(--hsa-muted);
+  font-weight: 400;
+  font-size: var(--hsa-text-sm);
+}
+
+.member-search .member-search__empty {
+  margin: 8px;
+  color: var(--hsa-muted);
+  font-size: var(--hsa-text-sm);
+}

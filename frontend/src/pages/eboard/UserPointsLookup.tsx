@@ -1,10 +1,12 @@
-import { useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { fetchAttendedEvents, sumVoterEligiblePoints } from '../../lib/attendedEvents';
 import { db } from '../../lib/firebase';
-import { isGeneralMember } from '../../lib/members';
+import { isGeneralMember, roleLine } from '../../lib/members';
 import EventsAttendedList from '../../components/members/EventsAttendedList';
-import EmailLookup from './EmailLookup';
+import MemberSearch from '../../components/members/MemberSearch';
+
+type LookupMember = Parameters<typeof roleLine>[0] & { email: string; firstName: string; lastName: string };
 
 function UserPointsLookup() {
     const [userPoints, setUserPoints] = useState(null);
@@ -12,6 +14,21 @@ function UserPointsLookup() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [eventBreakdown, setEventBreakdown] = useState([]);
+    const [members, setMembers] = useState<LookupMember[] | null>(null);
+    const [membersError, setMembersError] = useState('');
+
+    // Every account, read once, so the name search can suggest as you type.
+    useEffect(() => {
+        getDocs(collection(db, 'users'))
+            .then((snapshot) => setMembers(snapshot.docs.map((d) => {
+                const data = d.data();
+                return { ...data, email: d.id, firstName: data.firstName || '', lastName: data.lastName || '' };
+            })))
+            .catch((err) => {
+                console.error('Error loading members:', err);
+                setMembersError('Could not load members. Refresh to try again.');
+            });
+    }, []);
 
     // Runs for the member picked in the name search.
     const lookUp = async (searchEmail) => {
@@ -104,7 +121,13 @@ function UserPointsLookup() {
 
     return (
         <div className="user-points-lookup">
-            <EmailLookup onSelect={lookUp} />
+            <section className="user-points-lookup__search">
+                <h2>User Points Lookup</h2>
+                {membersError && <p className="error-message">{membersError}</p>}
+                {!members && !membersError && <p className="loading-message">Loading members…</p>}
+                <MemberSearch<LookupMember> members={members ?? []} disabled={!members} detail={roleLine}
+                    onPick={(member) => lookUp(member.email)} />
+            </section>
             {loading && <p className="lookup-cabinet-points">Loading points…</p>}
             {error && <p className="error-message">{error}</p>}
 
