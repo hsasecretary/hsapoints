@@ -326,6 +326,15 @@ def build_plan(data, sheet, rubric, signed_on, year_start):
         elif cid in codes and not codes[cid]["eventTypeId"]:
             code_types[cid] = type_id
             codes[cid]["eventTypeId"] = type_id
+    # A code made on the old Create Code page after the sheet was written has
+    # no Event Type and no row: its check-ins would silently never become
+    # Attendance, so it blocks --apply until someone adds its row.
+    for cid, code in sorted(codes.items()):
+        on_sheet = any(row["codeId"].strip().upper() == cid for row in sheet["Codes"])
+        if not code["eventTypeId"] and not on_sheet and iso(code["eventDate"]) >= year_start:
+            suggested = plan.suggest_event_type(data["codes"][cid].get("category"), code["event"])
+            problems.append(f"Codes: {cid} ({code['event']}, {code['eventDate']}) is not on the review sheet. "
+                            f"Add a row to the Codes tab with its eventTypeId (suggested: {suggested or 'none'}).")
 
     # Users: the backfilled facts.
     patches = {}
