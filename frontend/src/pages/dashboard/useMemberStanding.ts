@@ -5,6 +5,7 @@ import { computeStanding, type Attendance, type Code, type Member, type Standing
 import type { MemberRequest } from '../../lib/pointsOverview';
 import { rubric } from '../../lib/rubric';
 import { academicYear, toIsoDate } from '../../lib/semester';
+import { withView, type View } from '../../lib/viewAs';
 
 export type MemberStanding = {
     loading: boolean;
@@ -23,11 +24,14 @@ export type MemberStanding = {
 
 /**
  * Everything computeStanding needs for the signed-in Member, kept live, for
- * one school year (computeStanding works on one year at a time).
+ * one school year (computeStanding works on one year at a time). `view` is
+ * the signed-in Member's previewed view (useViewOverride); leave it out when
+ * looking at someone else.
  */
-export function useMemberStanding(email: string | null | undefined): MemberStanding {
+export function useMemberStanding(email: string | null | undefined, view: View | null = null): MemberStanding {
     const today = toIsoDate(new Date());
-    const [member, setMember] = useState<Member | null>(null);
+    const [storedMember, setMember] = useState<Member | null>(null);
+    const member = useMemo(() => storedMember && withView(storedMember, view), [storedMember, view]);
     const [attendances, setAttendances] = useState<Attendance[] | null>(null);
     const [codes, setCodes] = useState<Code[] | null>(null);
     const [requests, setRequests] = useState<MemberRequest[]>([]);

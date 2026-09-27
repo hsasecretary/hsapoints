@@ -1,4 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
+import { useViewOverride } from '../../components/layout/ViewAsContext';
 import { isGeneralMember } from '../../lib/members';
 import { CABINET_POINTS_GOAL } from '../../lib/computeStanding';
 import { pointsOverview } from '../../lib/pointsOverview';
@@ -26,7 +27,7 @@ type Bubble = (typeof BUBBLES)[number];
 //                     the Cabinet view "By category" is the Event Type table
 // Every number comes from computeStanding via useMemberStanding.
 function Dashboard({ email }: { email: string }) {
-    const { loading, member, attendances, codes, requests, pending, standing, today } = useMemberStanding(email);
+    const { loading, member, attendances, codes, requests, pending, standing, today } = useMemberStanding(email, useViewOverride());
     const [params, setParams] = useSearchParams();
     const open = BUBBLES.find((bubble) => bubble === params.get('open')) ?? null;
 

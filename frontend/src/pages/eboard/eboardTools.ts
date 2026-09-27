@@ -1,5 +1,6 @@
 // The E-Board tools, each on its own page under /eboard. Used by the routes
-// in App.tsx and the E-Board dropdown in SiteHeader, so they stay in sync.
+// in App.tsx, the E-Board dropdown in SiteHeader and the /eboard landing page
+// (EboardHome), so they stay in sync.
 export const EBOARD_TOOLS = [
     { path: 'event-codes', label: 'Event Codes' },
     { path: 'point-requests', label: 'Point Request Review' },

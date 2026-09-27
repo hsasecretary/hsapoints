@@ -9,6 +9,19 @@ html, body {
   overflow-x: hidden;
 }
 
+/* Read by screen readers, not shown. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Wrap a wide <table> in this so it scrolls sideways inside its own box
    (overflow-x on the <table> itself does nothing). */
 .table-scroll {

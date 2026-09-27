@@ -1,4 +1,5 @@
 import { Navigate } from 'react-router-dom';
+import { useViewOverride } from '../../components/layout/ViewAsContext';
 import { requirementsBoard } from '../../lib/requirementsBoard';
 import { useMemberStanding } from '../dashboard/useMemberStanding';
 import CoreEvents from './CoreEvents';
@@ -9,7 +10,7 @@ import SemesterGrid from './SemesterGrid';
 //   SemesterGrid — Tier 2 Semester Requirements, Fall | Spring
 // Only for Members held to the Cabinet rules; everyone else goes to /dashboard.
 function Requirements({ email }: { email: string }) {
-    const { loading, member, attendances, codes, requests, standing, today } = useMemberStanding(email);
+    const { loading, member, attendances, codes, requests, standing, today } = useMemberStanding(email, useViewOverride());
 
     if (!loading && !standing.heldToCabinetRules) return <Navigate to="/dashboard" replace />;
     const board = standing && requirementsBoard({ member, standing, attendances, codes, requests, today });
