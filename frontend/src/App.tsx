@@ -95,7 +95,7 @@ function App() {
                         <Route path="/signup" element={userEmail ? <Navigate to="/dashboard" replace /> : <SignUp />} />
                         <Route path="/login" element={userEmail ? <Navigate to="/dashboard" replace /> : <Login />} />
                         <Route path="/dashboard" element={userEmail ? <Dashboard email={userEmail} /> : <Navigate to="/login" />} />
-                        <Route path="/requirements" element={userEmail ? <Requirements email={userEmail} /> : <Navigate to="/login" />} />
+                        <Route path="/requirements" element={!userEmail ? <Navigate to="/login" /> : heldToCabinetRules ? <Requirements email={userEmail} /> : <Navigate to="/dashboard" replace />} />
                         <Route path="/requests" element={userEmail ? <Requests /> : <Navigate to="/login" />} />
                         <Route path="/guide" element={userEmail ? <Guide email={userEmail} /> : <Navigate to="/login" />} />
                         <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember} /> : <Navigate to="/login" />} />

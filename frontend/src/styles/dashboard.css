@@ -846,11 +846,15 @@ with the my requests tab. ---------- */
 
 .overview *,
 .overview *::before,
-.overview *::after {
+.overview *::after,
+.requirements-page *,
+.requirements-page *::before,
+.requirements-page *::after {
     box-sizing: border-box;
 }
 
-.overview button {
+.overview button,
+.requirements-page button {
     font-family: inherit;
     margin: 0;
     min-width: 0;
@@ -859,7 +863,9 @@ with the my requests tab. ---------- */
 .overview button:focus-visible,
 .overview input:focus-visible,
 .overview summary:focus-visible,
-.overview a:focus-visible {
+.overview a:focus-visible,
+.requirements-page button:focus-visible,
+.requirements-page a:focus-visible {
     outline: 3px solid rgba(15, 76, 100, .4);
     outline-offset: 2px;
 }
@@ -1516,24 +1522,6 @@ with the my requests tab. ---------- */
 /* ---- Requirements (requirements/: YearBoard, SemesterGrid, ToMakeUp) —
    #58 variant D, #75. Warm, never red, for anything still to make up.
    Scoped to .requirements-page. ---- */
-
-.requirements-page *,
-.requirements-page *::before,
-.requirements-page *::after {
-    box-sizing: border-box;
-}
-
-.requirements-page button {
-    font-family: inherit;
-    margin: 0;
-    min-width: 0;
-}
-
-.requirements-page button:focus-visible,
-.requirements-page a:focus-visible {
-    outline: 3px solid rgba(15, 76, 100, .4);
-    outline-offset: 2px;
-}
 
 .requirements-page .rq-h2 {
     margin: 28px 0 10px;

@@ -1,6 +1,6 @@
 import type { RequirementsBoard } from '../../lib/requirementsBoard';
 import { shortDate } from '../../lib/semester';
-import { MakeUpButton } from './YearBoard';
+import MakeUpButton from './MakeUpButton';
 
 // "To make up" (#58, from variant B): one card per open Missed Event, oldest
 // first, then any leftover Surplus, which covers the next miss. The Strike

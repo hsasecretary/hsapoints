@@ -175,7 +175,7 @@ describe('requirementsBoard', () => {
             ['Tabling at Turlington (hour 2)', 'Made up Cabinet Thursday Wk 1 and its Strike'],
         ]);
         expect(b.byType.rows[2].events[0]).toMatchObject({ name: 'Helped at orientation', did: 'Adjustment from E-Board' });
-        expect(b.byType.total).toEqual({ events: 4, cabinetPoints: 3, cabinetGoal: 20, vePoints: 6, veGoal: 15 });
+        expect(b.byType.total).toEqual({ events: 3, cabinetPoints: 3, cabinetGoal: 20, vePoints: 6, veGoal: 15 });
     });
 
     it('calls a spare Surplus Attendance an extra that makes up the next miss', () => {

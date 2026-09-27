@@ -13,10 +13,10 @@ function CellBody({ cell }: { cell: Cell }) {
     }
 }
 
-function Heading({ column, fallback }: { column: SemesterColumn; fallback: string }) {
+function Heading({ column, notStarted }: { column: SemesterColumn; notStarted?: string }) {
     return (
         <th scope="col">
-            {column.label} <small>{column.started ? `${column.done} of ${column.needed}` : fallback}</small>
+            {column.label} <small>{column.started ? `${column.done} of ${column.needed}` : notStarted}</small>
         </th>
     );
 }
@@ -31,8 +31,8 @@ function SemesterGrid({ grid }: { grid: RequirementsBoard['grid'] }) {
             <thead>
                 <tr>
                     <th scope="col">One of each</th>
-                    <Heading column={grid.fall} fallback="Starts in Aug" />
-                    <Heading column={grid.spring} fallback="Starts in Jan" />
+                    <Heading column={grid.fall} />
+                    <Heading column={grid.spring} notStarted="Starts in Jan" />
                 </tr>
             </thead>
             <tbody>

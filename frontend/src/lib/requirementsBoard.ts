@@ -78,6 +78,7 @@ export type RequirementsBoard = {
     extras: string[];
     byType: {
         rows: TypeRow[];
+        /** `events` counts Attendance only, not Adjustments. */
         total: { events: number; cabinetPoints: number; cabinetGoal: number; vePoints: number; veGoal: number };
     };
 };
@@ -115,6 +116,7 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
             tiles.push({ ...base, state: 'upcoming', strike: false, detail: { kind: 'upcoming' } });
         } else {
             const missed = missedByCode.get(core.codeId);
+            if (!missed) continue;
             if (missed.overridden) {
                 tiles.push({ ...base, state: 'madeup', strike: false, detail: { kind: 'closed' } });
             } else if (missed.madeUpBy) {
@@ -130,9 +132,8 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
         }
     }
     const hlhmMissed = standing.coreEvents.some((core) => core.eventTypeId === HLHM && core.status === 'missed');
-    const hlhmAttendance = [...attendances]
-        .filter((attendance) => attendance.eventTypeId === HLHM)
-        .sort((a, b) => a.eventDate.localeCompare(b.eventDate) || a.id.localeCompare(b.id))[0];
+    const byDate = [...attendances].sort((a, b) => a.eventDate.localeCompare(b.eventDate) || a.id.localeCompare(b.id));
+    const hlhmAttendance = byDate.find((attendance) => attendance.eventTypeId === HLHM);
     const hlhmCodes = standing.coreEvents.filter((core) => core.eventTypeId === HLHM);
     const lastHlhm = hlhmCodes[hlhmCodes.length - 1];
     if (standing.heldToCabinetRules && !hlhmMissed && (hlhmAttendance || lastHlhm)) {
@@ -161,8 +162,9 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
     const pendingIn = (semester: Semester, eventTypeId: string) => pending.some((request) =>
         (request.eventTypeId ?? codeTypes.get((request.codeId ?? '').toUpperCase())) === eventTypeId
         && semesterOf(request.date || today) === semester);
-    const cell = (semester: Semester, index: number): Cell => {
-        const requirement = standing.semesterRequirements[semester][index];
+    const cell = (semester: Semester, eventTypeId: string): Cell => {
+        const requirement = standing.semesterRequirements[semester].find((row) => row.eventTypeId === eventTypeId);
+        if (!requirement) return { kind: 'open' };
         if (requirement.waived) return { kind: 'waived' };
         if (requirement.met) return { kind: 'done', by: nameOf(requirement.filledBy) };
         return pendingIn(semester, requirement.eventTypeId) ? { kind: 'pending' } : { kind: 'open' };
@@ -180,11 +182,11 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
     const grid = {
         fall: column('fall', fallYear, `${fallYear}-06-01`),
         spring: column('spring', fallYear + 1, `${fallYear + 1}-01-01`),
-        rows: standing.semesterRequirements.fall.map((requirement, i) => ({
+        rows: standing.semesterRequirements.fall.map((requirement) => ({
             eventTypeId: requirement.eventTypeId,
             name: eventType(requirement.eventTypeId)?.label ?? requirement.eventTypeId,
-            fall: cell('fall', i),
-            spring: cell('spring', i),
+            fall: cell('fall', requirement.eventTypeId),
+            spring: cell('spring', requirement.eventTypeId),
         })),
     };
 
@@ -222,7 +224,6 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
             : 'Extra. It will make up your next miss');
     }
     const typeRows = new Map<string, TypeRow>();
-    const byDate = [...attendances].sort((a, b) => a.eventDate.localeCompare(b.eventDate) || a.id.localeCompare(b.id));
     for (const attendance of byDate) {
         const type = eventType(attendance.eventTypeId);
         const row = typeRows.get(attendance.eventTypeId)
@@ -264,7 +265,7 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
         byType: {
             rows,
             total: {
-                events: rows.reduce((sum, row) => sum + row.events.length, 0),
+                events: attendances.length,
                 cabinetPoints: standing.cabinetPoints,
                 cabinetGoal: CABINET_POINTS_GOAL,
                 vePoints: standing.vePoints,

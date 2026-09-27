@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { AT_RISK_STRIKES } from '../../lib/computeStanding';
 import type { RequirementsBoard, Tile } from '../../lib/requirementsBoard';
 import { shortDate } from '../../lib/semester';
+import MakeUpButton from './MakeUpButton';
 
 const strikeWord = (n: number) => `${n} Strike${n === 1 ? '' : 's'}`;
-
-function MakeUpButton({ codeId }: { codeId: string }) {
-    return <Link className="rq-makeup" to={`/requests?makeup=${encodeURIComponent(codeId)}`}>Make up event</Link>;
-}
 
 /** The line under the board for the tapped tile. */
 function Detail({ tile, pending }: { tile: Tile; pending: boolean }) {
@@ -61,7 +58,7 @@ function YearBoard({ board }: { board: RequirementsBoard }) {
                 </div>
                 <div className={board.atRisk ? 'is-over' : ''}>
                     <span className="rq-slots" role="img" aria-label={strikes ? strikeWord(strikes) : 'No Strikes'}>
-                        {Array.from({ length: Math.max(3, strikes) }, (_, i) => <span key={i} className={i < strikes ? 'is-on' : ''} />)}
+                        {Array.from({ length: Math.max(AT_RISK_STRIKES, strikes) }, (_, i) => <span key={i} className={i < strikes ? 'is-on' : ''} />)}
                     </span>
                     <span>{strikes ? strikeWord(strikes) : 'No Strikes'}</span>
                 </div>
@@ -107,5 +104,4 @@ function YearBoard({ board }: { board: RequirementsBoard }) {
     );
 }
 
-export { MakeUpButton };
 export default YearBoard;
