@@ -18,6 +18,14 @@ export type MemberRequest = {
     /** The Event Type the Member picked, or null for "Not listed". */
     eventTypeId?: string | null;
     makeupFor?: (string | null)[];
+    /** Set once E-Board reviews it. */
+    reviewedBy?: string | null;
+    /** 'YYYY-MM-DD', from reviewedAt. */
+    reviewedOn?: string | null;
+    /** The deny reason, or an Adjustment's note. */
+    reviewNotes?: string;
+    /** Approved as an Adjustment instead of an Attendance. */
+    adjustment?: { points: number; note: string };
 };
 
 export type Group = { key: string; name: string };

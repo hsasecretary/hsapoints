@@ -3,6 +3,7 @@
 // Core Events as one timeline. Each Missed Event has its actions inline, each
 // shows its effect before saving, and the history sits beside the timeline.
 import { useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import MemberSearch from '../../../components/members/MemberSearch';
 import { auth, db } from '../../../lib/firebase';
 import type { CoreEvent, MissedEvent } from '../../../lib/computeStanding';
@@ -35,7 +36,9 @@ function strikesText(count: number) {
 
 function ExcuseAbsence() {
     const roster = useRoster();
-    const [email, setEmail] = useState<string | null>(null);
+    // ?member={email} (from User Lookup) opens that Member.
+    const [params] = useSearchParams();
+    const [email, setEmail] = useState<string | null>(params.get('member')?.toLowerCase() ?? null);
     const [pending, setPending] = useState<{ kind: AbsenceActionKind; codeId: string } | null>(null);
     const [saved, setSaved] = useState('');
 

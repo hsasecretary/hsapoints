@@ -568,7 +568,7 @@
 
 /* Every routed page is a direct flex child here. A page root that centers
    its own content with `margin: 0 auto` (e.g. .point-request-review,
-   .user-points-lookup, .approvals) has an auto cross-axis margin, which
+   .ulk, .approvals) has an auto cross-axis margin, which
    makes a flex item shrink-wrap to its content's width instead of
    stretching — collapsing the page down to a single narrow column no
    matter how wide the window is. Force every page root to take the full

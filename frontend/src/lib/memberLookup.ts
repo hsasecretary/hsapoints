@@ -1,0 +1,237 @@
+// What E-Board sees on User Lookup (#37): one Member's standing for the
+// school year, every point behind it and where it came from, and their Point
+// Requests with who reviewed them. Pure, so it's tested without Firestore;
+// every number comes from computeStanding and the rubric, never from a
+// stored counter, so it always matches the Member's own dashboard.
+import { AT_RISK_STRIKES, CABINET_POINTS_GOAL, type Attendance, type Code, type Member, type MissedEvent, type Semester, type Standing } from './computeStanding';
+import type { MemberRequest } from './pointsOverview';
+import { eventType } from './rubric';
+import { academicYear } from './semester';
+
+export type PointSource = Attendance['source'] | 'adjustment';
+
+export const SOURCE_LABEL: Record<PointSource, string> = {
+    code: 'Code check-in',
+    request: 'Point Request',
+    eboard: 'Entered by E-Board',
+    adjustment: 'Adjustment',
+};
+
+/** One row of the points list: an event (a Tabling request's hours are one row) or an Adjustment. */
+export type LookupRow = {
+    id: string;
+    name: string;
+    /** 'YYYY-MM-DD', or '' for an Adjustment with no date. */
+    date: string;
+    /** The Event Type's label, or 'Adjustment'. */
+    eventType: string;
+    source: PointSource;
+    vePoints: number;
+    cabinetPoints: number;
+    /** Tabling hours, when more than one Attendance makes up the row. */
+    hours?: number;
+    requestId: string | null;
+    approvedBy: string | null;
+    approvedOn: string | null;
+};
+
+export type LookupLedger = {
+    /** Newest first; an Adjustment with no date goes last. */
+    rows: LookupRow[];
+    /** Equal to the standing's VE Points (Total Points). */
+    vePoints: number;
+    /** Equal to the standing's Cabinet Points. */
+    cabinetPoints: number;
+    /** How many rows are Adjustments. */
+    adjustments: number;
+};
+
+export function lookupLedger({ member, attendances, codes, requests }: {
+    member: Member;
+    attendances: Attendance[];
+    codes: Code[];
+    requests: MemberRequest[];
+}): LookupLedger {
+    const codeById = new Map(codes.map((row) => [row.id.toUpperCase(), row]));
+    const requestById = new Map(requests.map((request) => [request.id, request]));
+    const reviewOf = (requestId: string | undefined) => {
+        const request = requestId ? requestById.get(requestId) : undefined;
+        return { approvedBy: request?.reviewedBy ?? null, approvedOn: request?.reviewedOn ?? null };
+    };
+
+    const rows = new Map<string, LookupRow>();
+    for (const attendance of attendances) {
+        const type = eventType(attendance.eventTypeId);
+        const key = attendance.codeId ? `code:${attendance.codeId.toUpperCase()}`
+            : attendance.requestId ? `req:${attendance.requestId}` : attendance.id;
+        const existing = rows.get(key);
+        if (existing) {
+            existing.vePoints += type?.vePoints ?? 0;
+            existing.cabinetPoints += type?.cabinetPoints ?? 0;
+            existing.hours = (existing.hours ?? 1) + 1;
+            continue;
+        }
+        const code = attendance.codeId ? codeById.get(attendance.codeId.toUpperCase()) : undefined;
+        const request = attendance.requestId ? requestById.get(attendance.requestId) : undefined;
+        rows.set(key, {
+            id: attendance.id,
+            name: code?.event || request?.activityName || type?.label || 'Event',
+            date: attendance.eventDate,
+            eventType: type?.label ?? 'Unknown Event Type',
+            source: attendance.source,
+            vePoints: type?.vePoints ?? 0,
+            cabinetPoints: type?.cabinetPoints ?? 0,
+            requestId: attendance.requestId ?? null,
+            ...reviewOf(attendance.requestId),
+        });
+    }
+    (member.adjustments ?? []).forEach((adjustment, i) => {
+        rows.set(`adjustment:${i}`, {
+            id: `adjustment-${i}`,
+            name: adjustment.note || 'Adjustment from E-Board',
+            date: adjustment.date ?? '',
+            eventType: 'Adjustment',
+            source: 'adjustment',
+            vePoints: adjustment.points || 0,
+            cabinetPoints: 0,
+            requestId: adjustment.requestId ?? null,
+            ...reviewOf(adjustment.requestId),
+        });
+    });
+
+    const sorted = [...rows.values()].sort((a, b) =>
+        (b.date || '0000').localeCompare(a.date || '0000') || b.id.localeCompare(a.id));
+    return {
+        rows: sorted,
+        vePoints: sorted.reduce((sum, row) => sum + row.vePoints, 0),
+        cabinetPoints: sorted.reduce((sum, row) => sum + row.cabinetPoints, 0),
+        adjustments: sorted.filter((row) => row.source === 'adjustment').length,
+    };
+}
+
+export type RequestStatus = 'pending' | 'approved' | 'denied';
+
+const STATUS_LABEL: Record<RequestStatus, string> = { pending: 'Pending', approved: 'Approved', denied: 'Denied' };
+
+export type LookupRequest = {
+    id: string;
+    name: string;
+    date: string;
+    status: RequestStatus;
+    statusLabel: string;
+    /** What it asks for while pending; what it earned once reviewed (0 if denied). */
+    points: number;
+    pointsLabel: 'requested' | 'credited';
+    /** The Event Type E-Board confirmed, or the Member's pick while pending. */
+    eventType: string;
+    reviewedBy: string | null;
+    reviewedOn: string | null;
+    /** The deny reason, or an Adjustment's note. */
+    notes: string;
+};
+
+/**
+ * The Member's Point Requests from this school year, plus any older one still
+ * pending (it still needs a review): pending first, then newest first.
+ */
+export function lookupRequests(requests: MemberRequest[], today: string): LookupRequest[] {
+    const { start, end } = academicYear(today);
+    return requests
+        .filter((request) => request.status === 'pending' || !request.date || (request.date >= start && request.date <= end))
+        .map((request): LookupRequest => {
+            const status: RequestStatus = request.status === 'approved' || request.status === 'denied' ? request.status : 'pending';
+            const type = request.adjustment ? 'Adjustment'
+                : request.eventTypeId ? eventType(request.eventTypeId)?.label ?? request.eventTypeId : 'Not listed';
+            return {
+                id: request.id,
+                name: request.activityName || 'Point Request',
+                date: request.date ?? '',
+                status,
+                statusLabel: STATUS_LABEL[status],
+                points: status === 'denied' ? 0 : request.pointsRequested ?? 0,
+                pointsLabel: status === 'pending' ? 'requested' : 'credited',
+                eventType: type,
+                reviewedBy: request.reviewedBy ?? null,
+                reviewedOn: request.reviewedOn ?? null,
+                notes: request.reviewNotes ?? '',
+            };
+        })
+        .sort((a, b) => Number(b.status === 'pending') - Number(a.status === 'pending')
+            || (b.date || '0000').localeCompare(a.date || '0000') || a.id.localeCompare(b.id));
+}
+
+export type LookupSummary = {
+    /** Which rules the Member is held to: E-Board is exempt from the Cabinet ones. */
+    rules: 'general' | 'cabinet' | 'exempt';
+    vePoints: number;
+    veGoal: number;
+    veReached: boolean;
+    /** Pending Point Requests never count toward the Total Points. */
+    pendingCount: number;
+    pendingPoints: number;
+    cabinetPoints: number;
+    cabinetGoal: number;
+    openStrikes: number;
+    atRisk: boolean;
+    /** Missed Events still needing a Make-up. */
+    missedOwed: number;
+    /** Semester Requirements met out of those not waived. */
+    requirements: Record<Semester, { met: number; total: number }>;
+};
+
+export function lookupSummary(member: Member, standing: Standing, requests: MemberRequest[]): LookupSummary {
+    const pending = requests.filter((request) => request.status === 'pending');
+    const requirementsOf = (semester: Semester) => {
+        const rows = standing.semesterRequirements[semester].filter((req) => !req.waived);
+        return { met: rows.filter((req) => req.met).length, total: rows.length };
+    };
+    return {
+        rules: standing.heldToCabinetRules ? 'cabinet' : member.eboard ? 'exempt' : 'general',
+        vePoints: standing.vePoints,
+        veGoal: standing.veGoal,
+        veReached: standing.vePoints >= standing.veGoal,
+        pendingCount: pending.length,
+        pendingPoints: pending.reduce((sum, request) => sum + (request.pointsRequested ?? 0), 0),
+        cabinetPoints: standing.cabinetPoints,
+        cabinetGoal: CABINET_POINTS_GOAL,
+        openStrikes: standing.openStrikes,
+        atRisk: standing.openStrikes >= AT_RISK_STRIKES,
+        missedOwed: standing.missedEvents.filter((missed) => missed.owed).length,
+        requirements: { fall: requirementsOf('fall'), spring: requirementsOf('spring') },
+    };
+}
+
+export type MissedEventRow = {
+    codeId: string;
+    name: string;
+    eventDate: string;
+    state: 'Missed, Strike' | 'Missed, needs a Make-up' | 'Made up' | 'Closed by E-Board';
+    /** Still needs a Make-up. */
+    open: boolean;
+    strike: boolean;
+    excused: boolean;
+};
+
+const STATE_ORDER: MissedEventRow['state'][] = ['Missed, Strike', 'Missed, needs a Make-up', 'Made up', 'Closed by E-Board'];
+
+function missedState(missed: MissedEvent): MissedEventRow['state'] {
+    if (missed.overridden) return 'Closed by E-Board';
+    if (missed.madeUpBy) return 'Made up';
+    return missed.strike ? 'Missed, Strike' : 'Missed, needs a Make-up';
+}
+
+/** A Cabinet Member's Missed Events: open ones first (Strikes before excused), then made up, then closed; oldest first within each. */
+export function missedEventRows(standing: Standing, codes: Code[]): MissedEventRow[] {
+    const codeById = new Map(codes.map((row) => [row.id.toUpperCase(), row]));
+    return standing.missedEvents
+        .map((missed) => ({
+            codeId: missed.codeId,
+            name: codeById.get(missed.codeId.toUpperCase())?.event || eventType(missed.eventTypeId)?.label || missed.codeId,
+            eventDate: missed.eventDate,
+            state: missedState(missed),
+            open: missed.owed,
+            strike: missed.strike,
+            excused: missed.excused,
+        }))
+        .sort((a, b) => STATE_ORDER.indexOf(a.state) - STATE_ORDER.indexOf(b.state) || a.eventDate.localeCompare(b.eventDate));
+}
