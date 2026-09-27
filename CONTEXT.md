@@ -55,7 +55,11 @@ A Member's claim, with photo proof, that they attended an event, usually one who
 _Avoid_: Manual points
 
 **Adjustment**:
-Points E-Board added or took away by hand that don't trace back to any event, carried with a note of why. Taking points away for something a Member did is a negative Adjustment; undoing a Point Request approved by mistake is revoking it, not an Adjustment.
+Points E-Board granted by hand that don't trace back to any event, carried with a note of why: a Point Request that fits no Event Type, approved as an Adjustment. Undoing a Point Request approved by mistake is revoking it; taking away a code check-in is a Removed Check-in. Neither is a negative Adjustment.
+
+**Removed Check-in**:
+An Attendance from a redeemed code that E-Board took away with a reason, e.g. a code used without attending. The Member is treated as never having attended: the event's points go, a Core Event becomes a Missed Event (with a Strike unless excused), and anything it made up is owed again. The Member sees that it was removed and why, and can't redeem that code again; if they really were there, E-Board approves a Point Request for it instead.
+_Avoid_: Revoke (that's for Point Requests), deduction
 
 **Cabinet Points**:
 The points a Cabinet Member earns toward Graduating Cabinet — each Event Type's cabinet value (a GBM is worth 1 Cabinet Point).

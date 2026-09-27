@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { computeStanding, type Attendance, type Code, type Member } from './computeStanding';
-import { lookupLedger, lookupRequests, lookupSummary, missedEventRows } from './memberLookup';
+import { checkInRemovalEffect, lookupLedger, lookupRequests, lookupSummary, missedEventRows } from './memberLookup';
 import type { MemberRequest } from './pointsOverview';
 import { rubric } from './rubric';
 
@@ -36,7 +36,7 @@ describe('lookupLedger', () => {
         const member: Member = { ...generalMember, adjustments: [{ points: 3, note: 'Helped at the gala', date: '2026-09-15' }] };
         const attendances = [attended(gbm1), requested('r1', 'hsa-fundraising', '2026-09-08'), attended(gbm2, 'eboard')];
         const requests: MemberRequest[] = [{ id: 'r1', activityName: 'Empanada Sale', date: '2026-09-08', status: 'approved', reviewedBy: 'vp@ufl.edu', reviewedOn: '2026-09-09' }];
-        const ledger = lookupLedger({ member, attendances, codes: [gbm1, gbm2], requests });
+        const ledger = lookupLedger({ member, attendances, codes: [gbm1, gbm2], requests, today: TODAY });
 
         expect(ledger.rows.map((row) => [row.name, row.source, row.vePoints])).toEqual([
             ['Helped at the gala', 'adjustment', 3],
@@ -51,7 +51,7 @@ describe('lookupLedger', () => {
     it('says who approved a Point Request, and when', () => {
         const attendances = [requested('r1', 'hsa-fundraising', '2026-09-08')];
         const requests: MemberRequest[] = [{ id: 'r1', activityName: 'Empanada Sale', date: '2026-09-08', status: 'approved', reviewedBy: 'vp@ufl.edu', reviewedOn: '2026-09-09' }];
-        const [row] = lookupLedger({ member: generalMember, attendances, codes: [], requests }).rows;
+        const [row] = lookupLedger({ member: generalMember, attendances, codes: [], requests, today: TODAY }).rows;
 
         expect(row).toMatchObject({ eventType: 'HSA Fundraising', approvedBy: 'vp@ufl.edu', approvedOn: '2026-09-09', requestId: 'r1' });
     });
@@ -65,7 +65,7 @@ describe('lookupLedger', () => {
             ],
         };
         const requests: MemberRequest[] = [{ id: 'r2', status: 'approved', reviewedBy: 'sec@ufl.edu', reviewedOn: '2026-09-13' }];
-        const rows = lookupLedger({ member, attendances: [], codes: [], requests }).rows;
+        const rows = lookupLedger({ member, attendances: [], codes: [], requests, today: TODAY }).rows;
 
         expect(rows.map((row) => [row.name, row.date, row.vePoints, row.approvedBy, row.requestId])).toEqual([
             ['Photo booth volunteer', '2026-09-12', 2, 'sec@ufl.edu', 'r2'],
@@ -76,7 +76,7 @@ describe('lookupLedger', () => {
     it('shows a Tabling request\'s hours as one row with every hour\'s points', () => {
         const attendances = [1, 2, 3].map((n) => requested('t1', 'tabling', '2026-09-05', `-h${n}`));
         const requests: MemberRequest[] = [{ id: 't1', activityName: 'Turlington tabling', date: '2026-09-05', status: 'approved' }];
-        const ledger = lookupLedger({ member: generalMember, attendances, codes: [], requests });
+        const ledger = lookupLedger({ member: generalMember, attendances, codes: [], requests, today: TODAY });
 
         expect(ledger.rows).toHaveLength(1);
         expect(ledger.rows[0]).toMatchObject({ name: 'Turlington tabling', vePoints: 3, cabinetPoints: 3, hours: 3 });
@@ -85,7 +85,7 @@ describe('lookupLedger', () => {
     it('names the code behind each row, and counts the codes redeemed and how many came through a Point Request', () => {
         const salsa = code('SALSA', 'hsa-programming', '2026-09-12', 'Noche de Salsa');
         const attendances = [attended(gbm1), { ...attended(salsa, 'request'), requestId: 's1' }, requested('t1', 'tabling', '2026-09-05'), attended(gbm2, 'eboard')];
-        const ledger = lookupLedger({ member: generalMember, attendances, codes: [gbm1, gbm2, salsa], requests: [] });
+        const ledger = lookupLedger({ member: generalMember, attendances, codes: [gbm1, gbm2, salsa], requests: [], today: TODAY });
 
         expect(ledger.rows.map((row) => [row.name, row.codeId, row.source])).toEqual([
             ['Noche de Salsa', 'SALSA', 'request'],
@@ -98,7 +98,7 @@ describe('lookupLedger', () => {
 
     it('says who took points away', () => {
         const member: Member = { ...generalMember, adjustments: [{ points: -2, note: "Used a friend's code", date: '2026-09-20', by: 'vp@ufl.edu' }] };
-        const [row] = lookupLedger({ member, attendances: [], codes: [], requests: [] }).rows;
+        const [row] = lookupLedger({ member, attendances: [], codes: [], requests: [], today: TODAY }).rows;
 
         expect(row).toMatchObject({ vePoints: -2, approvedBy: 'vp@ufl.edu', approvedOn: '2026-09-20', codeId: null });
     });
@@ -106,10 +106,77 @@ describe('lookupLedger', () => {
     it('adds up Cabinet Points to match the standing', () => {
         const attendances = [attended(gbm1), attended(empanadas), attended(cabThu)];
         const codes = [gbm1, empanadas, cabThu];
-        const ledger = lookupLedger({ member: cabinetMember, attendances, codes, requests: [] });
+        const ledger = lookupLedger({ member: cabinetMember, attendances, codes, requests: [], today: TODAY });
 
         expect(ledger.cabinetPoints).toBe(standingOf(cabinetMember, attendances, codes).cabinetPoints);
         expect(ledger.rows.find((row) => row.name === 'Cabinet Thursday 1')).toMatchObject({ vePoints: 0, cabinetPoints: 0 });
+    });
+});
+
+describe('Removed Check-ins on the ledger', () => {
+    const removedGbm2 = { event: 'GBM 2', eventTypeId: 'gbm', eventDate: '2026-09-10', reason: "Used a friend's code", by: 'vp@ufl.edu', on: '2026-09-20' };
+
+    it('lists one crossed out with why, who and when, and leaves it out of the total and the codes', () => {
+        const member: Member = { ...generalMember, removedCheckIns: { GBM2: removedGbm2 } };
+        const ledger = lookupLedger({ member, attendances: [attended(gbm1)], codes: [gbm1, gbm2], requests: [], today: TODAY });
+
+        expect(ledger.rows.map((row) => [row.name, row.codeId, row.vePoints, row.removed])).toEqual([
+            ['GBM 2', 'GBM2', 2, { reason: "Used a friend's code", by: 'vp@ufl.edu', on: '2026-09-20' }],
+            ['GBM 1', 'GBM1', 2, null],
+        ]);
+        expect(ledger.vePoints).toBe(2);
+        expect(ledger.codes).toEqual({ redeemed: 1, byRequest: 0 });
+    });
+
+    it('keeps one after its code is deleted', () => {
+        const member: Member = { ...generalMember, removedCheckIns: { GBM2: removedGbm2 } };
+        const rows = lookupLedger({ member, attendances: [], codes: [], requests: [], today: TODAY }).rows;
+
+        expect(rows.map((row) => [row.name, row.codeId])).toEqual([['GBM 2', 'GBM2']]);
+    });
+
+    it('drops one once E-Board credits that code again, and one from another school year', () => {
+        const lastYear = { ...removedGbm2, event: 'Old GBM', eventDate: '2025-09-10' };
+        const member: Member = { ...generalMember, removedCheckIns: { GBM2: removedGbm2, OLD: lastYear } };
+        const rows = lookupLedger({ member, attendances: [{ ...attended(gbm2, 'request'), requestId: 'r9' }], codes: [gbm2], requests: [], today: TODAY }).rows;
+
+        expect(rows.map((row) => [row.name, row.removed])).toEqual([['GBM 2', null]]);
+    });
+});
+
+describe('checkInRemovalEffect', () => {
+    it('says a Core Event becomes a Missed Event with a Strike, and what points go', () => {
+        const codes = [gbm1, cabThu];
+        const attendances = [attended(gbm1), attended(cabThu)];
+
+        expect(checkInRemovalEffect({ member: cabinetMember, attendances, codes, today: TODAY }, 'm__GBM1')).toEqual({
+            vePoints: 2, cabinetPoints: 1, missed: ['GBM 1'], strikes: 1, owedAgain: [],
+        });
+    });
+
+    it("says a check-in for today's Core Event becomes a Missed Event once the day is over", () => {
+        const tonight = code('GBM9', 'gbm', TODAY, 'GBM 9');
+
+        expect(checkInRemovalEffect({ member: cabinetMember, attendances: [attended(tonight)], codes: [tonight], today: TODAY }, 'm__GBM9')).toMatchObject({
+            missed: ['GBM 9'], strikes: 1,
+        });
+    });
+
+    it('says which Missed Event a removed Make-up leaves owed again', () => {
+        const emp2 = code('EMP2', 'hsa-fundraising', '2026-09-09', 'Bake Sale');
+        const codes = [gbm1, empanadas, emp2];
+        // GBM 1 missed; the second fundraiser is surplus and makes it up.
+        const attendances = [attended(empanadas), attended(emp2)];
+
+        expect(checkInRemovalEffect({ member: cabinetMember, attendances, codes, today: TODAY }, 'm__EMP2')).toMatchObject({
+            missed: [], strikes: 1, owedAgain: ['GBM 1'],
+        });
+    });
+
+    it('only counts points for a General Member', () => {
+        expect(checkInRemovalEffect({ member: generalMember, attendances: [attended(gbm1)], codes: [gbm1], today: TODAY }, 'm__GBM1')).toEqual({
+            vePoints: 2, cabinetPoints: 1, missed: [], strikes: 0, owedAgain: [],
+        });
     });
 });
 

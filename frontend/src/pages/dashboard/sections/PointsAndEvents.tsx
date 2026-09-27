@@ -15,8 +15,31 @@ const dateLabel = (entry: LedgerEntry) => (entry.date ? shortDate(entry.date) : 
 function PointsAndEvents({ overview, byType }: { overview: PointsOverview; byType?: RequirementsBoard['byType'] }) {
     const [byDate, setByDate] = useState(false);
 
+    const removed = overview.removed.length > 0 && (
+        <div className="ov-removed">
+            <h4>Check-ins removed by E-Board</h4>
+            <ul className="ov-events">
+                {overview.removed.map((entry) => (
+                    <li key={entry.id}>
+                        <span className="ov-events__date">{entry.date ? shortDate(entry.date) : ''}</span>
+                        <span className="ov-events__name">
+                            {entry.name}
+                            <small>Removed: {entry.reason}</small>
+                        </span>
+                        <span className="ov-events__pts"><s>{signed(entry.points)}</s></span>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+
     if (overview.ledger.length === 0) {
-        return <p className="ov-empty">No events yet. Enter the code at your first event and it shows up here, with the points it earned.</p>;
+        return (
+            <>
+                <p className="ov-empty">No events yet. Enter the code at your first event and it shows up here, with the points it earned.</p>
+                {removed}
+            </>
+        );
     }
 
     return (
@@ -65,6 +88,7 @@ function PointsAndEvents({ overview, byType }: { overview: PointsOverview; byTyp
                     ))}
                 </div>
             )}
+            {removed}
         </>
     );
 }

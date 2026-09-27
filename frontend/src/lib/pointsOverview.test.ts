@@ -24,7 +24,7 @@ function requested(id: string, eventTypeId: string, eventDate: string, suffix = 
 
 function overviewFor(member: Member, attendances: Attendance[], codes: Code[], requests: MemberRequest[] = []) {
     const standing = computeStanding(member, attendances, rubric, codes, { today: TODAY });
-    return pointsOverview({ member, standing, attendances, codes, requests });
+    return pointsOverview({ member, standing, attendances, codes, requests, today: TODAY });
 }
 
 const gbm1 = code('GBM1', 'gbm', '2026-08-27', 'GBM 1');
@@ -115,6 +115,20 @@ describe('pointsOverview', () => {
             ['GBM 1', 2],
             ['Volunteered at orientation', 3],
         ]);
+    });
+
+    it("lists this year's Removed Check-ins apart, newest first, with the reason and the points they had earned", () => {
+        const removed = (event: string, eventDate: string) => ({ event, eventTypeId: 'gbm', eventDate, reason: 'Not there', by: 'vp@ufl.edu', on: '2026-09-20' });
+        const gbm2 = code('GBM2', 'gbm', '2026-09-10', 'GBM 2');
+        const member: Member = { ...generalMember, removedCheckIns: { GBM1: removed('GBM 1', '2026-08-27'), GBM2: removed('GBM 2', '2026-09-10'), OLD: removed('Old', '2025-09-01') } };
+        const overview = overviewFor(member, [], [gbm1, gbm2]);
+
+        expect(overview.removed).toEqual([
+            { id: 'GBM2', name: 'GBM 2', date: '2026-09-10', points: 2, reason: 'Not there' },
+            { id: 'GBM1', name: 'GBM 1', date: '2026-08-27', points: 2, reason: 'Not there' },
+        ]);
+        expect(overview.total).toBe(0);
+        expect(overview.eventsAttended).toBe(0);
     });
 
     it('adds up pending requests separately: they count once approved', () => {

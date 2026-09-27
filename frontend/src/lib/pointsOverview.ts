@@ -3,8 +3,9 @@
 // and by group, and the Point Requests still waiting on E-Board. Pure, so it's
 // tested without Firestore; every number comes from computeStanding and the
 // rubric, never from a stored counter.
-import type { Attendance, Code, Member, Standing } from './computeStanding';
+import type { Attendance, Code, Member, RemovedCheckIn, Standing } from './computeStanding';
 import { eventType, rubric } from './rubric';
+import { academicYear } from './semester';
 
 /** What a revoked request had earned, and who had approved it. */
 export type Revoked = { approvedBy: string | null; points: number };
@@ -55,6 +56,9 @@ export type PointsGroup = Group & { points: number; entries: LedgerEntry[] };
 
 export type PendingPoints = { id: string; name: string; date: string; points: number };
 
+/** A Removed Check-in as the Member sees it: what it had earned and why it went. */
+export type RemovedEntry = { id: string; name: string; date: string; points: number; reason: string };
+
 export type PointsOverview = {
     /** Total Points: the Member's VE Points. */
     total: number;
@@ -70,7 +74,22 @@ export type PointsOverview = {
     groups: PointsGroup[];
     pending: PendingPoints[];
     pendingPoints: number;
+    /** Newest first. */
+    removed: RemovedEntry[];
 };
+
+/**
+ * The Member's Removed Check-ins from this school year's events, newest
+ * first, leaving out any E-Board has since credited again.
+ */
+export function removedThisYear(member: Member, attendances: Attendance[], today: string): (RemovedCheckIn & { codeId: string })[] {
+    const { start, end } = academicYear(today);
+    const credited = new Set(attendances.map((attendance) => attendance.codeId?.toUpperCase()).filter(Boolean));
+    return Object.entries(member.removedCheckIns ?? {})
+        .map(([codeId, removed]) => ({ ...removed, codeId: codeId.toUpperCase() }))
+        .filter((removed) => removed.eventDate >= start && removed.eventDate <= end && !credited.has(removed.codeId))
+        .sort((a, b) => b.eventDate.localeCompare(a.eventDate) || a.codeId.localeCompare(b.codeId));
+}
 
 // The General Member groups (#59): OPA is one group; Affiliates also holds
 // HLHM, HLSA and CRASH; no Cabinet-only groups. Display only: every
@@ -104,12 +123,13 @@ function groupOrder(key: string): number {
     return type >= 0 ? GENERAL_GROUPS.length + type : Number.MAX_SAFE_INTEGER;
 }
 
-export function pointsOverview({ member, standing, attendances, codes, requests }: {
+export function pointsOverview({ member, standing, attendances, codes, requests, today }: {
     member: Member;
     standing: Standing;
     attendances: Attendance[];
     codes: Code[];
     requests: MemberRequest[];
+    today: string;
 }): PointsOverview {
     const byEventType = standing.heldToCabinetRules;
     const codeById = new Map(codes.map((row) => [row.id.toUpperCase(), row]));
@@ -191,5 +211,12 @@ export function pointsOverview({ member, standing, attendances, codes, requests 
         groups: [...groups.values()].sort((a, b) => groupOrder(a.key) - groupOrder(b.key)),
         pending,
         pendingPoints: pending.reduce((sum, request) => sum + request.points, 0),
+        removed: removedThisYear(member, attendances, today).map((removed) => ({
+            id: removed.codeId,
+            name: removed.event,
+            date: removed.eventDate,
+            points: eventType(removed.eventTypeId)?.vePoints ?? 0,
+            reason: removed.reason,
+        })),
     };
 }

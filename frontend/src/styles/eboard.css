@@ -469,18 +469,21 @@
 }
 .ulk .ulk-filter.is-active { background: var(--hsa-teal-700); border-color: var(--hsa-teal-700); color: #ffffff; }
 
-.ulk .ulk-takeaway { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 0 0; font-size: var(--hsa-text-sm); }
-.ulk .ulk-takeaway-form { margin-top: 12px; }
-.ulk .ulk-takeaway-form textarea { max-width: 360px; }
-.ulk .ulk-takeaway-form input { max-width: 120px; }
-.ulk .ulk-row__revoke { grid-column: 2 / -1; margin-top: 6px; }
+/* "Remove check-ins": off by default, so a Remove button is never one stray tap away. */
+.ulk .ulk-switch { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: var(--hsa-text-sm); font-weight: 600; cursor: pointer; }
+.ulk .ulk-switch input { width: 18px; height: 18px; margin: 0; accent-color: var(--hsa-danger); }
+.ulk .ulk-points-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 16px; }
+.ulk .ulk-row.is-removed { color: var(--hsa-muted); border-left-color: var(--hsa-danger-border); }
+.ulk .ulk-tag--removed { background: var(--hsa-danger-bg); border-color: var(--hsa-danger-border); color: var(--hsa-danger-strong); }
+.ulk .ulk-row__form { grid-column: 2 / -1; margin-top: 6px; }
+.ulk .ulk-row__form textarea { max-width: 420px; }
 
 /* Phones: two-line rows, the date above the name and the points beside it. */
 @media (max-width: 600px) {
     .ulk .ulk-row { grid-template-columns: 1fr auto; row-gap: 2px; }
     .ulk .ulk-row__date { grid-column: 1 / -1; }
     .ulk .ulk-row--total .ulk-row__date { display: none; }
-    .ulk .ulk-row__revoke { grid-column: 1 / -1; }
+    .ulk .ulk-row__form { grid-column: 1 / -1; }
     .ulk .ulk-facts__wide { grid-column: 1 / -1; }
     .ulk .ulk-stat { padding: 12px; }
     .ulk .ulk-stat__value { font-size: var(--hsa-text-2xl); }

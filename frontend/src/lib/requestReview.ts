@@ -252,7 +252,7 @@ export async function revokeRequest(db: Firestore, requestId: string, reason: st
         if (request?.status !== 'approved') return { ok: false, error: 'Only an approved request can be revoked. Refresh to see it.' };
         // Approved on the old review page: its points are only in the old counters.
         if (!request.adjustment && !request.attendanceIds) {
-            return { ok: false, error: 'This was approved before Attendances, so there is nothing to take back. Use Take away points on User Lookup.' };
+            return { ok: false, error: "This was approved before Attendances, so there is nothing to take back. Its points aren't counted on the new point system." };
         }
         const userRef = doc(db, 'users', String(request.userEmail).toLowerCase());
         const refs = ((request.attendanceIds ?? []) as string[]).map((id) => doc(db, 'attendances', id));
@@ -278,26 +278,6 @@ export async function revokeRequest(db: Firestore, requestId: string, reason: st
             ...(request.adjustment ? { adjustments: adjustments.filter((adjustment) => adjustment.requestId !== requestId) } : {}),
             ...(earned ? legacyCredit(eventDate, -earned, null) : {}),
             ...(codeId ? { eventCodes: arrayRemove(codeId) } : {}),
-        });
-        return { ok: true } as const;
-    });
-}
-
-/**
- * Takes points off a Member for something that happened, as a negative
- * Adjustment dated `today` that says who took them and why.
- */
-export async function deductPoints(db: Firestore, email: string, form: AdjustmentForm, reviewer: string, today: string): Promise<ReviewResult> {
-    const note = form.note.trim();
-    if (!Number.isInteger(form.points) || form.points <= 0) return { ok: false, error: 'Enter the points to take away as a whole number above 0.' };
-    if (!note) return { ok: false, error: 'Say why, so the Member knows.' };
-    const userRef = doc(db, 'users', email.toLowerCase());
-    // Appended, not arrayUnion: two identical deductions on one day are two deductions.
-    return runTransaction(db, async (tx) => {
-        const adjustments = (await tx.get(userRef)).data()?.adjustments ?? [];
-        tx.update(userRef, {
-            adjustments: [...adjustments, { points: -form.points, note, date: today, by: reviewer }],
-            ...legacyCredit(today, -form.points, null),
         });
         return { ok: true } as const;
     });

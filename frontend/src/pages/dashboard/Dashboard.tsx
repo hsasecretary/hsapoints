@@ -40,7 +40,7 @@ function Dashboard({ email }: { email: string }) {
 
     const profile = member as { firstName?: string; lastName?: string; cabinet?: string; eboard?: boolean; involvement?: string; webTeam?: boolean } | null;
     const firstName = profile?.firstName;
-    const overview = standing ? pointsOverview({ member, standing, attendances, codes, requests }) : null;
+    const overview = standing ? pointsOverview({ member, standing, attendances, codes, requests, today }) : null;
     const board = standing?.heldToCabinetRules ? requirementsBoard({ member, standing, attendances, codes, requests, today }) : null;
 
     return (

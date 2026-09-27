@@ -1041,6 +1041,11 @@ with the my requests tab. ---------- */
     color: var(--hsa-teal-600);
 }
 
+/* Check-ins E-Board removed, under the points: what they had earned, crossed out. */
+.overview .ov-removed { margin-top: 16px; }
+.overview .ov-removed h4 { margin: 0 0 6px; font-size: var(--hsa-text-sm); color: var(--hsa-danger-strong); }
+.overview .ov-removed .ov-events__pts { color: var(--hsa-muted); }
+
 .overview .ov-events li.ov-events__line {
     display: block;
     margin: 6px 0;

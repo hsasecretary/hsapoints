@@ -6,6 +6,7 @@ import { toIsoDate } from '../../../lib/semester';
 const refusalMessages: Record<Extract<RedeemResult, { ok: false }>['reason'], string> = {
     'not-found': 'No event has that code. Check the spelling with whoever is running the event.',
     'already-redeemed': 'You already checked in with this code.',
+    'removed': 'E-Board removed your check-in for this code. See Points & events for why.',
     'not-active': 'This code only works on the day of its event.',
     'cabinet-only': 'This code is for Cabinet Members only.',
 };

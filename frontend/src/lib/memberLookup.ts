@@ -3,10 +3,10 @@
 // Requests with who reviewed them. Pure, so it's tested without Firestore;
 // every number comes from computeStanding and the rubric, never from a
 // stored counter, so it always matches the Member's own dashboard.
-import { AT_RISK_STRIKES, CABINET_POINTS_GOAL, type Attendance, type Code, type Member, type MissedEvent, type Semester, type Standing } from './computeStanding';
-import type { MemberRequest, Revoked } from './pointsOverview';
-import { eventType } from './rubric';
-import { academicYear } from './semester';
+import { AT_RISK_STRIKES, CABINET_POINTS_GOAL, computeStanding, type Attendance, type Code, type Member, type MissedEvent, type Semester, type Standing } from './computeStanding';
+import { removedThisYear, type MemberRequest, type Revoked } from './pointsOverview';
+import { eventType, rubric } from './rubric';
+import { academicYear, fromIsoDate, toIsoDate } from './semester';
 
 /** Codes by upper-cased ID: a few older rows were stored in mixed case. */
 function codesById(codes: Code[]): Map<string, Code> {
@@ -45,6 +45,8 @@ export type LookupRow = {
     requestId: string | null;
     approvedBy: string | null;
     approvedOn: string | null;
+    /** A Removed Check-in: its points are what it had earned, left out of every total. */
+    removed: { reason: string; by: string; on: string } | null;
 };
 
 export type LookupLedger = {
@@ -54,17 +56,20 @@ export type LookupLedger = {
     vePoints: number;
     /** Equal to the standing's Cabinet Points. */
     cabinetPoints: number;
+    /** Rows that count: all but Removed Check-ins. */
+    counted: number;
     /** How many rows are Adjustments. */
     adjustments: number;
     /** Codes counted this year, and how many of those a Point Request added. */
     codes: { redeemed: number; byRequest: number };
 };
 
-export function lookupLedger({ member, attendances, codes, requests }: {
+export function lookupLedger({ member, attendances, codes, requests, today }: {
     member: Member;
     attendances: Attendance[];
     codes: Code[];
     requests: MemberRequest[];
+    today: string;
 }): LookupLedger {
     const codeById = codesById(codes);
     const requestById = new Map(requests.map((request) => [request.id, request]));
@@ -98,6 +103,7 @@ export function lookupLedger({ member, attendances, codes, requests }: {
             codeId: attendance.codeId ? code?.id ?? attendance.codeId.toUpperCase() : null,
             requestId: attendance.requestId ?? null,
             ...reviewOf(attendance.requestId),
+            removed: null,
         });
     }
     (member.adjustments ?? []).forEach((adjustment, i) => {
@@ -112,19 +118,85 @@ export function lookupLedger({ member, attendances, codes, requests }: {
             codeId: null,
             requestId: adjustment.requestId ?? null,
             ...(adjustment.by ? { approvedBy: adjustment.by, approvedOn: adjustment.date ?? null } : reviewOf(adjustment.requestId)),
+            removed: null,
         });
     });
+    for (const removed of removedThisYear(member, attendances, today)) {
+        const type = eventType(removed.eventTypeId);
+        rows.set(`removed:${removed.codeId}`, {
+            id: `removed-${removed.codeId}`,
+            name: removed.event,
+            date: removed.eventDate,
+            eventType: type?.label ?? 'Unknown Event Type',
+            source: 'code',
+            vePoints: type?.vePoints ?? 0,
+            cabinetPoints: type?.cabinetPoints ?? 0,
+            codeId: removed.codeId,
+            requestId: null,
+            approvedBy: null,
+            approvedOn: null,
+            removed: { reason: removed.reason, by: removed.by, on: removed.on },
+        });
+    }
 
     const sorted = [...rows.values()].sort((a, b) => byDateNewestFirst(a, b) || b.id.localeCompare(a.id));
+    const counted = sorted.filter((row) => !row.removed);
     return {
         rows: sorted,
-        vePoints: sorted.reduce((sum, row) => sum + row.vePoints, 0),
-        cabinetPoints: sorted.reduce((sum, row) => sum + row.cabinetPoints, 0),
-        adjustments: sorted.filter((row) => row.source === 'adjustment').length,
+        counted: counted.length,
+        vePoints: counted.reduce((sum, row) => sum + row.vePoints, 0),
+        cabinetPoints: counted.reduce((sum, row) => sum + row.cabinetPoints, 0),
+        adjustments: counted.filter((row) => row.source === 'adjustment').length,
         codes: {
-            redeemed: sorted.filter((row) => row.codeId).length,
-            byRequest: sorted.filter((row) => row.codeId && row.source === 'request').length,
+            redeemed: counted.filter((row) => row.codeId).length,
+            byRequest: counted.filter((row) => row.codeId && row.source === 'request').length,
         },
+    };
+}
+
+/** What removing one check-in would change, for E-Board to see before confirming. */
+export type RemovalEffect = {
+    vePoints: number;
+    cabinetPoints: number;
+    /** Core Events it turns into Missed Events. */
+    missed: string[];
+    /** Open Strikes it adds. */
+    strikes: number;
+    /** Missed Events it had made up, owed again. */
+    owedAgain: string[];
+};
+
+function dayAfter(isoDate: string): string {
+    const date = fromIsoDate(isoDate);
+    date.setDate(date.getDate() + 1);
+    return toIsoDate(date);
+}
+
+/** What a Member's standing is computed from, for one school year. */
+export type StandingFacts = { member: Member; attendances: Attendance[]; codes: Code[]; today: string };
+
+/** Works out a Removed Check-in's effect by computing the standing with and without its Attendance. */
+export function checkInRemovalEffect(
+    { member, attendances, codes, today }: StandingFacts,
+    attendanceId: string,
+): RemovalEffect {
+    // A Core Event is only missed once its day is over, so a check-in for
+    // today's event is judged as of tomorrow.
+    const eventDate = attendances.find((attendance) => attendance.id === attendanceId)?.eventDate ?? today;
+    const asOf = eventDate < today ? today : dayAfter(eventDate);
+    const before = computeStanding(member, attendances, rubric, codes, { today: asOf });
+    const after = computeStanding(member, attendances.filter((attendance) => attendance.id !== attendanceId), rubric, codes, { today: asOf });
+    const codeById = codesById(codes);
+    const nameOf = (missed: MissedEvent) => codeById.get(missed.codeId.toUpperCase())?.event || missed.codeId;
+    const beforeByCode = new Map(before.missedEvents.map((missed) => [missed.codeId.toUpperCase(), missed]));
+    return {
+        vePoints: before.vePoints - after.vePoints,
+        cabinetPoints: before.cabinetPoints - after.cabinetPoints,
+        missed: after.missedEvents.filter((missed) => !beforeByCode.has(missed.codeId.toUpperCase())).map(nameOf),
+        strikes: after.openStrikes - before.openStrikes,
+        owedAgain: after.missedEvents
+            .filter((missed) => missed.owed && beforeByCode.get(missed.codeId.toUpperCase())?.owed === false)
+            .map(nameOf),
     };
 }
 

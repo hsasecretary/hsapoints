@@ -1,14 +1,15 @@
 // Redeeming an event code: turns a code a Member typed into an Attendance
-// (docs/adr/0002-attendance-ledger-calculated-on-read.md). Takes the
+// (docs/adr/0002-attendance-ledger-calculated-on-read.md); and E-Board
+// removing one, a Removed Check-in (see CONTEXT.md). Takes the
 // Firestore instance so tests can run it against the emulator.
-import { arrayUnion, doc, increment, runTransaction, type Firestore } from 'firebase/firestore';
+import { arrayRemove, arrayUnion, doc, increment, runTransaction, type Firestore } from 'firebase/firestore';
 import { isHeldToCabinetRules } from './members';
 import { eventType } from './rubric';
 import { currentSemester, fromIsoDate } from './semester';
 
 export type RedeemResult =
     | { ok: true }
-    | { ok: false; reason: 'not-found' | 'already-redeemed' | 'not-active' | 'cabinet-only' };
+    | { ok: false; reason: 'not-found' | 'already-redeemed' | 'removed' | 'not-active' | 'cabinet-only' };
 
 export type RedeemOptions = {
     /** Local date as 'YYYY-MM-DD'; a code only works on its eventDate. */
@@ -46,6 +47,7 @@ export async function redeemCode(
         if (redeemedBeforeLedger || hasAttendance) {
             return { ok: false, reason: 'already-redeemed' } as const;
         }
+        if (member.removedCheckIns?.[codeId]) return { ok: false, reason: 'removed' } as const;
         if (code.eventDate !== today) return { ok: false, reason: 'not-active' } as const;
         if (eventType(code.eventTypeId)?.cabinetOnly && !viewingAsCabinet && !isHeldToCabinetRules(member)) {
             return { ok: false, reason: 'cabinet-only' } as const;
@@ -62,7 +64,51 @@ export async function redeemCode(
             });
         }
         tx.update(codeRef, { attendeeCount: increment(1), ateendecode: true });
-        tx.update(userRef, legacyCounters(codeId, code));
+        tx.update(userRef, legacyCounters(codeId, code, 1));
+        return { ok: true } as const;
+    });
+}
+
+export type RemoveResult = { ok: true } | { ok: false; error: string };
+
+/**
+ * E-Board takes away a check-in the Member made with a code, e.g. one used
+ * without attending: deletes its Attendance, so the Member is treated as
+ * never having attended, and records why on `removedCheckIns`, which also
+ * stops them redeeming the code again. A check-in a Point Request made is
+ * revoked with its request instead.
+ */
+export async function removeCheckIn(
+    db: Firestore,
+    attendanceId: string,
+    { reason, reviewer, today }: { reason: string; reviewer: string; today: string },
+): Promise<RemoveResult> {
+    const note = reason.trim();
+    if (!note) return { ok: false, error: 'Say why, so the Member knows.' };
+    const attendanceRef = doc(db, 'attendances', attendanceId);
+
+    return runTransaction(db, async (tx) => {
+        const attendance = (await tx.get(attendanceRef)).data();
+        if (attendance?.source !== 'code' || !attendance.codeId) {
+            return { ok: false, error: 'There is no check-in with this code to remove.' } as const;
+        }
+        const codeId: string = attendance.codeId;
+        const codeRef = doc(db, 'codes', codeId);
+        const code = (await tx.get(codeRef)).data();
+        tx.delete(attendanceRef);
+        if (code) tx.update(codeRef, { attendeeCount: increment(-1) });
+        // Keyed upper-cased, as redeeming and firestore.rules look it up.
+        tx.update(doc(db, 'users', attendance.email), {
+            [`removedCheckIns.${codeId.toUpperCase()}`]: {
+                event: code?.event ?? codeId,
+                eventTypeId: attendance.eventTypeId,
+                eventDate: attendance.eventDate,
+                reason: note,
+                by: reviewer,
+                on: today,
+            },
+            ...(code ? legacyCounters(codeId, code, -1) : {}),
+        });
         return { ok: true } as const;
     });
 }
@@ -80,10 +126,11 @@ const legacyCategoryFields: Record<string, string> = {
  * The old stored counters the live dashboard still reads, bumped the way the
  * old EventCodeForm did. Temporary: the cut-over task (#78) deletes this.
  * A code made after the Event Codes page stops setting category/points/
- * semester counts its rubric VE Points under otherPoints.
+ * semester counts its rubric VE Points under otherPoints. `sign` -1 takes
+ * them back when E-Board removes the check-in.
  */
-function legacyCounters(codeId: string, code: Record<string, any>) {
-    const points: number = code.points ?? eventType(code.eventTypeId)?.vePoints ?? 0;
+function legacyCounters(codeId: string, code: Record<string, any>, sign: 1 | -1) {
+    const points: number = sign * (code.points ?? eventType(code.eventTypeId)?.vePoints ?? 0);
     const semester: string = code.semester ?? currentSemester(fromIsoDate(code.eventDate));
     const categoryField = code.category === 'Cabinet'
         ? 'cabinetPoints'
@@ -91,7 +138,7 @@ function legacyCounters(codeId: string, code: Record<string, any>) {
             ? legacyCategoryFields[code.category] + (code.voterEligible === false ? 'NVE' : 'VE')
             : 'otherPoints';
     return {
-        eventCodes: arrayUnion(codeId),
+        eventCodes: sign > 0 ? arrayUnion(codeId) : arrayRemove(codeId),
         [semester]: increment(points),
         [categoryField]: increment(points),
     };

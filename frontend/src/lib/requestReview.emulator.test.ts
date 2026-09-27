@@ -3,7 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { collection, getDocs, query, where, type Firestore } from 'firebase/firestore';
 import { EBOARD, MEMBER, memberDoc, readPastRules, seed, signedInAs, startEmulator } from '../test/emulator';
-import { adjustRequest, approveRequest, deductPoints, denyRequest, revokeRequest } from './requestReview';
+import { adjustRequest, approveRequest, denyRequest, revokeRequest } from './requestReview';
 
 let env: RulesTestEnvironment;
 
@@ -185,38 +185,5 @@ describe('revoking an approved Point Request', () => {
     it('is E-Board only', async () => {
         await approveRequest(signedInAs(env, EBOARD), 'tabling', tablingDecision, EBOARD);
         await expect(revokeRequest(signedInAs(env, MEMBER), 'tabling', 'Mine', MEMBER)).rejects.toThrow();
-    });
-});
-
-describe('taking points away', () => {
-    it('adds a negative Adjustment dated today, saying who took them and why', async () => {
-        expect(await deductPoints(signedInAs(env, EBOARD), MEMBER, { points: 2, note: " Used a friend's code " }, EBOARD, '2026-10-25')).toEqual({ ok: true });
-
-        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({
-            adjustments: [{ points: -2, note: "Used a friend's code", date: '2026-10-25', by: EBOARD }],
-            fallPoints: -2,
-            otherPoints: -2,
-        });
-    });
-
-    it('keeps two identical deductions on one day as two', async () => {
-        const db = signedInAs(env, EBOARD);
-        const form = { points: 1, note: 'Late' };
-        await deductPoints(db, MEMBER, form, EBOARD, '2026-10-25');
-        await deductPoints(db, MEMBER, form, EBOARD, '2026-10-25');
-
-        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ adjustments: [{ points: -1 }, { points: -1 }], otherPoints: -2 });
-    });
-
-    it('needs a whole number above 0 and a reason', async () => {
-        const db = signedInAs(env, EBOARD);
-        expect((await deductPoints(db, MEMBER, { points: 0, note: 'x' }, EBOARD, '2026-10-25')).ok).toBe(false);
-        expect((await deductPoints(db, MEMBER, { points: 1.5, note: 'x' }, EBOARD, '2026-10-25')).ok).toBe(false);
-        expect((await deductPoints(db, MEMBER, { points: 1, note: '' }, EBOARD, '2026-10-25')).ok).toBe(false);
-        expect(await readPastRules(env, `users/${MEMBER}`)).not.toHaveProperty('adjustments');
-    });
-
-    it('is E-Board only', async () => {
-        await expect(deductPoints(signedInAs(env, MEMBER), MEMBER, { points: 1, note: 'x' }, MEMBER, '2026-10-25')).rejects.toThrow();
     });
 });
