@@ -78,7 +78,7 @@ function ReviewPanel({ request, codes, onReviewed }: ReviewPanelProps) {
         <div className="review-panel">
             <div className="review-field">
                 <label htmlFor={`type-${request.id}`}>Event Type <span className="review-required">required</span></label>
-                <select id={`type-${request.id}`} value={code?.eventTypeId ?? decision.eventTypeId} disabled={Boolean(request.codeId)}
+                <select id={`type-${request.id}`} className="event-type-select" value={code?.eventTypeId ?? decision.eventTypeId} disabled={Boolean(request.codeId)}
                     onChange={(e) => setType(e.target.value)}>
                     <option value="">Confirm the Event Type</option>
                     {tiers.map((tier) => (
@@ -97,7 +97,7 @@ function ReviewPanel({ request, codes, onReviewed }: ReviewPanelProps) {
             {!request.codeId && attachable.length > 0 && (
                 <div className="review-field">
                     <label htmlFor={`code-${request.id}`}>Attach to a code</label>
-                    <select id={`code-${request.id}`} value={decision.codeId ?? ''}
+                    <select id={`code-${request.id}`} className="event-type-select" value={decision.codeId ?? ''}
                         onChange={(e) => setDecision((current) => ({ ...current, codeId: e.target.value || null, makeupFor: [current.makeupFor[0] ?? null] }))}>
                         <option value="">No code</option>
                         {attachable.map((c) => (

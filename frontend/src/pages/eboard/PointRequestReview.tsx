@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { db } from '../../lib/firebase';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import MemberSearch from '../../components/members/MemberSearch';
 import type { Code } from '../../lib/computeStanding';
 import { canRevoke } from '../../lib/memberLookup';
+import { displayName, type NamedMember } from '../../lib/nameSearch';
 import { NOT_LISTED } from '../../lib/pointRequests';
 import type { Revoked } from '../../lib/pointsOverview';
 import type { ReviewRequest } from '../../lib/requestReview';
@@ -40,19 +42,38 @@ function memberPick(request: StoredRequest): string {
 function PointRequestReview() {
     const [requests, setRequests] = useState<StoredRequest[]>([]);
     const [codes, setCodes] = useState<Code[]>([]);
+    const [members, setMembers] = useState<NamedMember[]>([]);
+    const [membersError, setMembersError] = useState('');
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('pending');
     const [selectedImage, setSelectedImage] = useState(null);
     const [reviewing, setReviewing] = useState<string | null>(null);
     const [notice, setNotice] = useState('');
     // ?request={id} (from User Lookup) opens that request, whatever its status.
-    const [params] = useSearchParams();
+    // ?member={email} (issue #20) shows only that Member's requests.
+    const [params, setParams] = useSearchParams();
     const linkedId = params.get('request');
+    const memberFilter = params.get('member')?.toLowerCase() ?? null;
+    const setMemberFilter = (email: string | null) => {
+        const next = new URLSearchParams(params);
+        if (email) next.set('member', email);
+        else next.delete('member');
+        setParams(next);
+    };
     const linkedCard = useRef<HTMLDivElement>(null);
     const [linkedShown, setLinkedShown] = useState(false);
 
     useEffect(() => {
         fetchRequests();
+        getDocs(collection(db, 'users'))
+            .then((snapshot) => setMembers(snapshot.docs.map((d) => {
+                const data = d.data();
+                return { email: d.id, firstName: data.firstName || '', lastName: data.lastName || '' };
+            })))
+            .catch((error) => {
+                console.error('Error loading members:', error);
+                setMembersError('Could not load members. Refresh to try again.');
+            });
     }, []);
 
     useEffect(() => {
@@ -62,6 +83,12 @@ function PointRequestReview() {
         setLinkedShown(true);
         setFilter(linked.status);
         if (linked.status === 'pending') setReviewing(linked.id);
+        // A stale ?member= for someone else would hide the request this link named.
+        if (memberFilter && String(linked.userEmail).toLowerCase() !== memberFilter) {
+            const next = new URLSearchParams(params);
+            next.delete('member');
+            setParams(next);
+        }
     }, [linkedId, linkedShown, requests]);
 
     useEffect(() => {
@@ -110,9 +137,15 @@ function PointRequestReview() {
         }
     };
 
-    const filteredRequests = requests.filter(request =>
+    // Scoped to the picked Member (if any) before the status filter, so the
+    // status dropdown's counts reflect that Member too (issue #20).
+    const memberRequests = memberFilter
+        ? requests.filter(request => String(request.userEmail).toLowerCase() === memberFilter)
+        : requests;
+    const filteredRequests = memberRequests.filter(request =>
         filter === 'all' || request.status === filter
     );
+    const pickedMember = memberFilter ? members.find(m => m.email === memberFilter) ?? null : null;
 
     const handleReviewed = async (message: string) => {
         setReviewing(null);
@@ -174,13 +207,35 @@ const openImageModal = (request) => {
         <div className="point-request-review">
             <h2>Point Request Review</h2>
 
+            <div className="member-filter-section">
+                <label>Filter by member:</label>
+                {pickedMember ? (
+                    <div className="member-filter-section__picked">
+                        <span><strong>{displayName(pickedMember)}</strong> <span className="member-search__muted">{pickedMember.email}</span></span>
+                        <button type="button" className="member-filter-section__clear" onClick={() => setMemberFilter(null)}>
+                            Show everyone
+                        </button>
+                    </div>
+                ) : (
+                    <MemberSearch
+                        members={members}
+                        onPick={(member) => setMemberFilter(member.email)}
+                        detail={(member) => {
+                            const count = requests.filter(r => String(r.userEmail).toLowerCase() === member.email).length;
+                            return `${count} request${count === 1 ? '' : 's'}`;
+                        }}
+                    />
+                )}
+                {membersError && <p className="review-error" role="alert">{membersError}</p>}
+            </div>
+
             <div className="filter-section">
                 <label>Filter by status:</label>
                 <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-                    <option value="pending">Pending ({requests.filter(r => r.status === 'pending').length})</option>
-                    <option value="approved">Approved ({requests.filter(r => r.status === 'approved').length})</option>
-                    <option value="denied">Denied ({requests.filter(r => r.status === 'denied').length})</option>
-                    <option value="all">All ({requests.length})</option>
+                    <option value="pending">Pending ({memberRequests.filter(r => r.status === 'pending').length})</option>
+                    <option value="approved">Approved ({memberRequests.filter(r => r.status === 'approved').length})</option>
+                    <option value="denied">Denied ({memberRequests.filter(r => r.status === 'denied').length})</option>
+                    <option value="all">All ({memberRequests.length})</option>
                 </select>
                 <button onClick={fetchRequests} className="refresh-button">
                     Refresh
