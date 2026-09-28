@@ -510,7 +510,16 @@ h1, h2, h3, h4, h5, h6 {
   outline-offset: 2px;
 }
 
+/* Absolutely positioned so a long result list overlays whatever is below
+   (e.g. Point Request Review's Filter by status) instead of pushing it down. */
 .member-search .member-search__results {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 360px;
+  overflow-y: auto;
   list-style: none;
   margin: 4px 0 0;
   padding: 4px;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { db } from '../../lib/firebase';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
@@ -146,6 +146,12 @@ function PointRequestReview() {
         filter === 'all' || request.status === filter
     );
     const pickedMember = memberFilter ? members.find(m => m.email === memberFilter) ?? null : null;
+    // Only members who have submitted at least one Point Request show up in
+    // the autofill; the rest would just be noise to search through.
+    const membersWithRequests = useMemo(() => {
+        const emails = new Set(requests.map((request) => String(request.userEmail).toLowerCase()));
+        return members.filter((member) => emails.has(member.email));
+    }, [members, requests]);
 
     const handleReviewed = async (message: string) => {
         setReviewing(null);
@@ -208,7 +214,6 @@ const openImageModal = (request) => {
             <h2>Point Request Review</h2>
 
             <div className="member-filter-section">
-                <label>Filter by member:</label>
                 {pickedMember ? (
                     <div className="member-filter-section__picked">
                         <span><strong>{displayName(pickedMember)}</strong> <span className="member-search__muted">{pickedMember.email}</span></span>
@@ -217,14 +222,17 @@ const openImageModal = (request) => {
                         </button>
                     </div>
                 ) : (
-                    <MemberSearch
-                        members={members}
-                        onPick={(member) => setMemberFilter(member.email)}
-                        detail={(member) => {
-                            const count = requests.filter(r => String(r.userEmail).toLowerCase() === member.email).length;
-                            return `${count} request${count === 1 ? '' : 's'}`;
-                        }}
-                    />
+                    <>
+                        <MemberSearch
+                            members={membersWithRequests}
+                            onPick={(member) => setMemberFilter(member.email)}
+                            detail={(member) => {
+                                const count = requests.filter(r => String(r.userEmail).toLowerCase() === member.email).length;
+                                return `${count} request${count === 1 ? '' : 's'}`;
+                            }}
+                        />
+                        <p className="member-filter-section__hint">Search by name to see just one member&apos;s requests.</p>
+                    </>
                 )}
                 {membersError && <p className="review-error" role="alert">{membersError}</p>}
             </div>

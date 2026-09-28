@@ -507,33 +507,20 @@
 }
 
 /* Member filter (issue #20): the shared name search, above Filter by status.
-   Shares its card look and label style with .filter-section below. */
-.point-request-review .member-filter-section,
-.point-request-review .filter-section {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 18px 24px;
-    background: var(--hsa-surface);
-    border-radius: 10px;
-    border: 2px solid var(--hsa-teal-700);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-}
-
-.point-request-review .member-filter-section { margin-bottom: 16px; }
-
-.point-request-review .member-filter-section label,
-.point-request-review .filter-section label {
-    flex: none;
-    font-weight: 700;
-    color: var(--hsa-ink);
-    font-size: 15px;
+   Plain, like User Lookup's search box (no card, no label). */
+.point-request-review .member-filter-section {
+    margin-bottom: 20px;
 }
 
 .point-request-review .member-filter-section .member-search {
-    flex: 1 1 320px;
     max-width: 460px;
     margin-bottom: 0;
+}
+
+.point-request-review .member-filter-section__hint {
+    margin: 8px 0 0;
+    color: var(--hsa-muted);
+    font-size: 14px;
 }
 
 .point-request-review .member-filter-section__picked {
@@ -541,7 +528,6 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 12px;
-    flex: 1 1 320px;
     font-size: 14px;
     color: var(--hsa-ink);
 }
@@ -563,10 +549,25 @@
     color: var(--hsa-teal-700);
 }
 
-/* Filter Section (the card look and label style are shared above). */
+/* Filter Section: its own card, no longer shared with .member-filter-section. */
 .point-request-review .filter-section {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: 15px;
+    padding: 18px 24px;
+    background: var(--hsa-surface);
+    border-radius: 10px;
+    border: 2px solid var(--hsa-teal-700);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     margin-bottom: 30px;
+}
+
+.point-request-review .filter-section label {
+    flex: none;
+    font-weight: 700;
+    color: var(--hsa-ink);
+    font-size: 15px;
 }
 
 .point-request-review .filter-section select {
@@ -911,7 +912,6 @@
         grid-template-columns: 1fr;
     }
 
-    .point-request-review .member-filter-section,
     .point-request-review .filter-section {
         flex-direction: column;
         align-items: stretch;
