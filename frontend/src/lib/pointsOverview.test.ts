@@ -117,6 +117,20 @@ describe('pointsOverview', () => {
         ]);
     });
 
+    it('leaves an earlier school year\'s Adjustment out of the ledger, but keeps one with no date', () => {
+        const member: Member = {
+            ...generalMember,
+            adjustments: [
+                { points: 5, note: 'Last year\'s Adjustment', date: '2025-11-01' },
+                { points: 3, note: 'Undated Adjustment' },
+            ],
+        };
+        const overview = overviewFor(member, [], []);
+
+        expect(overview.total).toBe(3);
+        expect(overview.ledger.map((entry) => entry.name)).toEqual(['Undated Adjustment']);
+    });
+
     it("lists this year's Removed Check-ins apart, newest first, with the reason and the points they had earned", () => {
         const removed = (event: string, eventDate: string) => ({ event, eventTypeId: 'gbm', eventDate, reason: 'Not there', by: 'vp@ufl.edu', on: '2026-09-20' });
         const gbm2 = code('GBM2', 'gbm', '2026-09-10', 'GBM 2');

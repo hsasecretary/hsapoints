@@ -20,6 +20,7 @@ frontend/build
 .env.test.local
 .env.production.local
 *.pem
+/forms
 
 # Firebase & Admin Secrets
 serviceAccountKey.json

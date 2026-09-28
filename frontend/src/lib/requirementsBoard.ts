@@ -104,11 +104,12 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
     const missName = (missed: MissedEvent) => missedEventName(codes, missed);
     const codeName = (codeId: string, eventTypeId: string) => missedEventName(codes, { codeId, eventTypeId });
 
-    // Core Events. Any one HLHM event fills HLHM, so the optional ones fold
-    // into a single tile unless the last one was missed.
+    // Core Events. Any one HLHM event fills HLHM, so its events fold into a
+    // single tile: the one attended, else "any one by" the last one while it's
+    // still ahead. None is ever missed, so once they've all passed there's no tile.
     const tiles: Tile[] = [];
     for (const core of standing.coreEvents) {
-        if (core.eventTypeId === HLHM && core.status !== 'missed') continue;
+        if (core.eventTypeId === HLHM) continue;
         const base = { key: core.codeId, name: codeName(core.codeId, core.eventTypeId), date: core.eventDate, hlhm: core.eventTypeId === HLHM };
         if (core.status === 'attended') {
             tiles.push({ ...base, state: 'done', strike: false, detail: { kind: 'attended' } });
@@ -131,12 +132,11 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
             }
         }
     }
-    const hlhmMissed = standing.coreEvents.some((core) => core.eventTypeId === HLHM && core.status === 'missed');
     const byDate = [...attendances].sort((a, b) => a.eventDate.localeCompare(b.eventDate) || a.id.localeCompare(b.id));
     const hlhmAttendance = byDate.find((attendance) => attendance.eventTypeId === HLHM);
     const hlhmCodes = standing.coreEvents.filter((core) => core.eventTypeId === HLHM);
     const lastHlhm = hlhmCodes[hlhmCodes.length - 1];
-    if (standing.heldToCabinetRules && !hlhmMissed && (hlhmAttendance || lastHlhm)) {
+    if (standing.heldToCabinetRules && (hlhmAttendance || lastHlhm?.status === 'upcoming')) {
         const base = { key: 'hlhm', name: 'HLHM', hlhm: true, strike: false };
         tiles.push(hlhmAttendance
             ? {

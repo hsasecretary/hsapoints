@@ -58,6 +58,24 @@ describe('computeStanding', () => {
         expect(standing.cabinetPoints).toBe(0);
     });
 
+    it('leaves out an Adjustment dated in an earlier school year, but still counts one with no date at all', () => {
+        const standing = computeStanding(
+            {
+                ...generalMember,
+                adjustments: [
+                    { points: 5, note: 'Last year\'s Adjustment', date: '2025-10-01' },
+                    { points: 2, note: 'Undated, from before Adjustments were dated' },
+                ],
+            },
+            [],
+            rubric,
+            [],
+            { today: TODAY },
+        );
+
+        expect(standing.vePoints).toBe(2);
+    });
+
     it('gives a Cabinet Member a Missed Event and a Strike for an unexcused miss, until a later Additional Event makes it up', () => {
         const thursday = code('CT1', 'cabinet-thursday', '2026-09-03');
         const gbm = code('GBM1', 'gbm', '2026-09-10');
@@ -207,7 +225,7 @@ describe('computeStanding', () => {
         expect(standing.missedEvents.map((missed) => missed.codeId)).toEqual(['CT1']);
     });
 
-    it('misses the HLHM Core Event only once the last HLHM event has passed unattended', () => {
+    it('never misses an HLHM event or gives it a Strike, even once every one has passed unattended', () => {
         const first = code('HLHM1', 'hlhm', '2026-09-20');
         const last = code('HLHM2', 'hlhm', '2026-10-10');
 
@@ -218,9 +236,9 @@ describe('computeStanding', () => {
 
         const afterwards = computeStanding(cabinetMember, [], rubric, [first, last], { today: TODAY });
         expect(afterwards.coreEvents.map((event) => [event.codeId, event.status]))
-            .toEqual([['HLHM1', 'optional'], ['HLHM2', 'missed']]);
-        expect(afterwards.missedEvents.map((missed) => missed.codeId)).toEqual(['HLHM2']);
-        expect(afterwards.openStrikes).toBe(1);
+            .toEqual([['HLHM1', 'optional'], ['HLHM2', 'optional']]);
+        expect(afterwards.missedEvents).toEqual([]);
+        expect(afterwards.openStrikes).toBe(0);
     });
 
     it('honours a Point Request\'s named pick first, then runs the rest oldest-first', () => {

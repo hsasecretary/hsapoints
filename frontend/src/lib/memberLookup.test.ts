@@ -96,6 +96,19 @@ describe('lookupLedger', () => {
         expect(ledger.codes).toEqual({ redeemed: 3, byRequest: 1 });
     });
 
+    it('leaves an Adjustment dated in an earlier school year off the ledger, but keeps one with no date', () => {
+        const member: Member = {
+            ...generalMember,
+            adjustments: [
+                { points: 5, note: 'Last year\'s Adjustment', date: '2025-11-01' },
+                { points: 3, note: 'Undated Adjustment' },
+            ],
+        };
+        const rows = lookupLedger({ member, attendances: [], codes: [], requests: [], today: TODAY }).rows;
+
+        expect(rows.map((row) => row.name)).toEqual(['Undated Adjustment']);
+    });
+
     it('says who took points away', () => {
         const member: Member = { ...generalMember, adjustments: [{ points: -2, note: "Used a friend's code", date: '2026-09-20', by: 'vp@ufl.edu' }] };
         const [row] = lookupLedger({ member, attendances: [], codes: [], requests: [], today: TODAY }).rows;

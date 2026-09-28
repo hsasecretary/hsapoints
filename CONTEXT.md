@@ -78,7 +78,7 @@ Reaching 20 Cabinet Points. 20 is a target, not a cap: Cabinet Points keep count
 ### Cabinet requirements
 
 **Core Events** (Tier 1):
-The events a Cabinet Member attends every one of over the year: Cabinet Thursdays, GBMs, Cabinet Retreats, Cabinet Orientation, HLSA, and one HLHM event (any HLHM event counts).
+The events a Cabinet Member attends every one of over the year: Cabinet Thursdays, GBMs, Cabinet Retreats, Cabinet Orientation, HLSA, and one HLHM event (any HLHM event counts, so no single HLHM event is mandatory: skipping one is never a Missed Event or a Strike).
 _Avoid_: Required events, cabinet-required events
 
 **Semester Requirements** (Tier 2):

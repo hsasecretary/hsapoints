@@ -3,7 +3,7 @@
 // and by group, and the Point Requests still waiting on E-Board. Pure, so it's
 // tested without Firestore; every number comes from computeStanding and the
 // rubric, never from a stored counter.
-import type { Attendance, Code, Member, RemovedCheckIn, Standing } from './computeStanding';
+import { adjustmentsThisYear, type Attendance, type Code, type Member, type RemovedCheckIn, type Standing } from './computeStanding';
 import { eventType, rubric } from './rubric';
 import { academicYear } from './semester';
 
@@ -159,7 +159,7 @@ export function pointsOverview({ member, standing, attendances, codes, requests,
             crossed: false,
         });
     }
-    (member.adjustments ?? []).forEach((adjustment, i) => {
+    adjustmentsThisYear(member.adjustments, today).forEach((adjustment, i) => {
         entries.set(`adjustment:${i}`, {
             id: `adjustment-${i}`,
             name: adjustment.note || 'Adjustment from E-Board',

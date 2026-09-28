@@ -7,7 +7,11 @@
 // Attendance of two years would share Semester Requirements.
 import { isHeldToCabinetRules } from './members';
 import type { EventType } from './rubric';
-import { semesterOf } from './semester';
+import { academicYear, semesterOf } from './semester';
+
+/** An Adjustment (see CONTEXT.md): `requestId` when E-Board turned a Point
+ *  Request into it; `by` when E-Board took points away (no longer offered). */
+export type Adjustment = { points: number; note?: string; date?: string; requestId?: string; by?: string };
 
 /** The users/{email} fields a standing depends on. */
 export type Member = {
@@ -21,8 +25,7 @@ export type Member = {
     excusals?: { codeId: string }[];
     strikeRemovals?: { codeId: string }[];
     missedEventOverrides?: { codeId: string }[];
-    /** `requestId` when E-Board turned a Point Request into it; `by` when E-Board took points away (no longer offered). */
-    adjustments?: { points: number; note?: string; date?: string; requestId?: string; by?: string }[];
+    adjustments?: Adjustment[];
     /** Removed Check-ins, by upper-cased code. Display only: the Attendance is already gone. */
     removedCheckIns?: Record<string, RemovedCheckIn>;
 };
@@ -70,7 +73,7 @@ export type CoreEvent = {
     eventTypeId: string;
     eventDate: string;
     semester: Semester;
-    /** `optional`: an HLHM event the Member can skip, since any one HLHM event a year fills the Core Event. */
+    /** `optional`: an HLHM event the Member didn't go to. Any one HLHM event a year fills the Core Event, so none is ever missed. */
     status: 'attended' | 'missed' | 'upcoming' | 'optional';
 };
 
@@ -143,6 +146,18 @@ export const CABINET_POINTS_GOAL = 20;
 /** One HLHM event a year fills its Core Event; any beyond it is surplus. */
 const HLHM = 'hlhm';
 
+/**
+ * The Adjustments that count toward one school year: one dated inside it, or
+ * one with no date at all. Undated Adjustments predate the `date` field
+ * (#66) and carry nothing to place them by, so - unlike a dated one made in
+ * some other year - they're never excluded. Shared by computeStanding,
+ * pointsOverview and memberLookup so a Member's total always agrees.
+ */
+export function adjustmentsThisYear(adjustments: Adjustment[] | undefined, today: string): Adjustment[] {
+    const { start, end } = academicYear(today);
+    return (adjustments ?? []).filter((adjustment) => !adjustment.date || (adjustment.date >= start && adjustment.date <= end));
+}
+
 /** The cabinets that run MLP, whose members have Affiliate Org waived. */
 const MLP_CABINETS = ['mlpFall', 'mlpSpring'];
 
@@ -173,7 +188,7 @@ export function computeStanding(
     }
     // Adjustments stand in for the old uncategorized otherPoints, which
     // always counted toward the Total (= VE) Points.
-    for (const adjustment of member.adjustments ?? []) vePoints += adjustment.points || 0;
+    for (const adjustment of adjustmentsThisYear(member.adjustments, today)) vePoints += adjustment.points || 0;
 
     const affiliateWaived = MLP_CABINETS.includes(member.cabinet);
     const semesterRequirements = {
@@ -300,20 +315,17 @@ function listCoreEvents(
     const coreCodes = codes
         .filter((code) => types.get(code.eventTypeId)?.tier === 'core')
         .sort(byDateThenId);
-    // Any one HLHM event fills the HLHM Core Event, so it is missed only once
-    // the last HLHM event has passed with none attended; that last one is
-    // the Missed Event, and the rest were optional. (A later HLHM code moves
-    // the miss, and any excusal keyed to the old one, onto itself.)
+    // Any one HLHM event fills the HLHM Core Event, so no single HLHM event
+    // is mandatory: one that passes unattended is optional, never a Missed
+    // Event or a Strike.
     const hlhmAttended = replay.some((attendance) => attendance.eventTypeId === HLHM);
-    const hlhmCodes = coreCodes.filter((code) => code.eventTypeId === HLHM);
-    const lastHlhm = hlhmCodes[hlhmCodes.length - 1];
 
     return coreCodes.map((code) => {
         let status: CoreEvent['status'];
         if (attendedCodes.has(codeKey(code.id))) status = 'attended';
         else if (code.eventTypeId === HLHM && hlhmAttended) status = 'optional';
         else if (code.eventDate >= today) status = 'upcoming';
-        else if (code.eventTypeId === HLHM && code !== lastHlhm) status = 'optional';
+        else if (code.eventTypeId === HLHM) status = 'optional';
         else status = 'missed';
         return {
             codeId: code.id,

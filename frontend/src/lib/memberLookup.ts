@@ -3,7 +3,7 @@
 // Requests with who reviewed them. Pure, so it's tested without Firestore;
 // every number comes from computeStanding and the rubric, never from a
 // stored counter, so it always matches the Member's own dashboard.
-import { AT_RISK_STRIKES, CABINET_POINTS_GOAL, computeStanding, type Attendance, type Code, type Member, type MissedEvent, type Semester, type Standing } from './computeStanding';
+import { AT_RISK_STRIKES, CABINET_POINTS_GOAL, adjustmentsThisYear, computeStanding, type Attendance, type Code, type Member, type MissedEvent, type Semester, type Standing } from './computeStanding';
 import { removedThisYear, type MemberRequest, type Revoked } from './pointsOverview';
 import { eventType, rubric } from './rubric';
 import { academicYear, fromIsoDate, toIsoDate } from './semester';
@@ -110,7 +110,7 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
             takenBack: null,
         });
     }
-    (member.adjustments ?? []).forEach((adjustment, i) => {
+    adjustmentsThisYear(member.adjustments, today).forEach((adjustment, i) => {
         rows.set(`adjustment:${i}`, {
             id: `adjustment-${i}`,
             name: adjustment.note || 'Adjustment from E-Board',

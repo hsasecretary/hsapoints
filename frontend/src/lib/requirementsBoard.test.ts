@@ -104,10 +104,11 @@ describe('requirementsBoard', () => {
             expect.objectContaining({ key: 'hlhm', date: '2026-09-20', state: 'done', detail: { kind: 'hlhm-done', name: 'HLHM Paint Night', date: '2026-09-20' } }),
         ]);
 
-        const missed = board({ codes: [paint, film], today: '2026-10-20' });
-        expect(missed.months.flatMap((month) => month.tiles).filter((t) => t.hlhm)).toEqual([
-            expect.objectContaining({ key: 'HL2', state: 'open', strike: true }),
-        ]);
+        const allPassed = board({ codes: [paint, film], today: '2026-10-20' });
+        expect(allPassed.months.flatMap((month) => month.tiles).filter((t) => t.hlhm)).toEqual([]);
+        expect(allPassed.toMakeUp).toEqual([]);
+        expect(allPassed.openStrikes).toBe(0);
+        expect(allPassed.core.hlhmBy).toBeNull();
     });
 
     it('fills the Fall | Spring grid with the event that met each requirement, and a pending request as waiting', () => {

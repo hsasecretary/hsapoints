@@ -141,7 +141,7 @@ function MemberYear({ row, roster, pending, saved, onPick, onCancel, onSave }: {
 
     const attendedRow = (event: CoreEvent) => {
         const state = event.status === 'attended' ? 'Attended'
-            : event.status === 'optional' ? 'Not needed (HLHM already filled)'
+            : event.status === 'optional' ? 'Optional (any one HLHM event counts)'
             : event.eventDate === today ? 'Tonight' : 'Upcoming';
         return (
             <li key={event.codeId} className={`eap-row ${event.status === 'upcoming' ? 'is-future' : 'is-attended'}`}>
