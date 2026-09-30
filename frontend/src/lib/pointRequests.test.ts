@@ -176,6 +176,13 @@ describe('buildPointRequest', () => {
         });
     });
 
+    it('keeps what the Member wrote on a coded request, but does not require it', () => {
+        const coded = { typeChoiceId: 'gbm', codeId: 'GBMSEP', eventTypeId: 'gbm', eventDate: '2026-09-03' };
+        const vouched = buildPointRequest(draft({ ...coded, note: '  Sat with Ana, she can vouch  ' }), context);
+        expect(vouched).toMatchObject({ ok: true, data: { codeId: 'GBMSEP', description: 'Sat with Ana, she can vouch' } });
+        expect(buildPointRequest(draft({ ...coded, note: '' }), context)).toMatchObject({ ok: true, data: { description: '' } });
+    });
+
     it("saves a Tabling request's hours with one Make-up pick per hour", () => {
         const built = buildPointRequest(draft({
             typeChoiceId: 'tabling', eventTypeId: 'tabling', eventName: 'Turlington table', eventDate: '2026-10-12', hours: 3,

@@ -163,16 +163,16 @@ export function MakeupPicker({ legend, name, value, options, auto, onChange }: {
     );
 }
 
-export function ProofFields({ fields, set, asksNote }: { fields: Fields; set: SetFields; asksNote: boolean }) {
+export function ProofFields({ fields, set, hasCode }: { fields: Fields; set: SetFields; hasCode: boolean }) {
     return (
         <>
-            {asksNote && (
-                <label className="req-field">
-                    <span className="req-label">What did you do?</span>
-                    <textarea rows={3} value={fields.note} onChange={(e) => set({ note: e.target.value })}
-                        placeholder="Where it was, what you did, who can vouch for you" />
-                </label>
-            )}
+            <label className="req-field">
+                <span className="req-label">What did you do?{hasCode && <small> (optional)</small>}</span>
+                <textarea rows={3} value={fields.note} onChange={(e) => set({ note: e.target.value })}
+                    placeholder={hasCode
+                        ? 'Anything E-Board should know, like who can vouch for you or an excuse approved beforehand'
+                        : 'Where it was, what you did, who can vouch for you'} />
+            </label>
             <PhotoField value={fields.photo} onChange={(photo) => set({ photo })} />
         </>
     );

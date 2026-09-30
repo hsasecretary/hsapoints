@@ -347,7 +347,7 @@ function PointRequestForm() {
                                     legend={count > 1 ? `Hour ${i + 1}: make up which Missed Event?` : 'Make up which Missed Event?'}
                                     onChange={(codeId) => setPick(i, codeId)} />
                             ))}
-                            <ProofFields fields={fields} set={set} asksNote={!code} />
+                            <ProofFields fields={fields} set={set} hasCode={Boolean(code)} />
                             <PreviewPanel held={cabinet} preview={preview} typeId={pointsTypeId} count={count} code={code} owed={owed} />
                             <button type="button" className="req-submit" disabled={!built?.ok || sending} onClick={submit}>
                                 {sending ? 'Sending…' : 'Submit request'}
