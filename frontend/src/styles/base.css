@@ -503,8 +503,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 .loading-screen__shine {
   background: linear-gradient(105deg, transparent 35%, var(--hsa-teal-600) 50%, transparent 65%) 200% 0 / 250% 100%;
-  /* Starts with the fade-in and takes 0.45s, so a full sweep completes inside
-     the 500ms minimum display time (useMinLoadingTime). */
+  /* Starts with the fade-in and takes 0.6s, so a full sweep completes inside
+     the 600ms minimum display time (useMinLoadingTime). */
   animation: loading-screen-sweep 0.6s linear 0.15s infinite backwards;
 }
 @keyframes loading-screen-sweep { to { background-position: -100% 0; } }

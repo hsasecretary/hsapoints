@@ -17,7 +17,7 @@ export default function LoadingScreen({ fullPage = false }: { fullPage?: boolean
 // True while `loading` is true, then a little longer if the screen was already
 // showing, so it doesn't blink away the instant it appeared. Pair with the CSS
 // fade-in delay: a load shorter than `delayMs` shows nothing and holds nothing.
-export function useMinLoadingTime(loading: boolean, delayMs = 150, minMs = 500) {
+export function useMinLoadingTime(loading: boolean, delayMs = 150, minMs = 600) {
     const [held, setHeld] = useState(loading);
     const shownAt = useRef<number | null>(null);
 
