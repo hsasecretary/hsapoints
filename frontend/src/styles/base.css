@@ -479,7 +479,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: loading-screen-in 0.25s ease 0.15s backwards;
+  animation: loading-screen-in 0.12s ease 0.15s backwards;
 }
 .loading-screen--page {
   min-height: 100vh;
@@ -503,12 +503,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 .loading-screen__shine {
   background: linear-gradient(105deg, transparent 35%, var(--hsa-teal-600) 50%, transparent 65%) 200% 0 / 250% 100%;
-  animation: loading-screen-sweep 1.6s linear infinite;
+  /* Starts with the fade-in and takes 0.45s, so a full sweep completes inside
+     the 500ms minimum display time (useMinLoadingTime). */
+  animation: loading-screen-sweep 0.45s linear 0.15s infinite backwards;
 }
 @keyframes loading-screen-sweep { to { background-position: -100% 0; } }
 @keyframes loading-screen-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  .loading-screen__shine { animation-duration: 4s; }
+  .loading-screen__shine { animation-duration: 2s; }
 }
 
 /* Find a member by name (components/members/MemberSearch.tsx), on Excuse
