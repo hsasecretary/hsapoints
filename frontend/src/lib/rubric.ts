@@ -40,7 +40,7 @@ const rows = [
     { id: 'cabinet-retreat', label: 'Cabinet Retreat', tier: 'core', cabinetPoints: 1, vePoints: 1, cabinetOnly: true, codeable: true },
     { id: 'cabinet-orientation', label: 'Cabinet Orientation', tier: 'core', cabinetPoints: 1, vePoints: 1, cabinetOnly: true, codeable: true },
     { id: 'hlsa', label: 'HLSA', tier: 'core', cabinetPoints: 1, vePoints: 1, cabinetOnly: false, codeable: true },
-    // One HLHM event a year (Sept 15 - Oct 15) fills it; any beyond it is surplus.
+    // One HLHM event a year (Sept 15 - Oct 15) fills the requirement; any beyond it is surplus.
     { id: 'hlhm', label: 'HLHM', tier: 'semester', cabinetPoints: 1, vePoints: 1, cabinetOnly: false, codeable: true },
 
     // Semester Requirements

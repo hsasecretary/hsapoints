@@ -14,9 +14,10 @@ function lead({ toMakeUp, openStrikes, core }: RequirementsBoard): string {
 
 // Tier 1 (docs/research/cabinet-core-events-missed-ux.md): only the Missed
 // Events still to make up are shown, each with its Make up button; the next
-// Core Event and HLHM get a line each, and the whole year folds away below,
-// every row saying its status in words. E-Board is exempt: "Exempt" stands in for the summary and the year stays. The tile board this replaced is on
-// the archive/cabinet-tier1-tiles branch.
+// Core Event gets a line, and the whole year folds away below, every row
+// saying its status in words. E-Board is exempt: "Exempt" stands in for the
+// summary and the year stays. The tile board this replaced is on the
+// archive/cabinet-tier1-tiles branch.
 function CoreEvents({ board }: { board: RequirementsBoard }) {
     const { toMakeUp, extras, core, months, exempt } = board;
     return (

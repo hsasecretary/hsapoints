@@ -82,7 +82,8 @@ function PointRequestForm() {
         );
     }
 
-    const cabinet = standing.heldToCabinetRules;
+    // E-Board in the Cabinet view stays on the General picker: they can't earn Cabinet-only types.
+    const cabinet = standing.heldToCabinetRules && !standing.exempt;
     const from: Start = cabinet ? start : { kind: 'search' };
     const set = (patch: Partial<Fields>) => setFieldsState((current) => ({ ...current, ...patch }));
     const reset = (next: Start, nextChoice: TypeChoice | null = null) => {

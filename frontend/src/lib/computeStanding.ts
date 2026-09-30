@@ -146,7 +146,7 @@ export const AT_RISK_STRIKES = 3;
 /** Cabinet Points to be a Graduating Cabinet Member: a target, not a cap. */
 export const CABINET_POINTS_GOAL = 20;
 
-/** One HLHM event a year fills it; any beyond it is surplus. */
+/** One HLHM event a year fills its requirement; any beyond it is surplus. */
 const HLHM = 'hlhm';
 
 /**

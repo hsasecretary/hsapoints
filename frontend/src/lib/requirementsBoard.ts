@@ -102,7 +102,6 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
     const missName = (missed: MissedEvent) => missedEventName(codes, missed);
     const codeName = (codeId: string, eventTypeId: string) => missedEventName(codes, { codeId, eventTypeId });
 
-    // Core Events.
     const tiles: Tile[] = [];
     for (const core of standing.coreEvents) {
         const base = { key: core.codeId, name: codeName(core.codeId, core.eventTypeId), date: core.eventDate };
