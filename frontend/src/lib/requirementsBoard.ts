@@ -28,29 +28,25 @@ export type TileDetail =
     | { kind: 'madeup'; by: string; byDate: string; clearedStrike: boolean }
     /** E-Board closed the miss without a Make-up. */
     | { kind: 'closed' }
-    | { kind: 'open'; strike: boolean }
-    /** No HLHM event yet; any one on or before `by` fills it. */
-    | { kind: 'hlhm-open'; by: string }
-    | { kind: 'hlhm-done'; name: string; date: string };
+    | { kind: 'open'; strike: boolean };
 
 export type Tile = {
-    /** The code ID, or 'hlhm' for the one HLHM tile. */
+    /** The code ID. */
     key: string;
     name: string;
     date: string;
     state: TileState;
     /** An open miss that carries a Strike. */
     strike: boolean;
-    /** Stands for every HLHM event of the year. */
-    hlhm: boolean;
     detail: TileDetail;
 };
 
-export type Cell = { kind: 'done'; by: string } | { kind: 'pending' } | { kind: 'waived' } | { kind: 'open' };
+/** `fall-only`: HLHM is once a year, so its Spring cell is just a note. */
+export type Cell = { kind: 'done'; by: string } | { kind: 'pending' } | { kind: 'waived' } | { kind: 'open' } | { kind: 'fall-only' };
 
 export type SemesterColumn = { label: string; done: number; needed: number; started: boolean };
 
-export type GridRow = { eventTypeId: string; name: string; fall: Cell; spring: Cell };
+export type GridRow = { eventTypeId: string; name: string; fall: Cell; spring: Cell; note?: string };
 
 export type OwedMiss = {
     codeId: string;
@@ -67,8 +63,10 @@ export type TypeRow = { key: string; name: string; cabinetPoints: number; vePoin
 
 export type RequirementsBoard = {
     months: { label: string; tiles: Tile[] }[];
-    /** Tier 1 in one line: past Core Events attended (made-up misses don't count), the next one, and HLHM's deadline if it's still open. */
-    core: { attended: number; past: number; next: { name: string; date: string } | null; hlhmBy: string | null };
+    /** E-Board: owes nothing, so the page says "Exempt" over Tier 1 and Tier 2. */
+    exempt: boolean;
+    /** Tier 1 in one line: past Core Events attended (made-up misses don't count) and the next one. */
+    core: { attended: number; past: number; next: { name: string; date: string } | null };
     grid: { fall: SemesterColumn; spring: SemesterColumn; rows: GridRow[] };
     /** Oldest first. */
     toMakeUp: OwedMiss[];
@@ -104,13 +102,10 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
     const missName = (missed: MissedEvent) => missedEventName(codes, missed);
     const codeName = (codeId: string, eventTypeId: string) => missedEventName(codes, { codeId, eventTypeId });
 
-    // Core Events. Any one HLHM event fills HLHM, so its events fold into a
-    // single tile: the one attended, else "any one by" the last one while it's
-    // still ahead. None is ever missed, so once they've all passed there's no tile.
+    // Core Events.
     const tiles: Tile[] = [];
     for (const core of standing.coreEvents) {
-        if (core.eventTypeId === HLHM) continue;
-        const base = { key: core.codeId, name: codeName(core.codeId, core.eventTypeId), date: core.eventDate, hlhm: core.eventTypeId === HLHM };
+        const base = { key: core.codeId, name: codeName(core.codeId, core.eventTypeId), date: core.eventDate };
         if (core.status === 'attended') {
             tiles.push({ ...base, state: 'done', strike: false, detail: { kind: 'attended' } });
         } else if (core.status === 'upcoming') {
@@ -118,7 +113,7 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
         } else {
             const missed = missedByCode.get(core.codeId);
             if (!missed) continue;
-            if (missed.overridden) {
+            if (missed.overridden || standing.exempt) {
                 tiles.push({ ...base, state: 'madeup', strike: false, detail: { kind: 'closed' } });
             } else if (missed.madeUpBy) {
                 tiles.push({
@@ -134,19 +129,6 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
     }
     const byDate = [...attendances].sort((a, b) => a.eventDate.localeCompare(b.eventDate) || a.id.localeCompare(b.id));
     const hlhmAttendance = byDate.find((attendance) => attendance.eventTypeId === HLHM);
-    const hlhmCodes = standing.coreEvents.filter((core) => core.eventTypeId === HLHM);
-    const lastHlhm = hlhmCodes[hlhmCodes.length - 1];
-    if (standing.heldToCabinetRules && (hlhmAttendance || lastHlhm?.status === 'upcoming')) {
-        const base = { key: 'hlhm', name: 'HLHM', hlhm: true, strike: false };
-        tiles.push(hlhmAttendance
-            ? {
-                ...base,
-                date: hlhmAttendance.eventDate,
-                state: 'done',
-                detail: { kind: 'hlhm-done', name: nameOf(hlhmAttendance.id), date: hlhmAttendance.eventDate },
-            }
-            : { ...base, date: lastHlhm.eventDate, state: 'upcoming', detail: { kind: 'hlhm-open', by: lastHlhm.eventDate } });
-    }
     tiles.sort((a, b) => a.date.localeCompare(b.date) || a.key.localeCompare(b.key));
     const months: RequirementsBoard['months'] = [];
     for (const tile of tiles) {
@@ -169,25 +151,35 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
         if (requirement.met) return { kind: 'done', by: nameOf(requirement.filledBy) };
         return pendingIn(semester, requirement.eventTypeId) ? { kind: 'pending' } : { kind: 'open' };
     };
+    // HLHM is once a year, run Sept 15 - Oct 15: one Fall cell, and a note in Spring.
+    const hlhmRow: GridRow = {
+        eventTypeId: HLHM,
+        name: eventType(HLHM)?.label ?? 'HLHM',
+        note: 'Only runs Sept 15 – Oct 15',
+        fall: hlhmAttendance ? { kind: 'done', by: nameOf(hlhmAttendance.id) }
+            : pendingIn('fall', HLHM) || pendingIn('spring', HLHM) ? { kind: 'pending' } : { kind: 'open' },
+        spring: { kind: 'fall-only' },
+    };
     const fallYear = Number(academicYear(today).start.slice(0, 4));
     const column = (semester: Semester, year: number, start: string): SemesterColumn => {
         const counted = standing.semesterRequirements[semester].filter((requirement) => !requirement.waived);
+        const hlhm = semester === 'fall' ? 1 : 0;
         return {
             label: `${SEMESTER_NAMES[semester]} ${year}`,
-            done: counted.filter((requirement) => requirement.met).length,
-            needed: counted.length,
+            done: counted.filter((requirement) => requirement.met).length + (hlhm && hlhmAttendance ? 1 : 0),
+            needed: counted.length + hlhm,
             started: today >= start,
         };
     };
     const grid = {
         fall: column('fall', fallYear, `${fallYear}-06-01`),
         spring: column('spring', fallYear + 1, `${fallYear + 1}-01-01`),
-        rows: standing.semesterRequirements.fall.map((requirement) => ({
+        rows: [hlhmRow, ...standing.semesterRequirements.fall.map((requirement) => ({
             eventTypeId: requirement.eventTypeId,
             name: eventType(requirement.eventTypeId)?.label ?? requirement.eventTypeId,
             fall: cell('fall', requirement.eventTypeId),
             spring: cell('spring', requirement.eventTypeId),
-        })),
+        }))],
     };
 
     // To make up.
@@ -256,11 +248,11 @@ export function requirementsBoard({ member, standing, attendances, codes, reques
 
     return {
         months,
+        exempt: standing.exempt,
         core: {
             attended: tiles.filter((tile) => tile.state === 'done').length,
             past: tiles.filter((tile) => tile.state !== 'upcoming').length,
-            next: tiles.filter((tile) => tile.state === 'upcoming' && !tile.hlhm).map(({ name, date }) => ({ name, date }))[0] ?? null,
-            hlhmBy: tiles.flatMap((tile) => (tile.detail.kind === 'hlhm-open' ? [tile.detail.by] : []))[0] ?? null,
+            next: tiles.filter((tile) => tile.state === 'upcoming').map(({ name, date }) => ({ name, date }))[0] ?? null,
         },
         grid,
         toMakeUp,
@@ -293,10 +285,6 @@ export function tileStatus({ detail }: Tile): string {
             return 'Missed, nothing to make up';
         case 'madeup':
             return `Made up by ${detail.by} on ${shortDate(detail.byDate)}${detail.clearedStrike ? ', which cleared its Strike' : ''}`;
-        case 'hlhm-open':
-            return `Go to any one by ${shortDate(detail.by)}`;
-        case 'hlhm-done':
-            return `Attended ${detail.name}`;
     }
 }
 

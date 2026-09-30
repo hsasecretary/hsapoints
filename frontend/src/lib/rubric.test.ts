@@ -23,8 +23,8 @@ describe('the Event Type rubric', () => {
         );
     });
 
-    it('gives HLHM its own Core Event row, not the Affiliate Org one (#60)', () => {
-        expect(eventType('hlhm')).toMatchObject({ tier: 'core', cabinetPoints: 1, vePoints: 1 });
+    it('gives HLHM its own Semester Requirement row, not the Affiliate Org one (#60)', () => {
+        expect(eventType('hlhm')).toMatchObject({ tier: 'semester', cabinetPoints: 1, vePoints: 1 });
     });
 
     it('makes External Social an Additional Event', () => {

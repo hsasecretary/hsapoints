@@ -6,6 +6,8 @@ function CellBody({ cell }: { cell: Cell }) {
             return <><span aria-hidden="true">✓</span> <small>{cell.by}</small></>;
         case 'waived':
             return <small>Not needed</small>;
+        case 'fall-only':
+            return <small>Fall only</small>;
         case 'pending':
             return <small>Waiting for E-Board</small>;
         default:
@@ -38,7 +40,7 @@ function SemesterGrid({ grid }: { grid: RequirementsBoard['grid'] }) {
             <tbody>
                 {grid.rows.map((row) => (
                     <tr key={row.eventTypeId}>
-                        <th scope="row">{row.name}</th>
+                        <th scope="row">{row.name}{row.note && <small>{row.note}</small>}</th>
                         {([['fall', row.fall], ['spring', row.spring]] as const).map(([semester, cell]) => (
                             <td key={semester} className={`is-${cell.kind}${grid[semester].started ? '' : ' is-later'}`}>
                                 <CellBody cell={cell} />

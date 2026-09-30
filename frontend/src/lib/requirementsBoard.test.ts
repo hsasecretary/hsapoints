@@ -89,26 +89,39 @@ describe('requirementsBoard', () => {
         expect(b.toMakeUp).toEqual([]);
     });
 
-    it('shows HLHM as one tile: any one before the last HLHM event, then the one attended', () => {
+    it('puts HLHM in Tier 2 as a yearly row: open, pending, then done in Fall, with Spring marked "Fall only"', () => {
         const paint = code('HL1', 'hlhm', '2026-09-20', 'HLHM Paint Night');
         const film = code('HL2', 'hlhm', '2026-10-10', 'HLHM Film Night');
+        const hlhm = (b: ReturnType<typeof board>) => b.grid.rows.find((row) => row.eventTypeId === 'hlhm');
 
         const before = board({ codes: [paint, film], today: '2026-09-25' });
-        const hlhmTiles = before.months.flatMap((month) => month.tiles).filter((t) => t.hlhm);
-        expect(hlhmTiles).toEqual([
-            expect.objectContaining({ key: 'hlhm', name: 'HLHM', date: '2026-10-10', state: 'upcoming', detail: { kind: 'hlhm-open', by: '2026-10-10' } }),
-        ]);
+        expect(before.months.flatMap((month) => month.tiles).filter((t) => /HLHM/.test(t.name))).toEqual([]);
+        expect(before.core).not.toHaveProperty('hlhmBy');
+        expect(before.grid.rows[0]).toMatchObject({ eventTypeId: 'hlhm', name: 'HLHM', note: 'Only runs Sept 15 – Oct 15' });
+        expect(hlhm(before)).toMatchObject({ fall: { kind: 'open' }, spring: { kind: 'fall-only' } });
+
+        const asked: MemberRequest = { id: 'r1', status: 'pending', activityName: 'HLHM', date: '2026-09-22', eventTypeId: 'hlhm' };
+        expect(hlhm(board({ codes: [paint, film], requests: [asked], today: '2026-09-25' })).fall).toEqual({ kind: 'pending' });
 
         const went = board({ attendances: [attended(paint)], codes: [paint, film], today: '2026-09-25' });
-        expect(went.months.flatMap((month) => month.tiles).filter((t) => t.hlhm)).toEqual([
-            expect.objectContaining({ key: 'hlhm', date: '2026-09-20', state: 'done', detail: { kind: 'hlhm-done', name: 'HLHM Paint Night', date: '2026-09-20' } }),
-        ]);
+        expect(hlhm(went)).toMatchObject({ fall: { kind: 'done', by: 'HLHM Paint Night' }, spring: { kind: 'fall-only' } });
+        expect(went.grid.fall.done).toBe(1);
 
         const allPassed = board({ codes: [paint, film], today: '2026-10-20' });
-        expect(allPassed.months.flatMap((month) => month.tiles).filter((t) => t.hlhm)).toEqual([]);
         expect(allPassed.toMakeUp).toEqual([]);
         expect(allPassed.openStrikes).toBe(0);
-        expect(allPassed.core.hlhmBy).toBeNull();
+    });
+
+    it('marks an E-Board member exempt: nothing to make up, and a skipped Core Event is just closed', () => {
+        const thursday = code('CT2', 'cabinet-thursday', '2026-09-04', 'Cabinet Thursday Wk 2');
+        const eboardMember: Member = { cabinet: 'none', eboard: true, involvement: 'eboard', heldToCabinetRules: true, exemptView: true };
+        const b = board({ member: eboardMember, codes: [thursday], today: '2026-09-25' });
+
+        expect(b.exempt).toBe(true);
+        expect(b.toMakeUp).toEqual([]);
+        expect(b.openStrikes).toBe(0);
+        expect(b.months[0].tiles[0]).toMatchObject({ key: 'CT2', state: 'madeup', strike: false, detail: { kind: 'closed' } });
+        expect(board({ codes: [thursday], today: '2026-09-25' }).exempt).toBe(false);
     });
 
     it('fills the Fall | Spring grid with the event that met each requirement, and a pending request as waiting', () => {
@@ -122,7 +135,7 @@ describe('requirementsBoard', () => {
         expect(row('hsa-fundraising')).toMatchObject({ name: 'HSA Fundraising', fall: { kind: 'done', by: 'Empanada Sale' }, spring: { kind: 'open' } });
         expect(row('affiliate-org').fall).toEqual({ kind: 'pending' });
         expect(row('tabling').fall).toEqual({ kind: 'open' });
-        expect(b.grid.fall).toMatchObject({ label: 'Fall 2026', done: 1, needed: 9, started: true });
+        expect(b.grid.fall).toMatchObject({ label: 'Fall 2026', done: 1, needed: 10, started: true });
         expect(b.grid.spring).toMatchObject({ label: 'Spring 2027', done: 0, needed: 9, started: false });
     });
 
@@ -130,7 +143,7 @@ describe('requirementsBoard', () => {
         const b = board({ member: { ...cabinetMember, cabinet: 'mlpFall' }, today: '2026-09-25' });
 
         expect(b.grid.rows.find((r) => r.eventTypeId === 'affiliate-org').fall).toEqual({ kind: 'waived' });
-        expect(b.grid.fall).toMatchObject({ done: 0, needed: 8 });
+        expect(b.grid.fall).toMatchObject({ done: 0, needed: 9 });
     });
 
     it('lists leftover Surplus as covering the next miss', () => {
@@ -184,25 +197,24 @@ describe('requirementsBoard', () => {
         expect(b.byType.rows[0].events[0].did).toBe('Extra. It will make up your next miss');
     });
 
-    it('sums up Tier 1: attended out of past Core Events, the next one, and the HLHM deadline', () => {
+    it('sums up Tier 1: attended out of past Core Events and the next one', () => {
         const orientation = code('ORI', 'cabinet-orientation', '2026-07-30', 'Cabinet Orientation');
         const thursday = code('CT1', 'cabinet-thursday', '2026-08-28', 'Cabinet Thursday Wk 1');
         const gbm = code('GBM4', 'gbm', '2026-10-08', 'GBM 4');
         const gbm5 = code('GBM5', 'gbm', '2026-11-05', 'GBM 5');
-        const paint = code('HL1', 'hlhm', '2026-10-10', 'HLHM Paint Night');
         const social = code('MIX', 'external-social', '2026-09-21', 'Mixer with HSO');
         const b = board({
             attendances: [attended(orientation), attended(social)],
-            codes: [orientation, thursday, gbm, gbm5, paint, social],
+            codes: [orientation, thursday, gbm, gbm5, social],
             today: '2026-09-25',
         });
 
-        // The made-up Thursday counts as past but not attended; HLHM isn't due yet.
-        expect(b.core).toEqual({ attended: 1, past: 2, next: { name: 'GBM 4', date: '2026-10-08' }, hlhmBy: '2026-10-10' });
+        // The made-up Thursday counts as past but not attended.
+        expect(b.core).toEqual({ attended: 1, past: 2, next: { name: 'GBM 4', date: '2026-10-08' } });
     });
 
     it("says each Core Event's status in words, so no colour key is needed", () => {
-        const tile = (detail: Tile['detail']): Tile => ({ key: 'K', name: 'GBM 1', date: '2026-09-10', state: 'done', strike: false, hlhm: false, detail });
+        const tile = (detail: Tile['detail']): Tile => ({ key: 'K', name: 'GBM 1', date: '2026-09-10', state: 'done', strike: false, detail });
 
         expect(tileStatus(tile({ kind: 'attended' }))).toBe('Attended');
         expect(tileStatus(tile({ kind: 'upcoming' }))).toBe('Coming up');
@@ -211,7 +223,5 @@ describe('requirementsBoard', () => {
         expect(tileStatus(tile({ kind: 'madeup', by: 'Mixer', byDate: '2026-09-21', clearedStrike: true })))
             .toBe('Made up by Mixer on Sep 21, which cleared its Strike');
         expect(tileStatus(tile({ kind: 'madeup', by: 'Mixer', byDate: '2026-09-21', clearedStrike: false }))).toBe('Made up by Mixer on Sep 21');
-        expect(tileStatus(tile({ kind: 'hlhm-open', by: '2026-10-10' }))).toBe('Go to any one by Oct 10');
-        expect(tileStatus(tile({ kind: 'hlhm-done', name: 'HLHM Paint Night', date: '2026-09-20' }))).toBe('Attended HLHM Paint Night');
     });
 });

@@ -17,12 +17,14 @@ function Explainer({ member }: { member: Member }) {
                 <ol>
                     <li>
                         <strong>Tier 1 - Core Events.</strong> Come to all of them: Cabinet Thursdays, GBMs, Retreats,
-                        Orientation, HLSA, and one Hispanic-Latine Heritage Month event.
+                        Orientation, and HLSA.
                     </li>
                     <li>
                         <strong>Tier 2 - Semester Requirements.</strong> Do one of each, every semester: OPA General, OPA
                         Solidarity Session, Programming, Operations, Fundraising, Service, an Affiliate Org event (MLP
-                        directors are exempt), an hour of Tabling, and the Internal Social.
+                        directors are exempt), an hour of Tabling, and the Internal Social. Once a year, go to one
+                        Hispanic-Latine Heritage Month (HLHM) event. It only runs Sept 15 – Oct 15.
+                        E-Board is exempt from Tiers 1 and 2.
                     </li>
                     <li>
                         <strong>Reach 20 Cabinet Points to graduate.</strong> Each event is worth 1 point, except Thursdays

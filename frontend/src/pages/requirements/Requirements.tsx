@@ -22,6 +22,7 @@ function Requirements({ email }: { email: string }) {
                 <>
                     <CoreEvents board={board} />
                     <h2 className="rq-h2">Tier 2: Semester Requirements</h2>
+                    {board.exempt && <p className="rq-exempt rq-exempt--small">Exempt</p>}
                     <SemesterGrid grid={board.grid} />
                 </>
             )}

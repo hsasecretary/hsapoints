@@ -24,9 +24,10 @@ export function useViewAs(): ViewAsState {
     return useContext(ViewAsContext);
 }
 
-/** The view to apply to the displayed Member (`withView`): the previewed
- *  view, or null in the Own View. */
+/** The view to apply to the displayed Member (`withView`): the shown view for
+ *  anyone who can switch (E-Board's Own View is Cabinet but their doc isn't
+ *  held to the Cabinet rules, so it has to be applied), null for everyone else. */
 export function useViewOverride(): View | null {
-    const { own, view } = useViewAs();
-    return view === own ? null : view;
+    const { view, canSwitch } = useViewAs();
+    return canSwitch ? view : null;
 }

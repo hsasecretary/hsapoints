@@ -19,9 +19,10 @@ describe('canSwitchView', () => {
 });
 
 describe('ownView', () => {
-    it('is General for E-Board and Cabinet for Web-team Testers', () => {
-        expect(ownView(eboard)).toBe('general');
+    it('is Cabinet for E-Board and Web-team Testers, General for everyone else', () => {
+        expect(ownView(eboard)).toBe('cabinet');
         expect(ownView(tester)).toBe('cabinet');
+        expect(ownView(general)).toBe('general');
     });
 
     it('follows heldToCabinetRules once E-Board has set it', () => {
@@ -33,8 +34,8 @@ describe('ownView', () => {
 describe('effectiveView', () => {
     it('is the Own View until another view is picked', () => {
         const as = (member: Member) => ({ own: ownView(member), canSwitch: canSwitchView(member) });
-        expect(effectiveView(as(eboard), null)).toBe('general');
-        expect(effectiveView(as(eboard), 'cabinet')).toBe('cabinet');
+        expect(effectiveView(as(eboard), null)).toBe('cabinet');
+        expect(effectiveView(as(eboard), 'general')).toBe('general');
         expect(effectiveView(as(tester), 'general')).toBe('general');
     });
 
@@ -53,6 +54,26 @@ describe('withView', () => {
         const standing = (member: Member) => computeStanding(member, [], rubric, [], { today: '2026-09-26' });
         expect(standing(withView(eboard, 'cabinet')).heldToCabinetRules).toBe(true);
         expect(standing(withView(tester, 'general')).heldToCabinetRules).toBe(false);
+    });
+
+    it('marks E-Board in the Cabinet view as exempt, and nobody else', () => {
+        const standing = (member: Member) => computeStanding(member, [], rubric, [], { today: '2026-09-26' });
+        expect(standing(withView(eboard, 'cabinet')).exempt).toBe(true);
+        expect(standing(withView(eboard, 'general')).exempt).toBe(false);
+        expect(standing(withView(tester, 'cabinet')).exempt).toBe(false);
+        expect(standing(withView({ ...eboard, webTeam: true }, 'cabinet')).exempt).toBe(false);
+        expect(standing(withView({ ...eboard, heldToCabinetRules: true }, 'cabinet')).exempt).toBe(false);
+        expect(standing(withView(cabinet, 'cabinet')).exempt).toBe(false);
+    });
+
+    it('owes E-Board nothing for a Core Event they skipped, but still lists it', () => {
+        const gbm = [{ id: 'GBM1', eventTypeId: 'gbm', eventDate: '2026-09-10' }];
+        const standing = (member: Member) => computeStanding(member, [], rubric, gbm, { today: '2026-09-26' });
+        const exempt = standing(withView(eboard, 'cabinet'));
+        expect(exempt.coreEvents.map((event) => event.status)).toEqual(['missed']);
+        expect(exempt.missedEvents.filter((missed) => missed.owed)).toEqual([]);
+        expect(exempt.openStrikes).toBe(0);
+        expect(standing(withView(tester, 'cabinet')).openStrikes).toBe(1);
     });
 
     it('does not change the stored doc', () => {

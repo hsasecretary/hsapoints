@@ -8,6 +8,7 @@ import { formatAccountType } from '../../lib/roles';
 import CabinetGoal from './sections/CabinetGoal';
 import EventCodeForm from './sections/EventCodeForm';
 import Explainer from './sections/Explainer';
+import ExemptSummary from './sections/ExemptSummary';
 import MakeUpList from './sections/MakeUpList';
 import PointsAndEvents from './sections/PointsAndEvents';
 import PointsSummary from './sections/PointsSummary';
@@ -20,6 +21,7 @@ type Bubble = (typeof BUBBLES)[number];
 //   My information  — name, email, account type (as the old My Information card)
 //   EventCodeForm   — the large code box
 //   PointsSummary   — Total Points toward the goal, events attended, pending requests
+//                     (E-Board in the Cabinet view: ExemptSummary, one line in place of both bars)
 //   CabinetGoal     — Cabinet view only: Cabinet Points toward 20
 //   bubbles         — "Points & events" (PointsAndEvents) and "How it works"
 //                     (Explainer), each opening in place (?open=points|how); in
@@ -63,8 +65,14 @@ function Dashboard({ email }: { email: string }) {
 
             {loading ? <p className="overview__loading" role="status">Loading your points…</p> : (
                 <>
-                    <PointsSummary overview={overview} />
-                    {standing.heldToCabinetRules && <CabinetGoal points={standing.cabinetPoints} goal={CABINET_POINTS_GOAL} />}
+                    {standing.exempt
+                        ? <ExemptSummary overview={overview} cabinetPoints={standing.cabinetPoints} />
+                        : (
+                            <>
+                                <PointsSummary overview={overview} />
+                                {standing.heldToCabinetRules && <CabinetGoal points={standing.cabinetPoints} goal={CABINET_POINTS_GOAL} />}
+                            </>
+                        )}
 
                     <div className="ov-bubbles">
                         <button type="button" className={open === 'points' ? 'is-on' : ''} aria-expanded={open === 'points'}
@@ -86,7 +94,7 @@ function Dashboard({ email }: { email: string }) {
                             <Explainer member={member} />
                         </section>
                     )}
-                    {standing.heldToCabinetRules && (
+                    {standing.heldToCabinetRules && !standing.exempt && (
                         <MakeUpList standing={standing} codes={codes} pendingPicks={pendingMakeups(pending)} />
                     )}
                 </>

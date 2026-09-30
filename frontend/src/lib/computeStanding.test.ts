@@ -208,7 +208,7 @@ describe('computeStanding', () => {
         expect(standing.surplus.map((extra) => extra.attendanceId)).toEqual(['m__AFF1', 'm__AFF2']);
     });
 
-    it('fills the HLHM Core Event with the first HLHM event of the year and makes the second one surplus', () => {
+    it('fills HLHM with the first HLHM event of the year and makes the second one surplus', () => {
         const thursday = code('CT1', 'cabinet-thursday', '2026-09-03');
         const first = code('HLHM1', 'hlhm', '2026-09-20');
         const second = code('HLHM2', 'hlhm', '2026-10-01');
@@ -217,8 +217,8 @@ describe('computeStanding', () => {
             cabinetMember, [attended(second), attended(first)], rubric, [thursday, first, second, skipped], { today: TODAY },
         );
 
-        expect(standing.coreEvents.filter((event) => event.eventTypeId === 'hlhm').map((event) => [event.codeId, event.status]))
-            .toEqual([['HLHM1', 'attended'], ['HLHM2', 'attended'], ['HLHM3', 'optional']]);
+        expect(standing.coreEvents.filter((event) => event.eventTypeId === 'hlhm')).toEqual([]);
+        expect(standing.semesterRequirements.fall.map((req) => req.eventTypeId)).not.toContain('hlhm');
         expect(standing.surplus).toEqual([
             { attendanceId: 'm__HLHM2', eventTypeId: 'hlhm', eventDate: '2026-10-01', makeupFor: 'CT1' },
         ]);
@@ -230,13 +230,9 @@ describe('computeStanding', () => {
         const last = code('HLHM2', 'hlhm', '2026-10-10');
 
         const midMonth = computeStanding(cabinetMember, [], rubric, [first, last], { today: '2026-10-01' });
-        expect(midMonth.coreEvents.map((event) => [event.codeId, event.status]))
-            .toEqual([['HLHM1', 'optional'], ['HLHM2', 'upcoming']]);
         expect(midMonth.missedEvents).toEqual([]);
 
         const afterwards = computeStanding(cabinetMember, [], rubric, [first, last], { today: TODAY });
-        expect(afterwards.coreEvents.map((event) => [event.codeId, event.status]))
-            .toEqual([['HLHM1', 'optional'], ['HLHM2', 'optional']]);
         expect(afterwards.missedEvents).toEqual([]);
         expect(afterwards.openStrikes).toBe(0);
     });

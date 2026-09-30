@@ -20,6 +20,8 @@ export type Member = {
     eboard?: boolean;
     approved?: boolean;
     heldToCabinetRules?: boolean;
+    /** Set by withView, never stored: E-Board looking at the Cabinet view, where nothing is owed. */
+    exemptView?: boolean;
     webTeam?: boolean;
     mlpCohort?: 'fall' | 'spring';
     excusals?: { codeId: string }[];
@@ -73,8 +75,7 @@ export type CoreEvent = {
     eventTypeId: string;
     eventDate: string;
     semester: Semester;
-    /** `optional`: an HLHM event the Member didn't go to. Any one HLHM event a year fills the Core Event, so none is ever missed. */
-    status: 'attended' | 'missed' | 'upcoming' | 'optional';
+    status: 'attended' | 'missed' | 'upcoming';
 };
 
 export type MissedEvent = {
@@ -115,6 +116,8 @@ export type SurplusAttendance = {
 export type Standing = {
     /** Held to Core Events, Semester Requirements and Strikes. */
     heldToCabinetRules: boolean;
+    /** E-Board in the Cabinet view: Core Events show, but no Missed Event is owed and no Strike is earned. */
+    exempt: boolean;
     cabinetPoints: number;
     vePoints: number;
     /** VE Points needed to be voter eligible: 15, or 8 for MLP Spring. */
@@ -143,7 +146,7 @@ export const AT_RISK_STRIKES = 3;
 /** Cabinet Points to be a Graduating Cabinet Member: a target, not a cap. */
 export const CABINET_POINTS_GOAL = 20;
 
-/** One HLHM event a year fills its Core Event; any beyond it is surplus. */
+/** One HLHM event a year fills it; any beyond it is surplus. */
 const HLHM = 'hlhm';
 
 /**
@@ -170,6 +173,7 @@ export function computeStanding(
 ): Standing {
     const types = new Map(rubric.map((type) => [type.id, type]));
     const heldToCabinetRules = viewingAsCabinet || isHeldToCabinetRules(member);
+    const exempt = heldToCabinetRules && member.exemptView === true;
     // Replay in date order. On the same date an Attendance with a Make-up
     // pick goes last, so it's the one left surplus to honour its pick (a
     // Tabling request's hours share a date); then the ID breaks ties, so the
@@ -244,8 +248,8 @@ export function computeStanding(
                 strikeRemoved: isStrikeRemoved,
                 overridden: isOverridden,
                 madeUpBy: null,
-                owed: !isOverridden,
-                strike: !isOverridden && !isExcused && !isStrikeRemoved,
+                owed: !isOverridden && !exempt,
+                strike: !isOverridden && !isExcused && !isStrikeRemoved && !exempt,
             };
         });
 
@@ -254,6 +258,7 @@ export function computeStanding(
 
     return {
         heldToCabinetRules,
+        exempt,
         cabinetPoints,
         vePoints,
         veGoal: member.mlpCohort === 'spring' ? 8 : 15,
@@ -267,7 +272,8 @@ export function computeStanding(
 
 function listSemesterRequirements(rubric: readonly EventType[], affiliateWaived: boolean): SemesterRequirement[] {
     return rubric
-        .filter((type) => type.tier === 'semester')
+        // HLHM is a Semester Requirement on the rubric but yearly, so it's not listed per Semester.
+        .filter((type) => type.tier === 'semester' && type.id !== HLHM)
         .map((type) => {
             const waived = affiliateWaived && type.id === 'affiliate-org';
             return { eventTypeId: type.id, waived, met: waived, filledBy: null };
@@ -315,17 +321,10 @@ function listCoreEvents(
     const coreCodes = codes
         .filter((code) => types.get(code.eventTypeId)?.tier === 'core')
         .sort(byDateThenId);
-    // Any one HLHM event fills the HLHM Core Event, so no single HLHM event
-    // is mandatory: one that passes unattended is optional, never a Missed
-    // Event or a Strike.
-    const hlhmAttended = replay.some((attendance) => attendance.eventTypeId === HLHM);
-
     return coreCodes.map((code) => {
         let status: CoreEvent['status'];
         if (attendedCodes.has(codeKey(code.id))) status = 'attended';
-        else if (code.eventTypeId === HLHM && hlhmAttended) status = 'optional';
         else if (code.eventDate >= today) status = 'upcoming';
-        else if (code.eventTypeId === HLHM) status = 'optional';
         else status = 'missed';
         return {
             codeId: code.id,

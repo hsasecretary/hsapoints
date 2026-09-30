@@ -1058,6 +1058,29 @@ with the my requests tab. ---------- */
     font-weight: 700;
 }
 
+/* E-Board in the Cabinet view: one line in place of both progress bars */
+.overview .ov-exempt {
+    margin-top: 20px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--hsa-surface-subtle);
+}
+
+.overview .ov-exempt__lead {
+    margin: 0 0 6px;
+    font-weight: 700;
+    color: var(--hsa-teal-700);
+}
+
+.overview .ov-exempt__nums {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    margin: 0;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-ink-soft);
+}
+
 /* Cabinet view: Cabinet Points toward 20 */
 .overview .ov-cabinet {
     margin-top: 20px;
@@ -1196,6 +1219,19 @@ with the my requests tab. ---------- */
     font-size: var(--hsa-text-lg);
     color: var(--hsa-teal-700);
     text-align: left;
+}
+
+.requirements-page .rq-exempt {
+    margin: 0 0 12px;
+    font-weight: 700;
+    color: var(--hsa-teal-700);
+}
+
+.requirements-page .rq-exempt--small {
+    margin: -6px 0 10px;
+    font-size: var(--hsa-text-sm);
+    font-weight: 500;
+    color: var(--hsa-muted);
 }
 
 .requirements-page .rq-empty {

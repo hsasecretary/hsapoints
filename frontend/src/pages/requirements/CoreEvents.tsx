@@ -15,16 +15,18 @@ function lead({ toMakeUp, openStrikes, core }: RequirementsBoard): string {
 // Tier 1 (docs/research/cabinet-core-events-missed-ux.md): only the Missed
 // Events still to make up are shown, each with its Make up button; the next
 // Core Event and HLHM get a line each, and the whole year folds away below,
-// every row saying its status in words. The tile board this replaced is on
+// every row saying its status in words. E-Board is exempt: "Exempt" stands in for the summary and the year stays. The tile board this replaced is on
 // the archive/cabinet-tier1-tiles branch.
 function CoreEvents({ board }: { board: RequirementsBoard }) {
-    const { toMakeUp, extras, core, months } = board;
+    const { toMakeUp, extras, core, months, exempt } = board;
     return (
         <section className="rq-core" aria-labelledby="rq-core-title">
             <h2 id="rq-core-title" className="rq-h2">Tier 1: Core Events</h2>
             {months.length === 0 ? <p className="rq-empty">No Core Events yet this year.</p> : (
                 <>
-                    <p className={`rq-lead${toMakeUp.length ? ' is-owed' : ''}`}>{lead(board)}</p>
+                    {exempt
+                        ? <p className="rq-exempt">Exempt</p>
+                        : <p className={`rq-lead${toMakeUp.length ? ' is-owed' : ''}`}>{lead(board)}</p>}
                     {board.atRisk && <p className="rq-over">You’ll meet with E-Board to make a make-up plan.</p>}
 
                     {toMakeUp.length > 0 && (
@@ -53,10 +55,9 @@ function CoreEvents({ board }: { board: RequirementsBoard }) {
                         </p>
                     )}
 
-                    {(core.next || core.hlhmBy) && (
+                    {core.next && !exempt && (
                         <ul className="rq-next">
-                            {core.next && <li>Next: <strong>{core.next.name}</strong> on {shortDate(core.next.date)}</li>}
-                            {core.hlhmBy && <li>Go to any one <strong>HLHM</strong> event by {shortDate(core.hlhmBy)}</li>}
+                            <li>Next: <strong>{core.next.name}</strong> on {shortDate(core.next.date)}</li>
                         </ul>
                     )}
 
