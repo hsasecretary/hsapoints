@@ -246,7 +246,8 @@ export function buildPointRequest(draft: RequestDraft, { email, codes, today }: 
     if (type?.perHour && !(Number.isInteger(draft.hours) && draft.hours >= 1 && draft.hours <= MAX_HOURS)) {
         return { ok: false, error: `Enter whole hours, from 1 to ${MAX_HOURS}.` };
     }
-    if (!draft.photo) return { ok: false, error: 'Add a photo from the event.' };
+    // A note (who can vouch, an excuse approved beforehand) stands in for the photo.
+    if (!draft.photo && !note) return { ok: false, error: 'Add a photo, or say what you did.' };
 
     const count = attendanceCount({ eventTypeId, hours: draft.hours });
     return {

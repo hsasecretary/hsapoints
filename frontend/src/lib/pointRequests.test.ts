@@ -183,6 +183,15 @@ describe('buildPointRequest', () => {
         expect(buildPointRequest(draft({ ...coded, note: '' }), context)).toMatchObject({ ok: true, data: { description: '' } });
     });
 
+    it('lets a note stand in for the photo, but a blank note does not', () => {
+        const coded = { typeChoiceId: 'gbm', codeId: 'GBMSEP', eventTypeId: 'gbm', eventDate: '2026-09-03', photo: '' };
+        expect(buildPointRequest(draft({ ...coded, note: 'Sat with Ana, she can vouch' }), context))
+            .toMatchObject({ ok: true, data: { imageData: '', description: 'Sat with Ana, she can vouch' } });
+        expect(buildPointRequest(draft({ ...coded, note: '   ' }), context)).toEqual({ ok: false, error: 'Add a photo, or say what you did.' });
+        const codeless = { typeChoiceId: 'crash', eventTypeId: 'crash', eventName: 'CRASH', eventDate: '2026-10-02', photo: '' };
+        expect(buildPointRequest(draft({ ...codeless, note: 'Helped run it' }), context)).toMatchObject({ ok: true });
+    });
+
     it("saves a Tabling request's hours with one Make-up pick per hour", () => {
         const built = buildPointRequest(draft({
             typeChoiceId: 'tabling', eventTypeId: 'tabling', eventName: 'Turlington table', eventDate: '2026-10-12', hours: 3,
@@ -211,7 +220,7 @@ describe('buildPointRequest', () => {
 
     it.each([
         ['no event picked', draft({}), 'Pick the event you went to.'],
-        ['no photo', draft({ typeChoiceId: 'gbm', codeId: 'GBMSEP', eventTypeId: 'gbm', eventDate: '2026-09-03', photo: '' }), 'Add a photo from the event.'],
+        ['no photo', draft({ typeChoiceId: 'gbm', codeId: 'GBMSEP', eventTypeId: 'gbm', eventDate: '2026-09-03', photo: '' }), 'Add a photo, or say what you did.'],
         ['no name for an event without a code', draft({ typeChoiceId: 'crash', eventTypeId: 'crash', eventDate: '2026-10-02', note: 'x' }), 'Name the event.'],
         ['no date', draft({ typeChoiceId: 'crash', eventTypeId: 'crash', eventName: 'CRASH', note: 'x' }), 'Pick the date of the event.'],
         ['a date in the future', draft({ typeChoiceId: 'crash', eventTypeId: 'crash', eventName: 'CRASH', eventDate: '2026-10-16', note: 'x' }), "The event can't be in the future."],

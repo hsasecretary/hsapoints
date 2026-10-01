@@ -31,7 +31,7 @@ type PhotoFieldProps = {
     onChange: (dataUrl: string) => void;
 };
 
-// The photo proof every Point Request needs.
+// Photo proof for a Point Request; a note can stand in for it.
 function PhotoField({ value, onChange }: PhotoFieldProps) {
     const input = useRef<HTMLInputElement>(null);
     const [error, setError] = useState('');
@@ -62,7 +62,7 @@ function PhotoField({ value, onChange }: PhotoFieldProps) {
 
     return (
         <div className="req-field">
-            <span className="req-label">Photo proof</span>
+            <span className="req-label">Photo proof <small>(optional with a note)</small></span>
             <label className={`req-photo${value ? ' is-on' : ''}`}>
                 <input ref={input} type="file" accept="image/*" className="req-photo__input"
                     onChange={(e) => pick(e.target.files?.[0])} />

@@ -55,7 +55,7 @@ function Explainer({ member }: { member: Member }) {
                 Voter Eligible (VE) Points, also shown as Total Points, track your progress toward voter eligibility.
             </p>
             <p>Most events are worth 1 point. GBMs and fundraisers are worth 2. Socials don’t count.</p>
-            <p>Missed the code? Submit a Point Request with a photo, and E-Board will review it.</p>
+            <p>Missed the code? Submit a Point Request with a photo or a note, and E-Board will review it.</p>
         </div>
     );
 }

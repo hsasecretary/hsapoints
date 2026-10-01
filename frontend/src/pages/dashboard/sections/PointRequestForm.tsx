@@ -82,8 +82,8 @@ function PointRequestForm() {
         );
     }
 
-    // E-Board in the Cabinet view stays on the General picker: they can't earn Cabinet-only types.
-    const cabinet = standing.heldToCabinetRules && !standing.exempt;
+    // E-Board in the Cabinet view gets the same flow as a Cabinet Member, so they can see what one sees.
+    const cabinet = standing.heldToCabinetRules;
     const from: Start = cabinet ? start : { kind: 'search' };
     const set = (patch: Partial<Fields>) => setFieldsState((current) => ({ ...current, ...patch }));
     const reset = (next: Start, nextChoice: TypeChoice | null = null) => {
@@ -294,7 +294,7 @@ function PointRequestForm() {
                 )}
             </div>
             <p className="req-lede">
-                Went to something and didn't get the code in? Pick what it was for, then send a photo.
+                Went to something and didn't get the code in? Pick what it was for, then send a photo or say what you did.
                 {cabinet && ' Making up a Missed Event clears its Strike too.'}
             </p>
             {message.text && <p className={`req-message req-message--${message.type}`} role="status">{message.text}</p>}
@@ -319,7 +319,8 @@ function PointRequestForm() {
                             </button>
                         ))}
 
-                        {openRequirements.length > 0 && <p className="req-owe__h">Still needed this Semester</p>}
+                        {(openRequirements.length > 0 || standing.exempt) && <p className="req-owe__h">Still needed this Semester</p>}
+                        {openRequirements.length === 0 && standing.exempt && <p className="req-hint">Everything needed this Semester is done.</p>}
                         {openRequirements.map((requirement) => (
                             <button key={requirement.eventTypeId} type="button"
                                 className={`req-owe__row${from?.kind === 'requirement' && from.eventTypeId === requirement.eventTypeId ? ' is-on' : ''}`}

@@ -167,7 +167,7 @@ export function ProofFields({ fields, set, hasCode }: { fields: Fields; set: Set
     return (
         <>
             <label className="req-field">
-                <span className="req-label">What did you do?{hasCode && <small> (optional)</small>}</span>
+                <span className="req-label">What did you do?{hasCode && <small> (optional with a photo)</small>}</span>
                 <textarea rows={3} value={fields.note} onChange={(e) => set({ note: e.target.value })}
                     placeholder={hasCode
                         ? 'Anything E-Board should know, like who can vouch for you or an excuse approved beforehand'
