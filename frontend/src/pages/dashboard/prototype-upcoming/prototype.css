@@ -7,7 +7,7 @@
 .up { margin: 24px 0; }
 .up .up-h { text-align: left; font: 800 18px var(--hsa-font-display); color: var(--hsa-teal-700); margin: 0 0 12px; }
 .up-note, .up-more { font-size: 13px; color: var(--hsa-muted); margin: 8px 0 0; }
-.up .up-tag { display: inline-block; color: #fff !important; font: 700 11px var(--hsa-font-body); padding: 3px 8px; border-radius: 999px; width: fit-content; }
+.up .up-tag { font: 700 11px var(--hsa-font-body); padding: 3px 8px; border-radius: 999px; width: fit-content; }
 .up-vis { background-size: cover; background-position: center; border-radius: 10px; }
 .up-vis--poster { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
 .up-vis--poster span { font-size: 28px; }

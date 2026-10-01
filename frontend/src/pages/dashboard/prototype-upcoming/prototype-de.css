@@ -1,4 +1,13 @@
 /* PROTOTYPE (throwaway): D / E, the research-driven mobile variants. */
+
+/* Category icons: tinted pill + flat tile, no emoji. Loaded after prototype.css? No, before, so !important where it must win. */
+.up .up-tag { display: inline-flex; align-items: center; gap: 5px; color: var(--c) !important; background: color-mix(in srgb, var(--c) 12%, #fff) !important; border: 1px solid color-mix(in srgb, var(--c) 28%, #fff); font-weight: 700; }
+.up .up-vis--poster { color: rgba(255,255,255,.92); }
+.up .up-vis--poster .up-icon { stroke-width: 1.6; opacity: .95; }
+.up .up-d__nextimg .up-icon { width: 56px; height: 56px; margin-bottom: 36px; }
+.up .up-b__heroimg .up-icon { width: 64px; height: 64px; margin-bottom: 60px; }
+.up .up-chips button { display: inline-flex; align-items: center; gap: 6px; }
+.up-e__sheet label .up-icon { color: var(--hsa-teal-700); }
 .up-d__next { position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; color: #fff; }
 .up-d__nextimg { position: absolute; inset: 0; border-radius: 0; }
 .up-d__nextimg.up-vis--poster span { font-size: 64px; }

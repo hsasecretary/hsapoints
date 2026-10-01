@@ -7,17 +7,17 @@ import gbmCrowd from './photos/gbm-crowd.jpg';
 export type Category =
     | 'gbm' | 'hlhm' | 'mlp' | 'opa' | 'fundraiser' | 'service' | 'social' | 'cabinet' | 'tabling' | 'other';
 
-export const categories: Record<Category, { label: string; color: string; glyph: string }> = {
-    gbm:        { label: 'GBM',        color: '#155776', glyph: '🎤' },
-    hlhm:       { label: 'HLHM',       color: '#b45309', glyph: '💃' },
-    mlp:        { label: 'MLP',        color: '#6d28d9', glyph: '🌱' },
-    opa:        { label: 'OPA',        color: '#166534', glyph: '🗳️' },
-    fundraiser: { label: 'Fundraiser', color: '#be123c', glyph: '💸' },
-    service:    { label: 'Service',    color: '#0f766e', glyph: '🤝' },
-    social:     { label: 'Social',     color: '#c2410c', glyph: '🎉' },
-    cabinet:    { label: 'Cabinet',    color: '#334155', glyph: '📋' },
-    tabling:    { label: 'Tabling',    color: '#4d7c0f', glyph: '🪑' },
-    other:      { label: 'Other',      color: '#475569', glyph: '📅' },
+export const categories: Record<Category, { label: string; color: string }> = {
+    gbm:        { label: 'GBM',        color: '#155776' },
+    hlhm:       { label: 'HLHM',       color: '#b45309' },
+    mlp:        { label: 'MLP',        color: '#6d28d9' },
+    opa:        { label: 'OPA',        color: '#166534' },
+    fundraiser: { label: 'Fundraiser', color: '#be123c' },
+    service:    { label: 'Service',    color: '#0f766e' },
+    social:     { label: 'Social',     color: '#c2410c' },
+    cabinet:    { label: 'Cabinet',    color: '#334155' },
+    tabling:    { label: 'Tabling',    color: '#4d7c0f' },
+    other:      { label: 'Other',      color: '#475569' },
 };
 
 /** Past-year photos, per category. Only GBM has any yet; the rest fall back to a poster tile. */

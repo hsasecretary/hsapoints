@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import CategoryIcon from './CategoryIcon';
 import { Category, CalEvent, categories, daysAway, parts, photoFor, today, upcoming, when } from './events';
 
 // PROTOTYPE (throwaway). Three structurally different takes on "Upcoming events".
@@ -6,7 +7,7 @@ import { Category, CalEvent, categories, daysAway, parts, photoFor, today, upcom
 
 export function Tag({ cat }: { cat: Category }) {
     const c = categories[cat];
-    return <span className="up-tag" style={{ background: c.color }}>{c.glyph} {c.label}</span>;
+    return <span className="up-tag" style={{ '--c': c.color } as React.CSSProperties}><CategoryIcon cat={cat} size={13} />{c.label}</span>;
 }
 
 /** Photo when we have one for the category; otherwise a coloured poster tile (new events). */
@@ -15,9 +16,8 @@ function Visual({ ev, className = '' }: { ev: CalEvent; className?: string }) {
     const c = categories[ev.category];
     if (src) return <div className={`up-vis ${className}`} style={{ backgroundImage: `url(${src})` }} role="img" aria-label={`Photo from a past ${c.label}`} />;
     return (
-        <div className={`up-vis up-vis--poster ${className}`} style={{ background: `linear-gradient(135deg, ${c.color}, #0d3f54)` }} aria-hidden="true">
-            <span>{c.glyph}</span>
-            <em>New this year</em>
+        <div className={`up-vis up-vis--poster ${className}`} style={{ background: c.color }} aria-hidden="true">
+            <CategoryIcon cat={ev.category} size={30} />
         </div>
     );
 }
@@ -37,7 +37,7 @@ export function VariantA({ showCabinet }: { showCabinet: boolean }) {
                 <button type="button" className={filter === 'all' ? 'is-on' : ''} onClick={() => setFilter('all')}>All</button>
                 {present.map((cat) => (
                     <button key={cat} type="button" className={filter === cat ? 'is-on' : ''} onClick={() => setFilter(cat)}>
-                        {categories[cat].glyph} {categories[cat].label}
+                        <CategoryIcon cat={cat} size={14} />{categories[cat].label}
                     </button>
                 ))}
             </div>

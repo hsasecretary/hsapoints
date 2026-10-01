@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import CategoryIcon from './CategoryIcon';
 import { Category, CalEvent, categories, daysAway, parts, upcoming, when } from './events';
 import { Tag, VariantC } from './Variants';
 
@@ -10,8 +11,8 @@ function Tile({ ev, className = '' }: { ev: CalEvent; className?: string }) {
     const c = categories[ev.category];
     if (ev.photo) return <div className={`up-vis ${className}`} style={{ backgroundImage: `url(${ev.photo})` }} role="img" aria-label={`Photo from ${ev.title}`} />;
     return (
-        <div className={`up-vis up-vis--poster ${className}`} style={{ background: `linear-gradient(135deg, ${c.color}, #0d3f54)` }} aria-hidden="true">
-            <span>{c.glyph}</span>
+        <div className={`up-vis up-vis--poster ${className}`} style={{ background: c.color }} aria-hidden="true">
+            <CategoryIcon cat={ev.category} size={28} />
         </div>
     );
 }
@@ -42,7 +43,7 @@ function Row({ ev }: { ev: CalEvent }) {
 
 function Recurring({ list }: { list: CalEvent[] }) {
     const lines = Array.from(new Set(list.filter((ev) => ev.recurring).map((ev) => ev.recurring!)));
-    return lines.length ? <p className="up-d__recur">🔁 {lines.join(' · ')}</p> : null;
+    return lines.length ? <p className="up-d__recur">Repeats: {lines.join('; ')}</p> : null;
 }
 
 // D: Next up card + agenda grouped under date headers.
@@ -133,7 +134,7 @@ export function VariantE({ showCabinet }: { showCabinet: boolean }) {
                             <label key={cat}>
                                 <input type="checkbox" checked={!off.includes(cat)}
                                     onChange={() => setOff(off.includes(cat) ? off.filter((c) => c !== cat) : [...off, cat])} />
-                                {categories[cat].glyph} {categories[cat].label}
+                                <CategoryIcon cat={cat} size={18} />{categories[cat].label}
                             </label>
                         ))}
                         <button type="button" className="up-d__btn" onClick={() => setSheet(false)}>Done</button>
