@@ -46,6 +46,20 @@ function Recurring({ list }: { list: CalEvent[] }) {
     return lines.length ? <p className="up-d__recur">Repeats: {lines.join('; ')}</p> : null;
 }
 
+function NextUp({ ev }: { ev: CalEvent }) {
+    return (
+        <article className="up-d__next">
+            <Tile ev={ev} className="up-d__nextimg" />
+            <div className="up-d__scrim" />
+            <div className="up-d__nexttext">
+                <small>Next up · {when(ev.date)}</small>
+                <h3>{ev.title}</h3>
+                <p>{dateHeader(ev.date)}{ev.time ? ` · ${ev.time}` : ''}</p>
+            </div>
+        </article>
+    );
+}
+
 // D: Next up card + agenda grouped under date headers.
 export function VariantD({ showCabinet }: { showCabinet: boolean }) {
     const all = useMemo(() => upcoming(showCabinet), [showCabinet]);
@@ -60,15 +74,7 @@ export function VariantD({ showCabinet }: { showCabinet: boolean }) {
     return (
         <section className="up up-d" aria-label="Upcoming events">
             <h2 className="up-h">Upcoming events</h2>
-            <article className="up-d__next">
-                <Tile ev={next} className="up-d__nextimg" />
-                <div className="up-d__scrim" />
-                <div className="up-d__nexttext">
-                    <small>Next up · {when(next.date)}</small>
-                    <h3>{next.title}</h3>
-                    <p>{dateHeader(next.date)}{next.time ? ` · ${next.time}` : ''}</p>
-                </div>
-            </article>
+            <NextUp ev={next} />
             {groups.map(([date, evs]) => (
                 <div key={date}>
                     <h3 className="up-d__date">{dateHeader(date)}</h3>
@@ -90,6 +96,7 @@ export function VariantE({ showCabinet }: { showCabinet: boolean }) {
     const [sheet, setSheet] = useState(false);
     const [month, setMonth] = useState(false);
     const [laterOpen, setLaterOpen] = useState(false);
+    const [spotlight, setSpotlight] = useState(false);
     if (month) {
         return (
             <div className="up">
@@ -98,7 +105,10 @@ export function VariantE({ showCabinet }: { showCabinet: boolean }) {
             </div>
         );
     }
-    const list = all.filter((ev) => !off.includes(ev.category));
+    const filtered = all.filter((ev) => !off.includes(ev.category));
+    // With Spotlight on, the nearest event moves up into the card and leaves the groups.
+    const spot = spotlight ? filtered[0] : undefined;
+    const list = spot ? filtered.slice(1) : filtered;
     const within = (a: number, b: number) => list.filter((ev) => daysAway(ev.date) >= a && daysAway(ev.date) <= b);
     const sections: [string, CalEvent[]][] = [['Today', within(0, 0)], ['This week', within(1, 7)]];
     const later = within(8, 999);
@@ -110,6 +120,11 @@ export function VariantE({ showCabinet }: { showCabinet: boolean }) {
                     Filter{off.length ? ` (${cats.length - off.length}/${cats.length})` : ''}
                 </button>
             </div>
+            <label className="up-e__switch">
+                <input type="checkbox" role="switch" checked={spotlight} onChange={() => setSpotlight(!spotlight)} />
+                <span>Spotlight the next event</span>
+            </label>
+            {spot && <NextUp ev={spot} />}
             {sections.filter(([, evs]) => evs.length).map(([name, evs]) => (
                 <div key={name}>
                     <h3 className="up-d__date">{name}</h3>
