@@ -4,7 +4,7 @@ import { Category, CalEvent, categories, daysAway, parts, photoFor, today, upcom
 // PROTOTYPE (throwaway). Three structurally different takes on "Upcoming events".
 // A = chronological agenda, B = spotlight + poster strip, C = month calendar + detail.
 
-function Tag({ cat }: { cat: Category }) {
+export function Tag({ cat }: { cat: Category }) {
     const c = categories[cat];
     return <span className="up-tag" style={{ background: c.color }}>{c.glyph} {c.label}</span>;
 }

@@ -14,6 +14,8 @@ import PointsAndEvents from './sections/PointsAndEvents';
 import PointsSummary from './sections/PointsSummary';
 import PrototypeSwitcher, { useVariant } from './prototype-upcoming/PrototypeSwitcher';
 import { VariantA, VariantB, VariantC } from './prototype-upcoming/Variants';
+import { VariantD, VariantE } from './prototype-upcoming/VariantsDE';
+import './prototype-upcoming/prototype-de.css';
 import './prototype-upcoming/prototype.css';
 import { pendingMakeups, useMemberStanding } from './useMemberStanding';
 
@@ -35,7 +37,7 @@ type Bubble = (typeof BUBBLES)[number];
 function Dashboard({ email }: { email: string }) {
     const { loading, member, attendances, codes, requests, pending, standing, today } = useMemberStanding(email, useViewOverride());
     const [params, setParams] = useSearchParams();
-    const proto = useVariant(['A', 'B', 'C']);
+    const proto = useVariant(['D', 'E', 'A', 'B', 'C']);
     const open = BUBBLES.find((bubble) => bubble === params.get('open')) ?? null;
 
     const toggle = (bubble: Bubble) => {
@@ -81,8 +83,10 @@ function Dashboard({ email }: { email: string }) {
                     {/* PROTOTYPE: upcoming events */}
                     {proto.current === 'A' && <VariantA showCabinet={!!standing.heldToCabinetRules} />}
                     {proto.current === 'B' && <VariantB showCabinet={!!standing.heldToCabinetRules} />}
+                    {proto.current === 'D' && <VariantD showCabinet={!!standing.heldToCabinetRules} />}
+                    {proto.current === 'E' && <VariantE showCabinet={!!standing.heldToCabinetRules} />}
                     {proto.current === 'C' && <VariantC showCabinet={!!standing.heldToCabinetRules} />}
-                    <PrototypeSwitcher names={{ A: 'Agenda list', B: 'Spotlight + poster strip', C: 'Month calendar' }} current={proto.current} go={proto.go} />
+                    <PrototypeSwitcher names={{ D: 'Next up + agenda', E: 'This week + filter sheet', A: 'Agenda list', B: 'Spotlight + poster strip', C: 'Month calendar' }} current={proto.current} go={proto.go} />
 
                     <div className="ov-bubbles">
                         <button type="button" className={open === 'points' ? 'is-on' : ''} aria-expanded={open === 'points'}

@@ -36,6 +36,8 @@ export interface CalEvent {
     photo?: string;
     /** Calendar noise (NO SCHOOL, football): stays in the feed, never shown. */
     hidden?: boolean;
+    /** Repeats weekly; collapsed into one line instead of a row per week. */
+    recurring?: string;
 }
 
 const e = (id: string, date: string, title: string, category: Category, extra: Partial<CalEvent> = {}): CalEvent =>
@@ -44,14 +46,14 @@ const e = (id: string, date: string, title: string, category: Category, extra: P
 // Straight from the October 2026 screenshot of the HSA Master Calendar.
 export const events: CalEvent[] = [
     e('1', '2026-09-30', 'Solidarity Session #1', 'opa', { time: '5:30pm' }),
-    e('2', '2026-10-01', 'Cabinet', 'cabinet', { time: '7pm', cabinetOnly: true }),
-    e('3', '2026-10-02', 'Familia Fridays', 'tabling', { time: '10am' }),
+    e('2', '2026-10-01', 'Cabinet', 'cabinet', { time: '7pm', cabinetOnly: true, recurring: 'Cabinet, most Thursdays 7pm' }),
+    e('3', '2026-10-02', 'Familia Fridays', 'tabling', { time: '10am', recurring: 'Every Friday, 10am' }),
     e('4', '2026-10-02', 'Mochinut x DM fundraiser', 'fundraiser', { time: '5pm' }),
     e('5', '2026-10-03', 'HLHM Color Run 5K', 'hlhm'),
     e('6', '2026-10-07', 'MLP Opus fundraiser', 'fundraiser'),
     e('7', '2026-10-07', 'Volleyball Tournament', 'social'),
     e('8', '2026-10-08', 'HLHM Pageant (tentative)', 'hlhm'),
-    e('9', '2026-10-08', 'Cabinet', 'cabinet', { time: '7pm', cabinetOnly: true }),
+    e('9', '2026-10-08', 'Cabinet', 'cabinet', { time: '7pm', cabinetOnly: true, recurring: 'Cabinet, most Thursdays 7pm' }),
     e('10', '2026-10-09', 'Homecoming parade', 'other', { hidden: true }),
     e('11', '2026-10-09', 'NO SCHOOL', 'other', { hidden: true }),
     e('12', '2026-10-10', 'LWL Food Drive', 'service'),
@@ -59,22 +61,22 @@ export const events: CalEvent[] = [
     e('14', '2026-10-11', 'HLHM Domino Tournament', 'hlhm'),
     e('15', '2026-10-13', 'MLP Cabinet Rush', 'mlp'),
     e('16', '2026-10-15', 'HLHM Closing Ceremony', 'hlhm'),
-    e('17', '2026-10-16', 'Familia Fridays', 'tabling', { time: '10am' }),
+    e('17', '2026-10-16', 'Familia Fridays', 'tabling', { time: '10am', recurring: 'Every Friday, 10am' }),
     e('18', '2026-10-18', 'MLP Mentor Reveal', 'mlp'),
     e('19', '2026-10-19', 'MLP Monday', 'mlp'),
     e('20', '2026-10-19', 'E-Board Pie Fundraiser', 'fundraiser', { time: '11am' }),
     e('21', '2026-10-20', 'MLP Flip Factor Fundraiser', 'fundraiser'),
     e('22', '2026-10-21', 'Cardmaking (MLP x HSA x DSA)', 'social'),
-    e('23', '2026-10-22', 'GBM #3: Date Night', 'gbm'),
-    e('24', '2026-10-22', 'Cabinet', 'cabinet', { time: '7pm', cabinetOnly: true }),
-    e('25', '2026-10-23', 'Familia Fridays', 'tabling', { time: '10am' }),
+    e('23', '2026-10-22', 'GBM #3: Date Night', 'gbm', { photo: gbmCrowd }),
+    e('24', '2026-10-22', 'Cabinet', 'cabinet', { time: '7pm', cabinetOnly: true, recurring: 'Cabinet, most Thursdays 7pm' }),
+    e('25', '2026-10-23', 'Familia Fridays', 'tabling', { time: '10am', recurring: 'Every Friday, 10am' }),
     e('26', '2026-10-26', 'OPA Week', 'opa'),
     e('27', '2026-10-27', 'OPA Know Your Ballot', 'opa'),
     e('28', '2026-10-28', 'Solidarity Session x MLP IMA', 'opa'),
     e('29', '2026-10-29', 'Early Voting Party', 'opa'),
-    e('30', '2026-10-29', 'Cabinet', 'cabinet', { time: '7pm', cabinetOnly: true }),
+    e('30', '2026-10-29', 'Cabinet', 'cabinet', { time: '7pm', cabinetOnly: true, recurring: 'Cabinet, most Thursdays 7pm' }),
     e('31', '2026-10-30', 'Community Outreach event', 'service'),
-    e('32', '2026-10-30', 'Familia Fridays', 'tabling', { time: '10am' }),
+    e('32', '2026-10-30', 'Familia Fridays', 'tabling', { time: '10am', recurring: 'Every Friday, 10am' }),
 ];
 
 const pad = (n: number) => String(n).padStart(2, '0');
