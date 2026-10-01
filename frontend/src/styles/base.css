@@ -468,16 +468,49 @@ h1, h2, h3, h4, h5, h6 {
   outline-offset: 2px;
 }
 
-/* Shown while a lazily-loaded route chunk arrives (see the lazy() calls in
-   App.tsx). Reserves height so the header/footer don't jump. */
-.route-loading {
+/* Loading screen (components/ui/LoadingScreen.tsx). Used full-page before the
+   header exists, and under the header while a lazily-loaded route chunk arrives
+   (see the lazy() calls in App.tsx), where the height keeps the header/footer
+   from jumping. The logo is the white PNG tinted teal through a mask; the
+   shine sweeps at a constant speed. It fades in after 150ms so quick loads
+   never flash it. */
+.loading-screen {
   min-height: 50vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #155776;
-  font-size: 1.1rem;
-  font-weight: 600;
+  animation: loading-screen-in 0.12s ease 0.15s backwards;
+}
+.loading-screen--page {
+  min-height: 100vh;
+  background: var(--hsa-page);
+}
+.loading-screen__logo {
+  position: relative;
+  width: 170px;
+  height: 150px;
+}
+.loading-screen__base,
+.loading-screen__shine {
+  position: absolute;
+  inset: 0;
+  -webkit-mask: url(/hsa-logo-white.png) center / contain no-repeat;
+  mask: url(/hsa-logo-white.png) center / contain no-repeat;
+}
+.loading-screen__base {
+  background: var(--hsa-teal-600);
+  opacity: 0.22;
+}
+.loading-screen__shine {
+  background: linear-gradient(105deg, transparent 35%, var(--hsa-teal-600) 50%, transparent 65%) 200% 0 / 250% 100%;
+  /* Starts with the fade-in and takes 0.6s, so a full sweep completes inside
+     the 600ms minimum display time (useMinLoadingTime). */
+  animation: loading-screen-sweep 0.6s linear 0.15s infinite backwards;
+}
+@keyframes loading-screen-sweep { to { background-position: -100% 0; } }
+@keyframes loading-screen-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .loading-screen__shine { animation-duration: 2s; }
 }
 
 /* Find a member by name (components/members/MemberSearch.tsx), on Excuse
