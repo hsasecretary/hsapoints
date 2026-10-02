@@ -57,18 +57,13 @@ describe('redeeming an event code', () => {
         expect(await redeemCode(db, MEMBER, ' gbm1 ', { today: TODAY })).toEqual({ ok: false, reason: 'already-redeemed' });
     });
 
-    it("bumps the code's check-in count and the old point counters once, however often it's redeemed", async () => {
+    it("bumps the code's check-in count once, however often it's redeemed, and leaves the old point counters alone", async () => {
         const db = signedInAs(env, MEMBER);
         await redeemCode(db, MEMBER, 'GBM1', { today: TODAY });
         await redeemCode(db, MEMBER, 'GBM1', { today: TODAY });
 
         expect((await readPastRules(env, 'codes/GBM1'))?.attendeeCount).toBe(1);
-        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({
-            eventCodes: ['GBM1'],
-            fallPoints: 2,
-            gbmPointsVE: 2,
-            gbmPointsNVE: 0,
-        });
+        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ eventCodes: [], fallPoints: 0, gbmPointsVE: 0 });
     });
 
     it('says a code redeemed before the Attendance ledger existed is already redeemed', async () => {
@@ -88,8 +83,7 @@ describe('redeeming an event code', () => {
 
         expect(await redeemCode(db, MEMBER, 'OLD1', { today: TODAY })).toEqual({ ok: true });
         expect(await readPastRules(env, `attendances/${MEMBER}__OLD1`)).toBeUndefined();
-        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ eventCodes: ['OLD1'], fallPoints: 2, gbmPointsNVE: 2 });
-        expect(await redeemCode(db, MEMBER, 'OLD1', { today: TODAY })).toEqual({ ok: false, reason: 'already-redeemed' });
+        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ eventCodes: [], fallPoints: 0, gbmPointsNVE: 0 });
     });
 
     it("turns away a code that doesn't exist", async () => {

@@ -577,6 +577,45 @@ with the my requests tab. ---------- */
     overflow-wrap: anywhere;
 }
 
+/* One-time notice after the cut-over to the new point system */
+.overview .ov-banner {
+    margin: 0 0 20px;
+    padding: 14px 16px;
+    border: 1px solid var(--hsa-warm-edge);
+    border-left: 4px solid var(--hsa-gold-700);
+    border-radius: 12px;
+    background: var(--hsa-warm-bg);
+    color: var(--hsa-warm-ink);
+    text-align: left;
+}
+
+.overview .ov-banner p {
+    margin: 0 0 10px;
+}
+
+.overview .ov-banner__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.overview .ov-banner__actions button {
+    min-height: 44px;
+    padding: 10px 16px;
+    border: 1.5px solid var(--hsa-teal-700);
+    border-radius: 999px;
+    background: var(--hsa-teal-700);
+    color: #fff;
+    font-weight: 700;
+    font-size: var(--hsa-text-sm);
+    cursor: pointer;
+}
+
+.overview .ov-banner__actions .ov-banner__dismiss {
+    background: transparent;
+    color: var(--hsa-teal-700);
+}
+
 /* Phones: one pair per line */
 @media (max-width: 560px) {
     .overview .overview__info {

@@ -10,6 +10,7 @@ import EventCodeForm from './sections/EventCodeForm';
 import Explainer from './sections/Explainer';
 import ExemptSummary from './sections/ExemptSummary';
 import MakeUpList from './sections/MakeUpList';
+import NewPointSystemBanner from './sections/NewPointSystemBanner';
 import PointsAndEvents from './sections/PointsAndEvents';
 import PointsSummary from './sections/PointsSummary';
 import { pendingMakeups, useMemberStanding } from './useMemberStanding';
@@ -18,6 +19,7 @@ const BUBBLES = ['points', 'how'] as const;
 type Bubble = (typeof BUBBLES)[number];
 
 // /dashboard, the Overview (#57 as revised, #59 variant A), top to bottom:
+//   NewPointSystemBanner — one-time notice after the cut-over (#78)
 //   My information  — name, email, account type (as the old My Information card)
 //   EventCodeForm   — the large code box
 //   PointsSummary   — Total Points toward the goal, events attended, pending requests
@@ -40,6 +42,12 @@ function Dashboard({ email }: { email: string }) {
         setParams(next, { replace: true });
     };
 
+    const openGuide = () => {
+        const next = new URLSearchParams(params);
+        next.set('open', 'how');
+        setParams(next, { replace: true });
+    };
+
     const profile = member as { firstName?: string; lastName?: string; cabinet?: string; eboard?: boolean; involvement?: string; webTeam?: boolean } | null;
     const firstName = profile?.firstName;
     const overview = standing ? pointsOverview({ member, standing, attendances, codes, requests, today }) : null;
@@ -48,6 +56,7 @@ function Dashboard({ email }: { email: string }) {
     return (
         <div className="overview">
             <h1 className="overview__title">{firstName ? `Hi, ${firstName}` : 'Dashboard'}</h1>
+            <NewPointSystemBanner onOpenGuide={openGuide} />
             {profile && (
                 <dl className="overview__info" aria-label="My information">
                     <div><dt>Name</dt><dd>{[profile.firstName, profile.lastName].filter(Boolean).join(' ') || 'N/A'}</dd></div>

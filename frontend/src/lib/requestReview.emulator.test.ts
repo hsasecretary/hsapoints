@@ -62,8 +62,8 @@ describe('approving a Point Request', () => {
 
         expect((await approveRequest(db, 'tabling', tablingDecision, EBOARD)).ok).toBe(false);
         expect(await attendanceIds()).toHaveLength(3);
-        // The old counters, credited once, to Fall.
-        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ fallPoints: 3, springPoints: 0, otherPoints: 3 });
+        // The old counters are no longer credited.
+        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ fallPoints: 0, springPoints: 0, otherPoints: 0 });
     });
 
     it('files a request attached to a code under {email}__{CODE} and counts the check-in', async () => {
@@ -76,7 +76,7 @@ describe('approving a Point Request', () => {
         expect(await readPastRules(env, 'codes/SALSA')).toMatchObject({ attendeeCount: 5 });
     });
 
-    it("finds a code named in mixed case, and credits the old counters to the code's Semester", async () => {
+    it("finds a code named in mixed case and counts it under the code's date", async () => {
         await seed(env, {
             'codes/WINTER': { event: 'Winter Mixer', eventTypeId: 'hsa-programming', eventDate: '2027-01-15', attendeeCount: 0 },
             'pointRequests/winter': pending({ codeId: 'Winter', eventTypeId: 'hsa-programming', date: '2026-12-01' }),
@@ -85,7 +85,6 @@ describe('approving a Point Request', () => {
 
         expect(await approveRequest(signedInAs(env, EBOARD), 'winter', decision, EBOARD)).toEqual({ ok: true });
         expect(await readPastRules(env, `attendances/${MEMBER}__WINTER`)).toMatchObject({ codeId: 'WINTER', eventDate: '2027-01-15' });
-        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ fallPoints: 0, springPoints: 1 });
     });
 
     it("writes nothing new when the Member already redeemed the code, so it can't double count", async () => {
@@ -130,7 +129,7 @@ describe('turning a Point Request into an Adjustment', () => {
 });
 
 describe('revoking an approved Point Request', () => {
-    it('removes its Attendances, takes back the old counters, and marks it denied with the reason', async () => {
+    it('removes its Attendances and marks it denied with the reason', async () => {
         const db = signedInAs(env, EBOARD);
         await approveRequest(db, 'tabling', tablingDecision, EBOARD);
 
@@ -139,7 +138,6 @@ describe('revoking an approved Point Request', () => {
         expect(await readPastRules(env, 'pointRequests/tabling')).toMatchObject({
             status: 'denied', reviewedBy: EBOARD, reviewNotes: 'Approved by mistake', revoked: { approvedBy: EBOARD, points: 3 },
         });
-        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ fallPoints: 0, otherPoints: 0 });
     });
 
     it("un-counts the code's check-in, but leaves a check-in the Member made themselves", async () => {
@@ -163,7 +161,7 @@ describe('revoking an approved Point Request', () => {
         await adjustRequest(db, 'mixer', { points: 2, note: 'Helped run the mixer' }, EBOARD);
 
         expect(await revokeRequest(db, 'mixer', 'Did not help', EBOARD)).toEqual({ ok: true });
-        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ adjustments: [], otherPoints: 0 });
+        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ adjustments: [] });
         expect(await readPastRules(env, 'pointRequests/mixer')).toMatchObject({ status: 'denied', revoked: { points: 2 } });
     });
 

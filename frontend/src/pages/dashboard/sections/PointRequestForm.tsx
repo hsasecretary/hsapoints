@@ -254,7 +254,9 @@ function PointRequestForm() {
             <>
                 <p className="req-c__lead">Making up <strong>{startMiss.name}</strong>{startMiss.strike ? ' and its Strike' : ''}.</p>
                 <p className="req-hint">Pick what you went to. It makes up the miss if it was an extra (Surplus) event; E-Board checks when they review it.</p>
-                {typePicker(pickerGroups(true), true)}
+                {typePicker(pickerGroups(true).map((group) => ({
+                    ...group, choices: group.choices.filter((option) => eventType(option.eventTypeIds[0]).tier !== 'core'),
+                })), true)}
             </>
         );
     } else if (from?.kind === 'missed' && startMiss && from.path === 'attended') {

@@ -2,10 +2,9 @@
 // (docs/adr/0002-attendance-ledger-calculated-on-read.md); and E-Board
 // removing one, a Removed Check-in (see CONTEXT.md). Takes the
 // Firestore instance so tests can run it against the emulator.
-import { arrayRemove, arrayUnion, doc, increment, runTransaction, type Firestore } from 'firebase/firestore';
+import { doc, increment, runTransaction, type Firestore } from 'firebase/firestore';
 import { isHeldToCabinetRules } from './members';
 import { eventType } from './rubric';
-import { currentSemester, fromIsoDate } from './semester';
 
 export type RedeemResult =
     | { ok: true }
@@ -54,6 +53,7 @@ export async function redeemCode(
         }
         // A code made before Event Types existed has no eventTypeId yet; the
         // migration (#77) types it and writes its Attendance from eventCodes.
+        // Nothing writes the old point counters or eventCodes any more (#78).
         if (code.eventTypeId) {
             tx.set(attendanceRef, {
                 email: memberEmail,
@@ -64,7 +64,6 @@ export async function redeemCode(
             });
         }
         tx.update(codeRef, { attendeeCount: increment(1), ateendecode: true });
-        tx.update(userRef, legacyCounters(codeId, code, 1));
         return { ok: true } as const;
     });
 }
@@ -107,39 +106,7 @@ export async function removeCheckIn(
                 by: reviewer,
                 on: today,
             },
-            ...(code ? legacyCounters(codeId, code, -1) : {}),
         });
         return { ok: true } as const;
     });
-}
-
-// Old codes.category values and the users/{email} counter each one fed.
-const legacyCategoryFields: Record<string, string> = {
-    'GBM': 'gbmPoints',
-    'MLP Fall': 'mlpFallPoints',
-    'MLP Spring': 'mlpSpringPoints',
-    'OPA': 'opaPoints',
-    'Programming': 'programmingPoints',
-};
-
-/**
- * The old stored counters the live dashboard still reads, bumped the way the
- * old EventCodeForm did. Temporary: the cut-over task (#78) deletes this.
- * A code made after the Event Codes page stops setting category/points/
- * semester counts its rubric VE Points under otherPoints. `sign` -1 takes
- * them back when E-Board removes the check-in.
- */
-function legacyCounters(codeId: string, code: Record<string, any>, sign: 1 | -1) {
-    const points: number = sign * (code.points ?? eventType(code.eventTypeId)?.vePoints ?? 0);
-    const semester: string = code.semester ?? currentSemester(fromIsoDate(code.eventDate));
-    const categoryField = code.category === 'Cabinet'
-        ? 'cabinetPoints'
-        : legacyCategoryFields[code.category]
-            ? legacyCategoryFields[code.category] + (code.voterEligible === false ? 'NVE' : 'VE')
-            : 'otherPoints';
-    return {
-        eventCodes: sign > 0 ? arrayUnion(codeId) : arrayRemove(codeId),
-        [semester]: increment(points),
-        [categoryField]: increment(points),
-    };
 }

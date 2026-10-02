@@ -139,11 +139,11 @@ describe('the E-Board-only member fields', () => {
         await assertFails(setDoc(doc(db, `users/${MEMBER}`), memberDoc(MEMBER, { [field]: eboardOnly[field] })));
     });
 
-    it('still lets a Member sign up and bump the old counters until cut-over', async () => {
+    it("lets a Member sign up but never write their own points afterwards", async () => {
         await env.clearFirestore();
         const db = signedInAs(env, MEMBER);
         await assertSucceeds(setDoc(doc(db, `users/${MEMBER}`), memberDoc(MEMBER)));
-        await assertSucceeds(updateDoc(doc(db, `users/${MEMBER}`), { fallPoints: 2, gbmPointsVE: 2, eventCodes: ['GBM1'] }));
+        await assertFails(updateDoc(doc(db, `users/${MEMBER}`), { fallPoints: 2, gbmPointsVE: 2, eventCodes: ['GBM1'] }));
     });
 
     it('lets E-Board set them all', async () => {

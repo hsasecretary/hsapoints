@@ -23,22 +23,8 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(callerEmail())).data.eboard == true;
     }
 
-    // Fields a general member may change on their own doc when redeeming
-    // an event code (see EventCodeForm.tsx) — never profile/role fields.
-    function selfUpdateAllowedFields() {
-      return [
-        'fallPoints', 'springPoints', 'eventCodes',
-        'programmingPointsVE', 'programmingPointsNVE',
-        'gbmPointsVE', 'gbmPointsNVE',
-        'mlpFallPointsVE', 'mlpFallPointsNVE',
-        'mlpSpringPointsVE', 'mlpSpringPointsNVE',
-        'opaPointsVE', 'opaPointsNVE',
-        'cabinetPoints', 'otherPoints'
-      ];
-    }
-
     // Per-Member facts only E-Board sets (ADR-0002). A Member can't write
-    // them on update (they're not in selfUpdateAllowedFields) or sneak them
+    // them on update (Members can't update their doc) or sneak them
     // in at sign-up.
     function eboardOnlyMemberFields() {
       return [
@@ -72,9 +58,9 @@ service cloud.firestore {
         request.resource.data.strikes == 0 &&
         !request.resource.data.keys().hasAny(eboardOnlyMemberFields());
 
-      allow update: if (isEboard() && absenceLogOnlyGrows()) ||
-        (isSelf(email) &&
-         request.resource.data.diff(resource.data).affectedKeys().hasOnly(selfUpdateAllowedFields()));
+      // A Member's points are calculated from their Attendances, so they no
+      // longer write their own doc (#78); only E-Board updates it.
+      allow update: if isEboard() && absenceLogOnlyGrows();
 
       allow delete: if isEboard();
     }
