@@ -5,6 +5,7 @@ import Login from './pages/auth/Login';
 import Dashboard from './pages/dashboard/Dashboard';
 import SiteHeader from './components/layout/SiteHeader';
 import Footer from './components/layout/Footer';
+import LoadingScreen, { useMinLoadingTime } from './components/ui/LoadingScreen';
 import NotFound from './pages/NotFound';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import Requests from './pages/requests/Requests';
@@ -100,16 +101,17 @@ function App() {
         setView: (next) => setPicked(next === own ? null : next),
     }), [own, view, canSwitch]);
     const cabinetView = view === 'cabinet';
+    const showLoading = useMinLoadingTime(loading || (!!userEmail && !rolesLoaded));
 
     return (
         <ViewAsContext.Provider value={viewAs}>
         <Router>
-            {loading || (userEmail && !rolesLoaded) ? (
-                <div>Loading...</div>
+            {showLoading ? (
+                <LoadingScreen fullPage />
             ) : (
                 <div className={`app-shell${userEmail ? ' app-shell--signed-in' : ''}`}>
                     <SiteHeader signedIn={!!userEmail} eboard={isEboard} cabinetView={cabinetView} />
-                    <Suspense fallback={<div className="route-loading" role="status">Loading...</div>}>
+                    <Suspense fallback={<LoadingScreen />}>
                     <Routes>
                         <Route path="/" element={<Navigate to="/login" />} />
                         <Route path="/signup" element={userEmail ? <Navigate to="/dashboard" replace /> : <SignUp />} />
