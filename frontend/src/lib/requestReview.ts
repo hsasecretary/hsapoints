@@ -10,7 +10,7 @@ import type { Attendance, Code, Member } from './computeStanding';
 import { isHeldToCabinetRules } from './members';
 import { standingChange, type RequestPreview } from './pointRequests';
 import { eventType } from './rubric';
-import { academicYear, currentSemester, fromIsoDate, semesterOf } from './semester';
+import { academicYear, fromIsoDate, semesterOf } from './semester';
 
 /** The pointRequests/{id} fields review reads, with its doc ID as `id`.
  *  Requests from before Event Types (#71) have none of the optional ones. */
@@ -183,10 +183,6 @@ export async function approveRequest(db: Firestore, requestId: string, decision:
             pointsRequested: vePoints * created.length,
         });
         if (code && created.length) tx.update(codeRef, { attendeeCount: increment(1) });
-        if (created.length) {
-            // A code's date wins over the one on the request.
-            tx.update(userRef, legacyCredit(planned.attendances[0].data.eventDate, vePoints * created.length, code ? code.id : null));
-        }
         return { ok: true } as const;
     });
 }
@@ -230,7 +226,6 @@ export async function adjustRequest(db: Firestore, requestId: string, form: Adju
         tx.update(userRef, {
             // requestId keeps two identical Adjustments from collapsing into one.
             adjustments: arrayUnion({ points: form.points, note, date: request.date, requestId }),
-            ...legacyCredit(request.date, form.points, null),
         });
         return { ok: true } as const;
     });
@@ -273,25 +268,11 @@ export async function revokeRequest(db: Firestore, requestId: string, reason: st
             reviewNotes: note,
             revoked: { approvedBy: request.reviewedBy ?? null, points: earned },
         });
-        const eventDate = ours[0]?.data().eventDate ?? request.date;
         tx.update(userRef, {
             ...(request.adjustment ? { adjustments: adjustments.filter((adjustment) => adjustment.requestId !== requestId) } : {}),
-            ...(earned ? legacyCredit(eventDate, -earned, null) : {}),
+            // Only requests approved before the cut-over (#78) put the code here.
             ...(codeId ? { eventCodes: arrayRemove(codeId) } : {}),
         });
         return { ok: true } as const;
     });
-}
-
-/**
- * The old stored counters the live dashboard still reads, credited the way
- * the old review page did (under otherPoints), but to the event's Semester.
- * Temporary: the cut-over task (#78) deletes this.
- */
-function legacyCredit(eventDate: string, points: number, codeId: string | null) {
-    return {
-        [currentSemester(fromIsoDate(eventDate))]: increment(points),
-        otherPoints: increment(points),
-        ...(codeId ? { eventCodes: arrayUnion(codeId) } : {}),
-    };
 }
