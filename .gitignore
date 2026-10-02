@@ -20,6 +20,7 @@ frontend/build
 .env.test.local
 .env.production.local
 *.pem
+/forms
 
 # Firebase & Admin Secrets
 serviceAccountKey.json
@@ -54,3 +55,6 @@ CLAUDE.md
 # Logs
 logs
 *.log
+
+# Re-scoring migration inputs and outputs (member data)
+scripts/migration/

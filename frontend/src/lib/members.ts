@@ -1,4 +1,5 @@
 // Helpers for reading a member's role from their users/{email} document.
+import { eboardPositions, formatAccountType } from './roles';
 
 type MemberDoc = {
     involvement?: string;
@@ -27,4 +28,18 @@ export function isHeldToCabinetRules(
     if (typeof member.heldToCabinetRules === 'boolean') return member.heldToCabinetRules;
     if (member.webTeam === true) return true;
     return (member.cabinet ?? 'none') !== 'none' && member.approved === true && !member.eboard;
+}
+
+/** The role E-Board sees next to a name in a member search. A web-team
+ *  member on E-Board is a tester first: they follow the rubric. */
+export function roleLine(
+    member: MemberDoc & { approved?: boolean; heldToCabinetRules?: boolean; webTeam?: boolean; position?: string },
+): string {
+    const eboard = member.eboard
+        ? `E-Board, ${eboardPositions.find((p) => p.value === member.position)?.label ?? 'member'}`
+        : '';
+    if (member.webTeam) return eboard ? `Web-team Tester (${eboard})` : 'Web-team Tester';
+    if (eboard) return eboard;
+    if (isHeldToCabinetRules(member)) return `${formatAccountType(member.cabinet)} cabinet`;
+    return member.involvement === 'mlp' ? 'MLP General Member' : 'General Member';
 }

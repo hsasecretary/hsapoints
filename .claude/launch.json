@@ -13,6 +13,16 @@
       "port": 5173
     },
     {
+      "name": "frontend-dev-auto",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "-e",
+        "require('child_process').spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--port', process.env.PORT, '--strictPort', '--open', 'false'], { cwd: 'frontend', stdio: 'inherit' }).on('exit', (code) => process.exit(code))"
+      ],
+      "port": 5175,
+      "autoPort": true
+    },
+    {
       "name": "proto-47",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
@@ -28,6 +38,27 @@
         "false"
       ],
       "port": 5177
+    },
+    {
+      "name": "emulator-demo",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "emulator:demo",
+        "--prefix",
+        "frontend"
+      ],
+      "port": 9099
+    },
+    {
+      "name": "frontend-dev-emulator",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "-e",
+        "require('child_process').spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--mode', 'emulator', '--port', process.env.PORT, '--strictPort', '--open', 'false'], { cwd: 'frontend', stdio: 'inherit' }).on('exit', (code) => process.exit(code))"
+      ],
+      "port": 5176,
+      "autoPort": true
     }
   ]
 }

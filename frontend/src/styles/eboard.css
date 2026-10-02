@@ -2,177 +2,62 @@
    E-Board page (/eboard)
    ======================================================================== */
 
-/* ---- Create New Event Code  (CreateCode.tsx) --------------------------------------- */
+/* ---- E-Board tools landing page (EboardHome.tsx) ---------------------- */
 
-/* CreateCode Modern Styles */
-.create-code-container {
-    max-width: 800px;
+.eboard-home {
+    max-width: 560px;
     margin: 0 auto;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    border: 2px solid var(--hsa-teal-600);
+    padding: 28px 16px 40px;
 }
 
-.create-code-container .create-code-header {
-    text-align: center;
-    margin-bottom: 30px;
+.eboard-home__title {
+    margin: 0 0 16px;
+    color: var(--hsa-teal-700);
+    font-size: var(--hsa-text-2xl);
 }
 
-.create-code-container .create-code-header h2 {
-    color: var(--hsa-teal-600);
-    margin-bottom: 10px;
-    font-size: 28px;
-}
-
-.create-code-container .create-code-header p {
-    color: #666;
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-/* Form Styles */
-.create-code-container .create-code-form {
+.eboard-home__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.create-code-container .checkbox-group {
     flex-direction: column;
     gap: 10px;
-    justify-content: center;
 }
 
-.create-code-container .checkbox-label {
+.eboard-home__link {
     display: flex;
     align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 5px;
-    transition: background-color 0.2s;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 56px;
+    padding: 0 18px;
+    background: var(--hsa-surface);
+    border: 1px solid var(--hsa-border);
+    border-radius: 10px;
+    color: var(--hsa-ink);
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color 0.2s, background-color 0.2s;
 }
 
-.create-code-container .checkbox-label:hover {
-    background-color: var(--hsa-surface-subtle);
-}
-
-.create-code-container .checkbox-label input[type="checkbox"] {
-    width: auto;
-    margin: 0;
-    transform: scale(1.2);
-}
-
-/* Checkboxes: start at the top, flush with the other fields' left edge,
-   one consistent size, text wrapping next to the box. */
-.create-code-container .create-code-form .checkbox-group {
-    justify-content: flex-start;
-    gap: 6px;
-    padding-top: 22px;
-}
-
-.create-code-container .create-code-form .checkbox-label {
-    align-items: flex-start;
-    padding: 6px 0;
-    line-height: 1.35;
-}
-
-.create-code-container .create-code-form .checkbox-label input[type="checkbox"] {
-    flex-shrink: 0;
-    width: 18px;
-    height: 18px;
-    margin: 1px 0 0;
-    transform: none;
-    accent-color: var(--hsa-teal-600);
-}
-
-/* Voter Eligibility Info */
-.create-code-container .voter-eligibility-info {
-    background: var(--hsa-surface-subtle);
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-    text-align: center;
-    border-left: 4px solid var(--hsa-teal-600);
-}
-
-.create-code-container .eligibility-badge {
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-.create-code-container .eligibility-badge.eligible {
-    background: #28a745;
-    color: white;
-}
-
-.create-code-container .eligibility-badge.not-eligible {
-    background: #dc3545;
-    color: white;
-}
-
-.create-code-container .eligibility-note {
-    margin: 0;
-    font-size: 14px;
-    color: #666;
-    font-style: italic;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .create-code-container {
-        margin: 10px;
-        padding: 15px;
-    }
-
-    .create-code-container .create-code-form .checkbox-group {
-        padding-top: 0;
-    }
-
-    .create-code-container .create-code-header h2 {
-        font-size: 24px;
-    }
-
-    .create-code-container .create-code-header p {
-        font-size: 14px;
-    }
-}
-
-@media (max-width: 480px) {
-    .create-code-container {
-        padding: 10px;
-    }
-
-    .create-code-container .voter-eligibility-info {
-        padding: 15px;
-    }
-}
-.create-code-container .form-group label[for*="eventName"]:after,
-.create-code-container .form-group label[for*="eventCode"]:after,
-.create-code-container .form-group label[for*="category"]:after,
-.create-code-container .form-group label[for*="eventDate"]:after,
-.create-code-container .form-group label[for*="points"]:after {
-    content: ' *';
-    color: #dc3545;
-}
-
-/* Focus and hover states */
-.create-code-container .form-group input:hover,
-.create-code-container .form-group select:hover {
+.eboard-home__link:hover {
     border-color: var(--hsa-teal-600);
+    background: var(--hsa-teal-100);
 }
 
-/* Animation for loading state */
+.eboard-home__link:focus-visible {
+    outline: 3px solid var(--hsa-teal-600);
+    outline-offset: 2px;
+}
+
+.eboard-home__link span {
+    color: var(--hsa-teal-600);
+    font-size: 22px;
+}
 
 /* ---- Pending cabinet approvals  (ApprovedCabinet.tsx) ----------------------------------- */
 
-/* Same look as Manage Event Codes (EditableCodesTable). */
 #approvedCabinetContainer.approvals {
     max-width: 1100px;
     margin: 0 auto;
@@ -364,369 +249,245 @@
     }
 }
 
-/* ---- Excuse absence  (ExcuseAbscense.tsx) ---------------------------------------------- */
+/* ---- Excuse Absence  (excuseAbsence/ExcuseAbsence.tsx) ---------------------------------
+   Variant A of the #48 prototype. Strikes drawn as slanted tally strokes, red
+   from the third (probation risk). State colours: red = open Strike, amber =
+   excused / needs a Make-up, green = made up, slate = closed by E-Board. */
 
-.excuse-absence .excuse-absence__form h3 {
-    margin-top: 0;
+.eap { max-width: 1100px; margin: 0 auto; padding: 20px 16px; text-align: left; color: var(--hsa-ink); font-family: var(--hsa-font-body); }
+.eap * { box-sizing: border-box; }
+.eap h3, .eap h4 { margin: 0; color: var(--hsa-teal-700); text-align: left; }
+.eap h3 { font-size: var(--hsa-text-xl); }
+.eap h4 { font-size: var(--hsa-text-base); margin: 24px 0 10px; }
+.eap .eap-title { margin: 0 0 16px; font-size: var(--hsa-text-3xl); color: var(--hsa-teal-700); text-align: left; }
+.eap .eap-muted { color: var(--hsa-muted); font-weight: 400; font-size: var(--hsa-text-sm); }
+.eap .eap-empty { color: var(--hsa-muted); margin: 8px 0; font-size: var(--hsa-text-sm); list-style: none; }
+.eap .eap-error { color: var(--hsa-danger); margin: 0; font-size: var(--hsa-text-sm); }
+.eap .eap-done { margin: 12px 0 0; padding: 8px 12px; border-radius: 6px; background: var(--hsa-success-bg); color: var(--hsa-success-strong); font-size: var(--hsa-text-sm); }
+.eap .eap-risk { margin: 12px 0; padding: 10px 12px; border-left: 4px solid var(--hsa-danger); background: var(--hsa-danger-bg); color: var(--hsa-danger-strong); font-weight: 600; font-size: var(--hsa-text-sm); }
+
+.eap input[type=text], .eap textarea {
+    width: 100%; margin: 0; padding: 10px 12px; border: 1.5px solid var(--hsa-border); border-radius: 6px;
+    font: inherit; font-size: var(--hsa-text-base); background: var(--hsa-surface); color: var(--hsa-ink);
+}
+.eap button { font-family: inherit; margin: 0; min-height: 0; }
+.eap :focus-visible { outline: 3px solid rgba(15, 76, 100, 0.35); outline-offset: 2px; }
+
+.eap .eap-btn {
+    padding: 8px 14px; border: 1.5px solid var(--hsa-teal-700); border-radius: 6px; background: var(--hsa-surface);
+    color: var(--hsa-teal-700); font-weight: 600; font-size: var(--hsa-text-sm); cursor: pointer; width: auto;
+}
+.eap .eap-btn:hover { background: var(--hsa-teal-100); }
+.eap .eap-btn:disabled { opacity: 0.6; cursor: default; }
+.eap .eap-btn--primary { background: var(--hsa-teal-700); color: #fff; }
+.eap .eap-btn--primary:hover { background: var(--hsa-teal-800); }
+.eap .eap-btn--sm { padding: 4px 10px; font-size: var(--hsa-text-xs); }
+.eap .eap-btn.is-on { background: var(--hsa-teal-700); color: #fff; }
+
+.eap .eap-tag {
+    display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--hsa-border);
+    background: var(--hsa-surface-sunken); color: var(--hsa-ink-soft); font-size: var(--hsa-text-xs); font-weight: 600; vertical-align: middle;
+}
+.eap .eap-tag--excused { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+
+/* Strike tally */
+.eap .eap-tally { display: inline-flex; align-items: center; gap: 5px; height: 22px; }
+.eap .eap-tally__mark { display: inline-block; width: 4px; height: 100%; border-radius: 2px; background: var(--hsa-ink-soft); transform: skewX(-10deg); }
+.eap .eap-tally__mark.is-risk { background: var(--hsa-danger); }
+.eap .eap-tally__zero { font-weight: 700; color: var(--hsa-success); }
+.eap .eap-tally--sm { height: 16px; gap: 3px; }
+.eap .eap-tally--sm .eap-tally__mark { width: 3px; }
+.eap .eap-tally--lg { height: 34px; gap: 7px; }
+.eap .eap-tally--lg .eap-tally__mark { width: 6px; }
+.eap .eap-tally--lg .eap-tally__zero { font-size: var(--hsa-text-2xl); }
+
+/* At risk (3+ Strikes), for the Chief of Staff */
+.eap .eap-risk-list { margin-bottom: 20px; padding: 12px 14px; border: 1px solid var(--hsa-danger-border); border-radius: 8px; background: var(--hsa-surface); }
+.eap .eap-risk-list h3 { font-size: var(--hsa-text-base); color: var(--hsa-danger-strong); margin-bottom: 6px; }
+.eap .eap-risk-list ul { list-style: none; margin: 0; padding: 0; }
+.eap .eap-risk-list button {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-height: 44px; padding: 8px;
+    border: 0; border-top: 1px solid var(--hsa-border-light); background: none; text-align: left; cursor: pointer; color: var(--hsa-ink); font-size: var(--hsa-text-sm);
+}
+.eap .eap-risk-list li:first-child button { border-top: 0; }
+.eap .eap-risk-list button:hover { background: var(--hsa-danger-bg); }
+
+/* Member header */
+.eap .eap-who { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; padding-bottom: 16px; border-bottom: 2px solid var(--hsa-teal-700); }
+.eap .eap-who p { margin: 4px 0 0; }
+.eap .eap-counts { display: flex; gap: 28px; margin: 0; }
+.eap .eap-counts dt { font-size: var(--hsa-text-xs); color: var(--hsa-muted); font-weight: 600; }
+.eap .eap-counts dd { margin: 4px 0 0; }
+.eap .eap-num { font-size: var(--hsa-text-2xl); font-weight: 700; line-height: 34px; }
+
+/* Year timeline + history */
+.eap .eap-cols { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 32px; }
+.eap .eap-timeline { list-style: none; margin: 0; padding: 0; }
+.eap .eap-row {
+    display: grid; grid-template-columns: 64px 1fr auto; column-gap: 12px; row-gap: 4px; align-items: baseline;
+    padding: 10px 0 10px 14px; border-left: 3px solid var(--hsa-border-light); position: relative;
+}
+.eap .eap-row::before { content: ''; position: absolute; left: -7px; top: 15px; width: 11px; height: 11px; border-radius: 50%; background: var(--hsa-border); }
+.eap .eap-row.is-attended { color: var(--hsa-muted); }
+.eap .eap-row.is-future { color: var(--hsa-muted-light); font-style: italic; }
+.eap .eap-row.is-future::before { background: var(--hsa-surface); border: 2px solid var(--hsa-border); }
+.eap .eap-row.is-strike::before { background: var(--hsa-danger); }
+.eap .eap-row.is-strike { background: linear-gradient(90deg, var(--hsa-danger-bg), transparent 70%); }
+.eap .eap-row.is-open::before { background: #f59e0b; }
+.eap .eap-row.is-madeup::before { background: var(--hsa-success); }
+.eap .eap-row.is-closed::before { background: var(--hsa-muted); }
+.eap .eap-row__date { font-variant-numeric: tabular-nums; font-size: var(--hsa-text-sm); white-space: nowrap; }
+.eap .eap-row__name { font-weight: 600; }
+.eap .eap-row__state { font-size: var(--hsa-text-sm); font-weight: 600; text-align: right; }
+.eap .is-strike .eap-row__state { color: var(--hsa-danger-strong); }
+.eap .is-madeup .eap-row__state { color: var(--hsa-success); }
+.eap .eap-row__detail, .eap .eap-row__actions, .eap .eap-row__confirm { grid-column: 2 / -1; font-size: var(--hsa-text-sm); }
+.eap .eap-row__actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+
+/* Reason box + effect, before saving */
+.eap .eap-confirm { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; padding: 12px; border-radius: 8px; background: var(--hsa-surface-subtle); border: 1px solid var(--hsa-border-light); }
+.eap .eap-confirm__label { display: flex; flex-direction: column; gap: 6px; margin: 0; font-weight: 700; font-size: var(--hsa-text-sm); color: var(--hsa-teal-700); }
+.eap .eap-effects { font-size: var(--hsa-text-sm); color: var(--hsa-ink-soft); }
+.eap .eap-effects__label { font-weight: 700; font-size: var(--hsa-text-xs); color: var(--hsa-muted); }
+.eap .eap-effects ul { margin: 2px 0 0; padding-left: 18px; }
+.eap .eap-confirm__buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* History */
+.eap .eap-history { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.eap .eap-history__item { padding: 8px 0 8px 12px; border-left: 3px solid var(--hsa-border); font-size: var(--hsa-text-sm); }
+.eap .eap-history__item.is-excused { border-color: #f59e0b; }
+.eap .eap-history__item.is-strike-removed { border-color: var(--hsa-danger); }
+.eap .eap-history__item.is-closed { border-color: var(--hsa-muted); }
+.eap .eap-history__note { color: var(--hsa-ink-soft); margin-top: 2px; overflow-wrap: anywhere; }
+.eap .eap-history__meta { color: var(--hsa-muted); font-size: var(--hsa-text-xs); margin-top: 2px; overflow-wrap: anywhere; }
+
+@media (max-width: 760px) {
+    .eap .eap-cols { grid-template-columns: 1fr; }
+    .eap .eap-row { grid-template-columns: 52px 1fr; }
+    .eap .eap-row__state { grid-column: 2; text-align: left; }
 }
 
-.excuse-absence .excuse-absence__form .user-info-grid {
-    margin-bottom: 16px;
+/* ---- User Lookup  (UserPointsLookup.tsx) ------------------------------------------------
+   One Member's standing, points and Point Requests on one scrolling page
+   (docs/research/user-lookup-eboard-ux.md). ulk- = user lookup. Status is
+   always in words as well as colour. */
+
+.ulk { max-width: 1000px; margin: 0 auto; padding: 20px 16px; text-align: left; color: var(--hsa-ink); font-family: var(--hsa-font-body); }
+.ulk * { box-sizing: border-box; }
+.ulk h3, .ulk h4 { margin: 0; color: var(--hsa-teal-700); text-align: left; }
+.ulk h3 { font-size: var(--hsa-text-xl); }
+.ulk h4 { font-size: var(--hsa-text-base); display: inline; }
+.ulk .ulk-title { margin: 0 0 16px; font-size: var(--hsa-text-3xl); color: var(--hsa-teal-700); text-align: left; }
+.ulk .ulk-muted { color: var(--hsa-muted); font-size: var(--hsa-text-sm); margin: 8px 0; }
+.ulk .ulk-error { color: var(--hsa-danger); font-size: var(--hsa-text-sm); margin: 8px 0; }
+.ulk a { color: var(--hsa-teal-700); font-weight: 600; }
+.ulk :focus-visible { outline: 3px solid rgba(15, 76, 100, 0.35); outline-offset: 2px; }
+
+.ulk .ulk-body { margin-top: 20px; display: flex; flex-direction: column; gap: 16px; }
+.ulk .ulk-who { padding: 16px; background: var(--hsa-surface); border: 1px solid var(--hsa-border); border-radius: 10px; }
+.ulk .ulk-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px 16px; margin: 10px 0 0; }
+.ulk .ulk-facts dt { font-size: var(--hsa-text-xs); font-weight: 700; color: var(--hsa-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.ulk .ulk-facts dd { margin: 0; overflow-wrap: anywhere; }
+
+.ulk .ulk-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.ulk .ulk-stat {
+    display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; background: var(--hsa-surface);
+    border: 1px solid var(--hsa-border); border-top: 4px solid var(--hsa-teal-600); border-radius: 10px;
+}
+.ulk .ulk-stat.is-met { border-top-color: var(--hsa-success); }
+.ulk .ulk-stat.is-risk { border-top-color: var(--hsa-danger); background: var(--hsa-danger-bg); }
+.ulk .ulk-stat__label { font-size: var(--hsa-text-sm); font-weight: 700; color: var(--hsa-ink-soft); }
+.ulk .ulk-stat__label small { font-weight: 400; color: var(--hsa-muted); }
+.ulk .ulk-stat__value { font-size: var(--hsa-text-3xl); font-weight: 800; color: var(--hsa-teal-700); font-variant-numeric: tabular-nums; line-height: 1.15; }
+.ulk .ulk-stat__value small { font-size: var(--hsa-text-base); font-weight: 600; color: var(--hsa-muted); }
+.ulk .ulk-stat__value--pair { display: flex; flex-direction: column; font-size: var(--hsa-text-lg); }
+.ulk .ulk-stat__note { font-size: var(--hsa-text-sm); color: var(--hsa-muted); }
+.ulk .is-met .ulk-stat__note { color: var(--hsa-success-strong); font-weight: 600; }
+.ulk .ulk-stat__note--risk { color: var(--hsa-danger-strong); font-weight: 700; }
+.ulk .ulk-stat__pending { font-size: var(--hsa-text-sm); margin-top: 4px; }
+
+.ulk .ulk-panel { background: var(--hsa-surface); border: 1px solid var(--hsa-border); border-radius: 10px; padding: 0 16px; }
+.ulk .ulk-panel > summary {
+    display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px;
+    padding: 14px 0; cursor: pointer; list-style: none;
+}
+.ulk .ulk-panel > summary::-webkit-details-marker { display: none; }
+.ulk .ulk-panel > summary h4::before { content: '▸'; display: inline-block; margin-right: 8px; transition: transform 0.15s ease; }
+.ulk .ulk-panel[open] > summary h4::before { transform: rotate(90deg); }
+.ulk .ulk-panel > summary .ulk-muted { margin: 0; }
+.ulk .ulk-panel[open] { padding-bottom: 12px; }
+.ulk .ulk-panel__link { margin: 0 0 8px; font-size: var(--hsa-text-sm); color: var(--hsa-muted); }
+.ulk .ulk-unmet { margin: 8px 0 0; font-size: var(--hsa-text-sm); }
+
+.ulk .ulk-list { list-style: none; margin: 0; padding: 0; }
+.ulk .ulk-row {
+    display: grid; grid-template-columns: 64px 1fr auto; column-gap: 12px; align-items: baseline;
+    padding: 10px 0 10px 10px; border-top: 1px solid var(--hsa-border-light); border-left: 3px solid transparent;
+}
+.ulk .ulk-row.is-strike { border-left-color: var(--hsa-danger); background: linear-gradient(90deg, var(--hsa-danger-bg), transparent 70%); }
+.ulk .ulk-row.is-open { border-left-color: #f59e0b; }
+.ulk .ulk-row.is-closed, .ulk .ulk-row.is-madeup { color: var(--hsa-muted); }
+.ulk .ulk-row.is-madeup { border-left-color: var(--hsa-success); }
+.ulk .ulk-row.is-pending { border-left-color: #f59e0b; }
+.ulk .ulk-row--total { font-weight: 800; border-top: 2px solid var(--hsa-ink-soft); }
+.ulk .ulk-row__date { font-variant-numeric: tabular-nums; font-size: var(--hsa-text-sm); color: var(--hsa-muted); white-space: nowrap; }
+.ulk .ulk-row__name { font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.ulk .ulk-row__detail { display: block; font-weight: 400; font-size: var(--hsa-text-sm); color: var(--hsa-muted); }
+.ulk .ulk-note { font-style: italic; color: var(--hsa-ink-soft); }
+.ulk .ulk-row__end { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: var(--hsa-text-sm); font-weight: 600; text-align: right; }
+.ulk .ulk-row.is-strike .ulk-row__end { color: var(--hsa-danger-strong); }
+.ulk .ulk-num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ulk .ulk-num small { font-weight: 400; color: var(--hsa-muted); }
+
+.ulk .ulk-tag {
+    display: inline-block; padding: 0 8px; border-radius: 999px; border: 1px solid var(--hsa-border);
+    background: var(--hsa-surface-sunken); color: var(--hsa-ink-soft); font-size: var(--hsa-text-xs); font-weight: 600;
+}
+.ulk .ulk-row__name > .ulk-tag { margin-left: 6px; vertical-align: middle; }
+.ulk .ulk-tag--code { background: var(--hsa-teal-100); border-color: var(--hsa-teal-400); color: var(--hsa-teal-800); }
+.ulk .ulk-tag--request { background: var(--hsa-success-bg); border-color: var(--hsa-success-border); color: var(--hsa-success-strong); }
+.ulk .ulk-tag--eboard { background: var(--hsa-surface-sunken); border-color: var(--hsa-ink-soft); color: var(--hsa-ink); }
+.ulk .ulk-tag--adjustment, .ulk .ulk-tag--excused { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+
+.ulk .ulk-status { padding: 1px 10px; border-radius: 999px; font-size: var(--hsa-text-xs); font-weight: 700; border: 1px solid; }
+.ulk .ulk-status--pending { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+.ulk .ulk-status--approved { background: var(--hsa-success-bg); border-color: var(--hsa-success-border); color: var(--hsa-success-strong); }
+.ulk .ulk-status--denied { background: var(--hsa-danger-bg); border-color: var(--hsa-danger-border); color: var(--hsa-danger-strong); }
+.ulk .ulk-status--revoked { background: var(--hsa-surface-sunken); border-color: var(--hsa-danger-border); color: var(--hsa-danger-strong); }
+
+/* The code a row came from, beside its name. */
+.ulk .ulk-code {
+    margin-left: 6px; padding: 0 6px; border-radius: 4px; background: var(--hsa-surface-sunken);
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: var(--hsa-text-xs); font-weight: 600; color: var(--hsa-ink-soft);
 }
 
-.excuse-absence .excuse-absence__form .form-group {
-    margin-bottom: 12px;
+/* All / Codes / Point Requests / Adjustments above the points list. */
+.ulk .ulk-filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; }
+.ulk .ulk-filter {
+    min-width: 0; min-height: 32px; padding: 0 12px; border: 1px solid var(--hsa-border); border-radius: 999px;
+    background: var(--hsa-surface); color: var(--hsa-ink-soft); font: inherit; font-size: var(--hsa-text-sm); font-weight: 600; cursor: pointer;
 }
+.ulk .ulk-filter.is-active { background: var(--hsa-teal-700); border-color: var(--hsa-teal-700); color: #ffffff; }
 
-.excuse-absence .excuse-absence__actions {
-    margin-top: 8px;
-}
+/* "Remove check-ins": off by default, so a Remove button is never one stray tap away. */
+.ulk .ulk-switch { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: var(--hsa-text-sm); font-weight: 600; cursor: pointer; }
+.ulk .ulk-switch input { width: 18px; height: 18px; margin: 0; accent-color: var(--hsa-danger); }
+.ulk .ulk-points-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 16px; }
+/* A Removed Check-in or revoked Point Request: crossed out, counted nowhere. */
+.ulk .ulk-row.is-taken-back { color: var(--hsa-muted); border-left-color: var(--hsa-danger-border); }
+.ulk .ulk-tag--taken-back { background: var(--hsa-danger-bg); border-color: var(--hsa-danger-border); color: var(--hsa-danger-strong); }
+.ulk .ulk-row__form { grid-column: 2 / -1; margin-top: 6px; }
+.ulk .ulk-row__form textarea { max-width: 420px; }
 
-/* The step-2 card is a <form>; make it full width like the lookup's cards */
-.excuse-absence .excuse-absence__form {
-    width: auto;
-    margin: 0;
-}
-
-/* ---- Member points lookup (scoped to .user-points-lookup)  (UserPointsLookup.tsx) -------- */
-
-/* UserPointsLookup Styles */
-.user-points-lookup {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.user-points-lookup h2 {
-    text-align: center;
-    color: var(--hsa-teal-600);
-    margin-bottom: 10px;
-}
-
-/* Search Form */
-.user-points-lookup .search-form {
-    background: var(--hsa-surface-subtle);
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 30px;
-    border: 2px solid var(--hsa-teal-600);
-}
-
-.user-points-lookup .search-input-group {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.user-points-lookup .search-input {
-    flex: 1;
-    min-width: 300px;
-    padding: 12px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-.user-points-lookup .search-input:focus {
-    outline: none;
-    border-color: var(--hsa-teal-600);
-}
-
-.user-points-lookup .search-button,
-.user-points-lookup .clear-button {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.user-points-lookup .search-button {
-    background-color: var(--hsa-teal-600);
-    color: white;
-}
-
-.user-points-lookup .search-button:hover:not(:disabled) {
-    background-color: var(--hsa-teal-800);
-}
-
-.user-points-lookup .search-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.user-points-lookup .clear-button {
-    background-color: #dc3545;
-    color: white;
-}
-
-.user-points-lookup .clear-button:hover {
-    background-color: #c82333;
-}
-
-.user-points-lookup .error-message {
-    color: #dc3545;
-    text-align: center;
-    margin-top: 10px;
-    font-weight: bold;
-}
-
-/* User Results */
-.user-points-lookup .user-results {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-
-/* User Info Card */
-.user-points-lookup .user-info-card {
-    background: white;
-    border: 2px solid var(--hsa-teal-600);
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.user-points-lookup .user-info-card h3 {
-    color: var(--hsa-teal-600);
-    text-align: left;
-    margin-top: 0;
-    margin-bottom: 10px;
-    border-bottom: 2px solid var(--hsa-teal-600);
-    padding-bottom: 10px;
-}
-
-.user-points-lookup .user-info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 6px;
-}
-
-.user-points-lookup .user-info-grid div {
-    padding: 7px 10px;
-    background: var(--hsa-surface-subtle);
-    border-radius: 5px;
-    border-left: 4px solid var(--hsa-teal-600);
-}
-
-/* Points Summary */
-.user-points-lookup .points-summary {
-    background: white;
-    border: 2px solid var(--hsa-teal-600);
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.user-points-lookup .points-summary h3 {
-    color: var(--hsa-teal-600);
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.user-points-lookup .points-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-}
-
-.user-points-lookup .points-card {
-    background: var(--hsa-surface-subtle);
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-    transition: transform 0.2s;
-}
-
-.user-points-lookup .points-card:hover {
-    transform: translateY(-2px);
-}
-
-.user-points-lookup .points-card.total {
-    border-color: var(--hsa-teal-600);
-    background: linear-gradient(135deg, var(--hsa-teal-600), #1a6b8a);
-    color: white;
-}
-
-.user-points-lookup .points-card.eligible {
-    border-color: #28a745;
-    background: linear-gradient(135deg, #28a745, #34ce57);
-    color: white;
-}
-
-.user-points-lookup .points-card.not-eligible {
-    border-color: #dc3545;
-    background: linear-gradient(135deg, #dc3545, #e85563);
-    color: white;
-}
-
-.user-points-lookup .points-card h4 {
-    margin: 0 0 10px 0;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.user-points-lookup .points-value {
-    font-size: 2.5em;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.user-points-lookup .eligibility-status {
-    font-size: 12px;
-    font-weight: 600;
-}
-
-/* Category Breakdown */
-.user-points-lookup .category-breakdown {
-    background: white;
-    border: 2px solid var(--hsa-teal-600);
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.user-points-lookup .category-breakdown h3 {
-    color: var(--hsa-teal-600);
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.user-points-lookup .category-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-.user-points-lookup .category-table th,
-.user-points-lookup .category-table td {
-    padding: 12px;
-    text-align: center;
-    border: 1px solid #ddd;
-}
-
-.user-points-lookup .category-table th {
-    background-color: var(--hsa-teal-600);
-    color: white;
-    font-weight: bold;
-}
-
-.user-points-lookup .category-table tr:nth-child(even) {
-    background-color: var(--hsa-surface-subtle);
-}
-
-.user-points-lookup .category-table tr:hover {
-    background-color: var(--hsa-teal-100);
-}
-
-/* Event Breakdown */
-.user-points-lookup .event-breakdown {
-    background: white;
-    border: 2px solid var(--hsa-teal-600);
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.user-points-lookup .event-breakdown h3 {
-    color: var(--hsa-teal-600);
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.user-points-lookup .events-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    font-size: 14px;
-}
-
-.user-points-lookup .events-table th,
-.user-points-lookup .events-table td {
-    padding: 10px;
-    text-align: left;
-    border: 1px solid #ddd;
-}
-
-.user-points-lookup .events-table th {
-    background-color: var(--hsa-teal-600);
-    color: white;
-    font-weight: bold;
-    position: sticky;
-    top: 0;
-}
-
-.user-points-lookup .events-table tr:nth-child(even) {
-    background-color: var(--hsa-surface-subtle);
-}
-
-.user-points-lookup .events-table tr:hover {
-    background-color: var(--hsa-teal-100);
-}
-
-.user-points-lookup .badge-yes {
-    background-color: #28a745;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-.user-points-lookup .badge-no {
-    background-color: #dc3545;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .user-points-lookup {
-        padding: 10px;
-    }
-
-    .user-points-lookup .search-input-group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .user-points-lookup .search-input {
-        min-width: unset;
-    }
-
-    .user-points-lookup .points-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .user-points-lookup .user-info-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .user-points-lookup .events-table {
-        font-size: 12px;
-    }
-
-    .user-points-lookup .events-table th,
-    .user-points-lookup .events-table td {
-        padding: 8px 4px;
-    }
-}
-
-@media (max-width: 480px) {
-    .user-points-lookup .points-value {
-        font-size: 2em;
-    }
-
-    .user-points-lookup .events-table {
-        font-size: 10px;
-    }
+/* Phones: two-line rows, the date above the name and the points beside it. */
+@media (max-width: 600px) {
+    .ulk .ulk-row { grid-template-columns: 1fr auto; row-gap: 2px; }
+    .ulk .ulk-row__date { grid-column: 1 / -1; }
+    .ulk .ulk-row--total .ulk-row__date { display: none; }
+    .ulk .ulk-row__form { grid-column: 1 / -1; }
+    .ulk .ulk-facts__wide { grid-column: 1 / -1; }
+    .ulk .ulk-stat { padding: 12px; }
+    .ulk .ulk-stat__value { font-size: var(--hsa-text-2xl); }
 }
 
 /* ---- Review point requests  (PointRequestReview.tsx) --------------------------------------- */
@@ -745,21 +506,65 @@
     margin-bottom: 30px;
 }
 
-/* Filter Section */
+/* Member filter (issue #20): the shared name search, above Filter by status.
+   Plain, like User Lookup's search box (no card, no label). */
+.point-request-review .member-filter-section {
+    margin-bottom: 20px;
+}
+
+.point-request-review .member-filter-section .member-search {
+    max-width: 460px;
+    margin-bottom: 0;
+}
+
+.point-request-review .member-filter-section__hint {
+    margin: 8px 0 0;
+    color: var(--hsa-muted);
+    font-size: 14px;
+}
+
+.point-request-review .member-filter-section__picked {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--hsa-ink);
+}
+
+.point-request-review .member-filter-section__clear {
+    padding: 8px 14px;
+    border: 1.5px solid #94a3b8;
+    border-radius: 6px;
+    background: var(--hsa-surface);
+    color: var(--hsa-ink-soft);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.point-request-review .member-filter-section__clear:hover {
+    border-color: var(--hsa-teal-700);
+    color: var(--hsa-teal-700);
+}
+
+/* Filter Section: its own card, no longer shared with .member-filter-section. */
 .point-request-review .filter-section {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 15px;
-    margin-bottom: 30px;
     padding: 18px 24px;
     background: var(--hsa-surface);
     border-radius: 10px;
     border: 2px solid var(--hsa-teal-700);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
 }
 
 .point-request-review .filter-section label {
+    flex: none;
     font-weight: 700;
     color: var(--hsa-ink);
     font-size: 15px;
@@ -836,6 +641,11 @@
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
+.point-request-review .request-card.is-linked {
+    outline: 3px solid var(--hsa-teal-600);
+    outline-offset: 2px;
+}
+
 .point-request-review .request-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
@@ -852,8 +662,11 @@
     border-bottom: 2px solid var(--hsa-surface-sunken);
 }
 
+/* text-align: the site-wide h3 default centers it, which reads as an indent
+   when the email under it is wider. */
 .point-request-review .user-info h3 {
     margin: 0 0 4px 0;
+    text-align: left;
     color: var(--hsa-teal-700);
     font-size: 18px;
     font-weight: 800;
@@ -1105,731 +918,727 @@
         gap: 12px;
     }
 
+    .point-request-review .member-filter-section .member-search {
+        max-width: none;
+    }
+
     .point-request-review .request-actions {
         flex-direction: column;
     }
 }
 
-/* ---- Manage Event Codes table  (EditableCodesTable.tsx) ------------------------------------ */
-/* EditableCodesTable Styles */
-.editable-codes-table {
-    max-width: 1600px;
-    margin: 0 auto;
-    padding: 20px;
+/* Review panel (pointRequests/ReviewPanel.tsx): confirm the Event Type,
+   attach a code, Make-up picks, the effect preview, and the decision. */
+.point-request-review .review-open-button {
+    flex: 1;
 }
 
-/* Buttons Base */
-.editable-codes-table .refresh-button {
-    padding: 12px 22px;
+.point-request-review .review-notice {
+    margin: 0 0 16px;
+    padding: 10px 14px;
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-    min-width: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-/* Refresh Button - High Contrast Dark Slate Blue */
-.editable-codes-table .refresh-button {
-    background: var(--hsa-teal-700);
-    color: #ffffff;
-    border: 2px solid var(--hsa-teal-700);
-}
-
-.editable-codes-table .refresh-button:hover:not(:disabled) {
-    background: var(--hsa-teal-900);
-    border-color: var(--hsa-teal-900);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-/* Disabled State: Dark text on light background (Never white on gray) */
-.editable-codes-table .refresh-button:disabled {
-    background: var(--hsa-border-light);
-    color: var(--hsa-muted-light);
-    border-color: var(--hsa-border);
-    cursor: not-allowed;
-    opacity: 0.85;
-    box-shadow: none;
-    transform: none;
-}
-
-/* Enhanced focus states for accessibility */
-.editable-codes-table .refresh-button:focus {
-    outline: 3px solid #0284c7;
-    outline-offset: 2px;
-}
-
-.editable-codes-table .voter-eligible-label {
-    font-weight: 700;
-}
-
-/* Table Container */
-.editable-codes-table .table-container {
-    background: var(--hsa-surface);
-    border-radius: 10px;
-    overflow-x: auto;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    border: 2px solid var(--hsa-teal-700);
-}
-
-.editable-codes-table .codes-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    color: var(--hsa-ink);
-}
-
-.editable-codes-table .codes-table th {
-    background: var(--hsa-teal-700);
-    color: #ffffff;
-    padding: 14px 12px;
-    text-align: left;
-    font-weight: 700;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.editable-codes-table .codes-table td {
-    padding: 12px 10px;
-    border-bottom: 1px solid var(--hsa-border);
-    vertical-align: middle;
-}
-
-.editable-codes-table .codes-table tr.even {
-    background-color: var(--hsa-surface-subtle);
-}
-
-.editable-codes-table .codes-table tr.odd {
-    background-color: var(--hsa-surface);
-}
-
-.editable-codes-table .codes-table tr:hover {
-    background-color: var(--hsa-surface-sunken);
-}
-
-.editable-codes-table .code-id {
-    font-family: var(--hsa-font-mono);
-    font-weight: 700;
-    color: var(--hsa-teal-700);
-    min-width: 80px;
-}
-
-/* Edit Inputs in Table */
-.editable-codes-table .edit-input,
-.editable-codes-table .edit-select {
-    padding: 6px 8px;
-    border: 1.5px solid var(--hsa-teal-700);
-    border-radius: 4px;
-    font-size: 13px;
-    color: var(--hsa-ink);
-    width: 100%;
-    min-width: 100px;
-}
-
-.editable-codes-table .edit-input:focus,
-.editable-codes-table .edit-select:focus {
-    outline: none;
-    border-color: var(--hsa-teal-900);
-    box-shadow: 0 0 0 2px rgba(15, 76, 100, 0.2);
-}
-
-.editable-codes-table .points-input {
-    max-width: 80px;
-}
-
-/* Badges - Accessible High Contrast */
-.editable-codes-table .badge {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 700;
-    text-align: center;
-    display: inline-block;
-    min-width: 44px;
-}
-
-.editable-codes-table .badge-yes {
-    background-color: var(--hsa-success-bg);
-    color: var(--hsa-success-strong);
+    background: var(--hsa-success-bg);
     border: 1px solid var(--hsa-success-border);
-}
-
-.editable-codes-table .badge-no {
-    background-color: var(--hsa-danger-bg);
-    color: var(--hsa-danger-strong);
-    border: 1px solid var(--hsa-danger-border);
-}
-
-/* Action Buttons inside rows */
-.editable-codes-table .actions-cell {
-    text-align: center;
-    white-space: nowrap;
-}
-
-.editable-codes-table .edit-btn,
-.editable-codes-table .delete-btn,
-.editable-codes-table .save-btn,
-.editable-codes-table .cancel-btn {
-    padding: 6px 12px;
-    margin: 0 3px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
+    color: var(--hsa-success-strong);
     font-weight: 700;
-    min-width: 0;
-    min-height: 0;
-    transition: all 0.2s;
 }
 
-.editable-codes-table .edit-btn {
-    background: #0f5b7a;
-    color: #ffffff;
-    border: 1px solid #0f5b7a;
+.point-request-review .review-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-top: 14px;
+    border-top: 2px solid var(--hsa-surface-sunken);
 }
 
-.editable-codes-table .edit-btn:hover {
-    background: #0a3d52;
-}
-
-.editable-codes-table .delete-btn {
-    background: var(--hsa-danger);
-    color: #ffffff;
-    border: 1px solid var(--hsa-danger);
-}
-
-.editable-codes-table .delete-btn:hover {
-    background: var(--hsa-danger-strong);
-}
-
-.editable-codes-table .save-btn {
-    background: var(--hsa-success);
-    color: #ffffff;
-    border: 1px solid var(--hsa-success);
-}
-
-.editable-codes-table .save-btn:hover {
-    background: var(--hsa-success-strong);
-}
-
-.editable-codes-table .cancel-btn {
-    background: var(--hsa-muted);
-    color: #ffffff;
-    border: 1px solid var(--hsa-muted);
-}
-
-.editable-codes-table .cancel-btn:hover {
-    background: var(--hsa-ink-soft);
-}
-
-/* No Codes Message */
-.editable-codes-table .no-codes {
-    text-align: center;
-    padding: 40px;
-    color: var(--hsa-ink-soft);
-    font-weight: 600;
-    font-size: 16px;
-    border-top: 2px solid var(--hsa-border);
-}
-
-/* Accessibility Focus */
-.editable-codes-table .edit-btn:focus,
-.editable-codes-table .delete-btn:focus,
-.editable-codes-table .save-btn:focus,
-.editable-codes-table .cancel-btn:focus {
-    outline: 2px solid var(--hsa-teal-700);
-    outline-offset: 2px;
-}
-
-/* ------------------------------------------------------------------------
-   Search / filter bar
------------------------------------------------------------------------- */
-.editable-codes-table .codes-filters {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
-    grid-template-areas:
-        "search category refresh"
-        "count count count";
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.editable-codes-table .codes-filters .codes-search { grid-area: search; }
-.editable-codes-table .codes-filters .codes-category-filter { grid-area: category; }
-.editable-codes-table .codes-filters .codes-refresh { grid-area: refresh; }
-.editable-codes-table .codes-filters .codes-count { grid-area: count; }
-
-.editable-codes-table .codes-filters .codes-refresh {
-    min-width: 0;
-    height: 100%;
-    padding: 0 18px;
-    white-space: nowrap;
-}
-
-.editable-codes-table .codes-filters .codes-search,
-.editable-codes-table .codes-filters .codes-category-filter {
-    width: 100%;
+.point-request-review .review-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     margin: 0;
-    padding: 10px 12px;
+    padding: 0;
+    border: none;
+    min-width: 0;
+}
+
+.point-request-review .review-field label,
+.point-request-review .review-field legend {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--hsa-ink);
+    padding: 0;
+}
+
+.point-request-review .review-required {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--hsa-danger);
+}
+
+.point-request-review .review-field select,
+.point-request-review .review-field input,
+.point-request-review .review-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 10px;
     border: 1.5px solid #94a3b8;
     border-radius: 6px;
-    font-size: 15px;
-    font-family: inherit;
+    font: inherit;
+    font-size: 14px;
     color: var(--hsa-ink);
-    background-color: var(--hsa-surface);
+    background: var(--hsa-surface);
 }
 
-.editable-codes-table .codes-filters .codes-search:focus,
-.editable-codes-table .codes-filters .codes-category-filter:focus {
-    outline: none;
-    border-color: var(--hsa-teal-700);
-    box-shadow: 0 0 0 3px rgba(15, 76, 100, 0.2);
+.point-request-review .review-field select:disabled {
+    background: var(--hsa-surface-sunken);
+    color: var(--hsa-muted);
 }
 
-.editable-codes-table .codes-count {
-    grid-column: 1 / -1;
+.point-request-review .review-hint {
     margin: 0;
-    font-size: 13px;
+    font-size: 12.5px;
+    color: var(--hsa-muted);
+}
+
+.point-request-review .review-makeup-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-weight: 600;
-    color: var(--hsa-muted);
 }
 
-/* Phone-only pieces */
-.editable-codes-table .codes-table .cell-toggle,
-.editable-codes-table .codes-table .btn-label {
-    display: none;
+.point-request-review .review-makeup-row span {
+    flex: none;
+    width: 52px;
+    font-size: 13px;
+    color: var(--hsa-ink-soft);
 }
 
-/* ------------------------------------------------------------------------
-   Phones: each code is a compact row (Code / Event / Points / ▸).
-   Tap it to expand the rest of the fields and the Edit / Delete buttons.
------------------------------------------------------------------------- */
-@media (max-width: 768px) {
-    .editable-codes-table .codes-filters {
-        grid-template-columns: minmax(0, 1fr) auto;
-        grid-template-areas:
-            "search refresh"
-            "category category"
-            "count count";
-    }
-
-    .editable-codes-table .table-container {
-        overflow: visible;
-        border: none;
-        background: transparent;
-        box-shadow: none;
-    }
-
-    .editable-codes-table .codes-table,
-    .editable-codes-table .codes-table tbody {
-        display: block;
-    }
-
-    /* Eboard.css styles every <table> with a shadow and top margin */
-    .editable-codes-table .codes-table {
-        box-shadow: none;
-        margin-top: 0;
-    }
-
-    .editable-codes-table .codes-table thead {
-        display: none;
-    }
-
-    .editable-codes-table .codes-table tr,
-    .editable-codes-table .codes-table tr.even,
-    .editable-codes-table .codes-table tr.odd {
-        display: grid;
-        grid-template-columns: auto minmax(0, 1fr) auto auto;
-        align-items: center;
-        column-gap: 10px;
-        padding: 10px 12px;
-        margin-bottom: 8px;
-        background: var(--hsa-surface);
-        border: 1.5px solid var(--hsa-border);
-        border-radius: 8px;
-        cursor: pointer;
-    }
-
-    .editable-codes-table .codes-table tr:hover {
-        background: var(--hsa-surface-subtle);
-    }
-
-    .editable-codes-table .codes-table tr.expanded {
-        border-color: var(--hsa-teal-700);
-    }
-
-    .editable-codes-table .codes-table td {
-        display: block;
-        padding: 0;
-        border: none;
-    }
-
-    /* Summary line */
-    .editable-codes-table .codes-table .code-id {
-        grid-row: 1;
-        grid-column: 1;
-        font-size: 13px;
-    }
-
-    .editable-codes-table .codes-table .cell-event {
-        grid-row: 1;
-        grid-column: 2;
-        font-weight: 600;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .editable-codes-table .codes-table tr.expanded .cell-event {
-        white-space: normal;
-    }
-
-    .editable-codes-table .codes-table .cell-points {
-        grid-row: 1;
-        grid-column: 3;
-        font-weight: 700;
-        color: var(--hsa-teal-700);
-        white-space: nowrap;
-    }
-
-    .editable-codes-table .codes-table tr:not(.editing) .cell-points::after {
-        content: " pts";
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--hsa-muted-light);
-    }
-
-    .editable-codes-table .codes-table .cell-toggle {
-        display: block;
-        grid-row: 1;
-        grid-column: 4;
-    }
-
-    .editable-codes-table .codes-table .toggle-btn,
-    .editable-codes-table .codes-table .toggle-btn:hover {
-        min-width: 0;
-        min-height: 0;
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        border: none;
-        border-radius: 6px;
-        background: transparent;
-        box-shadow: none;
-        color: var(--hsa-teal-700);
-        font-size: 28px;
-        line-height: 1;
-        transition: transform 0.15s ease;
-    }
-
-    .editable-codes-table .codes-table tr.expanded .toggle-btn {
-        transform: rotate(90deg);
-    }
-
-    .editable-codes-table .codes-table .toggle-btn:hover {
-        background: var(--hsa-border-light);
-    }
-
-    /* Details: hidden until the row is expanded */
-    .editable-codes-table .codes-table .cell-detail {
-        display: none;
-        grid-column: 1 / -1;
-    }
-
-    .editable-codes-table .codes-table tr.expanded .cell-detail {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        padding: 8px 0;
-        border-top: 1px solid #eef2f6;
-    }
-
-    .editable-codes-table .codes-table tr.expanded .cell-detail[data-label]::before {
-        content: attr(data-label);
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--hsa-muted);
-    }
-
-    .editable-codes-table .codes-table tr.expanded .actions-cell {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        padding-top: 12px;
-    }
-
-    .editable-codes-table .codes-table .actions-cell button {
-        margin: 0;
-        padding: 10px;
-        font-size: 14px;
-    }
-
-    .editable-codes-table .codes-table .btn-label {
-        display: inline;
-    }
-
-    /* Editing: every field full-width with its label above it */
-    .editable-codes-table .codes-table tr.expanded.editing {
-        cursor: default;
-    }
-
-    .editable-codes-table .codes-table tr.expanded.editing td {
-        grid-column: 1 / -1;
-        grid-row: auto;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 4px;
-        padding: 6px 0;
-        border-top: none;
-    }
-
-    .editable-codes-table .codes-table tr.expanded.editing td[data-label]::before {
-        content: attr(data-label);
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--hsa-muted);
-    }
-
-    .editable-codes-table .codes-table tr.expanded.editing td input[type="checkbox"] {
-        align-self: flex-start;
-        width: 20px;
-        height: 20px;
-    }
-
-    .editable-codes-table .codes-table tr.expanded.editing td.actions-cell {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        padding-top: 12px;
-    }
-
-    .editable-codes-table .codes-table tr.expanded.editing td.cell-toggle {
-        display: none;
-    }
-
-    /* Full width, and drop the base input[type="text"] left margin (index.css) */
-    /* Full width,
-    and drop the base input[type="text"] left margin (index.css) */
-    .editable-codes-table .codes-table .edit-input,
-    .editable-codes-table .codes-table .edit-select {
-        width: 100%;
-        max-width: none;
-        min-width: 0;
-        margin: 0;
-        font-size: 15px;
-        padding: 8px 10px;
-    }
+.point-request-review .review-effect {
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: var(--hsa-teal-100);
+    border-left: 4px solid var(--hsa-teal-600);
+    font-size: 13.5px;
+    color: var(--hsa-ink);
 }
 
-/* ---- User lookup: cabinet points line above Cabinet Events  (UserPointsLookup.tsx) */
-.user-points-lookup .lookup-cabinet-points {
-    margin: 0 0 12px;
-    text-align: center;
-    color: var(--hsa-muted);
-}
-
-.user-points-lookup .lookup-cabinet-points strong {
+.point-request-review .review-effect__title {
+    margin: 0 0 4px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: var(--hsa-teal-700);
 }
 
-/* ---- UFL/SF Email Lookup (EmailLookup.tsx, on the User Lookup page) ---- */
-.user-points-lookup .email-lookup {
-    margin-bottom: 30px;
+.point-request-review .review-effect__points {
+    margin: 0;
+    font-weight: 800;
+    font-size: 15px;
 }
 
-.user-points-lookup .email-lookup h2 {
-    margin-bottom: 6px;
+.point-request-review .review-effect ul {
+    margin: 8px 0 0;
+    padding-left: 18px;
 }
 
-.user-points-lookup .email-lookup__subtitle {
-    margin: 0 0 16px;
-    text-align: center;
-    color: #666;
+.point-request-review .review-effect li + li {
+    margin-top: 4px;
 }
 
-.user-points-lookup .email-lookup .search-form {
-    margin-bottom: 0;
+.point-request-review .review-modes {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 8px;
+    background: var(--hsa-surface-sunken);
 }
 
-/* It's a text input (a name), so undo the base input[type="text"] margin
-   and width to line up with the email box above. */
-.user-points-lookup .email-lookup .search-input {
+.point-request-review .review-mode {
+    /* Sized by their labels and sharing what's left, so "Adjustment" stays inside a narrow card. */
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 4px;
+    min-height: 40px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--hsa-ink-soft);
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.point-request-review .review-info .danger-form,
+.point-request-review .review-info .danger-form__open { margin-top: 10px; }
+
+.point-request-review .review-mode.is-active {
+    background: var(--hsa-surface);
+    color: var(--hsa-teal-700);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);
+}
+
+.point-request-review .review-panel > .approve-button,
+.point-request-review .review-field .approve-button,
+.point-request-review .review-field .deny-button {
+    flex: none;
+    margin-top: 4px;
+}
+
+.point-request-review .review-error {
+    margin: 0;
+    color: var(--hsa-danger);
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* ---- Event Codes page  (EventCodesPage.tsx, pages/eboard/eventCodes/) --
+   A sticky quick-add row over a facet sidebar and the codes list. */
+.event-codes-page {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 12px 20px 0;
+}
+
+.event-codes-page button { font: inherit; min-width: 0; min-height: 0; }
+
+.event-codes-page :is(input, select, button):focus-visible {
+    outline: 3px solid var(--hsa-teal-400);
+    outline-offset: 2px;
+}
+
+.event-codes-page :is(input:not([type="checkbox"], [type="radio"]), select) {
     width: auto;
     max-width: none;
     margin: 0;
+    padding: 10px 12px;
+    border: 1.5px solid var(--hsa-teal-600);
+    border-radius: 6px;
+    font-family: inherit;
+    /* 16px, not --hsa-text-sm: iOS Safari zooms in on any field smaller than that. */
+    font-size: var(--hsa-text-base);
+    line-height: 1.25;
+    color: var(--hsa-ink);
+    background-color: var(--hsa-surface);
+    color-scheme: light;
 }
 
-.user-points-lookup .email-lookup__empty {
-    margin: 14px 0 0;
-    text-align: center;
-    color: #666;
+/* Native select, closed: the site's teal field with a teal chevron (see
+   docs/research/event-codes-select-and-date-ui.md). Also reused, at higher
+   specificity, by Point Request Review's own Event Type and "Attach to a
+   code" selects (ReviewPanel.tsx), which otherwise inherit the plainer grey
+   .review-field select styling. */
+.event-codes-page .event-type-select,
+.point-request-review .review-panel .event-type-select {
+    appearance: none;
+    padding-right: 38px;
+    border-color: var(--hsa-teal-600);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23155776' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+}
+.event-codes-page .event-type-select:invalid,
+.event-codes-page .event-type-select:has(option[value=""]:checked),
+.point-request-review .review-panel .event-type-select:invalid,
+.point-request-review .review-panel .event-type-select:has(option[value=""]:checked) { color: var(--hsa-muted); }
+.event-codes-page .event-type-select:focus,
+.point-request-review .review-panel .event-type-select:focus {
+    border-color: var(--hsa-teal-500);
+    box-shadow: 0 0 0 3px rgba(21, 87, 118, 0.15);
+}
+.point-request-review .review-panel .event-type-select:disabled {
+    cursor: not-allowed;
 }
 
-.user-points-lookup .email-lookup__results {
-    list-style: none;
-    margin: 16px 0 0;
-    padding: 0;
+/* Where the browser supports a customizable select (Chrome 135+, Safari 27+),
+   the open list is drawn in the page too: a rounded teal panel, tier headings,
+   the chosen type ticked. Everywhere else the rules above still apply. */
+@supports (appearance: base-select) {
+    .event-codes-page .event-type-select,
+    .event-codes-page .event-type-select::picker(select),
+    .point-request-review .review-panel .event-type-select,
+    .point-request-review .review-panel .event-type-select::picker(select) { appearance: base-select; }
+    .event-codes-page .event-type-select,
+    .point-request-review .review-panel .event-type-select { align-items: center; background-image: none; padding-right: 12px; }
+    .event-codes-page .event-type-select::picker-icon,
+    .point-request-review .review-panel .event-type-select::picker-icon {
+        content: "";
+        width: 12px;
+        height: 8px;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23155776' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center;
+        transition: rotate .15s ease;
+    }
+    .event-codes-page .event-type-select:open::picker-icon,
+    .point-request-review .review-panel .event-type-select:open::picker-icon { rotate: 180deg; }
+    .event-codes-page .event-type-select::picker(select),
+    .point-request-review .review-panel .event-type-select::picker(select) {
+        max-height: min(440px, 60vh);
+        margin-top: 4px;
+        padding: 6px;
+        border: 1.5px solid var(--hsa-teal-600);
+        border-radius: 10px;
+        background: var(--hsa-surface);
+        box-shadow: 0 12px 28px rgba(15, 76, 100, 0.22);
+    }
+    .event-codes-page .event-type-select optgroup,
+    .point-request-review .review-panel .event-type-select optgroup {
+        padding: 10px 10px 4px;
+        font-size: var(--hsa-text-xs);
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: var(--hsa-teal-700);
+    }
+    .event-codes-page .event-type-select optgroup + optgroup,
+    .point-request-review .review-panel .event-type-select optgroup + optgroup { margin-top: 4px; border-top: 1px solid var(--hsa-border-light); }
+    .event-codes-page .event-type-select option,
+    .point-request-review .review-panel .event-type-select option {
+        margin: 2px -4px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        font-size: var(--hsa-text-sm);
+        font-weight: 400;
+        letter-spacing: normal;
+        text-transform: none;
+        color: var(--hsa-ink);
+        cursor: pointer;
+    }
+    .event-codes-page .event-type-select option[value=""],
+    .point-request-review .review-panel .event-type-select option[value=""] { color: var(--hsa-muted); }
+    .event-codes-page .event-type-select option:is(:hover, :focus-visible),
+    .point-request-review .review-panel .event-type-select option:is(:hover, :focus-visible) { background: var(--hsa-teal-100); outline: none; }
+    .event-codes-page .event-type-select option:checked,
+    .point-request-review .review-panel .event-type-select option:checked { font-weight: 700; color: var(--hsa-teal-700); }
+    .event-codes-page .event-type-select option::checkmark,
+    .point-request-review .review-panel .event-type-select option::checkmark { color: var(--hsa-teal-600); }
+}
+
+.event-codes-page .link-button {
+    padding: 4px 6px;
+    border: none;
+    background: none;
+    color: var(--hsa-teal-600);
+    font-weight: 600;
+    font-size: var(--hsa-text-sm);
+    text-decoration: underline;
+    cursor: pointer;
+    box-shadow: none;
+}
+.event-codes-page .link-button:hover { background: none; border: none; box-shadow: none; color: var(--hsa-teal-800); }
+.event-codes-page .link-button--danger { color: var(--hsa-danger); }
+.event-codes-page .link-button--danger:hover { color: var(--hsa-danger-strong); }
+
+/* Quick-add row: sticks under the site header while the list scrolls. */
+.event-codes-page .quick-add {
+    position: sticky;
+    top: 84px;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    width: auto;
+    margin: 0;
+    padding: 12px;
+    background: var(--hsa-teal-700);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(15, 76, 100, 0.2);
+}
+.event-codes-page .quick-add :is(input, select) { border-color: transparent; }
+.event-codes-page .quick-add__name { flex: 2 1 200px; }
+.event-codes-page .quick-add__code { flex: 0 1 140px; font-weight: 700; letter-spacing: .04em; }
+.event-codes-page .quick-add__date { flex: 0 1 160px; }
+.event-codes-page .quick-add .event-type-select { flex: 1 1 240px; }
+.event-codes-page .quick-add__submit {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    background: var(--hsa-surface);
+    color: var(--hsa-teal-700);
+    font-weight: 700;
+    cursor: pointer;
+}
+.event-codes-page .quick-add__submit:hover { background: var(--hsa-teal-100); border: none; box-shadow: none; }
+.event-codes-page .quick-add .link-button,
+.event-codes-page .quick-add .link-button:hover { color: #fff; }
+.event-codes-page .quick-add__more {
+    display: flex;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin: 0;
+    color: #fff;
+    font-size: var(--hsa-text-sm);
+    font-weight: 400;
+}
+.event-codes-page .quick-add__status { flex-basis: 100%; color: var(--hsa-teal-100); font-size: var(--hsa-text-sm); }
+.event-codes-page .quick-add__status .type-facts { color: #fff; }
+.event-codes-page .quick-add__error { color: #fecaca; font-weight: 600; }
+
+/* Tier / Cabinet / VE / Semester: label over value, spaced out. */
+.event-codes-page .type-facts { display: flex; flex-wrap: wrap; gap: 10px 32px; margin: 4px 0 0; }
+.event-codes-page .type-facts div { display: flex; flex-direction: column; gap: 2px; }
+.event-codes-page .type-facts dt { font-size: var(--hsa-text-xs); text-transform: uppercase; letter-spacing: .06em; opacity: .8; }
+.event-codes-page .type-facts dd { margin: 0; font-weight: 700; }
+
+/* Facet sidebar + list */
+.event-codes-page__body {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 24px;
+    margin-top: 20px;
+    align-items: start;
+}
+.event-codes-page .code-facets-toggle { display: none; }
+.event-codes-page .code-facets {
+    position: sticky;
+    top: 200px;
+    /* Scrolls on its own when taller than the space under the add row. */
+    max-height: calc(100vh - 220px);
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
 }
-
-.user-points-lookup .email-lookup__result {
+.event-codes-page .code-facets input[type="search"] { width: 100%; }
+.event-codes-page .code-facets fieldset { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; border: none; }
+.event-codes-page .code-facets legend { margin-bottom: 4px; font-weight: 700; font-size: var(--hsa-text-sm); color: var(--hsa-ink); }
+.event-codes-page .code-facets label {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 14px;
-    background: var(--hsa-surface);
-    border: 1.5px solid var(--hsa-border);
-    border-radius: 8px;
+    gap: 6px;
+    margin: 0;
+    padding: 2px 0;
+    font-size: var(--hsa-text-sm);
+    font-weight: 400;
+    color: var(--hsa-ink);
+    cursor: pointer;
 }
+.event-codes-page .code-facets label span { margin-left: auto; color: var(--hsa-muted); font-variant-numeric: tabular-nums; }
+.event-codes-page .code-facets label.is-zero { color: var(--hsa-muted-light); }
+.event-codes-page .code-facets label.is-earlier { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--hsa-border-light); }
+.event-codes-page .code-facets .link-button { align-self: flex-start; }
 
-.user-points-lookup .email-lookup__who {
+.event-codes-page .code-list__note { margin: 0 0 8px; color: var(--hsa-muted); font-size: var(--hsa-text-sm); }
+.event-codes-page .code-list__empty { padding: 24px; text-align: center; color: var(--hsa-muted); }
+.event-codes-page .code-block + .code-block { margin-top: 28px; }
+.event-codes-page .code-block__title { margin: 0 0 8px; text-align: left; font-size: var(--hsa-text-xl); color: var(--hsa-teal-700); }
+.event-codes-page .code-block__title span { font-size: var(--hsa-text-base); font-weight: 400; color: var(--hsa-muted); }
+.event-codes-page .code-week h3 { margin: 16px 0 4px; text-align: left; font-size: var(--hsa-text-xs); font-weight: 600; color: var(--hsa-muted); }
+.event-codes-page .code-week ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--hsa-border); }
+
+.event-codes-page .code-row { border-bottom: 1px solid var(--hsa-border-light); background: var(--hsa-surface); }
+.event-codes-page .code-row__main {
+    display: grid;
+    grid-template-columns: 110px 140px minmax(0, 1fr) 190px 96px;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+    padding: 10px 8px;
+    border: none;
+    border-radius: 0;
+    background: none;
+    color: inherit;
+    font-size: var(--hsa-text-sm);
+    text-align: left;
+    box-shadow: none;
+    cursor: pointer;
+}
+.event-codes-page .code-row__main:hover { background: var(--hsa-surface-subtle); border: none; box-shadow: none; }
+.event-codes-page .code-row.is-open .code-row__main { background: var(--hsa-teal-100); }
+.event-codes-page .code-row__date { color: var(--hsa-muted); }
+.event-codes-page .code-row__code { overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: var(--hsa-teal-700); }
+.event-codes-page .code-row__count { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.event-codes-page .code-row__count small { color: var(--hsa-muted); }
+
+.event-codes-page .tier-chip {
+    justify-self: start;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: var(--hsa-text-xs);
+    font-weight: 600;
+    white-space: nowrap;
+}
+.event-codes-page .tier-chip--core { background: var(--hsa-teal-700); color: #fff; border: 1.5px solid var(--hsa-teal-700); }
+.event-codes-page .tier-chip--semester { background: var(--hsa-surface); color: var(--hsa-teal-700); border: 1.5px solid var(--hsa-teal-400); }
+.event-codes-page .tier-chip--additional { background: var(--hsa-surface); color: var(--hsa-muted); border: 1.5px dashed var(--hsa-muted-light); }
+.event-codes-page .tier-chip--none { background: var(--hsa-danger-bg); color: var(--hsa-danger-strong); border: 1.5px solid var(--hsa-danger-border); }
+
+/* An opened row: check-in count first, then the edit form. */
+.event-codes-page .code-row__detail { padding: 12px 8px 16px 130px; background: var(--hsa-teal-100); }
+.event-codes-page .code-row__checked-in { display: flex; align-items: baseline; gap: 10px; margin: 0 0 12px; }
+.event-codes-page .code-row__checked-in strong {
+    font-family: var(--hsa-font-display);
+    font-size: var(--hsa-text-3xl);
+    line-height: 1;
+    color: var(--hsa-teal-700);
+}
+.event-codes-page .code-row__checked-in span { color: var(--hsa-ink-soft); }
+.event-codes-page .code-edit { width: auto; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.event-codes-page .code-edit__fields { display: flex; flex-wrap: wrap; gap: 12px 16px; }
+.event-codes-page .code-edit__fields label {
     display: flex;
     flex-direction: column;
-    min-width: 0;
-}
-
-.user-points-lookup .email-lookup__name {
-    font-weight: 700;
+    gap: 4px;
+    margin: 0;
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
     color: var(--hsa-ink);
 }
+.event-codes-page .code-edit__fields small { font-weight: 400; color: var(--hsa-muted); }
+.event-codes-page .code-edit .type-facts { color: var(--hsa-ink); }
+.event-codes-page .code-edit__note { margin: 0; font-size: var(--hsa-text-sm); color: var(--hsa-ink-soft); }
+.event-codes-page .code-edit__error { margin: 0; font-size: var(--hsa-text-sm); font-weight: 600; color: var(--hsa-danger); }
+.event-codes-page .code-edit__actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.event-codes-page .code-edit__save {
+    padding: 9px 20px;
+    border: none;
+    border-radius: 6px;
+    background: var(--hsa-teal-600);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+.event-codes-page .code-edit__save:hover { background: var(--hsa-teal-800); border: none; box-shadow: none; }
+.event-codes-page .code-edit__delete { margin-left: auto; }
+/* Delete's "are you sure", in place of the action buttons. */
+.event-codes-page .code-edit__confirm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1.5px solid var(--hsa-danger-border);
+    border-radius: 6px;
+    background: var(--hsa-danger-bg);
+}
+.event-codes-page .code-edit__confirm p { flex: 1 1 200px; margin: 0; font-size: var(--hsa-text-sm); color: var(--hsa-danger-strong); }
+.event-codes-page .code-edit__confirm-delete {
+    padding: 9px 16px;
+    border: none;
+    border-radius: 6px;
+    background: var(--hsa-danger);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+.event-codes-page .code-edit__confirm-delete:hover { background: var(--hsa-danger-strong); border: none; box-shadow: none; }
 
-.user-points-lookup .email-lookup__email {
-    font-family: var(--hsa-font-mono);
-    font-size: 13px;
-    color: var(--hsa-teal-700);
-    word-break: break-all;
+@media (max-width: 800px) {
+    .event-codes-page { padding: 12px 16px 0; }
+    .event-codes-page .quick-add { position: static; }
+    .event-codes-page .quick-add :is(input, select, .quick-add__submit) { flex: 1 1 100%; }
+    /* Code and date share a row so the band isn't as tall. */
+    .event-codes-page .quick-add :is(.quick-add__code, .quick-add__date) { flex: 1 1 calc(50% - 4px); min-width: 0; }
+    /* Thumb-sized targets: 44px, Apple's and WCAG 2.5.5's size. */
+    .event-codes-page :is(input:not([type="checkbox"], [type="radio"]), select) { min-height: 44px; }
+    .event-codes-page :is(.quick-add__submit, .code-edit__save, .code-edit__confirm-delete) { min-height: 44px; }
+    .event-codes-page .link-button { min-height: 44px; padding: 10px 8px; }
+    .event-codes-page .code-facets label { min-height: 44px; padding: 0; }
+    .event-codes-page__body { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .event-codes-page .code-facets-toggle { display: inline-block; justify-self: start; }
+    .event-codes-page .code-facets { display: none; position: static; }
+    .event-codes-page .code-facets.is-open { display: flex; }
+    .event-codes-page .code-row__main {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: "code count" "event event" "date type";
+        gap: 4px 12px;
+        min-height: 48px;
+    }
+    .event-codes-page .code-row__code { grid-area: code; }
+    .event-codes-page .code-row__count { grid-area: count; }
+    .event-codes-page .code-row__event { grid-area: event; }
+    .event-codes-page .code-row__date { grid-area: date; }
+    .event-codes-page .code-row .tier-chip { grid-area: type; justify-self: end; }
+    .event-codes-page .code-row__detail { padding-left: 8px; }
+    .event-codes-page .code-edit__fields :is(label, .date-picker),
+    .event-codes-page .code-edit__fields :is(input, select) { width: 100%; }
+    .event-codes-page .code-edit__fields :is(label, .date-picker) { flex: 1 1 100%; }
 }
 
-.user-points-lookup .email-lookup__use {
-    flex-shrink: 0;
+/* Date picker (DatePicker.tsx, React Aria; see
+   docs/research/event-codes-date-picker.md). The field looks like the other
+   inputs; the calendar is portalled to <body>, so it's scoped by its own class.
+   The base-layer button look is reset on every button in both. */
+:where(.date-picker, .date-picker__popover) :where(button, button:hover, button:active) {
     min-width: 0;
     min-height: 0;
-    padding: 8px 14px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+.event-codes-page .date-picker { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.event-codes-page .date-picker__label { margin: 0; font-size: var(--hsa-text-sm); font-weight: 600; color: var(--hsa-ink); }
+.event-codes-page .date-picker__field {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 42px;
+    padding: 0 4px 0 10px;
     border: 1.5px solid var(--hsa-teal-600);
     border-radius: 6px;
     background: var(--hsa-surface);
-    color: var(--hsa-teal-600);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
+    transition: border-color .12s, box-shadow .12s;
 }
-
-.user-points-lookup .email-lookup__use:hover {
-    background: var(--hsa-teal-600);
-    color: #ffffff;
-    border-color: var(--hsa-teal-600);
-    box-shadow: none;
+.event-codes-page .quick-add .date-picker__field { border-color: transparent; }
+.event-codes-page .date-picker__field[data-hovered] { border-color: var(--hsa-teal-500); }
+.event-codes-page .date-picker__field[data-focus-within] {
+    border-color: var(--hsa-teal-500);
+    box-shadow: 0 0 0 3px rgba(21, 87, 118, 0.15);
 }
-
-@media (max-width: 480px) {
-    .user-points-lookup .email-lookup__result {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .user-points-lookup .email-lookup__use {
-        width: 100%;
-        padding: 10px;
-    }
-}
-
-/* ---- List of Codes card  (EditableCodesTable.tsx) ---------------------- */
-.editable-codes-table .codes-card {
-    padding: 20px;
-    background: var(--hsa-surface);
-    border: 2px solid var(--hsa-teal-600);
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-@media (max-width: 600px) {
-    .editable-codes-table .codes-card {
-        padding: 14px 10px;
-    }
-}
-
-/* ---- Create New Event Code toggle  (EventCodesPage.tsx) ----------------- */
-.create-code-toggle {
+.event-codes-page .date-picker__input {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    margin: 8px 0 16px;
-}
-
-.create-code-toggle .create-code-toggle__button {
+    flex: 1;
     min-width: 0;
-    min-height: 0;
-    padding: 12px 26px;
-    border: 2px solid var(--hsa-success);
-    border-radius: 8px;
-    background: var(--hsa-success);
-    color: #ffffff;
-    font-family: inherit;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-    transition: background-color 0.2s, transform 0.2s;
-}
-
-.create-code-toggle .create-code-toggle__button:hover {
-    background: var(--hsa-success-strong);
-    border-color: var(--hsa-success-strong);
-    transform: translateY(-1px);
-}
-
-.create-code-toggle .create-code-toggle__button[aria-expanded="true"] {
-    background: var(--hsa-muted);
-    border-color: var(--hsa-muted);
-}
-
-.create-code-toggle__done {
-    margin: 0;
-    color: var(--hsa-success);
-    font-weight: 700;
-}
-
-/* Smooth open/close: animates the row height from 0 to the form's height */
-.collapsible {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 0.3s ease;
-}
-
-.collapsible.is-open {
-    grid-template-rows: 1fr;
-    margin-bottom: 20px;
-}
-
-.collapsible__inner {
     overflow: hidden;
-    min-height: 0;
+    /* 16px so iOS doesn't zoom in on a segment. */
+    font-size: var(--hsa-text-base);
+    font-variant-numeric: tabular-nums;
+    color: var(--hsa-ink);
+    white-space: nowrap;
+}
+.event-codes-page .date-picker__segment { padding: 1px; border-radius: 3px; outline: none; caret-color: transparent; }
+.event-codes-page .date-picker__segment[data-type="literal"] { padding: 0; color: var(--hsa-muted); }
+.event-codes-page .date-picker__segment[data-placeholder] { color: var(--hsa-muted); }
+/* Mark the segment being typed into only when the keyboard is in use: a click
+   (which opens the calendar) leaves the numbers plain. */
+.event-codes-page .date-picker__field[data-focus-visible] .date-picker__segment[data-focused] { background: var(--hsa-teal-600); color: #fff; }
+.event-codes-page .date-picker__button {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    color: var(--hsa-teal-600);
+}
+.event-codes-page .date-picker__button[data-hovered],
+.event-codes-page .date-picker__button[data-pressed] { background: var(--hsa-teal-100); }
+.event-codes-page .date-picker__button[data-focus-visible] { outline: 3px solid var(--hsa-teal-400); outline-offset: 1px; }
+.event-codes-page .quick-add__more .date-picker { flex-direction: row; align-items: center; gap: 8px; }
+.event-codes-page .quick-add__more .date-picker__label { color: #fff; font-weight: 400; }
+.event-codes-page .quick-add__more .date-picker__field { width: 170px; }
+
+.date-picker__popover {
+    padding: 12px;
+    border: 1.5px solid var(--hsa-teal-600);
+    border-radius: 10px;
+    background: var(--hsa-surface);
+    box-shadow: 0 12px 32px rgba(15, 76, 100, 0.22);
+    font-family: var(--hsa-font-body);
+    color: var(--hsa-ink);
+    outline: none;
+}
+.date-picker__dialog { outline: none; }
+.date-picker__header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.date-picker__month { margin: 0; font-size: var(--hsa-text-base); font-weight: 700; color: var(--hsa-teal-700); }
+.date-picker__popover .date-picker__nav {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--hsa-teal-600);
+}
+.date-picker__popover .date-picker__nav[data-hovered] { background: var(--hsa-teal-100); }
+.date-picker__popover .date-picker__nav[data-focus-visible] { outline: 3px solid var(--hsa-teal-400); outline-offset: 1px; }
+.date-picker__grid { width: auto; margin: 0; border-collapse: separate; border-spacing: 2px; box-shadow: none; }
+.date-picker__grid :is(thead, tr, tr:hover) { background: none; }
+.date-picker__grid th {
+    padding: 4px 0;
+    border: none;
+    background: none;
+    font-size: var(--hsa-text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--hsa-muted);
+}
+.date-picker__grid td { padding: 0; border: none; background: none; }
+.date-picker__day {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: var(--hsa-text-sm);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    outline: none;
+    transition: background-color .1s, transform .1s;
+}
+.date-picker__day[data-outside-month] { visibility: hidden; }
+.date-picker__day[data-hovered] { background: var(--hsa-teal-100); }
+.date-picker__day[data-pressed] { transform: scale(.92); }
+/* Today: a teal ring. The picked day: solid teal. */
+.date-picker__day[data-today] { box-shadow: inset 0 0 0 1.5px var(--hsa-teal-500); font-weight: 700; color: var(--hsa-teal-700); }
+.date-picker__day[data-selected] { background: var(--hsa-teal-600); color: #fff; font-weight: 700; }
+.date-picker__day[data-focus-visible] { outline: 3px solid var(--hsa-teal-400); outline-offset: 1px; }
+.date-picker__shortcuts {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--hsa-teal-100);
+}
+.date-picker__popover .date-picker__shortcut {
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--hsa-teal-100);
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    color: var(--hsa-teal-700);
+    transition: background-color .1s, transform .1s;
+}
+.date-picker__popover .date-picker__shortcut[data-hovered] { background: #cde6f7; }
+.date-picker__popover .date-picker__shortcut[data-pressed] { transform: scale(.95); }
+.date-picker__popover .date-picker__shortcut[data-focus-visible] { outline: 3px solid var(--hsa-teal-400); outline-offset: 2px; }
+.date-picker__popover .date-picker__shortcut--clear { margin-left: auto; background: none; color: var(--hsa-danger); }
+.date-picker__popover .date-picker__shortcut--clear[data-hovered] { background: var(--hsa-danger-bg); }
+
+/* A short open: fade and slide a few px. Nothing moves with reduced motion on. */
+@media (prefers-reduced-motion: no-preference) {
+    .date-picker__popover[data-entering] { animation: date-picker-in .15s ease-out; }
+    .date-picker__popover[data-exiting] { animation: date-picker-in .1s ease-in reverse; }
+}
+@keyframes date-picker-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* ---- Event Codes page frame  (EventCodesPage.tsx) ---------------------- */
-.event-codes-page {
-    padding-top: 12px;
+/* Phones: a 44px field like the other inputs. */
+@media (max-width: 800px) {
+    .event-codes-page .date-picker__field { height: 44px; }
 }
 
-/* One-time admin export at the bottom of the page */
+/* Touch screens: thumb-sized days, arrows and chips. */
+@media (pointer: coarse) {
+    .date-picker__day { width: 44px; height: 44px; font-size: var(--hsa-text-base); }
+    .date-picker__popover .date-picker__nav { width: 44px; height: 44px; }
+    .date-picker__popover .date-picker__shortcut { min-height: 44px; padding: 10px 16px; }
+}
+/* Seven 44px days don't fit a 320px phone. */
+@media (pointer: coarse) and (max-width: 359px) {
+    .date-picker__popover { padding: 8px; }
+    .date-picker__day { width: 38px; height: 38px; }
+}
+
+/* One-time admin export at the bottom of the page. The big top margin keeps
+   it clear of the facet sidebar, which is sticky and ends right above it. */
 .admin-tool-card {
     max-width: 1100px;
-    margin: 10px auto 20px;
+    margin: 56px auto 20px;
     padding: 20px;
     text-align: center;
     background: var(--hsa-surface);
@@ -1866,6 +1675,6 @@
 
 @media (max-width: 600px) {
     .admin-tool-card {
-        margin: 10px 10px 20px;
+        margin: 40px 10px 20px;
     }
 }

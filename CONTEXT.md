@@ -28,13 +28,13 @@ MLP Fall or MLP Spring, each run by its own cabinet. An MLP Open event records w
 _Avoid_: Cohort (for the program that hosted an event)
 
 **E-Board**:
-Members on the executive board. Exempt from Core Events, Semester Requirements and Strikes; they may still redeem codes to follow their own progress, but nothing is required of them.
+Members on the executive board. Exempt from Core Events, Semester Requirements and Strikes; they may still redeem codes to follow their own progress, but nothing is required of them. Their dashboard and Requirements page use the Cabinet view but say "Exempt" where a Cabinet Member would see progress and Tier 1 to-dos.
 
 **Web-team Tester**:
 A Member on the web team who is held to the Cabinet Member rules so the Cabinet view can be tested on a real account. Not the same as E-Board: being a tester grants no E-Board tools.
 
 **Own View**:
-The dashboard a Member is really held to: the General Member view for General Members, MLP Members and E-Board; the Cabinet Member view for Cabinet Members and Web-team Testers. E-Board and Web-team Testers may switch to the other view to check it works; the dashboard always marks which one is their Own View.
+The dashboard a Member lands on: the General Member view for General Members and MLP Members; the Cabinet Member view for Cabinet Members, Web-team Testers and E-Board. For E-Board the Cabinet view is presentation only: they are still exempt from its requirements. E-Board and Web-team Testers may switch to the other view to check it works; the dashboard always marks which one is their Own View.
 _Avoid_: Role (a view is what is shown, not what the Member is)
 
 ### Events and points
@@ -55,7 +55,11 @@ A Member's claim, with photo proof, that they attended an event, usually one who
 _Avoid_: Manual points
 
 **Adjustment**:
-Points E-Board added by hand that don't trace back to any event, carried with a note of why.
+Points E-Board granted by hand that don't trace back to any event, carried with a note of why: a Point Request that fits no Event Type, approved as an Adjustment. Undoing a Point Request approved by mistake is revoking it; taking away a code check-in is a Removed Check-in. Neither is a negative Adjustment.
+
+**Removed Check-in**:
+An Attendance from a redeemed code that E-Board took away with a reason, e.g. a code used without attending. The Member is treated as never having attended: the event's points go, a Core Event becomes a Missed Event (with a Strike unless excused), and anything it made up is owed again. The Member sees that it was removed and why, and can't redeem that code again; if they really were there, E-Board approves a Point Request for it instead.
+_Avoid_: Revoke (that's for Point Requests), deduction
 
 **Cabinet Points**:
 The points a Cabinet Member earns toward Graduating Cabinet — each Event Type's cabinet value (a GBM is worth 1 Cabinet Point).
@@ -74,11 +78,11 @@ Reaching 20 Cabinet Points. 20 is a target, not a cap: Cabinet Points keep count
 ### Cabinet requirements
 
 **Core Events** (Tier 1):
-The events a Cabinet Member attends every one of over the year: Cabinet Thursdays, GBMs, Cabinet Retreats, Cabinet Orientation, HLSA, and one HLHM event (any HLHM event counts).
+The events a Cabinet Member attends every one of over the year: Cabinet Thursdays, GBMs, Cabinet Retreats, Cabinet Orientation and HLSA.
 _Avoid_: Required events, cabinet-required events
 
 **Semester Requirements** (Tier 2):
-One of each per semester: OPA General, OPA Solidarity Session, HSA Programming, HSA Operations, HSA Fundraising, HSA Service, Affiliate Org event (waived for Cabinet Members on the MLP Fall or MLP Spring cabinet; an HLHM event does not count, since HLHM is a program, not an affiliate), Tabling (1 hour; each hour tabled is its own Attendance), Internal Social.
+One of each per semester: OPA General, OPA Solidarity Session, HSA Programming, HSA Operations, HSA Fundraising, HSA Service, Affiliate Org event (waived for Cabinet Members on the MLP Fall or MLP Spring cabinet; an HLHM event does not count, since HLHM is a program, not an affiliate), Tabling (1 hour; each hour tabled is its own Attendance), Internal Social. HLHM is also a Tier 2 Semester Requirement, but once for the whole year rather than once per Semester: any one HLHM event fills it (they only run Sept 15 – Oct 15, so it shows in Fall and Spring has nothing to do), and skipping one is never a Missed Event or a Strike.
 
 **Internal Social**:
 A social open only to Cabinet Members, not the general public (e.g. the Lake Wauburg trip). A Semester Requirement.

@@ -9,6 +9,26 @@ html, body {
   overflow-x: hidden;
 }
 
+/* Sticky bars must never cover the focused element (WCAG 2.4.11).
+   SiteHeader measures its own height into --site-header-height; layout.css
+   adds the phone tab bar's scroll-padding-bottom. */
+html {
+  scroll-padding-top: calc(var(--site-header-height, 72px) + 8px);
+}
+
+/* Read by screen readers, not shown. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Wrap a wide <table> in this so it scrolls sideways inside its own box
    (overflow-x on the <table> itself does nothing). */
 .table-scroll {
@@ -448,14 +468,191 @@ h1, h2, h3, h4, h5, h6 {
   outline-offset: 2px;
 }
 
-/* Shown while a lazily-loaded route chunk arrives (see the lazy() calls in
-   App.tsx). Reserves height so the header/footer don't jump. */
-.route-loading {
+/* Loading screen (components/ui/LoadingScreen.tsx). Used full-page before the
+   header exists, and under the header while a lazily-loaded route chunk arrives
+   (see the lazy() calls in App.tsx), where the height keeps the header/footer
+   from jumping. The logo is the white PNG tinted teal through a mask; the
+   shine sweeps at a constant speed. It fades in after 150ms so quick loads
+   never flash it. */
+.loading-screen {
   min-height: 50vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #155776;
-  font-size: 1.1rem;
-  font-weight: 600;
+  animation: loading-screen-in 0.12s ease 0.15s backwards;
 }
+.loading-screen--page {
+  min-height: 100vh;
+  background: var(--hsa-page);
+}
+.loading-screen__logo {
+  position: relative;
+  width: 170px;
+  height: 150px;
+}
+.loading-screen__base,
+.loading-screen__shine {
+  position: absolute;
+  inset: 0;
+  -webkit-mask: url(/hsa-logo-white.png) center / contain no-repeat;
+  mask: url(/hsa-logo-white.png) center / contain no-repeat;
+}
+.loading-screen__base {
+  background: var(--hsa-teal-600);
+  opacity: 0.22;
+}
+.loading-screen__shine {
+  background: linear-gradient(105deg, transparent 35%, var(--hsa-teal-600) 50%, transparent 65%) 200% 0 / 250% 100%;
+  /* Starts with the fade-in and takes 0.6s, so a full sweep completes inside
+     the 600ms minimum display time (useMinLoadingTime). */
+  animation: loading-screen-sweep 0.6s linear 0.15s infinite backwards;
+}
+@keyframes loading-screen-sweep { to { background-position: -100% 0; } }
+@keyframes loading-screen-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .loading-screen__shine { animation-duration: 2s; }
+}
+
+/* Find a member by name (components/members/MemberSearch.tsx), on Excuse
+   Absence and User Lookup: a big search box with the closest names under it. */
+.member-search {
+  position: relative;
+  margin-bottom: 20px;
+  font-family: var(--hsa-font-body);
+  text-align: left;
+  color: var(--hsa-ink);
+}
+
+/* Two classes so a page's own `.page input[type=text]` rule can't restyle it. */
+.member-search .member-search__input[type=text] {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1.5px solid var(--hsa-teal-700);
+  border-radius: 6px;
+  font: inherit;
+  font-size: var(--hsa-text-lg);
+  background: var(--hsa-surface);
+  color: var(--hsa-ink);
+}
+
+.member-search :focus-visible {
+  outline: 3px solid rgba(15, 76, 100, 0.35);
+  outline-offset: 2px;
+}
+
+/* Absolutely positioned so a long result list overlays whatever is below
+   (e.g. Point Request Review's Filter by status) instead of pushing it down. */
+.member-search .member-search__results {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 360px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 4px;
+  border: 1px solid var(--hsa-border);
+  border-radius: 8px;
+  background: var(--hsa-surface);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .12);
+}
+
+.member-search .member-search__results button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  font-family: inherit;
+  font-size: var(--hsa-text-base);
+  text-align: left;
+  color: var(--hsa-ink);
+  cursor: pointer;
+}
+
+.member-search .member-search__results button:hover {
+  background: var(--hsa-teal-100);
+}
+
+.member-search .member-search__muted {
+  color: var(--hsa-muted);
+  font-weight: 400;
+  font-size: var(--hsa-text-sm);
+}
+
+.member-search .member-search__empty {
+  margin: 8px;
+  color: var(--hsa-muted);
+  font-size: var(--hsa-text-sm);
+}
+
+/* A small form that takes points away: revoking an approved Point Request
+   (pages/eboard/pointRequests/RevokeForm.tsx) and User Lookup's "Take away
+   points". A red outline button opens it; Cancel and a red confirm close it. */
+.danger-form__open {
+  min-width: 0;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1.5px solid var(--hsa-danger);
+  border-radius: 6px;
+  background: var(--hsa-surface);
+  color: var(--hsa-danger-strong);
+  font: inherit;
+  font-size: var(--hsa-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.danger-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--hsa-danger-border);
+  border-radius: 8px;
+  background: var(--hsa-danger-bg);
+  font-size: var(--hsa-text-sm);
+  text-align: left;
+}
+
+.danger-form label { font-weight: 700; }
+
+.danger-form input,
+.danger-form textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--hsa-border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.danger-form__hint { margin: 0; color: var(--hsa-ink-soft); }
+.danger-form__error { margin: 0; color: var(--hsa-danger-strong); }
+.danger-form__actions { display: flex; gap: 8px; }
+
+.danger-form__cancel,
+.danger-form__confirm {
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 6px;
+  font: inherit;
+  font-size: var(--hsa-text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.danger-form__cancel { border: 1px solid var(--hsa-border); background: var(--hsa-surface); color: var(--hsa-ink); }
+.danger-form__confirm { border: 1px solid var(--hsa-danger); background: var(--hsa-danger); color: #ffffff; }
+.danger-form__cancel:disabled, .danger-form__confirm:disabled { opacity: 0.6; cursor: not-allowed; }

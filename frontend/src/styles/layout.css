@@ -3,8 +3,10 @@
    ======================================================================== */
 
 /* ---- Site header (SiteHeader.tsx) ---------------------------------------
-   Logo + title on the left (links to /dashboard), nav links, Logout on the
-   right. Below 900px the links and Logout move into a dropdown menu. */
+   ≥600px: logo + title, the page links, E-Board ▾, Account ▾ (top right).
+   <600px: logo + Account on top (with the E-Board tools inside), the pages
+   in the bottom tab bar below. */
+
 .site-header {
     position: sticky;
     top: 0;
@@ -17,10 +19,10 @@
 .site-header__bar {
     display: flex;
     align-items: center;
-    gap: 28px;
+    gap: 24px;
     max-width: 1180px;
     margin: 0 auto;
-    padding: 10px 24px;
+    padding: 8px 24px;
     min-height: 68px;
 }
 
@@ -53,80 +55,130 @@
 .site-header__nav {
     display: flex;
     align-items: center;
-    gap: 26px;
+    gap: 4px;
     flex: 1;
+    min-width: 0;
 }
 
-.site-header__link {
-    color: rgba(255, 255, 255, 0.82);
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 500;
-    padding: 4px 0;
-    border-bottom: 2px solid transparent;
-    transition: color 0.2s, border-color 0.2s;
-}
-
-.site-header__link:hover,
-.site-header__link.is-active {
-    color: #ffffff;
-    border-bottom-color: rgba(255, 255, 255, 0.85);
-}
-
-/* E-Board dropdown (desktop) */
-.site-header__dropdown {
-    position: relative;
-}
-
-.site-header__dropdown-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+/* Every control in the bar opts out of base.css's button look. :where()
+   keeps this at element specificity, so each control's own class wins. */
+:where(.site-header) button {
     min-width: 0;
     min-height: 0;
     margin: 0;
-    border-radius: 0;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-    background: transparent;
     font-family: inherit;
     cursor: pointer;
 }
 
-.site-header__dropdown-toggle:hover,
-.site-header__dropdown-toggle:active {
-    background: transparent;
+:where(.site-header) button:hover,
+:where(.site-header) button:active {
     box-shadow: none;
-    border-top: none;
-    border-left: none;
-    border-right: none;
+}
+
+/* Page links and the E-Board toggle: 44px tall targets. The active page gets
+   an underline and bold text as well as the brighter colour. */
+.site-header__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.site-header__link::after {
+    content: '';
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 6px;
+    height: 3px;
+    border-radius: 2px;
+    background: transparent;
+}
+
+.site-header .site-header__link:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    border: none;
+}
+
+.site-header__link[aria-current='page'],
+.site-header__link.is-active {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.site-header__link[aria-current='page']::after,
+.site-header__link.is-active::after {
+    background: #ffffff;
 }
 
 .site-header__caret {
     font-size: 12px;
 }
 
-.site-header__dropdown-menu {
-    /* Same look as the phone menu: teal panel, white links */
+.site-header__link:focus-visible,
+.site-header .site-header__account-toggle:focus-visible,
+.site-header__brand:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 2px;
+}
+
+/* E-Board ▾ and Account ▾ panels (disclosures, not role="menu") */
+.site-header__dropdown,
+.site-header__account {
+    position: relative;
+}
+
+.site-header__panel {
     position: absolute;
-    top: calc(100% + 14px);
-    left: 50%;
-    transform: translateX(-50%);
+    top: calc(100% + 10px);
+    left: 0;
     min-width: 250px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
     padding: 8px;
     background: linear-gradient(135deg, var(--hsa-teal-700) 0%, var(--hsa-teal-600) 100%);
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 10px;
     box-shadow: 0 10px 24px rgba(15, 23, 42, 0.3);
     z-index: 110;
+    /* View as + the E-Board tools can outgrow a short screen: scroll inside */
+    max-height: calc(100vh - var(--site-header-height, 72px) - 16px);
+    overflow-y: auto;
 }
 
-.site-header__dropdown-link {
-    padding: 10px 12px;
+.site-header__panel[hidden] {
+    display: none;
+}
+
+.site-header__panel--end {
+    left: auto;
+    right: 0;
+}
+
+.site-header__panel ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.site-header__panel-link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 12px;
     border-radius: 8px;
     color: #ffffff;
     text-decoration: none;
@@ -135,141 +187,272 @@
     white-space: nowrap;
 }
 
-.site-header__dropdown-link:hover,
-.site-header__dropdown-link.is-active {
+.site-header__panel-link:hover {
     background: rgba(255, 255, 255, 0.12);
 }
 
-/* E-Board tools in the phone menu */
-.site-header__menu-heading {
-    margin: 8px 0 2px;
-    padding: 0 10px;
-    color: rgba(255, 255, 255, 0.6);
+.site-header__panel-link[aria-current='page'] {
+    background: rgba(255, 255, 255, 0.18);
+    font-weight: 700;
+    box-shadow: inset 3px 0 0 #ffffff;
+}
+
+.site-header__panel-link:focus-visible,
+.site-header .site-header__logout:focus-visible,
+.site-header__view:has(input:focus-visible) {
+    outline: 3px solid #ffffff;
+    outline-offset: -3px;
+}
+
+/* Account ▾ */
+.site-header__account {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.site-header .site-header__account-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 2px solid #ffffff;
+    border-radius: 8px;
+    background: transparent;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.site-header .site-header__account-toggle:hover,
+.site-header .site-header__account-toggle[aria-expanded='true'] {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: #ffffff;
+}
+
+.nav-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* The second "you're previewing" signal, next to the banner */
+.site-header__badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--hsa-teal-700);
+    border-radius: 50%;
+    background: var(--hsa-accent);
+}
+
+.site-header__views {
+    margin: 0 0 6px;
+    padding: 0 0 8px;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* The Account panel's E-Board tools, between View as and Log out. Phones
+   only: wider screens have E-Board ▾ in the bar. */
+@media (min-width: 600px) {
+    .site-header__tools {
+        display: none;
+    }
+}
+
+.site-header__tools {
+    margin: 0 0 8px;
+    padding: 0 0 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.site-header__views legend,
+.site-header .site-header__group {
+    padding: 4px 12px 6px;
+    color: rgba(255, 255, 255, 0.8);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
-.site-header__menu-link--sub {
-    padding-left: 22px;
-    font-size: 15px;
+.site-header .site-header__group {
+    margin: 0;
+    font-family: inherit;
+    line-height: normal;
+    text-align: left;
 }
 
-/* Boxed like the site's other secondary buttons, in white on the teal bar */
-.site-header__logout {
+.site-header__view {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0 12px;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 15px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.site-header__view:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.site-header__view input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--hsa-accent);
+}
+
+.site-header__yours {
     margin-left: auto;
-    min-width: 0;
-    min-height: 0;
-    padding: 8px 18px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--hsa-teal-700);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.site-header .site-header__logout {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 12px;
     border: 2px solid #ffffff;
     border-radius: 8px;
     background: transparent;
     color: #ffffff;
-    font-family: inherit;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
-    letter-spacing: 0.3px;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s, transform 0.2s;
+    text-align: center;
 }
 
-.site-header__logout:hover {
+.site-header .site-header__logout:hover {
     background: var(--hsa-surface);
     color: var(--hsa-teal-700);
     border-color: #ffffff;
-    box-shadow: none;
-    transform: translateY(-1px);
 }
 
-.site-header__logout:active {
-    background: var(--hsa-border-light);
-    color: var(--hsa-teal-700);
-    transform: translateY(0);
-    box-shadow: none;
-}
-
-.site-header__menu-toggle {
-    display: none;
-    margin-left: auto;
-    min-width: 0;
-    min-height: 0;
-    width: 42px;
-    height: 42px;
-    padding: 0;
-    border: 2px solid rgba(255, 255, 255, 0.7);
-    border-radius: 8px;
-    background: transparent;
-    color: #ffffff;
-    cursor: pointer;
-}
-
-.site-header__menu-toggle:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: #ffffff;
-    box-shadow: none;
-}
-
-.site-header__menu-toggle svg {
-    display: block;
-    width: 20px;
-    height: 20px;
-    margin: 0 auto;
-}
-
-.site-header__menu {
+/* Preview banner: "Viewing as Cabinet Member. Not your view." */
+.site-header__preview {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: 8px 16px 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 16px;
+    padding: 8px 24px;
+    background: var(--hsa-warm-bg-strong);
+    border-top: 3px solid var(--hsa-warm-edge);
+    color: var(--hsa-warm-ink);
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: center;
 }
 
-.site-header__menu-link {
-    padding: 12px 10px;
+.site-header__preview p {
+    margin: 0;
+}
+
+.site-header .site-header__preview button {
+    min-height: 44px;
+    padding: 0 14px;
+    border: 2px solid var(--hsa-warm-ink);
     border-radius: 8px;
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 500;
-}
-
-.site-header__menu-link:hover,
-.site-header__menu-link.is-active {
-    background: rgba(255, 255, 255, 0.12);
-}
-
-.site-header__logout--menu {
-    margin: 10px 0 0;
-    padding: 12px;
-    font-size: 15px;
-}
-
-/* Temp-Cabinet Points sits just left of Logout */
-.site-header__temp {
+    background: #ffffff;
+    color: var(--hsa-warm-ink);
+    font-size: 14px;
+    font-weight: 700;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
-.site-header__temp + .site-header__logout {
-    margin-left: 0;
+.site-header .site-header__preview button:hover {
+    background: var(--hsa-warm-bg);
+    border-color: var(--hsa-warm-ink);
 }
 
-@media (max-width: 900px) {
-    .site-header__nav,
-    .site-header__bar > .site-header__temp,
-    .site-header__bar > .site-header__logout {
+.site-header .site-header__preview button:focus-visible {
+    outline: 3px solid var(--hsa-warm-ink);
+    outline-offset: 2px;
+}
+
+/* ---- Bottom tab bar (SiteHeader.tsx, phone only) ----------------------- */
+.tab-bar {
+    display: none;
+}
+
+/* Narrow desktop: drop the title so the links, E-Board ▾ and Account fit
+   on one line */
+@media (max-width: 960px) {
+    .site-header__title {
         display: none;
     }
 
-    .site-header__menu-toggle {
-        display: block;
+    .site-header__bar {
+        gap: 12px;
+        padding: 8px 16px;
+    }
+
+    .site-header__link {
+        padding: 0 10px;
+        font-size: 14px;
+    }
+
+    .site-header__link::after {
+        left: 10px;
+        right: 10px;
     }
 }
 
-@media (max-width: 480px) {
+/* 600–759px: the links, E-Board ▾ and Account only fit with tighter links and
+   Account as icon + caret (its label stays for screen readers) */
+@media (min-width: 600px) and (max-width: 759.98px) {
     .site-header__bar {
-        padding: 8px 14px;
-        gap: 12px;
+        gap: 8px;
+    }
+
+    .site-header__nav {
+        gap: 0;
+    }
+
+    .site-header__link {
+        padding: 0 7px;
+    }
+
+    .site-header__link::after {
+        left: 7px;
+        right: 7px;
+    }
+
+    .site-header .site-header__account-toggle {
+        gap: 4px;
+        padding: 0 10px;
+    }
+
+    .site-header__account-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 599.98px) {
+    .site-header__nav {
+        display: none;
+    }
+
+    .site-header__bar {
         min-height: 60px;
     }
 
@@ -277,8 +460,98 @@
         width: 42px;
     }
 
-    .site-header__title {
-        font-size: 14px;
+    .site-header__preview {
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 6px 16px;
+        font-size: 13px;
+        text-align: left;
+    }
+
+    .site-header .site-header__preview button {
+        padding: 0 10px;
+        font-size: 13px;
+    }
+
+    .tab-bar {
+        display: block;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 100;
+        padding-bottom: env(safe-area-inset-bottom);
+        background: var(--hsa-surface);
+        border-top: 1px solid var(--hsa-border);
+        box-shadow: 0 -4px 14px rgba(15, 23, 42, 0.12);
+    }
+
+    /* Equal cells when the labels fit; wider cells for long labels rather
+       than truncating them ("Requirements" on a narrow phone) */
+    .tab-bar ul {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(min-content, 1fr);
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .tab-bar__tab {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        min-height: 60px;
+        padding: 6px 2px;
+        color: var(--hsa-muted);
+        text-decoration: none;
+    }
+
+    .tab-bar__pill {
+        display: grid;
+        place-items: center;
+        width: 52px;
+        max-width: 100%;
+        height: 28px;
+        border-radius: 999px;
+        transition: background-color 0.2s;
+    }
+
+    .tab-bar__label {
+        white-space: nowrap;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    /* Active: a filled pill and bold label, not colour alone */
+    .tab-bar__tab.is-active {
+        color: var(--hsa-teal-700);
+    }
+
+    .tab-bar__tab.is-active .tab-bar__pill {
+        background: var(--hsa-teal-100);
+        box-shadow: inset 0 0 0 1.5px var(--hsa-teal-600);
+    }
+
+    .tab-bar__tab.is-active .tab-bar__label {
+        font-weight: 700;
+    }
+
+    .tab-bar__tab:focus-visible {
+        outline: 3px solid var(--hsa-teal-600);
+        outline-offset: -3px;
+    }
+
+    /* Keep the tab bar off the focused element and the footer's last line */
+    html {
+        scroll-padding-bottom: calc(68px + env(safe-area-inset-bottom));
+    }
+
+    .app-shell--signed-in > .site-footer {
+        padding-bottom: calc(60px + env(safe-area-inset-bottom));
     }
 }
 
@@ -295,7 +568,7 @@
 
 /* Every routed page is a direct flex child here. A page root that centers
    its own content with `margin: 0 auto` (e.g. .point-request-review,
-   .user-points-lookup, .approvals) has an auto cross-axis margin, which
+   .ulk, .approvals) has an auto cross-axis margin, which
    makes a flex item shrink-wrap to its content's width instead of
    stretching — collapsing the page down to a single narrow column no
    matter how wide the window is. Force every page root to take the full

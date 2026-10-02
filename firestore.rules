@@ -44,7 +44,7 @@ service cloud.firestore {
       return [
         'mlpCohort', 'heldToCabinetRules', 'webTeam',
         'excusals', 'strikeRemovals', 'missedEventOverrides', 'adjustments',
-        'absenceLog'
+        'absenceLog', 'removedCheckIns'
       ];
     }
 
@@ -104,7 +104,9 @@ service cloud.firestore {
           attendance.source == 'code' &&
           id == callerEmail() + '__' + attendance.codeId &&
           attendance.eventTypeId == code.eventTypeId &&
-          attendance.eventDate == code.eventDate;
+          attendance.eventDate == code.eventDate &&
+          // E-Board removed this check-in (a Removed Check-in): not again.
+          !(attendance.codeId in get(/databases/$(database)/documents/users/$(callerEmail())).data.get('removedCheckIns', {}));
       }
 
       // Every Attendance ID starts `{email}__` (ADR-0002).
@@ -127,7 +129,12 @@ service cloud.firestore {
     match /pointRequests/{id} {
       allow get, list: if isEboard() ||
         (signedIn() && resource.data.userEmail == callerEmail());
-      allow create: if signedIn() && request.resource.data.userEmail == callerEmail();
+      // A Member submits their own request, and only for review: approving
+      // or denying it is E-Board's.
+      allow create: if signedIn() &&
+        request.resource.data.userEmail == callerEmail() &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.get('reviewedBy', null) == null;
       allow update, delete: if isEboard();
     }
 

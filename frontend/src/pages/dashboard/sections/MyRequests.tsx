@@ -109,7 +109,10 @@ function MyRequests() {
                                 <span className="request-card__activity">
                                     {request.activityName} — {formatDate(request.date)}
                                 </span>
-                                <span className="request-card__points">+{request.pointsRequested} pts</span>
+                                {/* 0 when E-Board picks the Event Type on review ("Not listed"). */}
+                                {request.pointsRequested > 0 && (
+                                    <span className="request-card__points">+{request.pointsRequested} pts</span>
+                                )}
                             </div>
 
                             <div className="request-card__status">

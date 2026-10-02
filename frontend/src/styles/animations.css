@@ -107,20 +107,6 @@
     animation: none;
 }
 
-/* The dashboard's points block (PointsOverview) is one section holding
-   every card, so fading it as a whole barely reads as an animation. It
-   hands the job to its cards instead — `.hsa-reveal` on `.user-results`
-   cascades My Information, Points Summary, the event code form, My Events
-   Attended and Points by Category one after another, the way the E-Board
-   User Lookup page cascades its sections. The block itself stops animating
-   so the two fades can't stack and muddy each other; the cards mount when
-   Firestore answers, which is the moment there's something to show.
-   Scoped to .formDash, so the E-Board page (where .user-points-lookup is
-   the page root) keeps fading as one piece. */
-.app-shell > .formDash > .user-points-lookup {
-    animation: none;
-}
-
 /* ---- 2. Tab panels ------------------------------------------------------
    Submit Request / My Requests (PointTabs.tsx). The panel is keyed on the
    active tab, so React replaces it on every click and the card inside

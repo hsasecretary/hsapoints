@@ -1,8 +1,9 @@
-// Redeeming an event code, end to end through the real firestore.rules (#69).
+// Redeeming an event code, and E-Board removing a check-in, end to end through the real firestore.rules (#69).
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import { MEMBER, memberDoc, readPastRules, seed, signedInAs, startEmulator } from '../test/emulator';
-import { redeemCode } from './redeemCode';
+import { doc, setDoc } from 'firebase/firestore';
+import { EBOARD, MEMBER, memberDoc, readPastRules, seed, signedInAs, startEmulator } from '../test/emulator';
+import { redeemCode, removeCheckIn } from './redeemCode';
 
 const TODAY = '2026-09-25';
 
@@ -22,7 +23,7 @@ beforeEach(async () => {
         [`users/${MEMBER}`]: memberDoc(MEMBER),
         'codes/GBM1': {
             event: 'GBM 1', eventTypeId: 'gbm', eventDate: TODAY, attendeeCount: 0,
-            // The old per-event fields, still set on codes until the Event Codes page is rebuilt.
+            // The old per-event fields, still on codes made before Event Types.
             category: 'GBM', points: 2, semester: 'fallPoints', voterEligible: true,
         },
     });
@@ -144,5 +145,77 @@ describe('redeeming an event code', () => {
             expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'CT1', { today: TODAY, viewingAsCabinet: true }))
                 .toEqual({ ok: true });
         });
+    });
+});
+
+describe('E-Board removing a check-in', () => {
+    const notThere = { reason: 'Not there', reviewer: EBOARD, today: TODAY };
+
+    beforeEach(async () => {
+        await seed(env, { [`users/${EBOARD}`]: memberDoc(EBOARD, { eboard: true }) });
+        await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM1', { today: TODAY });
+    });
+
+    it('deletes the Attendance, un-counts it and records why, who and when', async () => {
+        const result = await removeCheckIn(signedInAs(env, EBOARD), `${MEMBER}__GBM1`, { reason: " Used a friend's code ", reviewer: EBOARD, today: '2026-09-27' });
+
+        expect(result).toEqual({ ok: true });
+        expect(await readPastRules(env, `attendances/${MEMBER}__GBM1`)).toBeUndefined();
+        expect((await readPastRules(env, 'codes/GBM1'))?.attendeeCount).toBe(0);
+        expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({
+            eventCodes: [],
+            fallPoints: 0,
+            gbmPointsVE: 0,
+            removedCheckIns: {
+                GBM1: { event: 'GBM 1', eventTypeId: 'gbm', eventDate: TODAY, reason: "Used a friend's code", by: EBOARD, on: '2026-09-27' },
+            },
+        });
+    });
+
+    it("won't let the Member check in with that code again", async () => {
+        await removeCheckIn(signedInAs(env, EBOARD), `${MEMBER}__GBM1`, notThere);
+
+        expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM1', { today: TODAY })).toEqual({ ok: false, reason: 'removed' });
+        expect(await readPastRules(env, `attendances/${MEMBER}__GBM1`)).toBeUndefined();
+    });
+
+    it("won't let the Member write that Attendance back around the app", async () => {
+        await removeCheckIn(signedInAs(env, EBOARD), `${MEMBER}__GBM1`, notThere);
+
+        await expect(setDoc(doc(signedInAs(env, MEMBER), 'attendances', `${MEMBER}__GBM1`), {
+            email: MEMBER, eventTypeId: 'gbm', eventDate: TODAY, source: 'code', codeId: 'GBM1',
+        })).rejects.toThrow();
+    });
+
+    it('needs a reason', async () => {
+        expect((await removeCheckIn(signedInAs(env, EBOARD), `${MEMBER}__GBM1`, { ...notThere, reason: '  ' })).ok).toBe(false);
+        expect(await readPastRules(env, `attendances/${MEMBER}__GBM1`)).toBeDefined();
+    });
+
+    it('only removes a check-in the Member made with the code, not one a Point Request made', async () => {
+        await seed(env, {
+            'codes/SALSA': { event: 'Salsa', eventTypeId: 'hsa-programming', eventDate: TODAY, attendeeCount: 1 },
+            [`attendances/${MEMBER}__SALSA`]: { email: MEMBER, eventTypeId: 'hsa-programming', eventDate: TODAY, source: 'request', codeId: 'SALSA', requestId: 'r1' },
+        });
+        const db = signedInAs(env, EBOARD);
+
+        expect((await removeCheckIn(db, `${MEMBER}__SALSA`, notThere)).ok).toBe(false);
+        expect((await removeCheckIn(db, `${MEMBER}__NOPE`, notThere)).ok).toBe(false);
+        expect(await readPastRules(env, `attendances/${MEMBER}__SALSA`)).toBeDefined();
+    });
+
+    it('finds a code stored in mixed case, and keys the removal upper-cased', async () => {
+        await seed(env, {
+            'codes/Salsa2': { event: 'Salsa', eventTypeId: 'hsa-programming', eventDate: TODAY, attendeeCount: 1 },
+            [`attendances/${MEMBER}__Salsa2`]: { email: MEMBER, eventTypeId: 'hsa-programming', eventDate: TODAY, source: 'code', codeId: 'Salsa2' },
+        });
+
+        expect(await removeCheckIn(signedInAs(env, EBOARD), `${MEMBER}__Salsa2`, notThere)).toEqual({ ok: true });
+        expect((await readPastRules(env, 'codes/Salsa2'))?.attendeeCount).toBe(0);
+        expect((await readPastRules(env, `users/${MEMBER}`))?.removedCheckIns).toHaveProperty('SALSA2');
+    });
+
+    it('is E-Board only', async () => {
+        await expect(removeCheckIn(signedInAs(env, MEMBER), `${MEMBER}__GBM1`, { ...notThere, reviewer: MEMBER })).rejects.toThrow();
     });
 });

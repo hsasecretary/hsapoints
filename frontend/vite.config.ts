@@ -1,9 +1,15 @@
 /// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import optimizeLocales from '@react-aria/optimize-locales-plugin';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    // React Aria (the Event Codes date picker) ships strings for ~30 languages;
+    // the site is English-only, so keep just en-US. Must run before other plugins.
+    { ...optimizeLocales.vite({ locales: ['en-US'] }), enforce: 'pre' },
+  ],
   server: {
     open: true,
   },

@@ -54,6 +54,23 @@
     --hsa-success-bg: #dcfce7;
     --hsa-success-border: #86efac;
 
+    /* ---- Goal ------------------------------------------------------------
+       Marks a goal reached: the stretch of the VE bar past 15 and the
+       "You reached 15" lines (#59). */
+    --hsa-gold-700: #8a6113;      /* 5.53:1 on white */
+    --hsa-gold-50: #fdf6e3;
+
+    /* ---- Warm ------------------------------------------------------------
+       Waiting and owed, never an error: pending Point Requests (striped on
+       the VE bar) and Missed Events to make up. */
+    --hsa-warm-ink: #78350f;      /* 9.07:1 on white */
+    --hsa-warm-edge: #b45309;     /* stripe edge, 5.0:1 — WCAG 3:1 non-text */
+    --hsa-warm-stripe: #f5c26b;
+    --hsa-warm-stripe-light: #fde8b8;
+    --hsa-warm-bg: #fffbeb;
+    --hsa-warm-bg-strong: #fef3c7;
+    --hsa-accent: #fbbf24;        /* the Check in button on the teal code box */
+
     /* ---- Type ------------------------------------------------------------
        Montserrat does both jobs for now, as it did before. It is drawn
        from Buenos Aires street signage, which suits this organisation

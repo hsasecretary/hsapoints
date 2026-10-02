@@ -1,27 +1,10 @@
 /* ========================================================================
-   Member dashboard (/dashboard) and Cabinet page (/cabinet)
+   Member pages (/dashboard, /requests) and Cabinet page (/cabinet)
    ======================================================================== */
 
-/* ---- Dashboard page shell, attendance box, points cards  (Dashboard.tsx, Attendance.tsx, CabinetPoints.tsx) ---------- */
+/* ---- Cabinet points cards  (CabinetPoints.tsx) ---------- */
 
-.formDash {
-    /* Full-width white page under the header: no grey gap or sides. Content
-       inside keeps its own max-width and stays centred. Plain block flow
-       (not flex) so children always stack full-width, one per row — the
-       wrap-into-columns flex layout this used to have let "My Information"/
-       "Points Summary" and "Submit Point Request" end up side by side once
-       both had their own centred max-width. */
-    background-color: var(--hsa-surface);
-    width: 100%;
-    margin: 0;
-    padding: 24px 16px 32px;
-    flex: 1 0 auto;
-    display: block;
-}
 
-#dash {
-    width: 100%;
-}
 
 #pointsForm {
     width: 100%;
@@ -51,107 +34,8 @@
     text-align: center;
 }
 
-/* Typed codes show in capitals, but keep the placeholder in normal case */
-.attendanceForm #code::placeholder {
-    text-transform: none;
-}
-
-.attendanceForm {
-    display: block;
-    background-color: #80beda58;
-    border: 2px solid var(--hsa-teal-600);
-    width: calc(100% - 30px);
-    margin: 15px;
-    border-radius: 5px;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1), 0 6px 20px 0 rgba(0,0,0,0.19);
-}
-
-#attendanceInput {
-    max-width: 800px;
-    margin: auto;
-    padding: 10px;
-}
-
-/* ---- Event code controls  (EventCodeForm.tsx) ----
-   These were seven inline style={{}} objects, which meant the site's most-used
-   button rendered as raw browser chrome while every other form on the site used
-   .submit-button. Same controls, in CSS, so they can be themed and focused. */
-.attendanceForm .attendance-intro {
-    text-align: center;
-    color: #4a5568;
-    margin-bottom: 20px;
-}
-
-.attendanceForm .attendance-message {
-    text-align: center;
-}
-
-.attendanceForm .attendance-code-form {
-    width: 80%;
-    margin: auto;
-    padding-bottom: 20px;
-}
-
-.attendanceForm .attendance-code-form .form-group {
-    margin-bottom: 20px;
-}
-
-.attendanceForm .attendance-code-input {
-    width: 100%;
-    box-sizing: border-box;
-    font-size: 1.3rem;
-    padding: 12px;
-    border: 2px solid #155776;
-    border-radius: 5px;
-    text-align: center;
-    text-transform: uppercase;
-    transition: border-color 0.2s ease;
-}
-
-/* Replaces an onFocus handler that wrote #6db0cf (~2:1 on white) straight onto
-   element.style, where no stylesheet could ever override it. */
-.attendanceForm .attendance-code-input:focus-visible {
-    outline: 3px solid #0f4c64;
-    outline-offset: 2px;
-    border-color: #0f4c64;
-}
-
-.attendanceForm .attendance-hint {
-    font-size: 0.9em;
-    color: #4a5568;
-    margin-top: 5px;
-    text-align: center;
-}
-
-.attendanceForm .attendance-submit {
-    font-size: 1.1rem;
-    padding: 14px 32px;
-    min-height: 44px;   /* tap target */
-}
-
-.attendanceForm .attendance-submit:focus-visible {
-    outline: 3px solid #082f3f;
-    outline-offset: 3px;
-}
-
-/* White on base.css's #ccc disabled fill is ~1.6:1. #64748b is 4.78:1 — a
-   disabled control is exempt from AA, but "Submitting..." should be legible. */
-.attendanceForm .attendance-submit:disabled {
-    background: #64748b;
-    color: #fff;
-}
-
-/* .submit-button:disabled pulses to signal a pending submit, but this button is
-   also disabled whenever the box is empty — an idle field shouldn't throb. */
-.attendanceForm .attendance-submit:disabled:not(.is-loading) {
-    animation: none;
-}
-
 /* Enhanced Mobile Responsiveness */
 @media only screen and (max-width: 768px) {
-    .formDash {
-        padding: 16px 10px 24px;
-    }
 
     #pointsForm {
         flex-direction: column;
@@ -163,21 +47,9 @@
         margin: 0 0 10px;
         min-width: unset;
     }
-
-    .attendanceForm {
-        width: calc(100% - 20px);
-        margin: 10px;
-    }
-
-    #attendanceInput {
-        padding: 5px;
-    }
 }
 
 @media only screen and (max-width: 500px) {
-    .formDash {
-        padding: 12px 6px 20px;
-    }
 
     .subForm h3,
     .pointsSubForm h3,
@@ -197,37 +69,13 @@
         margin: 0 0 8px;
         padding: 10px;
     }
-
-    .attendanceForm {
-        width: calc(100% - 10px);
-        margin: 8px 5px;
-        padding: 8px;
-    }
-
-    /* 80% of a 375px screen leaves the code box ~290px wide for no reason. */
-    .attendanceForm .attendance-code-form {
-        width: 100%;
-    }
-
-    #attendanceInput {
-        padding: 0;
-    }
 }
 
 @media only screen and (max-width: 360px) {
-    .formDash {
-        padding: 10px 4px 16px;
-    }
 
     .pointsSubForm {
         padding: 8px;
         margin: 0 0 5px;
-    }
-
-    .attendanceForm {
-        width: calc(100% - 6px);
-        margin: 5px 3px;
-        padding: 5px;
     }
 
     .subForm h3,
@@ -238,248 +86,10 @@
     }
 }
 
-/* ---- My Points (scoped to .user-points-lookup, shared with E-Board's member lookup)  (Points.tsx) ---- */
+/* ---- Submit Point Request  (PointRequestForm.tsx, pointRequest/*) --------------------
+   Variant C of the prototype (#47): the "what you owe" sidebar, the form
+   beside it, and the Strikes view in the same card. req- = point request. */
 
-/* Increases the width of 
-
-
-.hide 
-{
-    display: none;
-}
-
-/* Points Dashboard Mobile Responsiveness */
-.user-points-lookup {
-    padding: 10px;
-    max-width: 100%;
-    overflow-x: hidden;
-}
-
-.user-points-lookup h2 {
-    font-size: 1.5em;
-    margin: 10px 0;
-}
-
-/* The attendance form sits between Points Summary and Points by Category;
-   line it up with the cards around it. */
-.user-points-lookup .attendanceForm {
-    width: auto;
-    margin: 0;
-    padding: 20px 20px 4px;
-}
-
-.user-points-lookup .user-info-card,
-.user-points-lookup .points-summary,
-.user-points-lookup .category-breakdown,
-.user-points-lookup .event-breakdown {
-    margin-bottom: 15px;
-    padding: 15px;
-    overflow-x: hidden;
-}
-
-.user-points-lookup .category-table,
-.user-points-lookup .events-table {
-    width: 100%;
-    font-size: 12px;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-
-.user-points-lookup .category-table th,
-.user-points-lookup .category-table td,
-.user-points-lookup .events-table th,
-.user-points-lookup .events-table td {
-    padding: 8px 4px;
-    text-align: center;
-    word-wrap: break-word;
-    border: 1px solid #ddd;
-}
-
-/* Mobile optimizations for tables */
-@media (max-width: 768px) {
-    .user-points-lookup {
-        padding: 5px;
-    }
-
-    .user-points-lookup .user-info-card,
-    .user-points-lookup .points-summary,
-    .user-points-lookup .category-breakdown,
-    .user-points-lookup .event-breakdown {
-        margin-bottom: 10px;
-        padding: 10px;
-    }
-
-    .user-points-lookup .user-info-grid {
-        grid-template-columns: 1fr !important;
-        gap: 6px !important;
-    }
-
-    .user-points-lookup .points-grid {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 10px !important;
-    }
-
-    /* On a phone the one thing a member opens this site to do is enter a code.
-       .user-results is a flex column, so order: -1 lifts the form to the top
-       without changing the DOM (desktop keeps its Points Summary -> code order).
-       The --hsa-order overrides re-sync the animations.css reveal stagger,
-       which is keyed to :nth-child() and doesn't follow visual order. */
-    .user-points-lookup .user-results > .attendanceForm {
-        order: -1;
-        --hsa-order: 0;
-    }
-
-    .user-points-lookup .user-results > .user-info-card {
-        --hsa-order: 1;
-    }
-
-    .user-points-lookup .user-results > .points-summary {
-        --hsa-order: 2;
-    }
-
-    /* Hide the original table on mobile and create card layout */
-    .user-points-lookup .events-table {
-        border: none;
-        width: 100%;
-    }
-
-    .user-points-lookup .events-table thead {
-        display: none;
-    }
-
-    .user-points-lookup .events-table tbody {
-        display: block;
-    }
-
-    .user-points-lookup .events-table tr {
-        display: block;
-        margin-bottom: 15px;
-        padding: 15px;
-        background: #f9f9f9;
-        border: 2px solid var(--hsa-teal-600);
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .user-points-lookup .events-table td {
-        display: block;
-        text-align: left;
-        border: none;
-        padding: 8px 0;
-        border-bottom: 1px solid #eee;
-        position: relative;
-    }
-
-    .user-points-lookup .events-table td:last-child {
-        border-bottom: none;
-    }
-
-    .user-points-lookup .events-table td:before {
-        content: attr(data-label) ": ";
-        font-weight: bold;
-        color: var(--hsa-teal-600);
-        display: inline-block;
-        min-width: 80px;
-        margin-right: 10px;
-    }
-
-    .user-points-lookup .category-table {
-        font-size: 11px;
-    }
-
-    .user-points-lookup .category-table th,
-    .user-points-lookup .category-table td {
-        padding: 6px 3px;
-        font-size: 11px;
-    }
-}
-
-@media (max-width: 480px) {
-    .user-points-lookup {
-        padding: 3px;
-    }
-
-    .user-points-lookup h2 {
-        font-size: 1.3em;
-    }
-
-    .user-points-lookup .user-info-card,
-    .user-points-lookup .points-summary,
-    .user-points-lookup .category-breakdown,
-    .user-points-lookup .event-breakdown {
-        padding: 8px;
-        margin-bottom: 8px;
-    }
-
-    /* Was 1fr, which stacked four 150px cards into ~718px of scroll before a
-       member could reach anything else. 2x2 compact tiles cost about a quarter
-       of that and still read at a glance. */
-    .user-points-lookup .points-grid {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 8px !important;
-    }
-
-    .user-points-lookup .points-card {
-        padding: 10px 8px !important;
-    }
-
-    .user-points-lookup .points-card h4 {
-        font-size: 12px !important;
-        margin-bottom: 4px !important;
-    }
-
-    .user-points-lookup .points-value {
-        font-size: 1.7em !important;
-        margin-bottom: 2px !important;
-    }
-
-    .user-points-lookup .eligibility-status {
-        font-size: 11px !important;
-    }
-
-    .user-points-lookup .events-table tr {
-        padding: 12px;
-        margin-bottom: 12px;
-    }
-
-    .user-points-lookup .events-table td {
-        padding: 6px 0;
-        font-size: 14px;
-    }
-
-    .user-points-lookup .events-table td:before {
-        min-width: 70px;
-        font-size: 13px;
-    }
-
-    .user-points-lookup .category-table {
-        font-size: 10px;
-    }
-
-    .user-points-lookup .category-table th,
-    .user-points-lookup .category-table td {
-        padding: 4px 2px;
-        font-size: 10px;
-    }
-
-    .user-points-lookup .user-info-card h3,
-    .user-points-lookup .points-summary h3,
-    .user-points-lookup .category-breakdown h3,
-    .user-points-lookup .event-breakdown h3 {
-        font-size: 1.1em;
-        margin-bottom: 10px;
-    }
-
-    .user-points-lookup .badge-yes,
-    .user-points-lookup .badge-no {
-        font-size: 12px;
-        padding: 3px 6px;
-    }
-}
-
-/* ---- Submit Point Request form  (PointRequest.tsx) ----------------------------------- */
-
-/* PointRequest Styles */
 .point-request {
     max-width: 800px;
     flex: 1 1 100%;
@@ -493,174 +103,180 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.point-request h2 {
-    text-align: center;
-    color: var(--hsa-teal-600);
-    margin-bottom: 10px;
-}
+.point-request.req { display: flex; flex-direction: column; gap: 22px; text-align: left; }
+.point-request.req * { box-sizing: border-box; }
 
-.point-request .description {
-    text-align: center;
-    color: #666;
-    margin-bottom: 30px;
-    font-size: 16px;
-    line-height: 1.5;
-}
+.point-request .req-title { margin: 0; font-size: var(--hsa-text-2xl); color: var(--hsa-teal-700); text-align: left; }
+.point-request .req-lede { margin: -12px 0 0; color: var(--hsa-muted); font-size: var(--hsa-text-base); }
+.point-request .req-message { margin: 0; padding: 10px 14px; border-radius: 6px; font-weight: 600; }
+.point-request .req-message--success { background: var(--hsa-success-bg); color: var(--hsa-success-strong); }
+.point-request .req-message--error { background: var(--hsa-danger-bg); color: var(--hsa-danger-strong); }
 
-/* Form Styles */
-.point-request .request-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.point-request .req-field { display: flex; flex-direction: column; gap: 8px; margin: 0; font-size: var(--hsa-text-base); font-weight: 400; color: var(--hsa-ink); }
+.point-request .req-label { font-size: var(--hsa-text-sm); font-weight: 700; color: var(--hsa-teal-700); padding: 0; }
+.point-request .req-hint { margin: 0; color: var(--hsa-muted); font-size: var(--hsa-text-sm); font-weight: 400; }
+.point-request .req-error { margin: 0; color: var(--hsa-danger); font-size: var(--hsa-text-sm); }
+.point-request .req-row { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+.point-request.req input:not([type=radio]):not([type=checkbox]):not([type=file]), .point-request.req textarea {
+    width: 100%; margin: 0; padding: 10px 12px; border: 1.5px solid var(--hsa-border); border-radius: 6px;
+    font-size: var(--hsa-text-base); background: var(--hsa-surface); color: var(--hsa-ink);
 }
-
-.point-request .form-group textarea {
-    resize: vertical;
-    min-height: 100px;
+.point-request.req input:focus-visible, .point-request.req textarea:focus-visible, .point-request.req button:focus-visible,
+.point-request .req-event:focus-within, .point-request .req-choice:focus-within, .point-request .req-photo:focus-within {
+    outline: 3px solid rgba(15, 76, 100, 0.35); outline-offset: 2px;
 }
+.point-request.req button { font-family: var(--hsa-font-body); margin: 0; min-height: 0; }
 
-.point-request .help-text {
-    font-size: 12px;
-    color: #666;
-    margin-top: 5px;
-    font-style: italic;
+/* Event Type chips */
+.point-request .req-chipgroup { display: flex; flex-direction: column; gap: 6px; }
+.point-request .req-chipgroup__label { font-size: var(--hsa-text-xs); font-weight: 600; color: var(--hsa-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.point-request .req-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.point-request .req-chip {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 8px 12px;
+    border: 1.5px solid #94a3b8; border-radius: 8px; background: var(--hsa-surface); color: var(--hsa-ink);
+    font-weight: 600; font-size: var(--hsa-text-sm); cursor: pointer;
 }
+.point-request .req-chip:hover { border-color: var(--hsa-teal-700); }
+.point-request .req-chip.is-on { background: var(--hsa-teal-700); border-color: var(--hsa-teal-700); color: #fff; }
+.point-request .req-chip__pts { font-weight: 400; font-size: var(--hsa-text-xs); opacity: .8; }
+.point-request .req-chip--other { border-style: dashed; }
 
-/* Image Upload and Preview */
-.point-request .form-group input[type="file"] {
-    padding: 8px;
-    border: 2px dashed #ddd;
-    background-color: #f9f9f9;
+/* Coded event list */
+.point-request .req-events { display: flex; flex-direction: column; border: 1px solid var(--hsa-border); border-radius: 8px; overflow: hidden; }
+.point-request .req-event {
+    display: grid; grid-template-columns: auto 1fr auto auto; gap: 10px; align-items: center; margin: 0; padding: 10px 12px;
+    border-top: 1px solid var(--hsa-border-light); font-size: var(--hsa-text-base); font-weight: 500; color: var(--hsa-ink); cursor: pointer;
 }
+.point-request .req-event:first-child { border-top: 0; }
+.point-request .req-event.is-on { background: var(--hsa-teal-100); }
+.point-request .req-event__date { color: var(--hsa-muted); font-size: var(--hsa-text-sm); }
+.point-request .req-event--other { border-top-style: dashed; }
+.point-request .req-event--other .req-event__name { color: var(--hsa-teal-700); font-weight: 700; }
+.point-request .req-tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: var(--hsa-text-xs); font-weight: 700; }
+.point-request .req-tag--miss { background: var(--hsa-danger-bg); color: var(--hsa-danger-strong); }
+.point-request .req-tag--pending { background: var(--hsa-surface-sunken); color: var(--hsa-ink-soft); }
 
-.point-request .form-group input[type="file"]:hover {
-    border-color: var(--hsa-teal-600);
-    background-color: #f0f8ff;
+/* Hours stepper */
+/* base.css gives every button a 10em min-width and 1.2em text on phones;
+   the form's buttons size themselves. */
+.point-request button { min-width: 0; min-height: 0; font-size: inherit; }
+
+.point-request .req-stepper { display: inline-flex; align-items: center; gap: 12px; }
+.point-request .req-stepper button { width: 44px; height: 44px; border: 1.5px solid var(--hsa-teal-700); border-radius: 8px; background: var(--hsa-surface); color: var(--hsa-teal-700); font-size: 20px; cursor: pointer; }
+.point-request .req-stepper button:disabled { border-color: var(--hsa-border); color: var(--hsa-muted); cursor: not-allowed; }
+.point-request .req-stepper output { min-width: 80px; text-align: center; font-weight: 700; }
+
+/* Make-up picker */
+.point-request .req-makeup { margin: 0; padding: 14px; border: 1.5px solid var(--hsa-danger-border); border-radius: 8px; display: flex; flex-direction: column; gap: 6px; }
+.point-request .req-makeup legend { padding: 0 6px; }
+.point-request .req-choice { display: flex; gap: 10px; align-items: center; margin: 0; padding: 6px 4px; font-size: var(--hsa-text-base); font-weight: 400; color: var(--hsa-ink); cursor: pointer; }
+.point-request .req-choice.is-on { font-weight: 600; }
+
+/* "If E-Board approves it" */
+.point-request .req-preview { border-left: 4px solid var(--hsa-teal-600); padding: 12px 16px; border-radius: 0 8px 8px 0; }
+.point-request .req-preview__title { margin: 0 0 6px; font-weight: 700; color: var(--hsa-teal-700); font-size: var(--hsa-text-sm); }
+.point-request .req-preview ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+
+/* Photo proof: the file input sits inside the dashed button */
+.point-request .req-photo { position: relative; display: block; margin: 0; padding: 12px; border: 1.5px dashed #94a3b8; border-radius: 8px; background: var(--hsa-surface-subtle); color: var(--hsa-muted); cursor: pointer; font-size: var(--hsa-text-sm); font-weight: 400; }
+.point-request .req-photo.is-on { border-style: solid; border-color: var(--hsa-success); color: var(--hsa-success-strong); background: var(--hsa-success-bg); }
+.point-request .req-photo__input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.point-request .req-photo__preview { display: flex; align-items: flex-end; gap: 12px; }
+.point-request .req-photo__preview img { max-width: 160px; max-height: 160px; border-radius: 6px; border: 1px solid var(--hsa-border); }
+.point-request .req-photo__preview button { padding: 0; border: 0; background: none; color: var(--hsa-danger); font-size: var(--hsa-text-sm); font-weight: 600; text-decoration: underline; cursor: pointer; }
+
+.point-request .req-submit { align-self: flex-start; height: 48px; padding: 0 28px; border: 0; border-radius: 8px; background: var(--hsa-teal-700); color: #fff; font-weight: 700; font-size: var(--hsa-text-base); cursor: pointer; }
+.point-request .req-submit:disabled { background: var(--hsa-border); color: var(--hsa-muted); cursor: not-allowed; }
+
+/* Start from what you owe: the sidebar and the form beside it */
+.point-request .req-c__head { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.point-request .req-c__head .req-title { min-width: 0; }
+.point-request .req-c__grid { display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start; }
+.point-request.req-c--general .req-c__grid { grid-template-columns: 1fr; }
+.point-request .req-owe { display: flex; flex-direction: column; gap: 2px; padding-right: 20px; border-right: 1px solid var(--hsa-border-light); }
+.point-request .req-owe__h { margin: 12px 0 4px; font-size: var(--hsa-text-sm); font-weight: 700; color: var(--hsa-teal-700); }
+.point-request .req-owe__h:first-child { margin-top: 0; }
+.point-request .req-owe__row { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 44px; padding: 8px 10px; border: 0; border-radius: 6px; background: none; color: var(--hsa-ink); font-size: var(--hsa-text-sm); font-weight: 500; text-align: left; cursor: pointer; }
+.point-request .req-owe__row:hover { background: var(--hsa-surface-subtle); }
+.point-request .req-owe__row.is-on { background: var(--hsa-teal-100); font-weight: 700; }
+.point-request .req-owe__row--other { margin-top: 10px; border: 1.5px dashed var(--hsa-border); }
+.point-request .req-owe__meta { display: flex; gap: 6px; align-items: center; color: var(--hsa-muted); font-size: var(--hsa-text-xs); white-space: nowrap; }
+.point-request .req-c__form { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.point-request .req-c__empty { margin: 0; padding: 24px; border: 1.5px dashed var(--hsa-border); border-radius: 10px; color: var(--hsa-muted); }
+.point-request .req-c__lead { margin: 0; font-size: var(--hsa-text-lg); }
+.point-request .req-fork { display: flex; flex-direction: column; gap: 10px; }
+.point-request .req-forkbtn { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; padding: 14px 16px; border: 1.5px solid var(--hsa-border); border-radius: 10px; background: var(--hsa-surface); color: var(--hsa-ink); text-align: left; cursor: pointer; font-size: var(--hsa-text-sm); }
+.point-request .req-forkbtn:hover { border-color: var(--hsa-teal-700); }
+.point-request .req-forkbtn strong { font-size: var(--hsa-text-base); color: var(--hsa-teal-700); }
+.point-request .req-pending { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 14px 16px; border: 1.5px dashed var(--hsa-border); border-radius: 10px; background: var(--hsa-surface-sunken); color: var(--hsa-ink-soft); font-size: var(--hsa-text-sm); }
+.point-request .req-pending strong { font-size: var(--hsa-text-base); color: var(--hsa-ink); }
+
+/* The Strikes button beside the title: red at 3 or more */
+.point-request .req-strikebtn {
+    flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: auto; min-width: 0; height: 44px; padding: 0 8px 0 16px; margin: 0;
+    border: 1.5px solid var(--hsa-teal-700); border-radius: 999px; background: var(--hsa-surface);
+    color: var(--hsa-teal-700); font-weight: 700; font-size: var(--hsa-text-sm); cursor: pointer;
 }
-
-.point-request .image-preview {
-    margin-top: 15px;
-    padding: 15px;
-    border: 2px solid var(--hsa-teal-600);
-    border-radius: 8px;
-    background-color: var(--hsa-surface-subtle);
+.point-request .req-strikebtn:hover { background: var(--hsa-teal-100); }
+.point-request .req-strikebtn__n {
+    min-width: 26px; height: 26px; padding: 0 6px; display: inline-grid; place-items: center; border-radius: 999px;
+    background: var(--hsa-teal-700); color: #fff; font-size: var(--hsa-text-xs);
 }
+.point-request .req-strikebtn.is-over { border-color: var(--hsa-danger-strong); color: var(--hsa-danger-strong); }
+.point-request .req-strikebtn.is-over:hover { background: var(--hsa-danger-bg); }
+.point-request .req-strikebtn.is-over .req-strikebtn__n { background: var(--hsa-danger-strong); }
 
-.point-request .image-preview h4 {
-    margin: 0 0 10px 0;
-    color: var(--hsa-teal-600);
+/* The Strikes view */
+.point-request .req-sp__back {
+    align-self: flex-start; padding: 0; border: 0; background: none; color: var(--hsa-teal-700);
+    font-size: var(--hsa-text-sm); font-weight: 600; text-decoration: underline; cursor: pointer;
 }
-
-.point-request .preview-container {
-    position: relative;
-    display: inline-block;
+.point-request .req-strikes {
+    display: flex; flex-direction: column; gap: 12px; padding: 18px 20px;
+    border: 1.5px solid var(--hsa-border); border-radius: 10px; background: var(--hsa-surface);
 }
-
-.point-request .preview-container img {
-    max-width: 300px;
-    max-height: 300px;
-    width: auto;
-    height: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+.point-request .req-strikes.is-over { border-color: var(--hsa-danger-border); background: var(--hsa-danger-bg); }
+.point-request .req-strikes__count { margin: 0; display: flex; align-items: baseline; gap: 8px; font-size: var(--hsa-text-lg); color: var(--hsa-ink); }
+.point-request .req-strikes__count strong { font-size: var(--hsa-text-3xl); line-height: 1; color: var(--hsa-teal-700); }
+.point-request .req-strikes.is-over .req-strikes__count strong { color: var(--hsa-danger-strong); }
+.point-request .req-strikes__away { margin-left: auto; color: var(--hsa-muted); font-size: var(--hsa-text-sm); }
+.point-request .req-strikes__track { display: flex; gap: 6px; padding-bottom: 18px; }
+.point-request .req-strikes__slot { position: relative; flex: 1; height: 14px; border-radius: 4px; background: var(--hsa-surface-sunken); }
+.point-request .req-strikes__slot.is-full { background: var(--hsa-teal-600); }
+.point-request .req-strikes.is-over .req-strikes__slot.is-full { background: var(--hsa-danger); }
+/* The line at 3, labelled under the third slot */
+.point-request .req-strikes__slot.is-line::after {
+    content: '3'; position: absolute; right: 0; top: 18px; font-size: var(--hsa-text-xs); font-weight: 700; color: var(--hsa-muted);
 }
-
-.point-request .clear-image {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+.point-request .req-strikes__warn { margin: 0; font-size: var(--hsa-text-base); font-weight: 700; color: var(--hsa-danger-strong); }
+.point-request .req-sp__list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--hsa-border); border-radius: 8px; }
+.point-request .req-sp__list li {
+    display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; padding: 10px 12px;
+    border-top: 1px solid var(--hsa-border-light);
 }
-
-.point-request .clear-image:hover {
-    background-color: #c82333;
+.point-request .req-sp__list li:first-child { border-top: 0; }
+.point-request .req-sp__event { font-weight: 600; color: var(--hsa-ink); }
+.point-request .req-sp__date { color: var(--hsa-muted); font-size: var(--hsa-text-sm); }
+.point-request .req-sp__fix {
+    height: 36px; padding: 0 12px; border: 1.5px solid var(--hsa-teal-700); border-radius: 6px; background: var(--hsa-surface);
+    color: var(--hsa-teal-700); font-weight: 700; font-size: var(--hsa-text-xs); cursor: pointer;
 }
+.point-request .req-sp__fix:hover { background: var(--hsa-teal-100); }
 
-/* Information Section */
-.point-request .info-section {
-    margin-top: 40px;
-    padding: 20px;
-    background-color: var(--hsa-teal-100);
-    border-radius: 8px;
-    border-left: 4px solid var(--hsa-teal-600);
-}
-
-.point-request .info-section ul {
-    margin: 0;
-    padding-left: 20px;
-}
-
-.point-request .info-section li {
-    margin-bottom: 8px;
-    line-height: 1.5;
-    color: #333;
-}
-
-/* Browsers draw date inputs taller than number inputs with the same
-   padding; pin Date and Points Requested to one height so they line up. */
-.point-request .request-form .form-row input[type="date"] {
-    height: 48px;
-}
-
-/* Responsive Design */
 @media (max-width: 768px) {
     .point-request {
         margin: 10px;
         padding: 15px;
     }
-
-    /* iOS Safari draws date inputs at their own size, ignoring width and
-       overlapping the next field. Dropping the native styling makes them
-       respect the box; tapping still opens the date picker. */
-    .point-request .form-group input[type="date"] {
-        -webkit-appearance: none;
-        appearance: none;
-        min-height: 48px;
-        background-color: #fff;
-    }
-
-    .point-request .form-group input[type="date"]::-webkit-date-and-time-value {
-        text-align: left;
-    }
-
-    .point-request .preview-container img {
-        max-width: 100%;
-        max-height: 250px;
-    }
 }
 
-@media (max-width: 480px) {
-    .point-request h2 {
-        font-size: 24px;
-    }
-
-    .point-request .description {
-        font-size: 14px;
-    }
-
-    .point-request .preview-container img {
-        max-height: 200px;
-    }
-}
-.point-request .form-group label[for*="activityType"]:after,
-.point-request .form-group label[for*="customActivityName"]:after,
-.point-request .form-group label[for*="description"]:after,
-.point-request .form-group label[for*="date"]:after,
-.point-request .form-group label[for*="pointsRequested"]:after,
-.point-request .form-group label[for*="imageUpload"]:after {
-    content: ' *';
-    color: #dc3545;
+@media (max-width: 640px) {
+    .point-request .req-row { grid-template-columns: 1fr; }
+    .point-request .req-c__grid { grid-template-columns: 1fr; }
+    .point-request .req-owe { padding: 0 0 16px; border-right: 0; border-bottom: 1px solid var(--hsa-border-light); }
+    .point-request .req-sp__list li { grid-template-columns: 1fr auto; }
+    .point-request .req-sp__list li > :last-child { grid-column: 1 / -1; justify-self: start; }
 }
 
 /* ---- Cabinet points breakdown  (CabinetPoints.tsx) ------------------------------------ */
@@ -695,179 +311,6 @@
 
 .strike {
     color:red;
-}
-
-/* ---- Points Requested: 1 / 2 choice  (PointRequest.tsx) ----------------
-   Only shown for "Other"; without it the Date field spans the row. */
-.point-request .form-row--single {
-    grid-template-columns: minmax(0, 1fr);
-}
-
-.point-request .points-choice {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.point-request .points-choice__option {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 48px;
-    margin: 0;
-    border: 1.5px solid #94a3b8;
-    border-radius: 6px;
-    background: var(--hsa-surface);
-    color: var(--hsa-ink);
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: border-color 0.2s, background-color 0.2s, color 0.2s;
-}
-
-.point-request .points-choice__option:hover {
-    border-color: var(--hsa-teal-700);
-}
-
-.point-request .points-choice__option.is-selected {
-    background: var(--hsa-teal-700);
-    border-color: var(--hsa-teal-700);
-    color: #ffffff;
-}
-
-/* The real radio stays in the page (keyboard + form validation) but is
-   drawn by its label instead. */
-.point-request .points-choice__option input {
-    position: absolute;
-    opacity: 0;
-    width: 1px;
-    height: 1px;
-    margin: 0;
-}
-
-.point-request .points-choice__option:focus-within {
-    outline: 3px solid rgba(15, 76, 100, 0.35);
-    outline-offset: 2px;
-}
-
-/* ---- My Events Attended  (EventsAttendedList.tsx) ----------------------
-   Compact rows (code + points); tap one to show the event details. */
-.user-points-lookup .attended-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.user-points-lookup .attended-item {
-    border: 1.5px solid var(--hsa-border);
-    border-radius: 8px;
-    background: var(--hsa-surface);
-    overflow: hidden;
-    transition: border-color 0.2s;
-}
-
-.user-points-lookup .attended-item.is-open {
-    border-color: var(--hsa-teal-700);
-}
-
-.user-points-lookup .attended-item__summary {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    min-width: 0;
-    min-height: 0;
-    margin: 0;
-    padding: 12px 14px;
-    border: none;
-    border-radius: 0;
-    background: transparent;
-    font-family: inherit;
-    font-size: 15px;
-    color: var(--hsa-ink);
-    text-align: left;
-    cursor: pointer;
-}
-
-.user-points-lookup .attended-item__summary:hover {
-    background: var(--hsa-surface-subtle);
-    border: none;
-    box-shadow: none;
-}
-
-.user-points-lookup .attended-item__summary:active {
-    background: var(--hsa-surface-sunken);
-    box-shadow: none;
-}
-
-.user-points-lookup .attended-item__code {
-    flex: 1;
-    min-width: 0;
-    font-family: var(--hsa-font-mono);
-    font-weight: 700;
-    color: var(--hsa-teal-700);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.user-points-lookup .attended-item__points {
-    font-weight: 700;
-    color: var(--hsa-teal-700);
-    white-space: nowrap;
-}
-
-.user-points-lookup .attended-item__unit {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--hsa-muted-light);
-}
-
-.user-points-lookup .attended-item__chevron {
-    font-size: 24px;
-    line-height: 1;
-    color: var(--hsa-teal-700);
-    transition: transform 0.15s ease;
-}
-
-.user-points-lookup .attended-item.is-open .attended-item__chevron {
-    transform: rotate(90deg);
-}
-
-.user-points-lookup .attended-item__details {
-    margin: 0;
-    padding: 0 14px 6px;
-}
-
-.user-points-lookup .attended-item__details > div {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 0;
-    border-top: 1px solid #eef2f6;
-    font-size: 14px;
-}
-
-.user-points-lookup .attended-item__details dt {
-    font-weight: 700;
-    color: var(--hsa-muted);
-}
-
-.user-points-lookup .attended-item__details dd {
-    margin: 0;
-    color: var(--hsa-ink);
-    text-align: right;
-}
-
-.user-points-lookup .attended-empty {
-    margin: 0;
-    text-align: center;
-    color: #666;
 }
 
 /* ---- Down here's the added css styling for the new point request tab system along
@@ -1043,4 +486,1098 @@ with the my requests tab. ---------- */
     .point-request-section .tab-button {
         font-size: 14px;
     }
+}
+/* ---- Overview  (Dashboard.tsx and sections/: EventCodeForm, PointsSummary,
+   MakeUpList, PointsAndEvents, Explainer) — #57 layout C as revised,
+   #59 variant A. Scoped to .overview / .requests-page / .explainer. ---- */
+
+.overview,
+.requests-page,
+.requirements-page {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+    text-align: left;
+    color: var(--hsa-ink);
+    font-family: var(--hsa-font-body);
+}
+
+.overview *,
+.overview *::before,
+.overview *::after,
+.requirements-page *,
+.requirements-page *::before,
+.requirements-page *::after {
+    box-sizing: border-box;
+}
+
+.overview button,
+.requirements-page button {
+    font-family: inherit;
+    margin: 0;
+    min-width: 0;
+}
+
+.overview button:focus-visible,
+.overview input:focus-visible,
+.overview summary:focus-visible,
+.overview a:focus-visible,
+.requirements-page button:focus-visible,
+.requirements-page a:focus-visible {
+    outline: 3px solid rgba(15, 76, 100, .4);
+    outline-offset: 2px;
+}
+
+.overview .overview__title,
+.requests-page .requests-page__title,
+.requirements-page .requirements-page__title {
+    margin: 0 0 16px;
+    font-family: var(--hsa-font-display);
+    font-size: var(--hsa-text-2xl);
+    line-height: 1.15;
+    color: var(--hsa-teal-700);
+    text-align: left;
+}
+
+/* My information: name, email, account type under "Hi, {name}". A pair
+   that doesn't fit moves to the next line whole instead of breaking in two;
+   a value only breaks by itself when it's wider than the page (a long email
+   on a phone). */
+.overview .overview__info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    margin: -8px 0 20px;
+    font-size: var(--hsa-text-sm);
+    text-align: left;
+}
+
+.overview .overview__info > div {
+    display: flex;
+    gap: 6px;
+    min-width: 0;
+}
+
+.overview .overview__info dt {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--hsa-teal-700);
+}
+
+.overview .overview__info dt::after {
+    content: ':';
+}
+
+.overview .overview__info dd {
+    margin: 0;
+    color: var(--hsa-muted);
+    overflow-wrap: anywhere;
+}
+
+/* Phones: one pair per line */
+@media (max-width: 560px) {
+    .overview .overview__info {
+        flex-direction: column;
+    }
+}
+
+.overview .overview__loading,
+.requirements-page .requirements-page__loading {
+    color: var(--hsa-muted);
+}
+
+.overview .ov-h2 {
+    margin: 0 0 4px;
+    font-size: var(--hsa-text-lg);
+    color: var(--hsa-teal-700);
+    text-align: left;
+}
+
+/* The large, filled code box */
+.overview .ov-code {
+    width: 100%;
+    max-width: none;
+    margin: 0 0 22px;
+    padding: 18px;
+    border-radius: 14px;
+    background: var(--hsa-teal-700);
+    box-shadow: 0 8px 22px rgba(8, 47, 63, .22);
+}
+
+.overview .ov-code__label {
+    display: block;
+    margin: 0 0 12px;
+    padding: 0;
+    font-weight: 700;
+    font-size: var(--hsa-text-lg);
+    color: #fff;
+}
+
+.overview .ov-code__row {
+    display: flex;
+    gap: 8px;
+}
+
+.overview .ov-code__row input {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 14px;
+    border: 1.5px solid transparent;
+    border-radius: 8px;
+    font-size: var(--hsa-text-lg);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.overview .ov-code__row input::placeholder {
+    letter-spacing: normal;
+    text-transform: none;
+}
+
+.overview .ov-code__row button {
+    min-height: 48px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--hsa-accent);
+    color: var(--hsa-teal-900);
+    font-weight: 700;
+    font-size: var(--hsa-text-base);
+    cursor: pointer;
+}
+
+.overview .ov-code__row button:disabled {
+    background: rgba(255, 255, 255, .18);
+    color: rgba(255, 255, 255, .85);
+    cursor: default;
+}
+
+.overview .ov-code__row button:focus-visible {
+    outline-color: var(--hsa-accent);
+}
+
+.overview .ov-code__hint {
+    margin: 8px 0 0;
+    font-size: var(--hsa-text-xs);
+    color: rgba(255, 255, 255, .85);
+}
+
+.overview .ov-code__msg {
+    margin: 8px 0 0;
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    color: #fecaca;
+}
+
+.overview .ov-code__msg:empty {
+    display: none;
+}
+
+.overview .ov-code__msg.is-ok {
+    color: #bbf7d0;
+}
+
+/* Total Points: big number and a single-colour bar to the goal */
+.overview .ov-score__num {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0 0 10px;
+}
+
+.overview .ov-score__num strong {
+    font-family: var(--hsa-font-display);
+    font-size: 64px;
+    line-height: .9;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--hsa-teal-700);
+}
+
+.overview .ov-score__num span {
+    font-size: var(--hsa-text-lg);
+    font-weight: 600;
+    color: var(--hsa-ink-soft);
+}
+
+.overview .ov-score__track {
+    position: relative;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--hsa-surface-sunken);
+    overflow: hidden;
+}
+
+.overview .ov-score__fill,
+.overview .ov-score__pending {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: 999px;
+}
+
+.overview .ov-score__fill {
+    background: var(--hsa-teal-600);
+}
+
+/* Striped, with a dark edge for WCAG's 3:1 non-text contrast */
+.overview .ov-score__pending {
+    background: repeating-linear-gradient(-45deg, var(--hsa-warm-stripe) 0 5px, var(--hsa-warm-stripe-light) 5px 10px);
+    box-shadow: inset 0 0 0 2px var(--hsa-warm-edge);
+}
+
+.overview .ov-score__over {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-radius: 0 999px 999px 0;
+    background: var(--hsa-gold-700);
+}
+
+.overview .ov-score__goal {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    margin-left: -1.5px;
+    background: #fff;
+}
+
+.overview .ov-score__meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px 16px;
+    margin-top: 8px;
+}
+
+.overview .ov-score__left {
+    flex: 1 1 16em;
+    margin: 0;
+    font-weight: 600;
+    color: var(--hsa-ink-soft);
+}
+
+.overview .ov-score__left.is-reached {
+    color: var(--hsa-gold-700);
+}
+
+.overview .ov-score__events {
+    margin: 0;
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    color: var(--hsa-muted);
+}
+
+.overview .ov-pending {
+    margin: 10px 0 0;
+    padding: 8px 12px;
+    border-left: 3px solid var(--hsa-warm-stripe);
+    background: var(--hsa-warm-bg);
+    color: var(--hsa-warm-ink);
+    font-size: var(--hsa-text-sm);
+}
+
+/* Cabinet view: Missed Events to make up */
+.overview .ov-makeups {
+    margin-top: 24px;
+}
+
+.overview .ov-makeups__sub {
+    margin: 0 0 8px;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-muted);
+}
+
+.overview .ov-makeups ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.overview .ov-makeups li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+}
+
+.overview .ov-makeups__name {
+    font-weight: 600;
+}
+
+.overview .ov-makeups__name small {
+    display: block;
+    font-weight: 400;
+    font-size: var(--hsa-text-xs);
+    color: var(--hsa-muted);
+}
+
+.overview .ov-makeups__btn {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1.5px solid var(--hsa-warm-edge);
+    border-radius: 999px;
+    background: var(--hsa-warm-bg);
+    color: var(--hsa-warm-ink);
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.overview .ov-makeups__btn:hover {
+    background: var(--hsa-warm-bg-strong);
+}
+
+.overview .ov-makeups__pending {
+    flex: none;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--hsa-warm-bg-strong);
+    color: var(--hsa-warm-ink);
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+}
+
+/* The two bubbles, opening in place */
+.overview .ov-bubbles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 22px 0 0;
+}
+
+.overview .ov-bubbles button {
+    min-height: 44px;
+    padding: 10px 16px;
+    border: 1.5px solid var(--hsa-teal-700);
+    border-radius: 999px;
+    background: var(--hsa-surface);
+    color: var(--hsa-teal-700);
+    font-weight: 700;
+    font-size: var(--hsa-text-sm);
+    cursor: pointer;
+}
+
+.overview .ov-bubbles button::after {
+    content: ' \25BE';
+}
+
+.overview .ov-bubbles button.is-on {
+    background: var(--hsa-teal-700);
+    color: #fff;
+}
+
+.overview .ov-bubbles button.is-on::after {
+    content: ' \25B4';
+}
+
+.overview .ov-panel {
+    margin-top: 12px;
+    padding: 16px;
+    border: 1px solid var(--hsa-border);
+    border-radius: 12px;
+    background: var(--hsa-surface);
+    animation: ov-open .18s ease-out;
+}
+
+@keyframes ov-open {
+    from { opacity: 0; transform: translateY(-4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .overview .ov-panel { animation: none; }
+}
+
+.overview .ov-empty {
+    margin: 0;
+    color: var(--hsa-muted);
+}
+
+/* Points & events: switch, category dropdowns, events by date */
+.overview .ov-seg {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 14px;
+    border-radius: 10px;
+    background: var(--hsa-surface-sunken);
+}
+
+.overview .ov-seg button {
+    flex: 1;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--hsa-ink-soft);
+    font-weight: 700;
+    font-size: var(--hsa-text-sm);
+    cursor: pointer;
+}
+
+.overview .ov-seg button.is-on {
+    background: var(--hsa-surface);
+    color: var(--hsa-teal-700);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .12);
+}
+
+.overview .ov-cats {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--hsa-border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--hsa-surface);
+}
+
+.overview .ov-cat + .ov-cat {
+    border-top: 1px solid var(--hsa-border-light);
+}
+
+.overview .ov-cat summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+}
+
+.overview .ov-cat summary::-webkit-details-marker {
+    display: none;
+}
+
+.overview .ov-cat summary::after {
+    content: '\25BE';
+    margin-left: 6px;
+    color: var(--hsa-muted);
+}
+
+.overview .ov-cat[open] summary::after {
+    content: '\25B4';
+}
+
+.overview .ov-cat summary > span:first-child {
+    flex: 1;
+}
+
+.overview .ov-cat__count {
+    margin-left: 4px;
+    font-size: var(--hsa-text-xs);
+    font-weight: 600;
+    color: var(--hsa-muted);
+}
+
+.overview .ov-cat__pts {
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    color: var(--hsa-teal-700);
+}
+
+.overview .ov-cat ul {
+    margin: 0;
+    padding: 0 14px 12px;
+    list-style: none;
+}
+
+.overview .ov-cat li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-ink-soft);
+}
+
+.overview .ov-events {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--hsa-border-light);
+}
+
+.overview .ov-events li {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 10px;
+    align-items: start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+}
+
+.overview .ov-events__date {
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    color: var(--hsa-teal-700);
+}
+
+.overview .ov-events__name {
+    font-weight: 600;
+}
+
+.overview .ov-events__name small {
+    display: block;
+    font-weight: 400;
+    font-size: var(--hsa-text-xs);
+    color: var(--hsa-muted);
+}
+
+.overview .ov-events__pts {
+    text-align: right;
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    color: var(--hsa-teal-600);
+}
+
+/* Check-ins E-Board removed, under the points: what they had earned, crossed out. */
+.overview .ov-removed { margin-top: 16px; }
+.overview .ov-removed h4 { margin: 0 0 6px; font-size: var(--hsa-text-sm); color: var(--hsa-danger-strong); }
+.overview .ov-removed .ov-events__pts { color: var(--hsa-muted); }
+
+.overview .ov-events li.ov-events__line {
+    display: block;
+    margin: 6px 0;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: 6px;
+    background: var(--hsa-gold-50);
+    color: var(--hsa-gold-700);
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+}
+
+/* E-Board in the Cabinet view: one line in place of both progress bars */
+.overview .ov-exempt {
+    margin-top: 20px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--hsa-surface-subtle);
+}
+
+.overview .ov-exempt__lead {
+    margin: 0 0 6px;
+    font-weight: 700;
+    color: var(--hsa-teal-700);
+}
+
+.overview .ov-exempt__nums {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    margin: 0;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-ink-soft);
+}
+
+/* Cabinet view: Cabinet Points toward 20 */
+.overview .ov-cabinet {
+    margin-top: 20px;
+}
+
+.overview .ov-cabinet__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+    font-size: var(--hsa-text-sm);
+    font-weight: 600;
+    color: var(--hsa-ink-soft);
+}
+
+.overview .ov-cabinet__top strong {
+    color: var(--hsa-teal-700);
+}
+
+.overview .ov-cabinet__track {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--hsa-surface-sunken);
+    overflow: hidden;
+}
+
+.overview .ov-cabinet__fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--hsa-teal-600);
+}
+
+.overview .ov-cabinet__note {
+    margin: 6px 0 0;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-muted);
+}
+
+.overview .ov-cabinet__note.is-reached {
+    font-weight: 600;
+    color: var(--hsa-teal-700);
+}
+
+/* Cabinet view: "By category" as a table of Event Types */
+.overview .ov-types {
+    width: 100%;
+    border: 1px solid var(--hsa-border);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--hsa-surface);
+    box-shadow: none;
+    font-size: var(--hsa-text-sm);
+}
+
+.overview .ov-types th,
+.overview .ov-types td {
+    padding: 9px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+    font-size: var(--hsa-text-sm);
+    text-align: right;
+    vertical-align: top;
+    background: none;
+    color: var(--hsa-ink);
+}
+
+.overview .ov-types th:first-child {
+    text-align: left;
+}
+
+.overview .ov-types th:not(:first-child),
+.overview .ov-types td {
+    width: 64px;
+}
+
+.overview .ov-types thead th {
+    background: var(--hsa-surface-sunken);
+    font-size: var(--hsa-text-xs);
+    color: var(--hsa-ink-soft);
+}
+
+.overview .ov-types tbody th button {
+    min-height: 32px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--hsa-teal-700);
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+}
+
+.overview .ov-types tbody th button::after {
+    content: ' \25BE';
+    color: var(--hsa-muted);
+}
+
+.overview .ov-types tr.is-open th button::after {
+    content: ' \25B4';
+}
+
+.overview .ov-types .ov-types__sub td {
+    width: auto;
+    padding-left: 22px;
+    text-align: left;
+    background: var(--hsa-surface-subtle);
+}
+
+.overview .ov-types .ov-types__sub span {
+    display: block;
+    font-weight: 600;
+}
+
+.overview .ov-types small {
+    font-size: var(--hsa-text-xs);
+    font-weight: 400;
+    color: var(--hsa-muted);
+}
+
+.overview .ov-types tfoot th,
+.overview .ov-types tfoot td {
+    border-bottom: 0;
+    border-top: 2px solid var(--hsa-teal-700);
+    font-weight: 800;
+}
+
+/* ---- Requirements (requirements/: CoreEvents, SemesterGrid) —
+   #58, #75. Warm, never red, for anything still to make up.
+   Scoped to .requirements-page. ---- */
+
+.requirements-page .rq-h2 {
+    margin: 28px 0 10px;
+    font-size: var(--hsa-text-lg);
+    color: var(--hsa-teal-700);
+    text-align: left;
+}
+
+.requirements-page .rq-exempt {
+    margin: 0 0 12px;
+    font-weight: 700;
+    color: var(--hsa-teal-700);
+}
+
+.requirements-page .rq-exempt--small {
+    margin: -6px 0 10px;
+    font-size: var(--hsa-text-sm);
+    font-weight: 500;
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-empty {
+    margin: 0;
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-over {
+    margin: -4px 0 12px;
+    padding: 10px 14px;
+    border-left: 4px solid var(--hsa-warm-edge);
+    border-radius: 6px;
+    background: var(--hsa-warm-bg);
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-warm-ink);
+}
+
+/* Tier 1: the lead line, then the Missed Events to make up */
+.requirements-page .rq-lead {
+    margin: 0 0 12px;
+    font-weight: 700;
+    color: var(--hsa-success);
+}
+
+.requirements-page .rq-lead.is-owed {
+    color: var(--hsa-warm-ink);
+}
+
+.requirements-page .rq-makeup {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1.5px solid var(--hsa-warm-edge);
+    border-radius: 999px;
+    background: var(--hsa-warm-bg);
+    color: var(--hsa-warm-ink);
+    font-size: var(--hsa-text-sm);
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.requirements-page .rq-makeup:hover {
+    background: var(--hsa-warm-bg-strong);
+}
+
+.requirements-page .rq-pending {
+    flex: none;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--hsa-warm-bg-strong);
+    color: var(--hsa-warm-ink);
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+}
+
+/* Tier 2: Fall | Spring grid */
+.requirements-page .rq-grid {
+    width: 100%;
+    border: 1px solid var(--hsa-border);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--hsa-surface);
+    box-shadow: none;
+    font-size: var(--hsa-text-sm);
+}
+
+.requirements-page .rq-grid th,
+.requirements-page .rq-grid td {
+    padding: 9px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+    font-size: var(--hsa-text-sm);
+    text-align: left;
+    vertical-align: top;
+    background: none;
+    color: var(--hsa-ink);
+}
+
+.requirements-page .rq-grid tbody tr:last-child > * {
+    border-bottom: 0;
+}
+
+.requirements-page .rq-grid thead th {
+    background: var(--hsa-surface-sunken);
+    font-size: var(--hsa-text-xs);
+    color: var(--hsa-ink-soft);
+}
+
+.requirements-page .rq-grid small {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-grid tbody th {
+    font-weight: 600;
+}
+
+.requirements-page .rq-grid td {
+    width: 30%;
+}
+
+.requirements-page .rq-grid td.is-done {
+    font-weight: 800;
+    color: var(--hsa-success);
+}
+
+.requirements-page .rq-grid td.is-done small {
+    color: var(--hsa-ink-soft);
+}
+
+.requirements-page .rq-grid td.is-pending small {
+    font-weight: 600;
+    color: var(--hsa-warm-ink);
+}
+
+.requirements-page .rq-grid td.is-later {
+    background: var(--hsa-surface-subtle);
+}
+
+.requirements-page .rq-hole {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--hsa-border);
+    border-radius: 50%;
+}
+
+/* To make up */
+.requirements-page .rq-hint {
+    margin: 8px 0 0;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.requirements-page .rq-cards li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1.5px solid var(--hsa-warm-stripe);
+    border-radius: 12px;
+    background: var(--hsa-surface);
+}
+
+.requirements-page .rq-cards__what {
+    font-weight: 700;
+}
+
+.requirements-page .rq-cards__what small {
+    display: block;
+    font-size: var(--hsa-text-xs);
+    font-weight: 400;
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-chip {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--hsa-warm-bg-strong);
+    color: var(--hsa-warm-ink);
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+    vertical-align: 1px;
+}
+
+.requirements-page .rq-bank {
+    margin: 12px 0 0;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--hsa-teal-100);
+    color: var(--hsa-teal-800);
+    font-size: var(--hsa-text-sm);
+}
+
+/* What's next, then the whole year folded away. Done rows stay plain. */
+.requirements-page .rq-next {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-ink-soft);
+}
+
+.requirements-page .rq-next li + li {
+    margin-top: 4px;
+}
+
+.requirements-page .rq-all {
+    margin-top: 14px;
+    border: 1px solid var(--hsa-border);
+    border-radius: 10px;
+    background: var(--hsa-surface);
+}
+
+.requirements-page .rq-all summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    min-height: 44px;
+    list-style: none;
+    padding: 10px 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.requirements-page .rq-all summary::-webkit-details-marker {
+    display: none;
+}
+
+.requirements-page .rq-all summary::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    margin: 0 4px 0 2px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform .15s;
+}
+
+.requirements-page .rq-all[open] summary::before {
+    transform: rotate(45deg);
+}
+
+.requirements-page .rq-all summary small {
+    margin-left: auto;
+
+    font-weight: 500;
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-all[open] summary {
+    border-bottom: 1px solid var(--hsa-border-light);
+}
+
+.requirements-page .rq-all__month {
+    padding: 10px 14px 4px;
+}
+
+.requirements-page .rq-all__month h3 {
+    margin: 0 0 4px;
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--hsa-muted);
+    text-align: left;
+}
+
+.requirements-page .rq-all__month ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.requirements-page .rq-all__month li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2px 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+    font-size: var(--hsa-text-sm);
+}
+
+.requirements-page .rq-all__month li:last-child {
+    border-bottom: 0;
+}
+
+.requirements-page .rq-all__month li small {
+    color: var(--hsa-muted);
+}
+
+.requirements-page .rq-all__status {
+    color: var(--hsa-ink-soft);
+}
+
+.requirements-page .rq-all__month li.is-open .rq-all__status {
+    font-weight: 700;
+    color: var(--hsa-warm-ink);
+}
+
+.requirements-page .rq-all__month li.is-upcoming .rq-all__status {
+    color: var(--hsa-muted);
+}
+
+@media (max-width: 420px) {
+    .requirements-page .rq-cards li {
+        grid-template-columns: 1fr;
+    }
+
+    .requirements-page .rq-makeup {
+        justify-content: center;
+    }
+}
+
+/* How points work (#49), in the bubble and on /guide */
+.explainer {
+    max-width: 60ch;
+    line-height: 1.6;
+    text-align: left;
+    text-wrap: pretty; /* no one-word last lines */
+}
+
+.explainer .explainer__lead {
+    font-weight: 700;
+    font-size: var(--hsa-text-lg);
+}
+
+.explainer .explainer__gloss {
+    font-style: italic;
+    color: var(--hsa-ink-soft);
+}
+
+.explainer ol {
+    padding-left: 20px;
+}
+
+.explainer li {
+    margin-bottom: 8px;
+}
+
+.explainer > :first-child {
+    margin-top: 0;
+}
+
+.explainer > :last-child {
+    margin-bottom: 0;
 }

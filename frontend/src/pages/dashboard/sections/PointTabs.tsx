@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import PointRequestForm from './PointRequestForm';
 import MyRequests from './MyRequests';
 
@@ -6,6 +7,18 @@ import MyRequests from './MyRequests';
 // so members can check the status of what they've already submitted.
 function PointTabs() {
     const [activeTab, setActiveTab] = useState<'submit' | 'history'>('submit');
+    const [params, setParams] = useSearchParams();
+
+    // Submit Request always lands on the form, even from the Strikes view
+    // (?view=strikes), which sits under the same tab.
+    const openSubmit = () => {
+        setActiveTab('submit');
+        if (params.has('view')) {
+            const updated = new URLSearchParams(params);
+            updated.delete('view');
+            setParams(updated);
+        }
+    };
 
     return (
         <div className="point-request-section">
@@ -15,7 +28,7 @@ function PointTabs() {
                     role="tab"
                     aria-selected={activeTab === 'submit'}
                     className={`tab-button${activeTab === 'submit' ? ' is-active' : ''}`}
-                    onClick={() => setActiveTab('submit')}
+                    onClick={openSubmit}
                 >
                     Submit Request
                 </button>

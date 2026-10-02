@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";// TODO: Add SDKs for Firebase products that you want to use
+import { connectAuthEmulator, getAuth } from "firebase/auth";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";// TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
@@ -16,8 +16,18 @@ const firebaseConfig = {
   measurementId: "G-QDXNW4S6Q1"
 };
 
+// `npm run dev:emulator` runs against the local Auth and Firestore emulators
+// (`npm run emulator:demo`, seeded by `npm run seed:demo`) instead of the live
+// project, so test accounts and fake codes never touch real data.
+const useEmulator = import.meta.env.MODE === "emulator";
+
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(useEmulator ? { ...firebaseConfig, projectId: "demo-hsapoints" } : firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+if (useEmulator) {
+  connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+}

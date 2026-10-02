@@ -9,6 +9,9 @@ export type NamedMember = {
 
 export type NameMatch = NamedMember & { score: number };
 
+/** "Maria Gonzalez", or the email for an account with no name. */
+export const displayName = (m: NamedMember) => `${m.firstName} ${m.lastName}`.trim() || m.email;
+
 /** Lowercase, strip accents (José -> jose) and punctuation, collapse spaces. */
 export function normalizeName(value: string): string {
     return (value || '')
