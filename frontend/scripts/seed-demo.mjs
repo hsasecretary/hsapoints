@@ -3,7 +3,7 @@
 // without touching the live project. Wipes the emulators first.
 //
 //   npm run emulator:demo   (leave running)
-//   npm run seed:demo
+//   npm run seed:demo       (waits for the emulator to finish starting)
 //   npm run dev:emulator    then sign in with an account below
 //
 // Test-only accounts; they exist only in the local Auth emulator.
@@ -119,6 +119,20 @@ async function createAccount(email) {
     });
     if (!response.ok) throw new Error(`Creating ${email}: ${await response.text()}`);
 }
+
+// emulator:demo takes 60-90s to open its ports; wait for both instead of failing with ECONNREFUSED.
+async function waitForEmulators(timeoutMs = 180000) {
+    const deadline = Date.now() + timeoutMs;
+    for (const url of [AUTH, 'http://127.0.0.1:8080']) {
+        for (;;) {
+            try { await fetch(url); break; } catch {
+                if (Date.now() > deadline) throw new Error(`Emulator at ${url} did not start. Is "npm run emulator:demo" running?`);
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+            }
+        }
+    }
+}
+await waitForEmulators();
 
 const env = await initializeTestEnvironment({ projectId: PROJECT, firestore: { host: '127.0.0.1', port: 8080 } });
 await env.clearFirestore();
