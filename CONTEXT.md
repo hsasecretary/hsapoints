@@ -50,6 +50,10 @@ An Event Type only Cabinet Members can earn, by code or Point Request: Cabinet T
 A Member's credit for one event, however it arrived: a redeemed code, an approved point request, or E-Board entering it directly. Every Attendance earns its Event Type's points, even when it is also used as a Make-up.
 _Avoid_: Redemption (only one of the ways Attendance arrives)
 
+**Entered Attendance**:
+An Attendance E-Board adds to a Member directly, from the Member's User Lookup, with no Point Request: for a coded event it picks the code, for an event with no code it gives the name, date and Event Type (and the hours, for Tabling). The date can't be in the future and must fall in the current school year. It counts exactly like a redeemed code, including Make-ups, which stay automatic. E-Board may add a note, which the Member sees; who entered it and when is always recorded. Available for any Member, Cabinet or not.
+_Avoid_: Manual attendance, override
+
 **Point Request**:
 A Member's claim, with photo proof, that they attended an event, usually one whose code they didn't redeem on the day. When the event had a code, the request names that event, and approving it counts exactly as redeeming its code. When a Semester Requirement or Additional Event has no code yet, the request gives the event's name and date instead; if E-Board later creates a code for that event, it may attach the request to it when approving, which then counts as redeeming that code. Once E-Board approves it and confirms its Event Type, it is an Attendance like any other. A request that fits no Event Type is denied or turned into an Adjustment.
 _Avoid_: Manual points
@@ -58,7 +62,7 @@ _Avoid_: Manual points
 Points E-Board granted by hand that don't trace back to any event, carried with a note of why: a Point Request that fits no Event Type, approved as an Adjustment. Undoing a Point Request approved by mistake is revoking it; taking away a code check-in is a Removed Check-in. Neither is a negative Adjustment.
 
 **Removed Check-in**:
-An Attendance from a redeemed code that E-Board took away with a reason, e.g. a code used without attending. The Member is treated as never having attended: the event's points go, a Core Event becomes a Missed Event (with a Strike unless excused), and anything it made up is owed again. The Member sees that it was removed and why, and can't redeem that code again; if they really were there, E-Board approves a Point Request for it instead.
+An Attendance from a redeemed code that E-Board took away with a reason, e.g. a code used without attending. The Member is treated as never having attended: the event's points go, a Core Event becomes a Missed Event (with a Strike unless excused), and anything it made up is owed again. The Member sees that it was removed and why, and can't redeem that code again; if they really were there, E-Board enters the Attendance directly (an Entered Attendance), which replaces the removal for that event.
 _Avoid_: Revoke (that's for Point Requests), deduction
 
 **Cabinet Points**:

@@ -1678,3 +1678,17 @@
         margin: 40px 10px 20px;
     }
 }
+
+/* "Add an event" on User Lookup: a stacked form inside the panel. */
+.ulk .ulk-add { display: grid; gap: 6px; max-width: 460px; }
+.ulk .ulk-add label { font-size: var(--hsa-text-sm); font-weight: 700; margin-top: 4px; }
+.ulk .ulk-add input, .ulk .ulk-add select, .ulk .ulk-add textarea {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--hsa-border); border-radius: 8px; background: var(--hsa-surface); font: inherit;
+}
+.ulk .ulk-add__effect { margin: 4px 0 0; padding: 8px 10px; border-radius: 8px; background: var(--hsa-teal-100); color: var(--hsa-teal-800); font-size: var(--hsa-text-sm); }
+.ulk .ulk-add__error { margin: 0; color: var(--hsa-danger-strong); }
+.ulk .ulk-add__confirm {
+    min-height: 40px; padding: 0 16px; border: 1px solid var(--hsa-teal-700); border-radius: 8px;
+    background: var(--hsa-teal-700); color: #ffffff; font: inherit; font-weight: 700; cursor: pointer;
+}
+.ulk .ulk-add__confirm:disabled { opacity: 0.6; cursor: not-allowed; }

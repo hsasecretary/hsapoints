@@ -57,6 +57,14 @@ export type Attendance = {
     requestId?: string;
     /** The Missed Event (a codeId) the Member picked for this to make up. */
     makeupFor?: string;
+    /** Entered Attendance (source 'eboard') only: who entered it and when ('YYYY-MM-DD'),
+     *  the note the Member sees, and for an event with no code its name and the
+     *  entry its Tabling hours share. */
+    enteredBy?: string;
+    enteredOn?: string;
+    note?: string;
+    eventName?: string;
+    entryId?: string;
 };
 
 /** A codes/{CODE} doc, with its doc ID as `id`. */

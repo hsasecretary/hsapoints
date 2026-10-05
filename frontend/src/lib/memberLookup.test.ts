@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { computeStanding, type Attendance, type Code, type Member } from './computeStanding';
-import { checkInRemovalEffect, lookupLedger, lookupRequests, lookupSummary, missedEventRows } from './memberLookup';
+import { checkInRemovalEffect, entryEffect, lookupLedger, lookupRequests, lookupSummary, missedEventRows } from './memberLookup';
 import type { MemberRequest } from './pointsOverview';
 import { rubric } from './rubric';
 
@@ -148,12 +148,72 @@ describe('Removed Check-ins on the ledger', () => {
         expect(rows.map((row) => [row.name, row.codeId])).toEqual([['GBM 2', 'GBM2']]);
     });
 
-    it('drops one once E-Board credits that code again, and one from another school year', () => {
+    it('drops one from another school year', () => {
         const lastYear = { ...removedGbm2, event: 'Old GBM', eventDate: '2025-09-10' };
-        const member: Member = { ...generalMember, removedCheckIns: { GBM2: removedGbm2, OLD: lastYear } };
-        const rows = lookupLedger({ member, attendances: [{ ...attended(gbm2, 'request'), requestId: 'r9' }], codes: [gbm2], requests: [], today: TODAY }).rows;
+        const member: Member = { ...generalMember, removedCheckIns: { OLD: lastYear } };
 
-        expect(rows.map((row) => [row.name, row.takenBack])).toEqual([['GBM 2', null]]);
+        expect(lookupLedger({ member, attendances: [], codes: [], requests: [], today: TODAY }).rows).toEqual([]);
+    });
+
+    it('shows one as superseded, and leaves it out of the total, once E-Board credits that code again', () => {
+        const member: Member = { ...generalMember, removedCheckIns: { GBM2: removedGbm2 } };
+        const entered: Attendance = { ...attended(gbm2, 'eboard'), enteredBy: 'vp@ufl.edu', enteredOn: '2026-09-22' };
+        const ledger = lookupLedger({ member, attendances: [entered], codes: [gbm2], requests: [], today: TODAY });
+
+        expect(ledger.rows.map((row) => [row.name, row.source, row.takenBack?.superseded ?? null])).toEqual([
+            ['GBM 2', 'code', true],
+            ['GBM 2', 'eboard', null],
+        ]);
+        expect(ledger.vePoints).toBe(2);
+    });
+});
+
+describe('Entered Attendance on the ledger', () => {
+    const entered = (c: Code, note?: string): Attendance => ({
+        ...attended(c, 'eboard'), enteredBy: 'vp@ufl.edu', enteredOn: '2026-09-22', ...(note ? { note } : {}),
+    });
+
+    it('counts like a code check-in, carrying who entered it, when and the note', () => {
+        const attendances = [entered(gbm1, 'Was at the door')];
+        const ledger = lookupLedger({ member: generalMember, attendances, codes: [gbm1], requests: [], today: TODAY });
+
+        expect(ledger.rows).toMatchObject([{ source: 'eboard', codeId: 'GBM1', vePoints: 2, enteredBy: 'vp@ufl.edu', enteredOn: '2026-09-22', note: 'Was at the door' }]);
+        expect(ledger.vePoints).toBe(standingOf(generalMember, attendances, [gbm1]).vePoints);
+        expect(standingOf(generalMember, attendances, [gbm1])).toEqual(standingOf(generalMember, [attended(gbm1)], [gbm1]));
+    });
+
+    it('lists an event with no code by its name, Tabling hours as one row', () => {
+        const hour = (n: number): Attendance => ({
+            id: `m__req-eb-1-h${n}`, eventTypeId: 'tabling', eventDate: '2026-09-09', source: 'eboard',
+            enteredBy: 'vp@ufl.edu', enteredOn: '2026-09-22', entryId: 'eb-1', eventName: 'Plaza tabling',
+        });
+        const ledger = lookupLedger({ member: generalMember, attendances: [hour(1), hour(2), hour(3)], codes: [], requests: [], today: TODAY });
+
+        expect(ledger.rows).toMatchObject([{ name: 'Plaza tabling', eventType: 'Tabling', hours: 3, vePoints: 3, codeId: null, note: '' }]);
+    });
+});
+
+describe('entryEffect', () => {
+    const entry = (c: Code): Attendance => ({ ...attended(c, 'eboard'), enteredBy: 'vp@ufl.edu', enteredOn: TODAY });
+
+    it('reports the points a General Member gains', () => {
+        expect(entryEffect({ member: generalMember, attendances: [], codes: [gbm1], today: TODAY }, [entry(gbm1)])).toEqual({
+            vePoints: 2, cabinetPoints: 1, cleared: [], madeUp: [], strikesCleared: 0,
+        });
+    });
+
+    it('clears the Missed Event and the Strike for a Core Event the Cabinet Member did attend', () => {
+        expect(entryEffect({ member: cabinetMember, attendances: [], codes: [gbm1], today: TODAY }, [entry(gbm1)])).toMatchObject({
+            cleared: ['GBM 1'], madeUp: [], strikesCleared: 1,
+        });
+    });
+
+    it('applies a Surplus Attendance as a Make-up for a Missed Event', () => {
+        const emp2 = code('EMP2', 'hsa-fundraising', '2026-09-09', 'Bake Sale');
+        // GBM 1 missed; the first fundraiser fills the requirement, the second is surplus.
+        const facts = { member: cabinetMember, attendances: [attended(empanadas)], codes: [gbm1, empanadas, emp2], today: TODAY };
+
+        expect(entryEffect(facts, [entry(emp2)])).toMatchObject({ cleared: [], madeUp: ['GBM 1'], strikesCleared: 1 });
     });
 });
 

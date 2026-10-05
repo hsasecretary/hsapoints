@@ -138,11 +138,30 @@ describe('pointsOverview', () => {
         const overview = overviewFor(member, [], [gbm1, gbm2]);
 
         expect(overview.removed).toEqual([
-            { id: 'GBM2', name: 'GBM 2', date: '2026-09-10', points: 2, reason: 'Not there' },
-            { id: 'GBM1', name: 'GBM 1', date: '2026-08-27', points: 2, reason: 'Not there' },
+            { id: 'GBM2', name: 'GBM 2', date: '2026-09-10', points: 2, reason: 'Not there', superseded: false },
+            { id: 'GBM1', name: 'GBM 1', date: '2026-08-27', points: 2, reason: 'Not there', superseded: false },
         ]);
         expect(overview.total).toBe(0);
         expect(overview.eventsAttended).toBe(0);
+    });
+
+    it('keeps a Removed Check-in as superseded once E-Board enters that event, and counts the Entered Attendance with its note', () => {
+        const removed = { event: 'GBM 1', eventTypeId: 'gbm', eventDate: '2026-08-27', reason: 'Not there', by: 'vp@ufl.edu', on: '2026-09-20' };
+        const member: Member = { ...generalMember, removedCheckIns: { GBM1: removed } };
+        const entered: Attendance = { ...attended(gbm1), source: 'eboard', enteredBy: 'vp@ufl.edu', enteredOn: '2026-09-22', note: 'Was at the door' };
+        const overview = overviewFor(member, [entered], [gbm1]);
+
+        expect(overview.removed).toEqual([{ id: 'GBM1', name: 'GBM 1', date: '2026-08-27', points: 2, reason: 'Not there', superseded: true }]);
+        expect(overview.total).toBe(2);
+        expect(overview.ledger).toMatchObject([{ name: 'GBM 1', points: 2, enteredByEboard: true, note: 'Was at the door' }]);
+    });
+
+    it("lists a code-less Entered Attendance by the name E-Board gave it, a Tabling event's hours as one event", () => {
+        const hour = (n: number): Attendance => ({ id: `m__req-eb-1-h${n}`, eventTypeId: 'tabling', eventDate: '2026-09-09', source: 'eboard', entryId: 'eb-1', eventName: 'Plaza tabling' });
+        const overview = overviewFor(generalMember, [hour(1), hour(2)], []);
+
+        expect(overview.ledger).toMatchObject([{ name: 'Plaza tabling', points: 2, enteredByEboard: true }]);
+        expect(overview.eventsAttended).toBe(1);
     });
 
     it('adds up pending requests separately: they count once approved', () => {

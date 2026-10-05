@@ -73,6 +73,13 @@ describe('attendances', () => {
         }));
     });
 
+    it("won't let a Member write an Entered Attendance, for themselves or with the audit fields", async () => {
+        const db = signedInAs(env, MEMBER);
+        const entered = { email: MEMBER, eventTypeId: 'gbm', eventDate: '2026-09-25', source: 'eboard', codeId: 'GBM1', enteredBy: EBOARD, enteredOn: '2026-09-25' };
+        await assertFails(setDoc(doc(db, `attendances/${MEMBER}__GBM1`), entered));
+        await assertFails(setDoc(doc(db, `attendances/${MEMBER}__req-eb-1`), { email: MEMBER, eventTypeId: 'crash', eventDate: '2026-09-25', source: 'eboard', enteredBy: EBOARD, enteredOn: '2026-09-25', eventName: 'Mixer', entryId: 'eb-1' }));
+    });
+
     it("won't let a Member change or delete an Attendance once written", async () => {
         await seed(env, { [`attendances/${MEMBER}__GBM1`]: codeAttendance(MEMBER) });
         const db = signedInAs(env, MEMBER);
