@@ -48,6 +48,9 @@ export type LedgerEntry = {
     group: Group;
     points: number;
     fromRequest: boolean;
+    /** E-Board entered it (an Entered Attendance), and the note they left. */
+    enteredByEboard: boolean;
+    note: string;
     /** This entry took the Member from below the goal to it. */
     crossed: boolean;
 };
@@ -56,8 +59,9 @@ export type PointsGroup = Group & { points: number; entries: LedgerEntry[] };
 
 export type PendingPoints = { id: string; name: string; date: string; points: number };
 
-/** A Removed Check-in as the Member sees it: what it had earned and why it went. */
-export type RemovedEntry = { id: string; name: string; date: string; points: number; reason: string };
+/** A Removed Check-in as the Member sees it: what it had earned and why it went.
+ *  `superseded` once E-Board has entered that event's Attendance instead. */
+export type RemovedEntry = { id: string; name: string; date: string; points: number; reason: string; superseded: boolean };
 
 export type PointsOverview = {
     /** Total Points: the Member's VE Points. */
@@ -80,14 +84,15 @@ export type PointsOverview = {
 
 /**
  * The Member's Removed Check-ins from this school year's events, newest
- * first, leaving out any E-Board has since credited again.
+ * first. One E-Board has since credited again (an Entered Attendance, or an
+ * approved Point Request) stays on record, marked `superseded`.
  */
-export function removedThisYear(member: Member, attendances: Attendance[], today: string): (RemovedCheckIn & { codeId: string })[] {
+export function removedThisYear(member: Member, attendances: Attendance[], today: string): (RemovedCheckIn & { codeId: string; superseded: boolean })[] {
     const { start, end } = academicYear(today);
     const credited = new Set(attendances.map((attendance) => attendance.codeId?.toUpperCase()).filter(Boolean));
     return Object.entries(member.removedCheckIns ?? {})
-        .map(([codeId, removed]) => ({ ...removed, codeId: codeId.toUpperCase() }))
-        .filter((removed) => removed.eventDate >= start && removed.eventDate <= end && !credited.has(removed.codeId))
+        .map(([codeId, removed]) => ({ ...removed, codeId: codeId.toUpperCase(), superseded: credited.has(codeId.toUpperCase()) }))
+        .filter((removed) => removed.eventDate >= start && removed.eventDate <= end)
         .sort((a, b) => b.eventDate.localeCompare(a.eventDate) || a.codeId.localeCompare(b.codeId));
 }
 
@@ -139,7 +144,8 @@ export function pointsOverview({ member, standing, attendances, codes, requests,
     const entries = new Map<string, LedgerEntry>();
     for (const attendance of attendances) {
         const key = attendance.codeId ? `code:${attendance.codeId.toUpperCase()}`
-            : attendance.requestId ? `req:${attendance.requestId}` : attendance.id;
+            : attendance.requestId ? `req:${attendance.requestId}`
+                : attendance.entryId ? `entry:${attendance.entryId}` : attendance.id;
         const points = eventType(attendance.eventTypeId)?.vePoints ?? 0;
         const existing = entries.get(key);
         if (existing) {
@@ -150,12 +156,14 @@ export function pointsOverview({ member, standing, attendances, codes, requests,
         const request = attendance.requestId ? requestById.get(attendance.requestId) : undefined;
         entries.set(key, {
             id: attendance.id,
-            name: code?.event || request?.activityName || eventType(attendance.eventTypeId)?.label || 'Event',
+            name: code?.event || request?.activityName || attendance.eventName || eventType(attendance.eventTypeId)?.label || 'Event',
             date: attendance.eventDate,
             kind: 'event',
             group: groupOf(attendance.eventTypeId, byEventType),
             points,
             fromRequest: attendance.source === 'request',
+            enteredByEboard: attendance.source === 'eboard',
+            note: attendance.note ?? '',
             crossed: false,
         });
     }
@@ -168,6 +176,8 @@ export function pointsOverview({ member, standing, attendances, codes, requests,
             group: ADJUSTMENTS,
             points: adjustment.points || 0,
             fromRequest: Boolean(adjustment.requestId),
+            enteredByEboard: false,
+            note: '',
             crossed: false,
         });
     });
@@ -217,6 +227,7 @@ export function pointsOverview({ member, standing, attendances, codes, requests,
             date: removed.eventDate,
             points: eventType(removed.eventTypeId)?.vePoints ?? 0,
             reason: removed.reason,
+            superseded: removed.superseded,
         })),
     };
 }

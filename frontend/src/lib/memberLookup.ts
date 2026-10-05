@@ -45,13 +45,24 @@ export type LookupRow = {
     requestId: string | null;
     approvedBy: string | null;
     approvedOn: string | null;
+    /** An Entered Attendance: who entered it, when, and the note the Member sees. */
+    enteredBy: string | null;
+    enteredOn: string | null;
+    note: string;
     /** A Removed Check-in or a revoked Point Request: its points are what it
      *  had earned, left out of every total. */
     takenBack: TakenBack | null;
 };
 
 /** Who took a row's points back, when and why. */
-export type TakenBack = { kind: 'removed' | 'revoked'; reason: string; by: string | null; on: string | null };
+export type TakenBack = {
+    kind: 'removed' | 'revoked';
+    reason: string;
+    by: string | null;
+    on: string | null;
+    /** A Removed Check-in E-Board has since credited again: it no longer takes anything away. */
+    superseded?: boolean;
+};
 
 export type LookupLedger = {
     /** Newest first; an Adjustment with no date goes last. */
@@ -86,7 +97,8 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
     for (const attendance of attendances) {
         const type = eventType(attendance.eventTypeId);
         const key = attendance.codeId ? `code:${attendance.codeId.toUpperCase()}`
-            : attendance.requestId ? `req:${attendance.requestId}` : attendance.id;
+            : attendance.requestId ? `req:${attendance.requestId}`
+                : attendance.entryId ? `entry:${attendance.entryId}` : attendance.id;
         const existing = rows.get(key);
         if (existing) {
             existing.vePoints += type?.vePoints ?? 0;
@@ -98,7 +110,7 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
         const request = attendance.requestId ? requestById.get(attendance.requestId) : undefined;
         rows.set(key, {
             id: attendance.id,
-            name: code?.event || request?.activityName || type?.label || 'Event',
+            name: code?.event || request?.activityName || attendance.eventName || type?.label || 'Event',
             date: attendance.eventDate,
             eventType: type?.label ?? 'Unknown Event Type',
             source: attendance.source,
@@ -107,6 +119,9 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
             codeId: attendance.codeId ? code?.id ?? attendance.codeId.toUpperCase() : null,
             requestId: attendance.requestId ?? null,
             ...reviewOf(attendance.requestId),
+            enteredBy: attendance.enteredBy ?? null,
+            enteredOn: attendance.enteredOn ?? null,
+            note: attendance.note ?? '',
             takenBack: null,
         });
     }
@@ -122,6 +137,9 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
             codeId: null,
             requestId: adjustment.requestId ?? null,
             ...(adjustment.by ? { approvedBy: adjustment.by, approvedOn: adjustment.date ?? null } : reviewOf(adjustment.requestId)),
+            enteredBy: null,
+            enteredOn: null,
+            note: '',
             takenBack: null,
         });
     });
@@ -139,7 +157,10 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
             requestId: null,
             approvedBy: null,
             approvedOn: null,
-            takenBack: { kind: 'removed', reason: removed.reason, by: removed.by, on: removed.on },
+            enteredBy: null,
+            enteredOn: null,
+            note: '',
+            takenBack: { kind: 'removed', reason: removed.reason, by: removed.by, on: removed.on, ...(removed.superseded ? { superseded: true } : {}) },
         });
     }
     const { start, end } = academicYear(today);
@@ -160,6 +181,9 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
             requestId: request.id,
             approvedBy: request.revoked.approvedBy,
             approvedOn: null,
+            enteredBy: null,
+            enteredOn: null,
+            note: '',
             takenBack: { kind: 'revoked', reason: request.reviewNotes ?? '', by: request.reviewedBy ?? null, on: request.reviewedOn ?? null },
         });
     }
@@ -191,6 +215,11 @@ export type RemovalEffect = {
     owedAgain: string[];
 };
 
+/** A Core Event is only missed once its day is over, so a change to an event today is judged as of tomorrow. */
+function judgedOn(eventDate: string, today: string): string {
+    return eventDate < today ? today : dayAfter(eventDate);
+}
+
 function dayAfter(isoDate: string): string {
     const date = fromIsoDate(isoDate);
     date.setDate(date.getDate() + 1);
@@ -205,10 +234,7 @@ export function checkInRemovalEffect(
     { member, attendances, codes, today }: StandingFacts,
     attendanceId: string,
 ): RemovalEffect {
-    // A Core Event is only missed once its day is over, so a check-in for
-    // today's event is judged as of tomorrow.
-    const eventDate = attendances.find((attendance) => attendance.id === attendanceId)?.eventDate ?? today;
-    const asOf = eventDate < today ? today : dayAfter(eventDate);
+    const asOf = judgedOn(attendances.find((attendance) => attendance.id === attendanceId)?.eventDate ?? today, today);
     const before = computeStanding(member, attendances, rubric, codes, { today: asOf });
     const after = computeStanding(member, attendances.filter((attendance) => attendance.id !== attendanceId), rubric, codes, { today: asOf });
     const codeById = codesById(codes);
@@ -222,6 +248,36 @@ export function checkInRemovalEffect(
         owedAgain: after.missedEvents
             .filter((missed) => missed.owed && beforeByCode.get(missed.codeId.toUpperCase())?.owed === false)
             .map(nameOf),
+    };
+}
+
+/** What entering an event would change, for E-Board to see before confirming. */
+export type EntryEffect = {
+    vePoints: number;
+    cabinetPoints: number;
+    /** Missed Events it clears: the Member did attend that Core Event. */
+    cleared: string[];
+    /** Missed Events it makes up. */
+    madeUp: string[];
+    /** Open Strikes it removes. */
+    strikesCleared: number;
+};
+
+/** Works out an Entered Attendance's effect by computing the standing with and without it. */
+export function entryEffect({ member, attendances, codes, today }: StandingFacts, entered: Attendance[]): EntryEffect {
+    const asOf = judgedOn(entered.map((attendance) => attendance.eventDate).sort().pop() ?? today, today);
+    const before = computeStanding(member, attendances, rubric, codes, { today: asOf });
+    const after = computeStanding(member, [...attendances, ...entered], rubric, codes, { today: asOf });
+    const codeById = codesById(codes);
+    const nameOf = (missed: MissedEvent) => codeById.get(missed.codeId.toUpperCase())?.event || missed.codeId;
+    const afterByCode = new Map(after.missedEvents.map((missed) => [missed.codeId.toUpperCase(), missed]));
+    const closed = before.missedEvents.filter((missed) => missed.owed && !afterByCode.get(missed.codeId.toUpperCase())?.owed);
+    return {
+        vePoints: after.vePoints - before.vePoints,
+        cabinetPoints: after.cabinetPoints - before.cabinetPoints,
+        cleared: closed.filter((missed) => !afterByCode.has(missed.codeId.toUpperCase())).map(nameOf),
+        madeUp: closed.filter((missed) => afterByCode.has(missed.codeId.toUpperCase())).map(nameOf),
+        strikesCleared: before.openStrikes - after.openStrikes,
     };
 }
 

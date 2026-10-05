@@ -2,8 +2,8 @@
 // behind it and where it came from, and their Point Requests with who
 // reviewed them. One scrolling page (docs/research/user-lookup-eboard-ux.md);
 // numbers come from computeStanding through lib/memberLookup.ts, so they
-// match the Member's own dashboard. E-Board can remove a code check-in and
-// revoke an approved request here; Strikes are changed on Excuse Absence and
+// match the Member's own dashboard. E-Board can add an event the Member
+// attended, remove a code check-in and revoke an approved request here; Strikes are changed on Excuse Absence and
 // pending requests reviewed on Point Request Review, each linked from here.
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -21,6 +21,7 @@ import { eventType } from '../../lib/rubric';
 import { shortDate } from '../../lib/semester';
 import MemberSearch from '../../components/members/MemberSearch';
 import { useMemberStanding } from '../dashboard/useMemberStanding';
+import AddEventPanel from './AddEventPanel';
 import RevokeForm from './pointRequests/RevokeForm';
 
 type LookupMember = Parameters<typeof roleLine>[0] & {
@@ -111,6 +112,7 @@ function MemberDetail({ member: profile }: { member: LookupMember }) {
                     {summary.rules === 'cabinet' && (
                         <CabinetDetail email={profile.email} standing={standing} codes={codes} attendances={attendances} summary={summary} />
                     )}
+                    <AddEventPanel email={profile.email} standingFacts={standingFacts} cabinet={summary.rules === 'cabinet'} />
                     <Points ledger={ledger} cabinet={summary.rules === 'cabinet'} email={profile.email}
                         standingFacts={standingFacts} />
                     <Requests rows={requestRows} />
@@ -220,12 +222,17 @@ function CabinetDetail({ email, standing, codes, attendances, summary }: {
 
 const TAKEN_BACK_LABEL: Record<TakenBack['kind'], string> = { removed: 'Removed Check-in', revoked: 'Revoked Point Request' };
 
-type PointsFilter = 'all' | 'codes' | 'requests' | 'adjustments';
+function takenBackLabel(takenBack: TakenBack): string {
+    return takenBack.superseded ? 'Removed Check-in, replaced' : TAKEN_BACK_LABEL[takenBack.kind];
+}
+
+type PointsFilter = 'all' | 'codes' | 'requests' | 'entered' | 'adjustments';
 
 const FILTERS: { value: PointsFilter; label: string; keep: (row: LookupRow) => boolean }[] = [
     { value: 'all', label: 'All', keep: () => true },
     { value: 'codes', label: 'Codes', keep: (row) => Boolean(row.codeId) },
     { value: 'requests', label: 'Point Requests', keep: (row) => row.source === 'request' || Boolean(row.requestId) },
+    { value: 'entered', label: 'Entered by E-Board', keep: (row) => row.source === 'eboard' },
     // Every change E-Board made by hand: Adjustments, Removed Check-ins and revoked requests.
     { value: 'adjustments', label: 'Adjustments', keep: (row) => row.source === 'adjustment' || Boolean(row.takenBack) },
 ];
@@ -278,12 +285,14 @@ function Points({ ledger, cabinet, email, standingFacts }: { ledger: LookupLedge
                                 {row.takenBack ? <s>{row.name}</s> : row.name}
                                 {row.codeId && <code className="ulk-code">{row.codeId}</code>}
                                 <span className="ulk-row__detail">
-                                    <span className={`ulk-tag ulk-tag--${row.takenBack ? 'taken-back' : row.source}`}>{row.takenBack ? TAKEN_BACK_LABEL[row.takenBack.kind] : SOURCE_LABEL[row.source]}</span>
+                                    <span className={`ulk-tag ulk-tag--${row.takenBack ? 'taken-back' : row.source}`}>{row.takenBack ? takenBackLabel(row.takenBack) : SOURCE_LABEL[row.source]}</span>
                                     {row.source !== 'adjustment' && ` ${row.eventType}${row.hours ? `, ${row.hours} hours` : ''}`}
+                                    {row.enteredBy && ` · Entered by ${row.enteredBy}${row.enteredOn ? `, ${shortDate(row.enteredOn)}` : ''}`}
                                     {row.approvedBy && ` · ${row.vePoints < 0 ? 'Taken away' : 'Approved'} by ${row.approvedBy}${row.approvedOn ? `, ${shortDate(row.approvedOn)}` : ''}`}
                                     {row.takenBack && ` · ${row.takenBack.kind === 'removed' ? 'Removed' : 'Revoked'}${row.takenBack.by ? ` by ${row.takenBack.by}` : ''}${row.takenBack.on ? `, ${shortDate(row.takenBack.on)}` : ''}`}
                                 </span>
                                 {row.takenBack?.reason && <span className="ulk-row__detail ulk-note">“{row.takenBack.reason}”</span>}
+                                {row.note && <span className="ulk-row__detail ulk-note">“{row.note}”</span>}
                             </span>
                             <span className="ulk-row__end ulk-num">
                                 {row.takenBack ? <s>+{row.vePoints} VE</s> : <>{row.vePoints > 0 ? '+' : ''}{row.vePoints} VE</>}

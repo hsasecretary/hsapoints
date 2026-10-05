@@ -24,7 +24,7 @@ function PointsAndEvents({ overview, byType }: { overview: PointsOverview; byTyp
                         <span className="ov-events__date">{entry.date ? shortDate(entry.date) : ''}</span>
                         <span className="ov-events__name">
                             {entry.name}
-                            <small>Removed: {entry.reason}</small>
+                            <small>{entry.superseded ? 'Removed, then entered by E-Board' : 'Removed'}: {entry.reason}</small>
                         </span>
                         <span className="ov-events__pts"><s>{signed(entry.points)}</s></span>
                     </li>
@@ -61,7 +61,10 @@ function PointsAndEvents({ overview, byType }: { overview: PointsOverview; byTyp
                                 <span className="ov-events__date">{dateLabel(entry)}</span>
                                 <span className="ov-events__name">
                                     {entry.name}
-                                    <small>{entry.group.name}{entry.fromRequest ? ', from a Point Request' : ''}</small>
+                                    <small>
+                                        {entry.group.name}{entry.fromRequest ? ', from a Point Request' : ''}{entry.enteredByEboard ? ', entered by E-Board' : ''}
+                                        {entry.note ? `: ${entry.note}` : ''}
+                                    </small>
                                 </span>
                                 <span className="ov-events__pts">{entry.points ? signed(entry.points) : 'No points'}</span>
                             </li>
