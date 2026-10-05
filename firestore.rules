@@ -73,7 +73,7 @@ service cloud.firestore {
       allow create, delete: if isEboard();
       allow update: if isEboard() ||
         (signedIn() &&
-         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendeeCount', 'ateendecode']));
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attendeeCount']));
     }
 
     // One doc per Attendance (docs/adr/0002-attendance-ledger-calculated-on-read.md).

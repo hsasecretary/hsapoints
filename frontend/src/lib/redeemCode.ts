@@ -63,7 +63,7 @@ export async function redeemCode(
                 codeId,
             });
         }
-        tx.update(codeRef, { attendeeCount: increment(1), ateendecode: true });
+        tx.update(codeRef, { attendeeCount: increment(1) });
         return { ok: true } as const;
     });
 }

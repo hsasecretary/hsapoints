@@ -6,6 +6,7 @@ function ForgotPassword() {
     {
         event.preventDefault();
         document.getElementById("emailError").innerText = "";
+        document.getElementById("resetStatus").innerText = "";
         var uflEmail = (document.getElementById("uflEmail") as HTMLInputElement).value;
         if(uflEmail.length <= 8 || uflEmail.substring(uflEmail.length-8) !== "@ufl.edu")
         {
@@ -14,12 +15,11 @@ function ForgotPassword() {
         }
         sendPasswordResetEmail(auth, uflEmail)
             .then(() => {
-            // Password reset email sent successfully
-                window.location.reload();
+                document.getElementById("resetStatus").innerText = "If an account exists for " + uflEmail + ", a reset email is on its way. Check your inbox and spam folder.";
             })
             .catch((error) => {
-            // Handle errors
-            console.error("Error sending password reset email:", error);
+                console.error("Error sending password reset email:", error);
+                document.getElementById("emailError").innerText = "*Couldn't send the reset email. Please try again.";
             });
     }
 	return (
@@ -28,6 +28,7 @@ function ForgotPassword() {
 					<h2>Forgot Password</h2>
 					<form onSubmit={check}>
 						<p className='errorMsg' id="emailError"></p>
+						<p role="status" id="resetStatus"></p>
 						<label htmlFor="uflEmail">UFL Email: </label><br/>
 						<input type="text" id="uflEmail" placeholder='albert@ufl.edu'></input>
 						<div className="center"><input type='submit' value='Reset'></input></div>

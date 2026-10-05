@@ -31,6 +31,8 @@ type Bubble = (typeof BUBBLES)[number];
 //                     Above the make-up list so they're seen.
 //   MakeUpList      — Cabinet view only: Missed Events to make up
 // Every number comes from computeStanding via useMemberStanding.
+const EXCUSE_ABSENCE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfL7rheJusXDurdtR4lfD7wMg8FmH9iwaFRll8haJRpH2i5vw/viewform';
+
 function Dashboard({ email }: { email: string }) {
     const { loading, member, attendances, codes, requests, pending, standing, today } = useMemberStanding(email, useViewOverride());
     const [params, setParams] = useSearchParams();
@@ -105,6 +107,11 @@ function Dashboard({ email }: { email: string }) {
                     )}
                     {standing.heldToCabinetRules && !standing.exempt && (
                         <MakeUpList standing={standing} codes={codes} pendingPicks={pendingMakeups(pending)} />
+                    )}
+                    {standing.heldToCabinetRules && !standing.exempt && (
+                        <p className="overview__excuse">
+                            Can't make an event? <a href={EXCUSE_ABSENCE_FORM_URL} target="_blank" rel="noopener noreferrer">Fill out the Excuse Absence form</a>.
+                        </p>
                     )}
                 </>
             )}
