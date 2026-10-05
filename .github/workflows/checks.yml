@@ -1,0 +1,19 @@
+name: Checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  typecheck_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run typecheck
+        working-directory: frontend
+      # Pure-logic tests only; the emulator suite (test:emulator) needs Java and firebase-tools.
+      - run: npm test
+        working-directory: frontend
