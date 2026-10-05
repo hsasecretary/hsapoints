@@ -7,10 +7,10 @@ function ForgotPassword() {
         event.preventDefault();
         document.getElementById("emailError").innerText = "";
         document.getElementById("resetStatus").innerText = "";
-        var uflEmail = (document.getElementById("uflEmail") as HTMLInputElement).value;
-        if(uflEmail.length <= 8 || uflEmail.substring(uflEmail.length-8) !== "@ufl.edu")
+        var uflEmail = (document.getElementById("uflEmail") as HTMLInputElement).value.trim().toLowerCase();
+        if(!uflEmail.endsWith("@ufl.edu") && !uflEmail.endsWith("@sfcollege.edu"))
         {
-            document.getElementById("emailError").innerText = "*Required: Input your UFL email";
+            document.getElementById("emailError").innerText = "*Required: Input your UFL or SF email";
             return false;
         }
         sendPasswordResetEmail(auth, uflEmail)
