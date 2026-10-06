@@ -109,6 +109,40 @@ An Attendance beyond what a requirement needs: any Additional Event, a Semester 
 **Make-up**:
 A Surplus Attendance credited against a Missed Event and, when that miss was unexcused, its Strike — one event covers both at once. Applied automatically: first the oldest Missed Event that still carries a Strike (clearing both at once), then the oldest other Missed Event (excused, or its Strike already removed by E-Board); a Surplus Attendance counts whether it happened before or after the Missed Event. A Member may name the Missed Event when submitting a Point Request (for a request covering several tabling hours, one per hour); an approved request's pick is honoured first. Only approved Attendance counts, never a pending request. The Member is shown which Missed Event and Strike each Make-up covered, never whether the miss was excused.
 
+### Closet
+
+**Closet**:
+The room of equipment Cabinet Members and E-Board borrow, free, for their events. Items only go out while an E-Board member is present. Open hours: Mon–Thu 8 AM–8 PM, Fri 8 AM–5 PM, Sat closed, Sun 12–5 PM, minus any closure dates E-Board records.
+
+**Closet Item**:
+One physical thing in the Closet, tagged with a unique sticker number and a description. Retired (or written off as lost) Closet Items keep their past Checkouts.
+_Avoid_: Rental, equipment (as the record)
+
+**Checkout**:
+The record of one Closet Item going out to one Member and coming back: sticker number, description, who took it (with their role at that moment), the E-Board Witness, when it went out, its Due Date, and when and by whom it was returned. A Member may have any number of open Checkouts.
+_Avoid_: Rental, loan
+
+**Closet Borrower**:
+A Member who may take Closet Items: Cabinet Members (approved) and E-Board, plus Web-team Testers. General Members and MLP Members may not. E-Board use the same form and are blocked by Overdue Checkouts like anyone else.
+
+**Witness**:
+The E-Board member present when a Closet Item went out, named on the Checkout. An E-Board borrower's Witness is another E-Board member.
+
+**Due Date**:
+The closing time of the second business day (Mon–Fri) after the Checkout, or of the next open day if that day is a closure. Mon → Wed 8 PM, Tue → Thu 8 PM, Wed → Fri 5 PM, Thu → Mon 8 PM, Fri → Tue 8 PM, Sun → Tue 8 PM. Sunday never counts as a business day. Saturday has no Checkouts.
+
+**Return**:
+E-Board recording that a Closet Item is back on the shelf, during open hours. Members cannot return their own items.
+
+**Overdue**:
+A Checkout still open once the Closet has closed on its Due Date. Worked out when read, never stored. No automatic Strike: E-Board contacts the Member. While a Member has any Overdue Checkout they cannot check anything else out.
+
+**Extension**:
+E-Board moves an open Checkout's Due Date to a later open day, with a required note. Kept in the Checkout's history; unlimited.
+
+**Forgiveness**:
+E-Board lifts an Overdue Member's checkout block while the item stays out (the Checkout is still Overdue until returned), or closes the Checkout without a Return because the item is lost, marking the Closet Item lost. Both need a reason and record who did it.
+
 ### Leaderboard
 
 **Rank**:
