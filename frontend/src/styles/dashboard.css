@@ -1620,3 +1620,8 @@ with the my requests tab. ---------- */
 .explainer > :last-child {
     margin-bottom: 0;
 }
+
+.overview .overview__excuse {
+    margin: 1.25rem 0 0;
+    text-align: center;
+}
