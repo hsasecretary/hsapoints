@@ -7,6 +7,10 @@ import SiteHeader from './components/layout/SiteHeader';
 import Footer from './components/layout/Footer';
 import LoadingScreen, { useMinLoadingTime } from './components/ui/LoadingScreen';
 import NotFound from './pages/NotFound';
+// PROTOTYPE (throwaway): feature-layout variants
+import { ProtoScreen } from './pages/prototype-feature-layout/layouts';
+import { LayoutSwitcher } from './pages/prototype-feature-layout/layoutStore';
+import './pages/prototype-feature-layout/prototype.css';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import Requests from './pages/requests/Requests';
 import Requirements from './pages/requirements/Requirements';
@@ -131,11 +135,13 @@ function App() {
                             <Route path="excuse-absence" element={<ExcuseAbsence />} />
                             <Route path="approvals" element={<ApprovedCabinet />} />
                         </Route>
+                        <Route path="/p/:screen" element={userEmail ? <ProtoScreen email={userEmail} /> : <Navigate to="/login" />} />
                         <Route path="/forgotPassword" element={<ForgotPassword />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>
                     </Suspense>
                     <Footer signedIn={!!userEmail} eboard={isEboard} />
+                    {userEmail && <LayoutSwitcher />}
                 </div>
             )}
         </Router>

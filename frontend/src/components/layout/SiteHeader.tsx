@@ -6,6 +6,9 @@ import { VIEW_LABELS, VIEWS } from '../../lib/viewAs';
 import { EBOARD_TOOLS } from '../../pages/eboard/eboardTools';
 import { navItems, type NavIcon, type NavItem } from './navItems';
 import { useViewAs } from './ViewAsContext';
+// PROTOTYPE (throwaway): feature-layout variants
+import { ProtoAccountInfo, ProtoDesktopLinks, ProtoTabBar, protoNav } from '../../pages/prototype-feature-layout/layouts';
+import { useLayout } from '../../pages/prototype-feature-layout/layoutStore';
 
 // White HSA logo. Served from our own /public rather than from the Wix CDN
 // that ufhsa.com uses: the header logo is on every page of the site, so a
@@ -31,6 +34,7 @@ function SiteHeader({ signedIn, eboard, cabinetView }: SiteHeaderProps) {
     const headerRef = useRef<HTMLElement>(null);
     const { pathname } = useLocation();
     const items = navItems({ cabinetView });
+    const protoItems = protoNav(useLayout(), cabinetView);
 
     // Sticky bars must not cover the focused element (WCAG 2.4.11): the
     // header's height feeds html's scroll-padding-top (layout.css). It grows
@@ -64,11 +68,7 @@ function SiteHeader({ signedIn, eboard, cabinetView }: SiteHeaderProps) {
                     {signedIn && (
                         <>
                             <nav className="site-header__nav" aria-label="Main">
-                                {items.map((item) => (
-                                    <NavLink key={item.to} to={item.to} className="site-header__link">
-                                        {item.label}
-                                    </NavLink>
-                                ))}
+                                <ProtoDesktopLinks items={protoItems} />
                                 {eboard && <EboardMenu active={pathname === '/eboard' || pathname.startsWith('/eboard/')} />}
                             </nav>
                             <AccountMenu eboard={eboard} />
@@ -78,7 +78,7 @@ function SiteHeader({ signedIn, eboard, cabinetView }: SiteHeaderProps) {
                 {signedIn && <PreviewBanner />}
             </header>
 
-            {signedIn && <TabBar items={items} />}
+            {signedIn && <ProtoTabBar items={protoItems} />}
         </>
     );
 }
@@ -184,6 +184,7 @@ function AccountMenu({ eboard }: { eboard: boolean }) {
                 <Caret />
             </button>
             <div id="account-menu" className="site-header__panel site-header__panel--end" hidden={!open}>
+                <ProtoAccountInfo /> {/* PROTOTYPE (throwaway): My information moves here in F */}
                 {canSwitch && (
                     <fieldset className="site-header__views">
                         <legend>View as</legend>

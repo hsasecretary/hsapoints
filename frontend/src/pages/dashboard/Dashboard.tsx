@@ -14,6 +14,8 @@ import NewPointSystemBanner from './sections/NewPointSystemBanner';
 import PointsAndEvents from './sections/PointsAndEvents';
 import PointsSummary from './sections/PointsSummary';
 import { pendingMakeups, useMemberStanding } from './useMemberStanding';
+// PROTOTYPE (throwaway): feature-layout variants
+import { DashboardAfterCode, DashboardBeforeMakeUps, DashboardEnd, useHideCodeBox, useHideInfo } from '../prototype-feature-layout/layouts';
 
 const BUBBLES = ['points', 'how'] as const;
 type Bubble = (typeof BUBBLES)[number];
@@ -34,6 +36,8 @@ type Bubble = (typeof BUBBLES)[number];
 function Dashboard({ email }: { email: string }) {
     const { loading, member, attendances, codes, requests, pending, standing, today } = useMemberStanding(email, useViewOverride());
     const [params, setParams] = useSearchParams();
+    const hideCode = useHideCodeBox();
+    const hideInfo = useHideInfo();
     const open = BUBBLES.find((bubble) => bubble === params.get('open')) ?? null;
 
     const toggle = (bubble: Bubble) => {
@@ -57,7 +61,7 @@ function Dashboard({ email }: { email: string }) {
         <div className="overview">
             <h1 className="overview__title">{firstName ? `Hi, ${firstName}` : 'Dashboard'}</h1>
             <NewPointSystemBanner onOpenGuide={openGuide} />
-            {profile && (
+            {profile && !hideInfo && (
                 <dl className="overview__info" aria-label="My information">
                     <div><dt>Name</dt><dd>{[profile.firstName, profile.lastName].filter(Boolean).join(' ') || 'N/A'}</dd></div>
                     <div><dt>Email</dt><dd>{email}</dd></div>
@@ -70,7 +74,8 @@ function Dashboard({ email }: { email: string }) {
                     </div>
                 </dl>
             )}
-            <div className="overview__code"><EventCodeForm /></div>
+            {!hideCode && <div className="overview__code"><EventCodeForm /></div>}
+            <DashboardAfterCode />
 
             {loading ? <p className="overview__loading" role="status">Loading your points…</p> : (
                 <>
@@ -103,9 +108,11 @@ function Dashboard({ email }: { email: string }) {
                             <Explainer member={member} />
                         </section>
                     )}
+                    <DashboardBeforeMakeUps />
                     {standing.heldToCabinetRules && !standing.exempt && (
                         <MakeUpList standing={standing} codes={codes} pendingPicks={pendingMakeups(pending)} />
                     )}
+                    <DashboardEnd />
                 </>
             )}
         </div>
