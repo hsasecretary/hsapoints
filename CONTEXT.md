@@ -150,16 +150,16 @@ E-Board lifts an Overdue Member's checkout block while the item stays out (the C
 ### Leaderboard
 
 **Rank**:
-A Member's numeric position on the Leaderboard, computed by sorting all Members by Total Points and using competition ranking: Members with equal Total Points share a Rank, and the next distinct Rank skips ahead by the size of that Tie Cluster (1, 1, 3, 4…).
+A Member's numeric position on the Leaderboard, computed by sorting every Member except E-Board by their Total Points for the current school year (Adjustments included, so it is the number their Overview shows) and using competition ranking: Members with equal Total Points share a Rank, and the next distinct Rank skips ahead by the size of that Tie Cluster (1, 1, 3, 4…). Members with no points yet are ranked too, so the count of Members is everyone. E-Board are never ranked: they run the system and are exempt from it. Ranks reset with Total Points each school year.
 
 **Tie Cluster**:
 The set of Members who share the same Total Points value, and therefore the same Rank.
 
 **Leaderboard**:
-The anonymized, per-Member view of standing among all Members: shows Top Ranks by name, then Your Standing surrounded by its Neighboring Ranks, with Neighboring Ranks shown as position and score only, and every other Member's identity hidden.
+The anonymized, per-Member view of standing among all Members: shows Top Ranks by name, then Your Standing surrounded by its Neighboring Ranks, with Neighboring Ranks shown as position and score only, and every other Member's identity hidden. The viewer's own Total Points are always current; everyone else's are as of the board's last refresh, which the board shows. E-Board see Top Ranks and the count of Members but have no Your Standing, whichever view they are previewing.
 
 **Top Ranks**:
-Members whose Rank is 1 through 5. May include more than five Members when a Tie Cluster spans the Rank-5 boundary.
+Members whose Rank is 1 through 5 and who have at least 1 point. May include more than five Members when a Tie Cluster spans the Rank-5 boundary. A Member with no points is never in Top Ranks, so a year where nobody has scored yet has no Top Ranks and names nobody.
 _Avoid_: Top 5 (imprecise once ties are involved)
 
 **Your Standing**:
