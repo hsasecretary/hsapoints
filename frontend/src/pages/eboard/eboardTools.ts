@@ -7,4 +7,5 @@ export const EBOARD_TOOLS = [
     { path: 'user-lookup', label: 'User Lookup' },
     { path: 'excuse-absence', label: 'Excuse Absence' },
     { path: 'approvals', label: 'E-Board Member Approval' },
+    { path: 'closet', label: 'Closet' },
 ] as const;

@@ -194,3 +194,38 @@ describe('pointRequests', () => {
         await assertFails(addDoc(collection(db, 'pointRequests'), { ...pendingRequest(MEMBER), reviewedBy: MEMBER }));
     });
 });
+
+describe('closetItems', () => {
+    const CABINET_MEMBER = 'carla@ufl.edu';
+    const item = { description: 'Projector', retired: false };
+
+    beforeEach(async () => {
+        await seed(env, { [`users/${CABINET_MEMBER}`]: memberDoc(CABINET_MEMBER, { cabinet: 'operations' }) });
+    });
+
+    it('lets E-Board add, update and retire a Closet Item', async () => {
+        const db = signedInAs(env, EBOARD);
+        await assertSucceeds(setDoc(doc(db, 'closetItems/099'), item));
+        await assertSucceeds(updateDoc(doc(db, 'closetItems/099'), { retired: true }));
+        await assertSucceeds(deleteDoc(doc(db, 'closetItems/099')));
+    });
+
+    it("won't let a General Member or a Cabinet Member write a Closet Item", async () => {
+        for (const email of [MEMBER, CABINET_MEMBER]) {
+            await assertFails(setDoc(doc(signedInAs(env, email), 'closetItems/099'), item));
+        }
+        await seed(env, { 'closetItems/099': item });
+        for (const email of [MEMBER, CABINET_MEMBER]) {
+            await assertFails(updateDoc(doc(signedInAs(env, email), 'closetItems/099'), { retired: true }));
+            await assertFails(deleteDoc(doc(signedInAs(env, email), 'closetItems/099')));
+        }
+    });
+
+    it('lets a Cabinet Member and E-Board read Closet Items, never a General Member', async () => {
+        await seed(env, { 'closetItems/099': item });
+        await assertSucceeds(getDoc(doc(signedInAs(env, CABINET_MEMBER), 'closetItems/099')));
+        await assertSucceeds(getDocs(collection(signedInAs(env, EBOARD), 'closetItems')));
+        await assertFails(getDoc(doc(signedInAs(env, MEMBER), 'closetItems/099')));
+        await assertFails(getDocs(collection(signedInAs(env, MEMBER), 'closetItems')));
+    });
+});
