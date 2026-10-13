@@ -134,3 +134,17 @@ The viewing Member's own Rank and Tie Cluster size on the Leaderboard, always sh
 **Neighboring Ranks**:
 The Ranks immediately above and below Your Standing on the Leaderboard — up to three in each direction, one per Rank. Their Rank numbers and Total Points are shown; the Members holding them are never named or counted. A Rank already in Top Ranks is never also a Neighboring Rank: it is on the Leaderboard by name, so there is nothing about it left to hide.
 _Avoid_: Filler rows, nearby members
+
+### Closet
+
+**Closet Item**:
+A piece of HSA equipment (e.g. a folding table, a speaker) E-Board makes available for free loan, tracked by its Sticker Number. E-Board adds and retires Closet Items on `/eboard/closet`; nothing else about one ever changes.
+
+**Sticker Number**:
+The number on a Closet Item's physical sticker and its unique ID in the registry. Stored zero-padded to at least 3 digits ("3" is "003") so it sorts and matches the sticker itself.
+
+**Retired** (Closet Item):
+A Closet Item E-Board has taken out of circulation. It keeps its place in the registry and its Checkout history, so it is never deleted, but it can't be checked out again.
+
+**Closet Borrower**:
+A Member who can read the Closet Item registry and, once Checkouts exist, borrow from it: every Cabinet Member and E-Board. A General Member isn't one, since they can't borrow from the Closet.

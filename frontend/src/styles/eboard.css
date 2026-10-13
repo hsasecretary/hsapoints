@@ -1692,3 +1692,58 @@
     background: var(--hsa-teal-700); color: #ffffff; font: inherit; font-weight: 700; cursor: pointer;
 }
 .ulk .ulk-add__confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ---- Closet Items  (ClosetItemsPage.tsx) ------------------------------
+   Add a Closet Item by sticker number + description; Active and Retired
+   lists below. Simpler than Event Codes: no filters, no inline edit. */
+.closet-items-page { max-width: 760px; margin: 0 auto; padding: 20px 16px 40px; }
+
+.closet-items-page__add {
+    display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px;
+    margin-bottom: 24px; padding: 16px; background: var(--hsa-surface);
+    border: 1.5px solid var(--hsa-teal-600); border-radius: 10px;
+}
+.closet-items-page__add label { display: flex; flex-direction: column; gap: 4px; font-size: var(--hsa-text-sm); font-weight: 700; color: var(--hsa-ink); }
+.closet-items-page__add input {
+    padding: 9px 10px; border: 1.5px solid var(--hsa-border); border-radius: 6px;
+    font: inherit; font-size: var(--hsa-text-base); color: var(--hsa-ink); background: var(--hsa-surface);
+}
+.closet-items-page__add button[type="submit"] {
+    padding: 10px 18px; border: none; border-radius: 6px; background: var(--hsa-teal-700);
+    color: #ffffff; font: inherit; font-weight: 700; cursor: pointer;
+}
+.closet-items-page__add button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
+.closet-items-page__error { flex: 1 1 100%; margin: 0; color: var(--hsa-danger-strong); font-size: var(--hsa-text-sm); font-weight: 600; }
+
+.closet-items-page h2 { display: flex; align-items: baseline; gap: 8px; color: var(--hsa-teal-700); font-size: var(--hsa-text-lg); }
+.closet-items-page h2 span { color: var(--hsa-muted); font-weight: 400; font-size: var(--hsa-text-sm); }
+.closet-items-page__empty { color: var(--hsa-muted); }
+
+.closet-items-page__list { list-style: none; margin: 0; padding: 0; }
+.closet-items-page__row {
+    display: flex; align-items: center; gap: 12px; padding: 10px 0;
+    border-top: 1px solid var(--hsa-border-light);
+}
+.closet-items-page__sticker { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--hsa-teal-700); }
+.closet-items-page__description { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.closet-items-page__list--retired .closet-items-page__row { color: var(--hsa-muted); }
+
+.closet-items-page__tag {
+    padding: 1px 8px; border-radius: 999px; border: 1px solid var(--hsa-border);
+    background: var(--hsa-surface-sunken); color: var(--hsa-ink-soft); font-size: var(--hsa-text-xs); font-weight: 600;
+}
+
+.closet-items-page .link-button {
+    padding: 4px 6px; border: none; background: none; color: var(--hsa-teal-600);
+    font-weight: 600; font-size: var(--hsa-text-sm); text-decoration: underline; cursor: pointer; box-shadow: none;
+}
+.closet-items-page .link-button:hover { background: none; border: none; box-shadow: none; color: var(--hsa-teal-800); }
+.closet-items-page .link-button--danger { color: var(--hsa-danger); }
+.closet-items-page .link-button--danger:hover { color: var(--hsa-danger-strong); }
+
+.closet-items-page__confirm { display: flex; align-items: center; gap: 8px; font-size: var(--hsa-text-sm); color: var(--hsa-danger-strong); font-weight: 600; }
+.closet-items-page__confirm button:not(.link-button) {
+    padding: 4px 12px; border: none; border-radius: 6px; background: var(--hsa-danger);
+    color: #ffffff; font: inherit; font-weight: 700; cursor: pointer;
+}
+.closet-items-page__confirm button:not(.link-button):disabled { opacity: 0.6; cursor: not-allowed; }

@@ -23,6 +23,16 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(callerEmail())).data.eboard == true;
     }
 
+    // Closet Borrowers (#104, #105): every Cabinet Member and E-Board. A
+    // General Member can't read the Closet Item registry, since they can't
+    // borrow from it.
+    function isClosetBorrower() {
+      return isEboard() ||
+        (signedIn() &&
+         exists(/databases/$(database)/documents/users/$(callerEmail())) &&
+         get(/databases/$(database)/documents/users/$(callerEmail())).data.get('cabinet', 'none') != 'none');
+    }
+
     // Per-Member facts only E-Board sets (ADR-0002). A Member can't write
     // them on update (Members can't update their doc) or sneak them
     // in at sign-up.
@@ -135,6 +145,14 @@ service cloud.firestore {
          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['emails']) &&
          request.resource.data.emails.hasAll(resource.data.emails) &&
          request.resource.data.emails.hasOnly(resource.data.emails.concat([callerEmail()])));
+    }
+
+    // The Closet Item registry (#104, #105): sticker number -> description.
+    // E-Board adds and retires items; a retired item still reads (its
+    // history survives, see lib/closet.ts) but only E-Board can write it.
+    match /closetItems/{stickerNumber} {
+      allow get, list: if isClosetBorrower();
+      allow create, update, delete: if isEboard();
     }
 
     match /{document=**} {
