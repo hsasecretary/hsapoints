@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
-import { auth } from '../../lib/firebase';
+import { auth, db } from '../../lib/firebase';
+import { refreshLeaderboard } from '../../lib/leaderboardRefresh';
 import { VIEW_LABELS, VIEWS } from '../../lib/viewAs';
 import { EBOARD_TOOLS } from '../../pages/eboard/eboardTools';
 import { navItems, type NavIcon, type NavItem } from './navItems';
@@ -145,7 +146,53 @@ function EboardToolLinks() {
                     </NavLink>
                 </li>
             ))}
+            <li className="site-header__panel-divider">
+                <RefreshLeaderboardButton />
+            </li>
         </ul>
+    );
+}
+
+type RefreshState = 'idle' | 'busy' | 'done' | 'failed';
+
+const REFRESH_LABELS: Record<RefreshState, string> = {
+    idle: 'Refresh Leaderboard',
+    busy: 'Refreshing…',
+    done: 'Leaderboard refreshed',
+    failed: "Couldn't refresh. Try again",
+};
+
+/** Rebuilds leaderboard/current now, from any page (EboardHome has the same, with the last refresh time). */
+function RefreshLeaderboardButton() {
+    const [state, setState] = useState<RefreshState>('idle');
+
+    useEffect(() => {
+        if (state !== 'done') return undefined;
+        const timer = window.setTimeout(() => setState('idle'), 3000);
+        return () => window.clearTimeout(timer);
+    }, [state]);
+
+    async function refresh() {
+        setState('busy');
+        try {
+            await refreshLeaderboard(db, auth.currentUser?.email?.toLowerCase() ?? 'E-Board');
+            setState('done');
+        } catch (error) {
+            console.error('Error refreshing the Leaderboard:', error);
+            setState('failed');
+        }
+    }
+
+    return (
+        <button
+            type="button"
+            className="site-header__panel-link site-header__panel-action"
+            onClick={refresh}
+            disabled={state === 'busy'}
+            aria-live="polite"
+        >
+            {REFRESH_LABELS[state]}
+        </button>
     );
 }
 

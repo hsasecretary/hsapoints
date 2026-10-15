@@ -14,6 +14,7 @@ import Leaderboard from './pages/points/Leaderboard';
 import Requirements from './pages/requirements/Requirements';
 import { ViewAsContext, type ViewAsState } from './components/layout/ViewAsContext';
 import { canSwitchView, effectiveView, ownView, type View } from './lib/viewAs';
+import { isRanked } from './lib/leaderboard';
 
 import React, { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { onAuthStateChanged} from 'firebase/auth';
@@ -36,6 +37,8 @@ function App() {
     const [userEmail, setUserEmail] = useState(null);
     const [isEboard, setIsEboard] = useState(false);
     const [isCabinetMember, setIsCabinetMember] = useState(false);
+    // On the Leaderboard (lib/leaderboard.ts isRanked): all but E-Board, Web-team devs included.
+    const [isRankedMember, setIsRankedMember] = useState(true);
     // The view switcher (lib/viewAs.ts): the Member's Own View, whether they
     // may switch, and the view they picked (null = their own). Display only.
     const [own, setOwn] = useState<View>('general');
@@ -63,6 +66,7 @@ function App() {
         setPicked(null);
         if (!userEmail) {
             setIsEboard(false);
+            setIsRankedMember(true);
             setIsCabinetMember(false);
             setOwn('general');
             setCanSwitch(false);
@@ -77,6 +81,7 @@ function App() {
             (userDocSnap) => {
                 const data = userDocSnap.exists() ? userDocSnap.data() : null;
                 setIsEboard(data?.eboard === true);
+                setIsRankedMember(data ? isRanked(data) : true);
                 setIsCabinetMember(data?.approved === true && data?.cabinet !== "none");
                 setOwn(data ? ownView(data) : 'general');
                 setCanSwitch(data ? canSwitchView(data) : false);
@@ -85,6 +90,7 @@ function App() {
             (error) => {
                 console.error("Failed to load user roles:", error);
                 setIsEboard(false);
+                setIsRankedMember(true);
                 setIsCabinetMember(false);
                 setOwn('general');
                 setCanSwitch(false);
@@ -124,7 +130,7 @@ function App() {
                         <Route path="/points" element={userEmail ? <Points /> : <Navigate to="/login" />}>
                             <Route index element={<Navigate to="requests" replace />} />
                             <Route path="requests" element={<Requests />} />
-                            <Route path="leaderboard" element={<Leaderboard email={userEmail} eboard={isEboard} />} />
+                            <Route path="leaderboard" element={<Leaderboard email={userEmail} ranked={isRankedMember} />} />
                         </Route>
                         {/* Requests moved under Points; ?makeup={CODE} links still work */}
                         <Route path="/requests" element={<RequestsMoved />} />

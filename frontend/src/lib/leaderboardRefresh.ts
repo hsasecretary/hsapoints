@@ -6,7 +6,7 @@ import {
     collection, doc, getDoc, getDocs, query, runTransaction, serverTimestamp, setDoc, where, type Firestore,
 } from 'firebase/firestore';
 import type { Attendance, Member } from './computeStanding';
-import { isStale, snapshotFor, type LeaderboardSnapshot } from './leaderboard';
+import { isRanked, isStale, snapshotFor, type LeaderboardSnapshot } from './leaderboard';
 import { academicYear, toIsoDate } from './semester';
 
 export const LEADERBOARD_DOC = 'leaderboard/current';
@@ -61,7 +61,7 @@ export async function refreshLeaderboard(db: Firestore, by: string, today = toIs
 
     const users = usersSnap.docs.map((snap) => ({ email: snap.id, data: snap.data() as Member & { firstName?: string; lastName?: string; leaderboardToken?: string } }));
     const tokens = new Map(users.filter((user) => user.data.leaderboardToken).map((user) => [user.email, user.data.leaderboardToken]));
-    const missing = users.filter((user) => !user.data.leaderboardToken && user.data.eboard !== true).map((user) => user.email);
+    const missing = users.filter((user) => !user.data.leaderboardToken && isRanked(user.data)).map((user) => user.email);
     (await assignTokens(db, missing)).forEach((token, email) => tokens.set(email, token));
 
     const snapshot = snapshotFor({

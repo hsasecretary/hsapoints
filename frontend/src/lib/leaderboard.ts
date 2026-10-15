@@ -37,8 +37,17 @@ export type SnapshotMember = {
     firstName?: string;
     lastName?: string;
     eboard?: boolean;
+    webTeam?: boolean;
     totalPoints: number;
 };
+
+/**
+ * Whether a Member is on the board: everyone but E-Board, who run the system
+ * and are exempt from it, except Web-team devs, who are ranked like anyone.
+ */
+export function isRanked(member: { eboard?: boolean; webTeam?: boolean }): boolean {
+    return member.eboard !== true || member.webTeam === true;
+}
 
 /** One Member on the board. `name` is null for anyone the snapshot didn't name. */
 export type LeaderboardEntry = {
@@ -136,9 +145,9 @@ function fullName(member: SnapshotMember): string {
     return [member.firstName, member.lastName].map((part) => (part ?? '').trim()).filter(Boolean).join(' ');
 }
 
-/** The snapshot E-Board writes: every Member but E-Board, named only in Top Ranks. */
+/** The snapshot E-Board writes: every ranked Member, named only in Top Ranks. */
 export function buildSnapshot(members: SnapshotMember[]): LeaderboardSnapshot {
-    const ranked = members.filter((member) => member.eboard !== true);
+    const ranked = members.filter(isRanked);
     const nameByToken = new Map(ranked.map((member) => [member.token, fullName(member)]));
     const groups = rankGroups(ranked.map((member) => ({
         token: member.token, name: nameByToken.get(member.token), totalPoints: member.totalPoints,
@@ -161,6 +170,7 @@ export function snapshotFor({ today, members }: RefreshInput): LeaderboardSnapsh
         firstName: member.firstName,
         lastName: member.lastName,
         eboard: member.eboard,
+        webTeam: member.webTeam,
         totalPoints: memberTotal(member, attendances, today),
     })));
 }
@@ -229,17 +239,17 @@ export function buildLeaderboard(entries: LeaderboardEntry[]): LeaderboardResult
 }
 
 /**
- * The board a viewer sees. A Member is ranked with their live Total Points;
- * E-Board aren't ranked, so they get the snapshot as it is and no Your
- * Standing, whatever view they preview.
+ * The board a viewer sees. A ranked Member (isRanked) is ranked with their
+ * live Total Points; the rest of E-Board get the snapshot as it is and no
+ * Your Standing, whatever view they preview.
  */
-export function boardFor({ snapshot, token, liveTotal, eboard }: {
+export function boardFor({ snapshot, token, liveTotal, ranked }: {
     snapshot: LeaderboardSnapshot;
     token: string | null;
     liveTotal: number;
-    eboard: boolean;
+    ranked: boolean;
 }): LeaderboardResult {
-    return buildLeaderboard(eboard ? snapshotEntries(snapshot) : withViewer(snapshot, token, liveTotal));
+    return buildLeaderboard(ranked ? withViewer(snapshot, token, liveTotal) : snapshotEntries(snapshot));
 }
 
 /**

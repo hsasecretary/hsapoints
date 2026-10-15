@@ -112,10 +112,12 @@ def main():
         data = d.to_dict() or {}
         by_email.setdefault(str(data.get("email", "")).lower(), []).append({"id": d.id, **plain(data)})
 
-    # E-Board are never ranked, so they never need a token. A dry run makes
-    # up the missing ones; --apply writes them before building the snapshot.
+    # E-Board are never ranked (Web-team devs are; lib/leaderboard.ts isRanked),
+    # so they never need a token. A dry run makes up the missing ones; --apply
+    # writes them before building the snapshot.
     missing = [email for email, user in users.items()
-               if not user.get("leaderboardToken") and user.get("eboard") is not True]
+               if not user.get("leaderboardToken")
+               and (user.get("eboard") is not True or user.get("webTeam") is True)]
     tokens = {email: user["leaderboardToken"] for email, user in users.items() if user.get("leaderboardToken")}
     tokens.update(assign_tokens(db, missing) if args.apply else {email: str(uuid.uuid4()) for email in missing})
 

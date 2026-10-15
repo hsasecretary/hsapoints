@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Attendance, Member } from './computeStanding';
 import {
-    REFRESH_AFTER_MS, TOP_RANK_CUTOFF, asOfLabel, boardFor, buildLeaderboard, buildSnapshot, entryName, isStale,
+    REFRESH_AFTER_MS, TOP_RANK_CUTOFF, asOfLabel, boardFor, buildLeaderboard, buildSnapshot, entryName, isRanked, isStale,
     memberTotal, snapshotEntries, snapshotFor, withViewer, type SnapshotMember,
 } from './leaderboard';
 
@@ -28,6 +28,12 @@ describe('buildSnapshot', () => {
         expect(snapshot.scores).toEqual([{ t: 'a', p: 4 }]);
         expect(snapshot.members).toBe(1);
         expect(snapshot.names).not.toHaveProperty('eva');
+    });
+
+    it('ranks a Web-team dev even when they are on E-Board', () => {
+        const snapshot = buildSnapshot([member('a', 4), member('dev', 6, { eboard: true, webTeam: true })]);
+        expect(snapshot.scores).toEqual([{ t: 'dev', p: 6 }, { t: 'a', p: 4 }]);
+        expect(snapshot.names).toHaveProperty('dev');
     });
 
     it('counts Members with no points but never names them', () => {
@@ -150,6 +156,15 @@ describe('buildLeaderboard', () => {
     });
 });
 
+describe('isRanked', () => {
+    it('ranks Members and Web-team devs, never the rest of E-Board', () => {
+        expect(isRanked({ eboard: false })).toBe(true);
+        expect(isRanked({})).toBe(true);
+        expect(isRanked({ eboard: true })).toBe(false);
+        expect(isRanked({ eboard: true, webTeam: true })).toBe(true);
+    });
+});
+
 describe('isStale', () => {
     const now = new Date('2026-09-26T12:00:00Z');
 
@@ -167,13 +182,13 @@ describe('boardFor', () => {
     const snapshot = buildSnapshot([member('a', 9), member('me', 4), member('c', 6)]);
 
     it('ranks a Member with their live Total Points', () => {
-        const result = boardFor({ snapshot, token: 'me', liveTotal: 7, eboard: false });
+        const result = boardFor({ snapshot, token: 'me', liveTotal: 7, ranked: true });
         expect(result.yourStanding).toMatchObject({ rank: 2, totalPoints: 7 });
         expect(result.totalMembers).toBe(3);
     });
 
     it("gives E-Board the snapshot as it is, with no Your Standing", () => {
-        const result = boardFor({ snapshot, token: null, liveTotal: 50, eboard: true });
+        const result = boardFor({ snapshot, token: null, liveTotal: 50, ranked: false });
         expect(result.yourStanding).toBeNull();
         expect(result.totalMembers).toBe(3);
         expect(result.topRanks.map((group) => group.totalPoints)).toEqual([9, 6, 4]);

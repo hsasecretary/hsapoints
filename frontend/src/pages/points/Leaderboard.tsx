@@ -57,19 +57,20 @@ function useSnapshot(): Snapshot | null | undefined | 'error' {
 
 // /points/leaderboard. Everyone else is as of E-Board's last refresh; the
 // viewer is ranked with their live Total Points, so redeeming a code moves
-// them at once. E-Board aren't ranked: they see the snapshot as it is.
-export default function Leaderboard({ email, eboard }: { email: string; eboard: boolean }) {
+// them at once. E-Board (but Web-team devs) aren't ranked: they see the
+// snapshot as it is.
+export default function Leaderboard({ email, ranked }: { email: string; ranked: boolean }) {
     const snapshot = useSnapshot();
-    // E-Board get no Your Standing, so they skip loading their own.
-    const { member, standing } = useMemberStanding(eboard ? null : email, useViewOverride());
+    // Unranked E-Board get no Your Standing, so they skip loading their own.
+    const { member, standing } = useMemberStanding(ranked ? email : null, useViewOverride());
     const token = (member as { leaderboardToken?: string } | null)?.leaderboardToken ?? null;
     const liveTotal = standing?.vePoints ?? null;
 
     const leaderboard = useMemo(() => {
         if (!snapshot || snapshot === 'error') return null;
-        if (!eboard && liveTotal === null) return null;
-        return boardFor({ snapshot, token, liveTotal: liveTotal ?? 0, eboard });
-    }, [snapshot, token, liveTotal, eboard]);
+        if (ranked && liveTotal === null) return null;
+        return boardFor({ snapshot, token, liveTotal: liveTotal ?? 0, ranked });
+    }, [snapshot, token, liveTotal, ranked]);
 
     const [expandedRanks, setExpandedRanks] = useState<Set<number>>(new Set());
 
@@ -107,7 +108,7 @@ export default function Leaderboard({ email, eboard }: { email: string; eboard: 
         <Shell>
             {snapshot.refreshedAt && (
                 <p className="leaderboard-asof">
-                    {eboard ? 'As of' : 'Others as of'} {asOfLabel(snapshot.refreshedAt, new Date())}
+                    {ranked ? 'Others as of' : 'As of'} {asOfLabel(snapshot.refreshedAt, new Date())}
                 </p>
             )}
 
@@ -141,7 +142,7 @@ export default function Leaderboard({ email, eboard }: { email: string; eboard: 
 
             {yourStanding && !yourStanding.isInTopRanks && <StandingBoard standing={yourStanding} />}
 
-            {eboard ? (
+            {!ranked ? (
                 <div className="leaderboard-summary">
                     <div className="leaderboard-counter">
                         {totalMembers} Member{totalMembers === 1 ? '' : 's'} ranked
