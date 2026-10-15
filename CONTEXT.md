@@ -104,6 +104,10 @@ A Core Event that has happened and that the Cabinet Member didn't attend. Excuse
 **Excused Absence**:
 A Missed Event E-Board marked excused. It still needs a Make-up, but earns no Strike. The policy asks for the excuse before the event; E-Board judges that when marking it, and the system sets no deadline. Only E-Board and the backend see the excused/unexcused split; Members just see Missed Events and their Strike count.
 
+**Excuse Request**:
+A Cabinet Member's or Web-team Tester's request, filed in the portal, to have a Core Event they can't attend marked as an Excused Absence. It names one Core Event E-Board has already coded, by its name and date (never its code), and gives a reason; a Member may file for several events at once, but each is its own request. Only an event dated today or later can be named, and the date and time it was filed are recorded for E-Board to see; a late excuse is E-Board's to enter directly. E-Board reviews every one; nothing is excused until E-Board approves, and a denial needs a reason the Member sees. A Member may withdraw a request that is still pending; a denied one is final for the Member. It replaces the Valid Excuse Form. Only Core Events can be named: other events can't become Missed Events, so there is nothing to excuse.
+_Avoid_: Valid Excuse Form (the Google Form it replaces)
+
 **Strike**:
 The mark an unexcused Missed Event earns. A Member's Strike count is their open Strikes: it goes up with each unexcused Missed Event and down with each Make-up or removal, with no upper limit. Strikes never reset: open fall Strikes carry into the spring. At three or more open Strikes, a Cabinet Member is at risk of probation and must meet with the Chief of Staff. Cleared by a Make-up, or removed by E-Board with a recorded reason; removing a Strike does not close its Missed Event, which still needs a Make-up unless E-Board overrides the Missed Event itself.
 
