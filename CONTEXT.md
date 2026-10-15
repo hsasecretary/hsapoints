@@ -159,8 +159,8 @@ The set of Members who share the same Total Points value, and therefore the same
 The anonymized, per-Member view of standing among all Members: shows Top Ranks by name, then Your Standing surrounded by its Neighboring Ranks, with Neighboring Ranks shown as position and score only, and every other Member's identity hidden. The viewer's own Total Points are always current; everyone else's are as of the board's last refresh, which the board shows. E-Board see Top Ranks and the count of Members but have no Your Standing, whichever view they are previewing.
 
 **Top Ranks**:
-Members whose Rank is 1 through 5 and who have at least 1 point. May include more than five Members when a Tie Cluster spans the Rank-5 boundary. A Member with no points is never in Top Ranks, so a year where nobody has scored yet has no Top Ranks and names nobody.
-_Avoid_: Top 5 (imprecise once ties are involved)
+Members whose Rank is 1 through 10 and who have at least 1 point. May include more than ten Members when a Tie Cluster spans the Rank-10 boundary. A Member with no points is never in Top Ranks, so a year where nobody has scored yet has no Top Ranks and names nobody.
+_Avoid_: Top 10 (imprecise once ties are involved)
 
 **Your Standing**:
 The viewing Member's own Rank and Tie Cluster size on the Leaderboard, always shown regardless of whether they're also in Top Ranks.
