@@ -30,7 +30,7 @@ service cloud.firestore {
       return [
         'mlpCohort', 'heldToCabinetRules', 'webTeam',
         'excusals', 'strikeRemovals', 'missedEventOverrides', 'adjustments',
-        'absenceLog', 'removedCheckIns'
+        'absenceLog', 'removedCheckIns', 'leaderboardToken'
       ];
     }
 
@@ -135,6 +135,14 @@ service cloud.firestore {
          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['emails']) &&
          request.resource.data.emails.hasAll(resource.data.emails) &&
          request.resource.data.emails.hasOnly(resource.data.emails.concat([callerEmail()])));
+    }
+
+    // The Leaderboard's snapshot (docs/adr/0004): every Member's Total Points
+    // under a random token, names for Top Ranks only. Any Member reads it;
+    // only E-Board's refresh writes it.
+    match /leaderboard/current {
+      allow get: if signedIn();
+      allow write: if isEboard();
     }
 
     match /{document=**} {

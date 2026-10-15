@@ -56,6 +56,38 @@
     font-size: 22px;
 }
 
+.eboard-home__leaderboard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+    padding: 16px 18px;
+    background: var(--hsa-surface-subtle);
+    border: 1px solid var(--hsa-border-light);
+    border-radius: 12px;
+}
+
+.eboard-home__subtitle {
+    margin: 0;
+    text-align: left;
+    color: var(--hsa-ink);
+    font-size: var(--hsa-text-base);
+}
+
+.eboard-home__status {
+    margin: 4px 0 0;
+    color: var(--hsa-muted);
+    font-size: var(--hsa-text-sm);
+}
+
+.eboard-home__error {
+    margin: 4px 0 0;
+    color: var(--hsa-danger);
+    font-size: var(--hsa-text-sm);
+}
+
 /* ---- Pending cabinet approvals  (ApprovedCabinet.tsx) ----------------------------------- */
 
 #approvedCabinetContainer.approvals {

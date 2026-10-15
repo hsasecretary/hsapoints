@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
-import { auth } from '../../lib/firebase';
+import { auth, db } from '../../lib/firebase';
+import { refreshLeaderboard } from '../../lib/leaderboardRefresh';
 import { VIEW_LABELS, VIEWS } from '../../lib/viewAs';
 import { EBOARD_TOOLS } from '../../pages/eboard/eboardTools';
 import { navItems, type NavIcon, type NavItem } from './navItems';
@@ -145,7 +146,53 @@ function EboardToolLinks() {
                     </NavLink>
                 </li>
             ))}
+            <li className="site-header__panel-divider">
+                <RefreshLeaderboardButton />
+            </li>
         </ul>
+    );
+}
+
+type RefreshState = 'idle' | 'busy' | 'done' | 'failed';
+
+const REFRESH_LABELS: Record<RefreshState, string> = {
+    idle: 'Refresh Leaderboard',
+    busy: 'Refreshing…',
+    done: 'Leaderboard refreshed',
+    failed: "Couldn't refresh. Try again",
+};
+
+/** Rebuilds leaderboard/current now, from any page (EboardHome has the same, with the last refresh time). */
+function RefreshLeaderboardButton() {
+    const [state, setState] = useState<RefreshState>('idle');
+
+    useEffect(() => {
+        if (state !== 'done') return undefined;
+        const timer = window.setTimeout(() => setState('idle'), 3000);
+        return () => window.clearTimeout(timer);
+    }, [state]);
+
+    async function refresh() {
+        setState('busy');
+        try {
+            await refreshLeaderboard(db, auth.currentUser?.email?.toLowerCase() ?? 'E-Board');
+            setState('done');
+        } catch (error) {
+            console.error('Error refreshing the Leaderboard:', error);
+            setState('failed');
+        }
+    }
+
+    return (
+        <button
+            type="button"
+            className="site-header__panel-link site-header__panel-action"
+            onClick={refresh}
+            disabled={state === 'busy'}
+            aria-live="polite"
+        >
+            {REFRESH_LABELS[state]}
+        </button>
     );
 }
 
@@ -256,7 +303,7 @@ function Caret() {
 const ICON_PATHS: Record<NavIcon | 'account', ReactNode> = {
     dashboard: <><path d="M4 11.5 12 5l8 6.5" /><path d="M6 10v9h12v-9" /><path d="M10 19v-5h4v5" /></>,
     requirements: <><rect x="5" y="4" width="14" height="16" rx="2" /><path d="m8.5 9 1.5 1.5L13 7.5" /><path d="M8.5 15h7" /></>,
-    requests: <><path d="M4 13h4l1.5 2.5h5L16 13h4" /><path d="M4 13 6.5 5h11L20 13v6H4z" /></>,
+    points: <><path d="M8 4h8v5a4 4 0 0 1-8 0z" /><path d="M8 6H5a3 3 0 0 0 3 3M16 6h3a3 3 0 0 1-3 3" /><path d="M12 13v3M9 20h6M10 16h4v4h-4z" /></>,
     account: <><circle cx="12" cy="8.5" r="3.5" /><path d="M5 20a7 7 0 0 1 14 0" /></>,
 };
 
