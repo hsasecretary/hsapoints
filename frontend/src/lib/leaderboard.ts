@@ -228,6 +228,39 @@ export function buildLeaderboard(entries: LeaderboardEntry[]): LeaderboardResult
     };
 }
 
+/**
+ * The board a viewer sees. A Member is ranked with their live Total Points;
+ * E-Board aren't ranked, so they get the snapshot as it is and no Your
+ * Standing, whatever view they preview.
+ */
+export function boardFor({ snapshot, token, liveTotal, eboard }: {
+    snapshot: LeaderboardSnapshot;
+    token: string | null;
+    liveTotal: number;
+    eboard: boolean;
+}): LeaderboardResult {
+    return buildLeaderboard(eboard ? snapshotEntries(snapshot) : withViewer(snapshot, token, liveTotal));
+}
+
+/**
+ * The name a Top Rank row shows. A viewer the last refresh didn't name has
+ * climbed into Top Ranks since, so they are "You"; anyone else unnamed (only
+ * possible when the viewer dropped out since) stays anonymous.
+ */
+export function entryName(entry: LeaderboardEntry): string {
+    return entry.name ?? (entry.isViewer ? 'You' : 'A Member');
+}
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** When the snapshot was taken: "6:05 PM" today, "Oct 12, 6:05 PM" before. */
+export function asOfLabel(refreshedAt: Date, now: Date): string {
+    const hours = refreshedAt.getHours();
+    const time = `${hours % 12 || 12}:${String(refreshedAt.getMinutes()).padStart(2, '0')} ${hours < 12 ? 'AM' : 'PM'}`;
+    const sameDay = refreshedAt.toDateString() === now.toDateString();
+    return sameDay ? time : `${MONTHS[refreshedAt.getMonth()]} ${refreshedAt.getDate()}, ${time}`;
+}
+
 /** Whether an E-Board page should refresh the snapshot: missing, or over an hour old. */
 export function isStale(refreshedAt: Date | null, now: Date): boolean {
     return !refreshedAt || now.getTime() - refreshedAt.getTime() > REFRESH_AFTER_MS;

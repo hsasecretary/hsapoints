@@ -30,7 +30,7 @@ function MakeUpList({ standing, codes, pendingPicks }: {
                                 {pendingPicks.has(missed.codeId)
                                     ? <span className="ov-makeups__pending">Make-up pending review</span>
                                     : (
-                                        <Link className="ov-makeups__btn" to={`/requests?makeup=${encodeURIComponent(missed.codeId)}`}>
+                                        <Link className="ov-makeups__btn" to={`/points/requests?makeup=${encodeURIComponent(missed.codeId)}`}>
                                             Make up event
                                         </Link>
                                     )}

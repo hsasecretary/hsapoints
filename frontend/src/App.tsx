@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
 import SignUp from './pages/auth/SignUp';
 import Login from './pages/auth/Login';
@@ -8,7 +8,9 @@ import Footer from './components/layout/Footer';
 import LoadingScreen, { useMinLoadingTime } from './components/ui/LoadingScreen';
 import NotFound from './pages/NotFound';
 import ForgotPassword from './pages/auth/ForgotPassword';
-import Requests from './pages/requests/Requests';
+import Points from './pages/points/Points';
+import Requests from './pages/points/Requests';
+import Leaderboard from './pages/points/Leaderboard';
 import Requirements from './pages/requirements/Requirements';
 import { ViewAsContext, type ViewAsState } from './components/layout/ViewAsContext';
 import { canSwitchView, effectiveView, ownView, type View } from './lib/viewAs';
@@ -118,7 +120,14 @@ function App() {
                         <Route path="/login" element={userEmail ? <Navigate to="/dashboard" replace /> : <Login />} />
                         <Route path="/dashboard" element={userEmail ? <Dashboard email={userEmail} /> : <Navigate to="/login" />} />
                         <Route path="/requirements" element={!userEmail ? <Navigate to="/login" /> : cabinetView ? <Requirements email={userEmail} /> : <Navigate to="/dashboard" replace />} />
-                        <Route path="/requests" element={userEmail ? <Requests /> : <Navigate to="/login" />} />
+                        {/* The Points tab: Requests · Leaderboard, each its own URL */}
+                        <Route path="/points" element={userEmail ? <Points /> : <Navigate to="/login" />}>
+                            <Route index element={<Navigate to="requests" replace />} />
+                            <Route path="requests" element={<Requests />} />
+                            <Route path="leaderboard" element={<Leaderboard email={userEmail} eboard={isEboard} />} />
+                        </Route>
+                        {/* Requests moved under Points; ?makeup={CODE} links still work */}
+                        <Route path="/requests" element={<RequestsMoved />} />
                         {/* The Guide page is gone; its explainer is the Overview's How it works bubble */}
                         <Route path="/guide" element={<Navigate to="/dashboard?open=how" replace />} />
                         <Route path="/cabinet" element={userEmail ? <Cabinet cabinet={isCabinetMember} /> : <Navigate to="/login" />} />
@@ -141,6 +150,12 @@ function App() {
         </Router>
         </ViewAsContext.Provider>
     );
+}
+
+// /requests → /points/requests, keeping the query string (?makeup={CODE}).
+function RequestsMoved() {
+    const { search } = useLocation();
+    return <Navigate to={{ pathname: '/points/requests', search }} replace />;
 }
 
 export default App;

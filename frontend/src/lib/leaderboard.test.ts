@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { Attendance, Member } from './computeStanding';
 import {
-    REFRESH_AFTER_MS, TOP_RANK_CUTOFF, buildLeaderboard, buildSnapshot, isStale, memberTotal, snapshotEntries,
-    snapshotFor, withViewer, type SnapshotMember,
+    REFRESH_AFTER_MS, TOP_RANK_CUTOFF, asOfLabel, boardFor, buildLeaderboard, buildSnapshot, entryName, isStale,
+    memberTotal, snapshotEntries, snapshotFor, withViewer, type SnapshotMember,
 } from './leaderboard';
 
 const TODAY = '2026-09-26';
@@ -160,5 +160,55 @@ describe('isStale', () => {
 
     it('is fresh within the hour', () => {
         expect(isStale(new Date(now.getTime() - REFRESH_AFTER_MS + 1000), now)).toBe(false);
+    });
+});
+
+describe('boardFor', () => {
+    const snapshot = buildSnapshot([member('a', 9), member('me', 4), member('c', 6)]);
+
+    it('ranks a Member with their live Total Points', () => {
+        const result = boardFor({ snapshot, token: 'me', liveTotal: 7, eboard: false });
+        expect(result.yourStanding).toMatchObject({ rank: 2, totalPoints: 7 });
+        expect(result.totalMembers).toBe(3);
+    });
+
+    it("gives E-Board the snapshot as it is, with no Your Standing", () => {
+        const result = boardFor({ snapshot, token: null, liveTotal: 50, eboard: true });
+        expect(result.yourStanding).toBeNull();
+        expect(result.totalMembers).toBe(3);
+        expect(result.topRanks.map((group) => group.totalPoints)).toEqual([9, 6, 4]);
+    });
+});
+
+describe('entryName', () => {
+    it("shows a Top Rank's name", () => {
+        expect(entryName({ token: 'a', name: 'Ana Ruiz', totalPoints: 3 })).toBe('Ana Ruiz');
+    });
+
+    it('shows "You" for a viewer the last refresh did not name (they climbed into Top Ranks since)', () => {
+        const all = Array.from({ length: 12 }, (_, i) => member(`m${i}`, 20 - i));
+        const stale = buildSnapshot([...all, member('me', 0)]);
+        const { topRanks } = buildLeaderboard(withViewer(stale, 'me', 30));
+        const [first] = topRanks;
+        expect(first.members).toEqual([{ token: 'me', name: null, totalPoints: 30, isViewer: true }]);
+        expect(entryName(first.members[0])).toBe('You');
+    });
+
+    it('never shows a token for someone else the snapshot did not name', () => {
+        expect(entryName({ token: 'secret', name: null, totalPoints: 1 })).toBe('A Member');
+    });
+});
+
+describe('asOfLabel', () => {
+    const now = new Date(2026, 9, 14, 19, 30);
+
+    it('gives the time alone for a refresh earlier today', () => {
+        expect(asOfLabel(new Date(2026, 9, 14, 18, 5), now)).toBe('6:05 PM');
+        expect(asOfLabel(new Date(2026, 9, 14, 0, 0), now)).toBe('12:00 AM');
+        expect(asOfLabel(new Date(2026, 9, 14, 12, 40), now)).toBe('12:40 PM');
+    });
+
+    it('adds the date for an older refresh', () => {
+        expect(asOfLabel(new Date(2026, 9, 12, 9, 7), now)).toBe('Oct 12, 9:07 AM');
     });
 });
