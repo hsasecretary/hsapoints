@@ -113,13 +113,11 @@ function toNeighborRank(group: RankGroup): NeighborRank {
 
 // Competition ranking: walk the sorted list, starting a new Tie Cluster
 // whenever Total Points changes. A cluster's Rank is 1 + how many Members are
-// strictly ahead of it. Ties sort by name, then token, so the order never
-// depends on the order the entries came in.
+// strictly ahead of it. Ties sort by token, never by name: the snapshot's
+// order is visible to every Member, and a name order would tell them who
+// they tie with.
 function rankGroups(entries: LeaderboardEntry[]): RankGroup[] {
-    const sorted = [...entries].sort((a, b) =>
-        b.totalPoints - a.totalPoints
-        || (a.name ?? '').localeCompare(b.name ?? '')
-        || a.token.localeCompare(b.token));
+    const sorted = [...entries].sort((a, b) => b.totalPoints - a.totalPoints || a.token.localeCompare(b.token));
     const groups: RankGroup[] = [];
     let membersAhead = 0;
     for (const entry of sorted) {
@@ -221,7 +219,11 @@ export function buildLeaderboard(entries: LeaderboardEntry[]): LeaderboardResult
 
     return {
         totalMembers: entries.length,
-        topRanks: groups.filter(isTopRank),
+        // Top Ranks are shown by name, so list each Tie Cluster alphabetically.
+        topRanks: groups.filter(isTopRank).map((group) => ({
+            ...group,
+            members: [...group.members].sort((a, b) => (a.name ?? '').localeCompare(b.name ?? '')),
+        })),
         yourStanding,
     };
 }

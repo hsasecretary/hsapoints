@@ -33,7 +33,8 @@ function LeaderboardRefresh() {
     const [error, setError] = useState('');
 
     useEffect(() => onSnapshot(doc(db, LEADERBOARD_DOC),
-        (snap) => setRefreshedAt(snap.data()?.refreshedAt?.toDate?.() ?? null),
+        // 'estimate' so "Refresh now" shows its time before the server's lands.
+        (snap) => setRefreshedAt(snap.data({ serverTimestamps: 'estimate' })?.refreshedAt?.toDate?.() ?? null),
         (err) => {
             console.error('Error loading the Leaderboard snapshot:', err);
             setRefreshedAt(null);

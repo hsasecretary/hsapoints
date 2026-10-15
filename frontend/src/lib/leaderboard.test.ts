@@ -48,6 +48,14 @@ describe('buildSnapshot', () => {
         expect(snapshot.names).not.toHaveProperty('last');
     });
 
+    it("orders a Tie Cluster by token, so the snapshot leaks nothing of its Members' names", () => {
+        const snapshot = buildSnapshot([
+            member('tok-b', 0, { firstName: 'Abel' }),
+            member('tok-a', 0, { firstName: 'Zoe' }),
+        ]);
+        expect(snapshot.scores.map((score) => score.t)).toEqual(['tok-a', 'tok-b']);
+    });
+
     it('names nobody when nobody has scored yet', () => {
         const snapshot = buildSnapshot([member('a', 0), member('b', 0)]);
         expect(snapshot.names).toEqual({});
@@ -117,6 +125,12 @@ describe('buildLeaderboard', () => {
         const result = buildLeaderboard(snapshotEntries(buildSnapshot([member('a', 5), member('b', 5), member('c', 3)])));
         expect(result.topRanks.map((group) => [group.rank, group.members.length])).toEqual([[1, 2], [3, 1]]);
         expect(result.yourStanding).toBeNull();
+    });
+
+    it('lists a Top Rank Tie Cluster by name', () => {
+        const snapshot = buildSnapshot([member('tok-a', 5, { firstName: 'Zoe' }), member('tok-b', 5, { firstName: 'Abel' })]);
+        const [first] = buildLeaderboard(snapshotEntries(snapshot)).topRanks;
+        expect(first.members.map((entry) => entry.name)).toEqual(['Abel Member', 'Zoe Member']);
     });
 
     it('keeps 0-point Ranks out of Top Ranks even inside the cutoff', () => {

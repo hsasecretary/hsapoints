@@ -30,7 +30,7 @@ from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
 FRONTEND = BASE.parent / "frontend"
-BATCH_SIZE = 400
+BATCH_SIZE = 400  # users docs per token transaction (Firestore allows 500 writes)
 REFRESHED_BY = "scripts/refresh_leaderboard.py"
 
 
@@ -45,10 +45,30 @@ def plain(value):
     return value
 
 
-def academic_year(today):
-    """The school year holding `today`, June 1 to May 31, as 'YYYY-MM-DD' bounds."""
-    year = today.year if today.month >= 6 else today.year - 1
-    return f"{year}-06-01", f"{year + 1}-05-31"
+def assign_tokens(db, emails):
+    """Gives each of `emails` a leaderboardToken unless one is there by now, and
+    returns every one's token. In a transaction, like lib/leaderboardRefresh.ts,
+    so an E-Board page refreshing at the same time can't be overwritten."""
+    from google.cloud import firestore as cloud_firestore
+
+    @cloud_firestore.transactional
+    def assign(transaction, chunk):
+        refs = [db.collection("users").document(email) for email in chunk]
+        snaps = [ref.get(transaction=transaction) for ref in refs]
+        result = {}
+        for email, ref, snap in zip(chunk, refs, snaps):
+            existing = (snap.to_dict() or {}).get("leaderboardToken")
+            if existing:
+                result[email] = existing
+            else:
+                result[email] = str(uuid.uuid4())
+                transaction.update(ref, {"leaderboardToken": result[email]})
+        return result
+
+    tokens = {}
+    for i in range(0, len(emails), BATCH_SIZE):
+        tokens.update(assign(db.transaction(), emails[i:i + BATCH_SIZE]))
+    return tokens
 
 
 def build_snapshot(refresh_input):
@@ -85,19 +105,19 @@ def main():
         db = firestore.client()
         server_timestamp = firestore.SERVER_TIMESTAMP
 
-    start, end = academic_year(args.today)
     users = {d.id: d.to_dict() or {} for d in db.collection("users").stream()}
+    # Every Attendance: lib/leaderboard.ts keeps only this school year's.
     by_email = {}
     for d in db.collection("attendances").stream():
         data = d.to_dict() or {}
-        if start <= str(data.get("eventDate", "")) <= end:
-            by_email.setdefault(str(data.get("email", "")).lower(), []).append({"id": d.id, **plain(data)})
+        by_email.setdefault(str(data.get("email", "")).lower(), []).append({"id": d.id, **plain(data)})
 
-    # E-Board are never ranked, so they never need a token.
-    new_tokens = {email: str(uuid.uuid4()) for email, user in users.items()
-                  if not user.get("leaderboardToken") and user.get("eboard") is not True}
-    tokens = {**{email: user["leaderboardToken"] for email, user in users.items() if user.get("leaderboardToken")},
-              **new_tokens}
+    # E-Board are never ranked, so they never need a token. A dry run makes
+    # up the missing ones; --apply writes them before building the snapshot.
+    missing = [email for email, user in users.items()
+               if not user.get("leaderboardToken") and user.get("eboard") is not True]
+    tokens = {email: user["leaderboardToken"] for email, user in users.items() if user.get("leaderboardToken")}
+    tokens.update(assign_tokens(db, missing) if args.apply else {email: str(uuid.uuid4()) for email in missing})
 
     snapshot = build_snapshot({
         "today": args.today.isoformat(),
@@ -106,21 +126,15 @@ def main():
     })
 
     print(f"MODE: {'APPLY (writing to Firestore)' if args.apply else 'DRY RUN (no writes -- pass --apply)'}")
-    print(f"Read {len(users)} users and {sum(len(rows) for rows in by_email.values())} attendances for {start} to {end}.")
-    print(f"{len(new_tokens)} Members need a token. Snapshot ({snapshot['members']} ranked):")
+    print(f"Read {len(users)} users and {sum(len(rows) for rows in by_email.values())} attendances.")
+    print(f"{len(missing)} Members {'were given' if args.apply else 'need'} a token. Snapshot ({snapshot['members']} ranked):")
     print(json.dumps(snapshot, indent=2))
 
     if not args.apply:
         return
-    emails = list(new_tokens)
-    for i in range(0, len(emails), BATCH_SIZE):
-        batch = db.batch()
-        for email in emails[i:i + BATCH_SIZE]:
-            batch.update(db.collection("users").document(email), {"leaderboardToken": new_tokens[email]})
-        batch.commit()
     db.collection("leaderboard").document("current").set(
         {**snapshot, "refreshedAt": server_timestamp, "refreshedBy": REFRESHED_BY})
-    print(f"Gave {len(new_tokens)} Members a token and wrote leaderboard/current.")
+    print("Wrote leaderboard/current.")
 
 
 if __name__ == "__main__":
