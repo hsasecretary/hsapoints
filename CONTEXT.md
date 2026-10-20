@@ -101,6 +101,10 @@ Events whose job is to make up a Missed Event or clear a Strike: additional tabl
 **Missed Event**:
 A Core Event that has happened and that the Cabinet Member didn't attend. Excused or not, it must be made up. Every Core Event gets a code; a Core Event E-Board never coded is not a Missed Event for anyone, so no Member is penalised for it. A Missed Event stays owed across Semesters: a fall miss still open in the spring can be made up then.
 
+**Excuse Request**:
+A Cabinet Member's request, filed from the Overview before a Core Event they can't attend, naming the event and the reason. One request per event, stamped with when it was filed. E-Board approves or denies it on Excuse Absence; approving writes the Excused Absence, and denying records a reason the Member sees. A Member may withdraw a request while it is still pending.
+_Avoid_: Valid Excuse Form, Excuse Absence form
+
 **Excused Absence**:
 A Missed Event E-Board marked excused. It still needs a Make-up, but earns no Strike. The policy asks for the excuse before the event; E-Board judges that when marking it, and the system sets no deadline. Only E-Board and the backend see the excused/unexcused split; Members just see Missed Events and their Strike count.
 
