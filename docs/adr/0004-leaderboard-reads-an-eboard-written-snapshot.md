@@ -10,7 +10,7 @@ Members can't list `users`, and there is no server, so the Leaderboard needs a M
 
 **Consequences**
 
-- The snapshot is refreshed by E-Board's browser: automatically when an E-Board member opens an E-Board page and it is over an hour old, by a "Refresh now" button, or by an admin script. A refresh reads every `users` doc and every Attendance (a few thousand reads), so it is never run per change.
+- The snapshot is refreshed by E-Board's browser: automatically when an E-Board member opens an E-Board page and it is over six hours old, by a "Refresh now" button, or by an admin script. A refresh reads every `users` doc and every Attendance (a few thousand reads), so it is never run per change. It was hourly at first, and on 2026-10-21 that, on top of check-ins, used up the free tier's 50,000 daily reads and took the whole site down until the quota reset. Each automatic try stamps `attemptedAt` on the snapshot first, so a refresh that fails or is still running in another tab isn't retried until the interval passes again.
 - Other Members' standings lag by up to the refresh interval; the board says when it was refreshed.
 - Tokens don't rotate. Someone watching the snapshot over time can follow one anonymous score between refreshes, but putting a name to it needs outside knowledge of that Member's points, and the board already shows Neighboring Ranks' scores. Rotating would cost a write per Member per refresh.
 - E-Board are not ranked, and Members with no points are never in Top Ranks (see CONTEXT.md).

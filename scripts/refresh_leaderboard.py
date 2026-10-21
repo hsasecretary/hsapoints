@@ -2,7 +2,7 @@
 Refresh the Leaderboard snapshot, leaderboard/current (#115,
 docs/adr/0004-leaderboard-reads-an-eboard-written-snapshot.md), from the
 command line. The app does this itself whenever an E-Board member opens an
-E-Board page and the snapshot is over an hour old, or presses "Refresh now";
+E-Board page and the snapshot is over six hours old, or presses "Refresh now";
 this is the fallback for when nobody on E-Board can.
 
 Dry run (the default; writes nothing, prints the snapshot):

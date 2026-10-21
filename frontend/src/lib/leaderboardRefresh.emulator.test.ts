@@ -64,7 +64,7 @@ describe('refreshLeaderboardIfStale', () => {
         expect((await readPastRules(env, 'leaderboard/current')).members).toBe(2);
     });
 
-    it('refreshes a snapshot over an hour old', async () => {
+    it('refreshes a snapshot older than the refresh interval', async () => {
         const old = Timestamp.fromMillis(NOW.getTime() - REFRESH_AFTER_MS - 60_000);
         await seed(env, { 'leaderboard/current': { members: 0, scores: [], names: {}, refreshedAt: old, refreshedBy: 'x' } });
         expect(await refreshLeaderboardIfStale(signedInAs(env, EBOARD), EBOARD, NOW)).toBe(true);
@@ -77,5 +77,15 @@ describe('refreshLeaderboardIfStale', () => {
         expect(await refreshLeaderboardIfStale(signedInAs(env, EBOARD), EBOARD, NOW)).toBe(false);
         expect((await readPastRules(env, 'leaderboard/current')).members).toBe(0);
         expect((await readPastRules(env, `users/${MEMBER}`)).leaderboardToken).toBeUndefined();
+    });
+
+    it("doesn't retry an old snapshot another E-Board page already started refreshing", async () => {
+        // A refresh that failed or is still running: one try per interval, not
+        // one per page opened (each try reads every users doc and Attendance).
+        const old = Timestamp.fromMillis(NOW.getTime() - REFRESH_AFTER_MS - 60_000);
+        const tried = Timestamp.fromMillis(NOW.getTime() - 60_000);
+        await seed(env, { 'leaderboard/current': { members: 0, scores: [], names: {}, refreshedAt: old, refreshedBy: 'x', attemptedAt: tried } });
+        expect(await refreshLeaderboardIfStale(signedInAs(env, EBOARD), EBOARD, NOW)).toBe(false);
+        expect((await readPastRules(env, 'leaderboard/current')).members).toBe(0);
     });
 });

@@ -77,8 +77,9 @@ export function useMemberStanding(email: string | null | undefined, view: View |
                 })),
                 (error) => console.error('Error loading point requests:', error)),
         ];
-        getDocs(collection(db, 'codes'))
-            .then((snap) => setCodes(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Code).filter(inYear)))
+        // Only this year's codes: every Member's dashboard load pays one read per code.
+        getDocs(query(collection(db, 'codes'), where('eventDate', '>=', start), where('eventDate', '<=', end)))
+            .then((snap) => setCodes(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Code)))
             .catch((error) => {
                 console.error('Error loading codes:', error);
                 setCodes([]);
