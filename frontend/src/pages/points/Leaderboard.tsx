@@ -36,8 +36,9 @@ function useSnapshot(): Snapshot | null | undefined | 'error' {
         getDoc(doc(db, 'leaderboard', 'current'))
             .then((snap) => {
                 if (!live) return;
+                // A doc holding only an E-Board refresh's `attemptedAt` isn't a snapshot yet.
                 const data = snap.data();
-                setSnapshot(data ? {
+                setSnapshot(data?.refreshedAt ? {
                     members: data.members ?? 0,
                     scores: data.scores ?? [],
                     names: data.names ?? {},

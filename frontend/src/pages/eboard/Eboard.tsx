@@ -6,7 +6,7 @@ import { refreshLeaderboardIfStale } from '../../lib/leaderboardRefresh';
 // Frame for every /eboard/* page: e-board members only. The tool itself
 // (event codes, point requests, ...) renders in <Outlet />; the pages are
 // listed in eboardTools.ts. Opening any of them also refreshes the
-// Leaderboard snapshot once it is over an hour old (docs/adr/0004), in the
+// Leaderboard snapshot once it is over six hours old (docs/adr/0004), in the
 // background so the page never waits on it.
 function Eboard({ eboard }) {
   const { pathname } = useLocation();

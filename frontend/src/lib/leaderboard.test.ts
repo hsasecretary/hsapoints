@@ -168,12 +168,16 @@ describe('isRanked', () => {
 describe('isStale', () => {
     const now = new Date('2026-09-26T12:00:00Z');
 
-    it('is stale with no snapshot or one over an hour old', () => {
+    it('waits six hours between refreshes', () => {
+        expect(REFRESH_AFTER_MS).toBe(6 * 60 * 60 * 1000);
+    });
+
+    it('is stale with no snapshot or one older than the interval', () => {
         expect(isStale(null, now)).toBe(true);
         expect(isStale(new Date(now.getTime() - REFRESH_AFTER_MS - 1), now)).toBe(true);
     });
 
-    it('is fresh within the hour', () => {
+    it('is fresh within the interval', () => {
         expect(isStale(new Date(now.getTime() - REFRESH_AFTER_MS + 1000), now)).toBe(false);
     });
 });

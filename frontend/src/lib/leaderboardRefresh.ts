@@ -3,7 +3,7 @@
 // leaderboardToken, and write the snapshot lib/leaderboard.ts builds.
 // scripts/refresh_leaderboard.py does the same from the command line.
 import {
-    collection, doc, getDoc, getDocs, query, runTransaction, serverTimestamp, setDoc, where, type Firestore,
+    collection, doc, getDocs, query, runTransaction, serverTimestamp, setDoc, Timestamp, where, type Firestore,
 } from 'firebase/firestore';
 import type { Attendance, Member } from './computeStanding';
 import { isRanked, isStale, snapshotFor, type LeaderboardSnapshot } from './leaderboard';
@@ -77,16 +77,32 @@ export async function refreshLeaderboard(db: Firestore, by: string, today = toIs
 let inFlight: Promise<boolean> | null = null;
 
 /**
- * Refreshes when the snapshot is missing or over an hour old; otherwise reads
- * one doc and stops. Fire and forget from any E-Board page: one refresh at a
- * time per tab, and a failure is only logged.
+ * Claims the next refresh when the snapshot is missing or older than
+ * REFRESH_AFTER_MS, by stamping `attemptedAt` on it. Counting the last
+ * attempt as well as the last refresh means a refresh that fails, or is still
+ * running in another E-Board member's tab, isn't retried on every page opened.
+ */
+async function claimRefresh(db: Firestore, now: Date): Promise<boolean> {
+    const ref = doc(db, LEADERBOARD_DOC);
+    return runTransaction(db, async (transaction) => {
+        const data = (await transaction.get(ref)).data();
+        const stamps = [data?.refreshedAt, data?.attemptedAt].filter(Boolean).map((stamp) => stamp.toMillis());
+        const lastTry = stamps.length ? new Date(Math.max(...stamps)) : null;
+        if (!isStale(lastTry, now)) return false;
+        transaction.set(ref, { attemptedAt: Timestamp.fromDate(now) }, { merge: true });
+        return true;
+    });
+}
+
+/**
+ * Refreshes when the snapshot is missing or stale and no other refresh has
+ * been tried since; otherwise reads one doc and stops. Fire and forget from
+ * any E-Board page: one refresh at a time per tab, and a failure is only logged.
  */
 export function refreshLeaderboardIfStale(db: Firestore, by: string, now = new Date()): Promise<boolean> {
     if (inFlight) return inFlight.then(() => false);
     inFlight = (async () => {
-        const snap = await getDoc(doc(db, LEADERBOARD_DOC));
-        const refreshedAt = snap.data()?.refreshedAt?.toDate?.() ?? null;
-        if (!isStale(refreshedAt, now)) return false;
+        if (!(await claimRefresh(db, now))) return false;
         await refreshLeaderboard(db, by, toIsoDate(now));
         return true;
     })()

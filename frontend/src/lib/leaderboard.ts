@@ -15,8 +15,12 @@ export const TOP_RANK_CUTOFF = 10;
 /** How many Neighboring Ranks to expose on each side of Your Standing. */
 const NEIGHBOR_RANGE = 3;
 
-/** An E-Board page refreshes the snapshot once it is older than this. */
-export const REFRESH_AFTER_MS = 60 * 60 * 1000;
+/**
+ * An E-Board page refreshes the snapshot once it is older than this. A refresh
+ * reads every users doc and this year's Attendance, so hourly ran through the
+ * free tier's daily reads; a Member's own score is live anyway.
+ */
+export const REFRESH_AFTER_MS = 6 * 60 * 60 * 1000;
 
 /** One ranked Member in the snapshot: their token and Total Points. */
 export type LeaderboardScore = { t: string; p: number };
@@ -271,7 +275,7 @@ export function asOfLabel(refreshedAt: Date, now: Date): string {
     return sameDay ? time : `${MONTHS[refreshedAt.getMonth()]} ${refreshedAt.getDate()}, ${time}`;
 }
 
-/** Whether an E-Board page should refresh the snapshot: missing, or over an hour old. */
+/** Whether an E-Board page should refresh the snapshot: missing, or older than REFRESH_AFTER_MS. */
 export function isStale(refreshedAt: Date | null, now: Date): boolean {
     return !refreshedAt || now.getTime() - refreshedAt.getTime() > REFRESH_AFTER_MS;
 }
