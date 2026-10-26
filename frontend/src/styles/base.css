@@ -357,6 +357,50 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* Segmented control (components/ui/Segments.tsx): one row of options, the
+   picked one raised. The Points page's Requests · Leaderboard. */
+.segments {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--hsa-surface-sunken);
+}
+
+.segments .segments__option {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  margin: 0;
+  padding: 9px 6px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--hsa-muted);
+  font: 600 var(--hsa-text-sm) var(--hsa-font-body);
+  cursor: pointer;
+}
+
+.segments .segments__option:hover {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--hsa-teal-700);
+}
+
+.segments .segments__option.is-on {
+  background: var(--hsa-surface);
+  color: var(--hsa-teal-700);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, .15);
+}
+
+.segments .segments__option:focus-visible {
+  outline: 3px solid rgba(15, 76, 100, .4);
+  outline-offset: 2px;
+}
+
 /* "Loading…" placeholder while a list fetches */
 .loading-message {
   text-align: center;

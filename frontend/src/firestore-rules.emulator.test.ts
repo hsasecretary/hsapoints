@@ -3,7 +3,7 @@
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 import { assertFails, assertSucceeds, type RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import {
-    addDoc, collection, deleteDoc, deleteField, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where,
+    addDoc, collection, deleteDoc, deleteField, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where, type Firestore,
 } from 'firebase/firestore';
 import { buildPointRequest } from './lib/pointRequests';
 import { EBOARD, MEMBER, OTHER_MEMBER, memberDoc, seed, signedInAs, startEmulator } from './test/emulator';
@@ -133,6 +133,7 @@ describe('the E-Board-only member fields', () => {
         missedEventOverrides: [{ codeId: 'CT1', reason: 'not held', by: EBOARD, at: '2026-09-25' }],
         adjustments: [{ points: 2, note: 'volunteered', date: '2026-09-25' }],
         absenceLog: [logEntry('CT1')],
+        leaderboardToken: 'my-own-token',
     };
 
     it.each(Object.keys(eboardOnly))("won't let a Member set their own %s", async (field) => {
@@ -192,5 +193,42 @@ describe('pointRequests', () => {
         await assertFails(addDoc(collection(db, 'pointRequests'), pendingRequest(OTHER_MEMBER)));
         await assertFails(addDoc(collection(db, 'pointRequests'), { ...pendingRequest(MEMBER), status: 'approved' }));
         await assertFails(addDoc(collection(db, 'pointRequests'), { ...pendingRequest(MEMBER), reviewedBy: MEMBER }));
+    });
+});
+
+describe('the Leaderboard snapshot', () => {
+    const snapshot = { members: 2, scores: [{ t: 'tok-a', p: 5 }, { t: 'tok-b', p: 0 }], names: { 'tok-a': 'Test Member' } };
+
+    beforeEach(async () => {
+        await seed(env, {
+            'leaderboard/current': snapshot,
+            [`users/${MEMBER}`]: memberDoc(MEMBER, { leaderboardToken: 'tok-a' }),
+            [`users/${OTHER_MEMBER}`]: memberDoc(OTHER_MEMBER, { leaderboardToken: 'tok-b' }),
+        });
+    });
+
+    it('lets any Member read it but never write it', async () => {
+        const db = signedInAs(env, MEMBER);
+        await assertSucceeds(getDoc(doc(db, 'leaderboard/current')));
+        await assertFails(setDoc(doc(db, 'leaderboard/current'), { ...snapshot, names: { 'tok-a': 'Me', 'tok-b': 'You' } }));
+        await assertFails(updateDoc(doc(db, 'leaderboard/current'), { members: 3 }));
+        await assertFails(deleteDoc(doc(db, 'leaderboard/current')));
+    });
+
+    it("won't let anyone signed out read it", async () => {
+        const db = env.unauthenticatedContext().firestore() as unknown as Firestore;
+        await assertFails(getDoc(doc(db, 'leaderboard/current')));
+    });
+
+    it('lets E-Board write it', async () => {
+        const db = signedInAs(env, EBOARD);
+        await assertSucceeds(setDoc(doc(db, 'leaderboard/current'), { ...snapshot, refreshedAt: serverTimestamp(), refreshedBy: EBOARD }));
+    });
+
+    it("lets a Member read their own token but not anyone else's", async () => {
+        const db = signedInAs(env, MEMBER);
+        await assertSucceeds(getDoc(doc(db, `users/${MEMBER}`)));
+        await assertFails(getDoc(doc(db, `users/${OTHER_MEMBER}`)));
+        await assertFails(getDocs(collection(db, 'users')));
     });
 });

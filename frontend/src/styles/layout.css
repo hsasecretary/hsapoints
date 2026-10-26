@@ -197,6 +197,27 @@
     box-shadow: inset 3px 0 0 #ffffff;
 }
 
+/* "Refresh Leaderboard": an action, set off from the tool links above */
+.site-header__panel-divider {
+    margin-top: 4px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.site-header .site-header__panel-action {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.site-header .site-header__panel-action:disabled {
+    cursor: progress;
+    opacity: 0.75;
+}
+
 .site-header__panel-link:focus-visible,
 .site-header .site-header__logout:focus-visible,
 .site-header__view:has(input:focus-visible) {
