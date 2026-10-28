@@ -38,7 +38,7 @@ function Explainer({ member }: { member: Member }) {
                     <strong>Missed something?</strong> Any extra event (an Additional Event: more tabling hours, MLP Open, a
                     fundraiser, OPA, programming, an Affiliate Org event, CRASH) makes it up. One extra event covers the
                     oldest Missed Event and its Strike. Three Strikes means a meeting with E-Board to make a make-up plan.
-                    To count as excused, file the Valid Excuse Form <em>before</em> the event.
+                    To count as excused, send an excuse request from "Excuse an absence" <em>before</em> the event.
                 </p>
             </div>
         );

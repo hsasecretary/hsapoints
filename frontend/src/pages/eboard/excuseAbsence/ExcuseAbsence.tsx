@@ -13,6 +13,8 @@ import { shortDate } from '../../../lib/semester';
 import {
     attendanceLabel, codeLabel, codeName, ConfirmAction, displayName, History, RiskNote, StrikeTally,
 } from './parts';
+import ExcuseInbox from './ExcuseInbox';
+import { useExcuseInbox } from './useExcuseInbox';
 import { useRoster, type Roster, type RosterRow } from './useRoster';
 
 type MissState = 'strike' | 'open' | 'madeup' | 'closed';
@@ -42,6 +44,9 @@ function ExcuseAbsence() {
     const setEmail = (next: string) => setParams({ member: next });
     const [pending, setPending] = useState<{ kind: AbsenceActionKind; codeId: string } | null>(null);
     const [saved, setSaved] = useState('');
+    const inbox = useExcuseInbox();
+    // ?tab=requests opens the Excuse Request inbox (the E-Board menu badge links there).
+    const tab = params.get('tab') === 'requests' ? 'requests' : 'lookup';
 
     const members = useMemo(() => roster.rows.map((r) => r.member), [roster.rows]);
     const rowOf = (member: RosterRow['member']) => roster.rows.find((r) => r.member.email === member.email);
@@ -68,9 +73,35 @@ function ExcuseAbsence() {
         }
     };
 
+    const nameOf = (requestEmail: string) => {
+        const found = roster.rows.find((r) => r.member.email.toLowerCase() === requestEmail)?.member;
+        return found ? displayName(found) : requestEmail;
+    };
+    const tabs = (
+        <div className="eap-tabs" role="tablist">
+            <button type="button" role="tab" aria-selected={tab === 'lookup'} className={`eap-btn${tab === 'lookup' ? ' is-on' : ''}`} onClick={() => setParams({})}>
+                Member lookup
+            </button>
+            <button type="button" role="tab" aria-selected={tab === 'requests'} className={`eap-btn${tab === 'requests' ? ' is-on' : ''}`} onClick={() => setParams({ tab: 'requests' })}>
+                Requests{inbox.requests.length > 0 && <span className="eap-tag">{inbox.requests.length}</span>}
+            </button>
+        </div>
+    );
+
+    if (tab === 'requests') {
+        return (
+            <div className="eap">
+                <h2 className="eap-title">Excuse Absence</h2>
+                {tabs}
+                <ExcuseInbox requests={inbox.requests} loading={inbox.loading} error={inbox.error} nameOf={nameOf} />
+            </div>
+        );
+    }
+
     return (
         <div className="eap">
             <h2 className="eap-title">Excuse Absence</h2>
+            {tabs}
             {roster.error && <p className="eap-error" role="alert">{roster.error}</p>}
             {roster.loading && <p className="eap-empty">Loading members…</p>}
 
