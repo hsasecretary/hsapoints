@@ -146,6 +146,10 @@ export type StandingOptions = {
     today: string;
     /** E-Board or a Web-team Tester previewing the Cabinet Member view. */
     viewingAsCabinet?: boolean;
+    /** The rule before ADR-0005, where a pick only counted on Attendance that
+     *  was Surplus anyway. Only for scripts/makeup_pick_dry_run.py; remove
+     *  once #121 has shipped. */
+    legacyPicks?: boolean;
 };
 
 /** Open Strikes at which a Cabinet Member is at risk of probation and must meet with the Chief of Staff. */
@@ -155,7 +159,7 @@ export const AT_RISK_STRIKES = 3;
 export const CABINET_POINTS_GOAL = 20;
 
 /** One HLHM event a year fills its requirement; any beyond it is surplus. */
-const HLHM = 'hlhm';
+export const HLHM = 'hlhm';
 
 /**
  * The Adjustments that count toward one school year: one dated inside it, or
@@ -177,13 +181,13 @@ export function computeStanding(
     attendances: Attendance[],
     rubric: readonly EventType[],
     codes: Code[],
-    { today, viewingAsCabinet = false }: StandingOptions,
+    { today, viewingAsCabinet = false, legacyPicks = false }: StandingOptions,
 ): Standing {
     const types = new Map(rubric.map((type) => [type.id, type]));
     const heldToCabinetRules = viewingAsCabinet || isHeldToCabinetRules(member);
     const exempt = heldToCabinetRules && member.exemptView === true;
     // Replay in date order. On the same date an Attendance with a Make-up
-    // pick goes last, so it's the one left surplus to honour its pick (a
+    // pick goes last, so one without a pick fills the requirement first (a
     // Tabling request's hours share a date); then the ID breaks ties, so the
     // result never depends on the order Firestore returned the docs in.
     const replay = [...attendances].sort((a, b) =>
@@ -201,40 +205,6 @@ export function computeStanding(
     // Adjustments stand in for the old uncategorized otherPoints, which
     // always counted toward the Total (= VE) Points.
     for (const adjustment of adjustmentsThisYear(member.adjustments, today)) vePoints += adjustment.points || 0;
-
-    const affiliateWaived = MLP_CABINETS.includes(member.cabinet);
-    const semesterRequirements = {
-        fall: listSemesterRequirements(rubric, affiliateWaived),
-        spring: listSemesterRequirements(rubric, affiliateWaived),
-    };
-    const surplus: SurplusAttendance[] = [];
-    let hlhmFilled = false;
-    for (const attendance of replay) {
-        const tier = types.get(attendance.eventTypeId)?.tier;
-        let isSurplus = tier === 'additional';
-        if (attendance.eventTypeId === HLHM) {
-            isSurplus = hlhmFilled;
-            hlhmFilled = true;
-        } else if (tier === 'semester') {
-            const requirement = semesterRequirements[semesterOf(attendance.eventDate)]
-                .find((req) => req.eventTypeId === attendance.eventTypeId);
-            if (requirement.met) {
-                // Already filled that Semester, or waived.
-                isSurplus = true;
-            } else {
-                requirement.met = true;
-                requirement.filledBy = attendance.id;
-            }
-        }
-        if (isSurplus) {
-            surplus.push({
-                attendanceId: attendance.id,
-                eventTypeId: attendance.eventTypeId,
-                eventDate: attendance.eventDate,
-                makeupFor: null,
-            });
-        }
-    }
 
     const coreEvents = heldToCabinetRules ? listCoreEvents(codes, types, replay, today) : [];
     const excused = codeIdSet(member.excusals);
@@ -261,8 +231,50 @@ export function computeStanding(
             };
         });
 
-    const makeupPicks = new Map(replay.map((attendance) => [attendance.id, attendance.makeupFor && codeKey(attendance.makeupFor)]));
-    assignMakeups(surplus, missedEvents, makeupPicks);
+    const affiliateWaived = MLP_CABINETS.includes(member.cabinet);
+    const semesterRequirements = {
+        fall: listSemesterRequirements(rubric, affiliateWaived),
+        spring: listSemesterRequirements(rubric, affiliateWaived),
+    };
+    const surplus: SurplusAttendance[] = [];
+    let hlhmFilled = false;
+    for (const attendance of replay) {
+        const tier = types.get(attendance.eventTypeId)?.tier;
+        // A pick on anything but a Core Event wins over filling a requirement,
+        // while its miss is still owed (ADR-0005): the requirement waits.
+        const pickable = tier !== 'core' && attendance.makeupFor
+            ? missedEvents.find((missed) => missed.owed && codeKey(missed.codeId) === codeKey(attendance.makeupFor))
+            : undefined;
+        const pickWins = Boolean(pickable) && !legacyPicks;
+        let isSurplus = tier === 'additional' || pickWins;
+        if (pickWins) {
+            // Neither the requirement nor HLHM is filled: it waits for the next one.
+        } else if (attendance.eventTypeId === HLHM) {
+            isSurplus = hlhmFilled;
+            hlhmFilled = true;
+        } else if (tier === 'semester') {
+            const requirement = semesterRequirements[semesterOf(attendance.eventDate)]
+                .find((req) => req.eventTypeId === attendance.eventTypeId);
+            if (requirement.met) {
+                // Already filled that Semester, or waived.
+                isSurplus = true;
+            } else {
+                requirement.met = true;
+                requirement.filledBy = attendance.id;
+            }
+        }
+        if (isSurplus) {
+            // Settled now, so a later pick of the same miss fills its requirement instead.
+            if (pickable) makeUp(pickable, attendance.id);
+            surplus.push({
+                attendanceId: attendance.id,
+                eventTypeId: attendance.eventTypeId,
+                eventDate: attendance.eventDate,
+                makeupFor: pickable?.codeId ?? null,
+            });
+        }
+    }
+    assignMakeups(surplus, missedEvents);
 
     return {
         heldToCabinetRules,
@@ -288,34 +300,25 @@ function listSemesterRequirements(rubric: readonly EventType[], affiliateWaived:
         });
 }
 
+function makeUp(missed: MissedEvent, attendanceId: string) {
+    missed.madeUpBy = attendanceId;
+    missed.owed = false;
+    missed.strike = false;
+}
+
 /**
- * Credits Surplus Attendance against Missed Events. First each pick a
- * Member named on a Point Request, if that miss is still owed; then the
- * rest, oldest first, each against the oldest Missed Event still carrying a
- * Strike, else the oldest other one still owed. A surplus from before the
+ * Credits the Surplus Attendance no pick already placed against Missed
+ * Events: oldest first, each against the oldest Missed Event still carrying
+ * a Strike, else the oldest other one still owed. A surplus from before the
  * miss counts too, and so does one from the other Semester (#42, #62).
  */
-function assignMakeups(
-    surplus: SurplusAttendance[],
-    missedEvents: MissedEvent[],
-    makeupPicks: Map<string, string | undefined>,
-) {
-    const cover = (surplusAttendance: SurplusAttendance, missed: MissedEvent) => {
-        surplusAttendance.makeupFor = missed.codeId;
-        missed.madeUpBy = surplusAttendance.attendanceId;
-        missed.owed = false;
-        missed.strike = false;
-    };
-    for (const surplusAttendance of surplus) {
-        const pick = makeupPicks.get(surplusAttendance.attendanceId);
-        const picked = pick && missedEvents.find((missed) => missed.owed && codeKey(missed.codeId) === pick);
-        if (picked) cover(surplusAttendance, picked);
-    }
+function assignMakeups(surplus: SurplusAttendance[], missedEvents: MissedEvent[]) {
     for (const surplusAttendance of surplus) {
         if (surplusAttendance.makeupFor) continue;
         const target = missedEvents.find((missed) => missed.strike) ?? missedEvents.find((missed) => missed.owed);
         if (!target) return;
-        cover(surplusAttendance, target);
+        surplusAttendance.makeupFor = target.codeId;
+        makeUp(target, surplusAttendance.attendanceId);
     }
 }
 

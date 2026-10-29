@@ -67,10 +67,18 @@ describe('attendances', () => {
         const ref = doc(db, `attendances/${MEMBER}__GBM1`);
         await assertFails(setDoc(ref, { ...codeAttendance(MEMBER), source: 'request' }));
         await assertFails(setDoc(ref, { ...codeAttendance(MEMBER), source: 'eboard' }));
-        await assertFails(setDoc(ref, { ...codeAttendance(MEMBER), makeupFor: 'CT1' }));
+        await assertFails(setDoc(ref, { ...codeAttendance(MEMBER), requestId: '1' }));
         await assertFails(setDoc(doc(db, `attendances/${MEMBER}__req-1`), {
             email: MEMBER, eventTypeId: 'tabling', eventDate: '2026-09-20', source: 'request', requestId: '1',
         }));
+    });
+
+    it('lets a Member name the Missed Event a check-in makes up, as a string', async () => {
+        const db = signedInAs(env, MEMBER);
+        const ref = doc(db, `attendances/${MEMBER}__GBM1`);
+        await assertFails(setDoc(ref, { ...codeAttendance(MEMBER), makeupFor: ['CT1'] }));
+        await assertFails(setDoc(ref, { ...codeAttendance(MEMBER), makeupFor: null }));
+        await assertSucceeds(setDoc(ref, { ...codeAttendance(MEMBER), makeupFor: 'CT1' }));
     });
 
     it("won't let a Member write an Entered Attendance, for themselves or with the audit fields", async () => {
@@ -85,6 +93,8 @@ describe('attendances', () => {
         const db = signedInAs(env, MEMBER);
         const ref = doc(db, `attendances/${MEMBER}__GBM1`);
         await assertFails(updateDoc(ref, { eventDate: '2026-09-26' }));
+        // A Make-up pick is final for the Member.
+        await assertFails(updateDoc(ref, { makeupFor: 'CT1' }));
         await assertFails(deleteDoc(ref));
     });
 

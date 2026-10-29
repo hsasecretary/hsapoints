@@ -4,7 +4,7 @@
 import { useMemo, useState } from 'react';
 import { auth, db } from '../../../lib/firebase';
 import type { Code } from '../../../lib/computeStanding';
-import { missedEventName } from '../../../lib/pointRequests';
+import { missedEventName, requirementWaitsNotice } from '../../../lib/pointRequests';
 import {
     adjustRequest, approveRequest, attachableCodes, attendanceCountFor, denyRequest, initialDecision, previewApproval,
     type ApprovalPreview, type ReviewDecision, type ReviewRequest,
@@ -126,7 +126,7 @@ function ReviewPanel({ request, codes, onReviewed }: ReviewPanelProps) {
                             </select>
                         </label>
                     ))}
-                    <p className="review-hint">Only counts when that Attendance is Surplus.</p>
+                    <p className="review-hint">A pick wins over filling a requirement, as long as that miss is still owed.</p>
                 </fieldset>
             )}
 
@@ -210,6 +210,7 @@ function Effect({ preview, codes, heldToCabinetRules, eventTypeId }: {
                         } else if (attendance.makeupFor) what = `Makes up ${attendance.makeupFor}.`;
                         else if (attendance.surplus) what = 'Surplus, but nothing is left to make up.';
                         else what = fills;
+                        if (attendance.requirementWaits) what += ` ${requirementWaitsNotice(eventTypeId, 'they')}`;
                         return <li key={attendance.id}>{many && <strong>Hour {i + 1}: </strong>}{what}</li>;
                     })}
                 </ul>

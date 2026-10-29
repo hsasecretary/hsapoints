@@ -72,7 +72,9 @@ function Dashboard({ email }: { email: string }) {
                     </div>
                 </dl>
             )}
-            <div className="overview__code"><EventCodeForm /></div>
+            <div className="overview__code">
+                <EventCodeForm member={standing ? member : null} attendances={attendances} codes={codes} pendingPicks={pendingMakeups(pending)} />
+            </div>
 
             {loading ? <p className="overview__loading" role="status">Loading your points…</p> : (
                 <>

@@ -1094,6 +1094,40 @@ The list is already centred inside the frame, so it gives its cap back:
     outline-color: var(--hsa-accent);
 }
 
+/* Second step when the code can make up a Missed Event (#121) */
+.overview .ov-code__pick {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 12px 0 0;
+}
+
+.overview .ov-code__pick label {
+    margin: 0;
+    font-weight: 600;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-surface);
+}
+
+.overview .ov-code__pick select {
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+    border: 0;
+    border-radius: 8px;
+    font-size: var(--hsa-text-base);
+}
+
+.overview .ov-code__notice {
+    margin: 0;
+    padding: 8px 12px;
+    border-left: 3px solid var(--hsa-accent);
+    border-radius: 0 6px 6px 0;
+    background: rgba(255, 255, 255, .12);
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-surface);
+}
+
 .overview .ov-code__hint {
     margin: 8px 0 0;
     font-size: var(--hsa-text-xs);

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Attendance, Code, Member } from './computeStanding';
 import {
-    buildPointRequest, eventChoices, NOT_LISTED, pickerGroups, previewRequest, type RequestDraft,
+    buildPointRequest, eventChoices, NOT_LISTED, pickerGroups, previewRequest, requirementWaitsNotice, type RequestDraft,
     type TypeChoice,
 } from './pointRequests';
 
@@ -101,7 +101,7 @@ describe('previewRequest', () => {
         const preview = previewRequest(generalMember, [], codes,
             draft({ codeId: 'GBMSEP', eventTypeId: 'gbm', eventDate: '2026-09-03' }), options);
 
-        expect(preview).toEqual({ cabinetPoints: 1, vePoints: 2, attendances: [{ surplus: false, makeupFor: null }], covers: [] });
+        expect(preview).toEqual({ cabinetPoints: 1, vePoints: 2, attendances: [{ surplus: false, makeupFor: null, requirementWaits: false }], covers: [] });
     });
 
     it("clears a Missed Event and its Strike when the Member names that event's code (\"I was there\")", () => {
@@ -110,7 +110,7 @@ describe('previewRequest', () => {
         const preview = previewRequest(member, [], codes,
             draft({ codeId: 'GBMOCT', eventTypeId: 'gbm', eventDate: '2026-10-01' }), options);
 
-        expect(preview.attendances).toEqual([{ surplus: false, makeupFor: null }]);
+        expect(preview.attendances).toEqual([{ surplus: false, makeupFor: null, requirementWaits: false }]);
         expect(preview.covers).toEqual([{ codeId: 'GBMOCT', eventTypeId: 'gbm', eventDate: '2026-10-01', strike: true }]);
     });
 
@@ -123,9 +123,9 @@ describe('previewRequest', () => {
         expect(preview.cabinetPoints).toBe(3);
         expect(preview.vePoints).toBe(3);
         expect(preview.attendances).toEqual([
-            { surplus: false, makeupFor: null },
-            { surplus: true, makeupFor: 'CT1' },
-            { surplus: true, makeupFor: 'GBMSEP' },
+            { surplus: false, makeupFor: null, requirementWaits: false },
+            { surplus: true, makeupFor: 'CT1', requirementWaits: false },
+            { surplus: true, makeupFor: 'GBMSEP', requirementWaits: false },
         ]);
         expect(preview.covers.map((missed) => [missed.codeId, missed.strike])).toEqual([['GBMSEP', false], ['CT1', true]]);
     });
@@ -137,13 +137,39 @@ describe('previewRequest', () => {
             draft({ eventTypeId: 'tabling', eventDate: '2026-10-12', hours: 2, makeupFor: ['GBMSEP', null] }), options);
 
         expect(preview.attendances).toEqual([
-            { surplus: true, makeupFor: 'GBMSEP' },
-            { surplus: true, makeupFor: 'CT1' },
+            { surplus: true, makeupFor: 'GBMSEP', requirementWaits: false },
+            { surplus: true, makeupFor: 'CT1', requirementWaits: false },
         ]);
+    });
+
+    it('makes up the picked miss with the first HLHM of the year, and says the HLHM requirement waits', () => {
+        const retreat = code('RET1', 'cabinet-retreat', '2026-09-12', 'Cabinet Retreat');
+        const preview = previewRequest(cabinetMember, [attended(gbmSept), attended(gbmOct), attended(thursday)], [...codes, retreat],
+            draft({ eventTypeId: 'hlhm', eventDate: '2026-09-25', makeupFor: ['RET1'] }), options);
+
+        expect(preview.attendances).toEqual([{ surplus: true, makeupFor: 'RET1', requirementWaits: true }]);
+        expect(preview.covers.map((missed) => missed.codeId)).toEqual(['RET1']);
+    });
+
+    it("doesn't say a requirement waits when the picked event was extra anyway", () => {
+        const member = { ...cabinetMember, excusals: [{ codeId: 'GBMSEP' }] };
+        const alreadyTabled: Attendance = { id: `${EMAIL}__req-old-h1`, eventTypeId: 'tabling', eventDate: '2026-09-01', source: 'request' };
+        const preview = previewRequest(member, [alreadyTabled, attended(gbmOct)], codes,
+            draft({ eventTypeId: 'tabling', eventDate: '2026-10-12', makeupFor: ['GBMSEP'] }), options);
+
+        expect(preview.attendances).toEqual([{ surplus: true, makeupFor: 'GBMSEP', requirementWaits: false }]);
     });
 
     it('previews nothing until the Event Type and date are known (E-Board picks the type for "Not listed")', () => {
         expect(previewRequest(generalMember, [], codes, draft({ eventName: 'Mixer', eventDate: '2026-10-02' }), options)).toBeNull();
+    });
+});
+
+describe('requirementWaitsNotice', () => {
+    it('tells the Member, or E-Board about the Member, which requirement stays open', () => {
+        expect(requirementWaitsNotice('hlhm')).toBe('Your HLHM requirement stays open until you go to another HLHM event.');
+        expect(requirementWaitsNotice('hsa-service', 'they'))
+            .toBe('Their HSA Service requirement stays open until they go to another HSA Service event.');
     });
 });
 
