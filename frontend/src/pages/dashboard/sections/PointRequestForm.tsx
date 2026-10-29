@@ -253,7 +253,7 @@ function PointRequestForm() {
         lead = (
             <>
                 <p className="req-c__lead">Making up <strong>{startMiss.name}</strong>{startMiss.strike ? ' and its Strike' : ''}.</p>
-                <p className="req-hint">Pick what you went to. It makes up the miss even if it's your first of that event; E-Board checks when they review it.</p>
+                <p className="req-hint">Pick what you went to. It makes up the miss even if it's your first of that event this Semester, but then that requirement stays open until you go to another one. E-Board checks when they review it.</p>
                 {typePicker(pickerGroups(true).map((group) => ({
                     ...group, choices: group.choices.filter((option) => eventType(option.eventTypeIds[0]).tier !== 'core'),
                 })), true)}

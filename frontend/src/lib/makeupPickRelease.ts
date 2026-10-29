@@ -1,49 +1,55 @@
-// The release dry run for #121 (ADR-0005): which Members' standing changes
-// now that a Make-up pick beats filling a requirement. Run before deploy
-// through scripts/makeup_pick_dry_run.py; remove with `legacyPicks` once
-// #121 has shipped.
-import { computeStanding, HLHM, type Semester, type Standing } from './computeStanding';
+// The release step for #121 (ADR-0005): the new rule applies from the
+// release on, so a Point Request approved before it keeps the standing it
+// had. Its pick, if the old rule ignored it, is set aside (makeupFor →
+// ignoredMakeupFor) by scripts/set_aside_old_makeup_picks.py. Remove with
+// `legacyPicks` once that has been applied.
+import { computeStanding, HLHM, type Attendance, type Standing } from './computeStanding';
 import type { MigrationInput } from './migrationStandings';
 import { rubric } from './rubric';
 
-export type PickRuleChange = {
-    email: string;
-    /** Missed Events whose Make-up moved: the Attendance before and after (null: still owed). */
-    madeUp: { codeId: string; before: string | null; after: string | null }[];
-    /** Requirements met under the old rule and open under the new; HLHM is yearly, so no Semester. */
-    reopened: { eventTypeId: string; semester: Semester | null }[];
-    openStrikes: { before: number; after: number };
+export type SetAsideInput = MigrationInput & {
+    /** IDs of Attendance from Point Requests approved before the release: the only picks that may be set aside. */
+    approvedBefore: string[];
 };
 
-function filledRequirements(standing: Standing, hlhmFilled: boolean): string[] {
-    const filled = (['fall', 'spring'] as const).flatMap((semester) => standing.semesterRequirements[semester]
-        .filter((req) => req.met && !req.waived)
-        .map((req) => `${semester}:${req.eventTypeId}`));
-    return hlhmFilled ? [...filled, `:${HLHM}`] : filled;
+export type SetAsideResult = {
+    setAside: { email: string; attendanceId: string; makeupFor: string }[];
+    /** Members whose standing would still change after setting their picks aside: apply nothing until it's empty. */
+    mismatches: string[];
+};
+
+/** What a Member sees: who made up each Missed Event, open Strikes, and the requirements filled. */
+function outcome(standing: Standing, attendances: Attendance[]): string {
+    const hlhmFilled = attendances.some((attendance) => attendance.eventTypeId === HLHM
+        && !standing.surplus.some((row) => row.attendanceId === attendance.id));
+    return JSON.stringify({
+        madeUp: standing.missedEvents.map((missed) => [missed.codeId, missed.madeUpBy, missed.owed, missed.strike]),
+        openStrikes: standing.openStrikes,
+        requirements: standing.semesterRequirements,
+        hlhmFilled,
+    });
 }
 
-export function pickRuleChanges({ today, codes, members }: MigrationInput): PickRuleChange[] {
-    const changes: PickRuleChange[] = [];
+export function picksToSetAside({ today, codes, members, approvedBefore }: SetAsideInput): SetAsideResult {
+    const eligible = new Set(approvedBefore);
+    const result: SetAsideResult = { setAside: [], mismatches: [] };
     for (const { email, member, attendances } of members) {
-        const before = computeStanding(member, attendances, rubric, codes, { today, legacyPicks: true });
-        const after = computeStanding(member, attendances, rubric, codes, { today });
-        const hlhmFilled = (standing: Standing) => attendances.some((attendance) => attendance.eventTypeId === HLHM
-            && !standing.surplus.some((row) => row.attendanceId === attendance.id));
+        const scored = (rows: Attendance[], legacyPicks: boolean) => computeStanding(member, rows, rubric, codes, { today, legacyPicks });
+        // A pick made after the release follows the new rule, so it's left out
+        // of both the old scoring and the check.
+        const before = attendances.filter((attendance) => !attendance.makeupFor || eligible.has(attendance.id));
+        const old = scored(before, true);
+        // The old rule only honoured a pick on Attendance that was Surplus anyway.
+        const ignored = before.filter((attendance) => attendance.makeupFor
+            && !old.surplus.some((row) => row.attendanceId === attendance.id));
+        if (!ignored.length) continue;
 
-        const madeUp = after.missedEvents
-            .map((missed, i) => ({ codeId: missed.codeId, before: before.missedEvents[i].madeUpBy, after: missed.madeUpBy }))
-            .filter((row) => row.before !== row.after);
-        const stillFilled = new Set(filledRequirements(after, hlhmFilled(after)));
-        const reopened = filledRequirements(before, hlhmFilled(before))
-            .filter((key) => !stillFilled.has(key))
-            .map((key) => {
-                const [semester, eventTypeId] = key.split(':');
-                return { eventTypeId, semester: (semester || null) as Semester | null };
-            });
-        const openStrikes = { before: before.openStrikes, after: after.openStrikes };
-        if (madeUp.length || reopened.length || openStrikes.before !== openStrikes.after) {
-            changes.push({ email, madeUp, reopened, openStrikes });
+        const setAside = new Set(ignored.map((attendance) => attendance.id));
+        const after = before.map(({ makeupFor, ...rest }) => (setAside.has(rest.id) ? rest : { ...rest, makeupFor }));
+        if (outcome(scored(after, false), after) !== outcome(old, before)) result.mismatches.push(email);
+        for (const attendance of ignored) {
+            result.setAside.push({ email, attendanceId: attendance.id, makeupFor: attendance.makeupFor });
         }
     }
-    return changes;
+    return result;
 }

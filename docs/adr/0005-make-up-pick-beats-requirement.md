@@ -11,5 +11,5 @@ A Member who names a Missed Event for an Attendance (on a Point Request, or when
 **Consequences**
 
 - A pick only counts while its miss is still owed; if E-Board overrode it or another Attendance already made it up, the Attendance fills its requirement as if nothing were named.
-- Standing is calculated on read (ADR-0002), so this re-scores already-approved requests whose pick was ignored: those Members see a Missed Event made up and a requirement reopened. A dry-run script lists who changes before release.
+- Standing is calculated on read (ADR-0002), so on its own this would re-score already-approved requests whose pick was ignored, reopening requirements Members thought were done. Instead the rule applies from the release on: `scripts/set_aside_old_makeup_picks.py`, run at release, moves each ignored pick on a request approved before then to `ignoredMakeupFor`, so those Members keep the standing they had (requirement filled, the named miss still owed).
 - Without a pick, a requirement-filling Attendance still fills the requirement; only the Member's explicit choice turns it into a Make-up.

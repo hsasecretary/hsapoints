@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Attendance, Code, Member } from './computeStanding';
-import { pickRuleChanges } from './makeupPickRelease';
+import { picksToSetAside } from './makeupPickRelease';
 
 const TODAY = '2027-04-20';
 const cabinetMember: Member = { cabinet: 'programming', approved: true, eboard: false, heldToCabinetRules: true };
@@ -16,51 +16,68 @@ function requested(email: string, id: string, eventTypeId: string, eventDate: st
     return { id: `${email}__req-${id}`, eventTypeId, eventDate, source: 'request', requestId: id, ...(makeupFor ? { makeupFor } : {}) };
 }
 
-describe('pickRuleChanges', () => {
-    it('lists only the Members an ignored pick now changes: the miss made up, the requirement reopened, the Strikes', () => {
-        const changed = 'a@ufl.edu';
-        const unchanged = 'b@ufl.edu';
-        const changes = pickRuleChanges({
+function attendedThursday(email: string): Attendance {
+    return { id: `${email}__CT1`, eventTypeId: 'cabinet-thursday', eventDate: '2026-09-03', source: 'code', codeId: 'CT1' };
+}
+
+describe('picksToSetAside', () => {
+    it('sets aside a pick the old rule ignored, so the requirement stays filled and the miss stays owed', () => {
+        const email = 'a@ufl.edu';
+        const hlhm = requested(email, 'r1', 'hlhm', '2026-09-20', 'RET1');
+        const result = picksToSetAside({
             today: TODAY,
             codes: [retreat, thursday],
-            members: [
-                {
-                    email: changed,
-                    member: cabinetMember,
-                    attendances: [
-                        { id: `${changed}__CT1`, eventTypeId: 'cabinet-thursday', eventDate: '2026-09-03', source: 'code', codeId: 'CT1' },
-                        requested(changed, 'r1', 'hlhm', '2026-09-20', 'RET1'),
-                        requested(changed, 'r2', 'hsa-service', '2026-10-01', 'RET1'),
-                    ],
-                },
-                {
-                    email: unchanged,
-                    member: cabinetMember,
-                    // A pick on an event that was Surplus anyway was already honoured.
-                    attendances: [
-                        { id: `${unchanged}__CT1`, eventTypeId: 'cabinet-thursday', eventDate: '2026-09-03', source: 'code', codeId: 'CT1' },
-                        requested(unchanged, 'r1', 'crash', '2026-09-20', 'RET1'),
-                    ],
-                },
-            ],
+            members: [{ email, member: cabinetMember, attendances: [attendedThursday(email), hlhm] }],
+            approvedBefore: [hlhm.id],
         });
 
-        expect(changes).toEqual([{
-            email: changed,
-            madeUp: [{ codeId: 'RET1', before: null, after: `${changed}__req-r1` }],
-            reopened: [{ eventTypeId: 'hlhm', semester: null }],
-            openStrikes: { before: 1, after: 0 },
-        }]);
+        expect(result).toEqual({ setAside: [{ email, attendanceId: hlhm.id, makeupFor: 'RET1' }], mismatches: [] });
     });
 
-    it('reports a Semester Requirement the pick now leaves open, with its Semester', () => {
-        const email = 'c@ufl.edu';
-        const changes = pickRuleChanges({
+    it("sets aside the old pick without counting a later request's pick, which the new rule applies to, as a mismatch", () => {
+        const email = 'd@ufl.edu';
+        const oldHlhm = requested(email, 'r1', 'hlhm', '2026-09-20', 'RET1');
+        const lateService = requested(email, 'r2', 'hsa-service', '2026-10-05', 'CT1');
+        const result = picksToSetAside({
             today: TODAY,
-            codes: [retreat],
-            members: [{ email, member: cabinetMember, attendances: [requested(email, 'r1', 'hsa-service', '2026-10-01', 'RET1')] }],
+            codes: [retreat, thursday],
+            members: [{ email, member: cabinetMember, attendances: [oldHlhm, lateService] }],
+            approvedBefore: [oldHlhm.id],
         });
 
-        expect(changes[0].reopened).toEqual([{ eventTypeId: 'hsa-service', semester: 'fall' }]);
+        expect(result).toEqual({ setAside: [{ email, attendanceId: oldHlhm.id, makeupFor: 'RET1' }], mismatches: [] });
+    });
+
+    it('leaves a pick the old rule honoured, and one from a request approved after the release', () => {
+        const email = 'b@ufl.edu';
+        const crash = requested(email, 'r1', 'crash', '2026-09-20', 'RET1');
+        const lateHlhm = requested(email, 'r2', 'hlhm', '2026-10-01', 'CT1');
+        const result = picksToSetAside({
+            today: TODAY,
+            codes: [retreat, thursday],
+            members: [{ email, member: cabinetMember, attendances: [crash, lateHlhm] }],
+            // r2 was approved after the release, so the new rule applies to it.
+            approvedBefore: [crash.id],
+        });
+
+        expect(result).toEqual({ setAside: [], mismatches: [] });
+    });
+
+    it('sets aside each ignored Tabling hour, keeping the hour whose pick was honoured', () => {
+        const email = 'c@ufl.edu';
+        // Both hours picked and both the first Tabling of the Semester: under the
+        // old rule the first filled Tabling (pick ignored), the second made up CT1.
+        const hours = [
+            requested(email, 't1-h1', 'tabling', '2026-09-15', 'RET1'),
+            requested(email, 't1-h2', 'tabling', '2026-09-15', 'CT1'),
+        ];
+        const result = picksToSetAside({
+            today: TODAY,
+            codes: [retreat, thursday],
+            members: [{ email, member: cabinetMember, attendances: hours }],
+            approvedBefore: hours.map((hour) => hour.id),
+        });
+
+        expect(result).toEqual({ setAside: [{ email, attendanceId: hours[0].id, makeupFor: 'RET1' }], mismatches: [] });
     });
 });

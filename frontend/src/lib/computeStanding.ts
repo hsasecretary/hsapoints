@@ -57,6 +57,9 @@ export type Attendance = {
     requestId?: string;
     /** The Missed Event (a codeId) the Member picked for this to make up. */
     makeupFor?: string;
+    /** Never read: a pick on a Point Request approved before ADR-0005, which
+     *  the old rule ignored, kept for reference so its standing didn't change. */
+    ignoredMakeupFor?: string;
     /** Entered Attendance (source 'eboard') only: who entered it and when ('YYYY-MM-DD'),
      *  the note the Member sees, and for an event with no code its name and the
      *  entry its Tabling hours share. */
@@ -147,7 +150,7 @@ export type StandingOptions = {
     /** E-Board or a Web-team Tester previewing the Cabinet Member view. */
     viewingAsCabinet?: boolean;
     /** The rule before ADR-0005, where a pick only counted on Attendance that
-     *  was Surplus anyway. Only for scripts/makeup_pick_dry_run.py; remove
+     *  was Surplus anyway. Only for scripts/set_aside_old_makeup_picks.py; remove
      *  once #121 has shipped. */
     legacyPicks?: boolean;
 };
