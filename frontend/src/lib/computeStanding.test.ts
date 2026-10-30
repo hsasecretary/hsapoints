@@ -265,6 +265,95 @@ describe('computeStanding', () => {
         ]);
     });
 
+    it('lets a pick on the first HLHM of the year make up a Cabinet Retreat, leaving HLHM for the next one', () => {
+        const retreat = code('RET1', 'cabinet-retreat', '2026-09-12');
+        const first = code('HLHM1', 'hlhm', '2026-09-20');
+        const second = code('HLHM2', 'hlhm', '2026-10-01');
+        const codes = [retreat, first, second];
+
+        const picked = computeStanding(cabinetMember, [attended(first, { makeupFor: 'RET1' })], rubric, codes, { today: TODAY });
+        expect(picked.missedEvents[0]).toMatchObject({ codeId: 'RET1', madeUpBy: 'm__HLHM1', owed: false, strike: false });
+        expect(picked.surplus).toEqual([
+            { attendanceId: 'm__HLHM1', eventTypeId: 'hlhm', eventDate: '2026-09-20', makeupFor: 'RET1' },
+        ]);
+        expect(picked.openStrikes).toBe(0);
+
+        // The next HLHM then fills the yearly requirement, so it isn't surplus.
+        const both = computeStanding(
+            cabinetMember, [attended(first, { makeupFor: 'RET1' }), attended(second)], rubric, codes, { today: TODAY },
+        );
+        expect(both.surplus.map((extra) => extra.attendanceId)).toEqual(['m__HLHM1']);
+        expect(both.missedEvents[0].madeUpBy).toBe('m__HLHM1');
+    });
+
+    it('can still score a pick the old way, for the release dry run', () => {
+        const retreat = code('RET1', 'cabinet-retreat', '2026-09-12');
+        const first = code('HLHM1', 'hlhm', '2026-09-20');
+        const standing = computeStanding(
+            cabinetMember, [attended(first, { makeupFor: 'RET1' })], rubric, [retreat, first], { today: TODAY, legacyPicks: true },
+        );
+
+        expect(standing.surplus).toEqual([]);
+        expect(standing.missedEvents[0]).toMatchObject({ codeId: 'RET1', madeUpBy: null, owed: true });
+    });
+
+    it('lets a pick on the first Semester Requirement event of the Semester make up a miss, and the next one fills it', () => {
+        const thursday = code('CT1', 'cabinet-thursday', '2026-09-03');
+        const first = code('SERV1', 'hsa-service', '2026-09-15');
+        const second = code('SERV2', 'hsa-service', '2026-10-15');
+        const standing = computeStanding(
+            cabinetMember, [attended(first, { makeupFor: 'CT1' }), attended(second)], rubric, [thursday, first, second], { today: TODAY },
+        );
+
+        expect(standing.missedEvents[0]).toMatchObject({ codeId: 'CT1', madeUpBy: 'm__SERV1', owed: false });
+        expect(standing.semesterRequirements.fall.find((req) => req.eventTypeId === 'hsa-service'))
+            .toEqual({ eventTypeId: 'hsa-service', waived: false, met: true, filledBy: 'm__SERV2' });
+        expect(standing.surplus.map((extra) => extra.attendanceId)).toEqual(['m__SERV1']);
+    });
+
+    it('lets every hour of a Tabling request make up the miss it names, leaving Tabling open', () => {
+        const thursday = code('CT1', 'cabinet-thursday', '2026-09-03');
+        const gbm = code('GBM1', 'gbm', '2026-09-10');
+        const hours = [
+            requested('t1-h1', 'tabling', '2026-09-15', { makeupFor: 'CT1' }),
+            requested('t1-h2', 'tabling', '2026-09-15', { makeupFor: 'GBM1' }),
+        ];
+        const standing = computeStanding(cabinetMember, hours, rubric, [thursday, gbm], { today: TODAY });
+
+        expect(standing.missedEvents.map((missed) => [missed.codeId, missed.madeUpBy])).toEqual([
+            ['CT1', 'm__req-t1-h1'],
+            ['GBM1', 'm__req-t1-h2'],
+        ]);
+        expect(standing.semesterRequirements.fall.find((req) => req.eventTypeId === 'tabling'))
+            .toMatchObject({ met: false, filledBy: null });
+        expect(standing.openStrikes).toBe(0);
+    });
+
+    it('fills the requirement as if nothing were named when the picked miss is overridden or already made up', () => {
+        const retreat = code('RET1', 'cabinet-retreat', '2026-09-12');
+        const hlhm = code('HLHM1', 'hlhm', '2026-09-20');
+        const overriddenMember: Member = { ...cabinetMember, missedEventOverrides: [{ codeId: 'RET1' }] };
+        const overridden = computeStanding(overriddenMember, [attended(hlhm, { makeupFor: 'RET1' })], rubric, [retreat, hlhm], { today: TODAY });
+        expect(overridden.surplus).toEqual([]);
+        expect(overridden.missedEvents[0]).toMatchObject({ overridden: true, madeUpBy: null });
+
+        // An earlier Make-up already named the Retreat, so the HLHM pick has nothing left to cover.
+        const crash = requested('r1', 'crash', '2026-09-14', { makeupFor: 'RET1' });
+        const madeUp = computeStanding(cabinetMember, [crash, attended(hlhm, { makeupFor: 'RET1' })], rubric, [retreat, hlhm], { today: TODAY });
+        expect(madeUp.surplus).toEqual([
+            { attendanceId: 'm__req-r1', eventTypeId: 'crash', eventDate: '2026-09-14', makeupFor: 'RET1' },
+        ]);
+    });
+
+    it('ignores a pick on a Core Event: it counts as attending, never as a Make-up', () => {
+        const thursday = code('CT1', 'cabinet-thursday', '2026-09-03');
+        const gbm = code('GBM1', 'gbm', '2026-09-10');
+        const standing = computeStanding(cabinetMember, [attended(gbm, { makeupFor: 'CT1' })], rubric, [thursday, gbm], { today: TODAY });
+
+        expect(standing.surplus).toEqual([]);
+        expect(standing.missedEvents[0]).toMatchObject({ codeId: 'CT1', owed: true });
+    });
+
     it('falls back to the automatic order when a pick names nothing still owed', () => {
         const thursday = code('CT1', 'cabinet-thursday', '2026-09-03');
         const gbm = code('GBM1', 'gbm', '2026-09-10');

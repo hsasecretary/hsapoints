@@ -85,7 +85,9 @@ service cloud.firestore {
       function isOwnCodeAttendance() {
         let attendance = request.resource.data;
         let code = get(/databases/$(database)/documents/codes/$(attendance.codeId)).data;
-        return attendance.keys().hasOnly(['email', 'eventTypeId', 'eventDate', 'source', 'codeId']) &&
+        return attendance.keys().hasOnly(['email', 'eventTypeId', 'eventDate', 'source', 'codeId', 'makeupFor']) &&
+          // The Missed Event (a codeId) the Member picked for it to make up (#121).
+          attendance.get('makeupFor', '') is string &&
           attendance.email == callerEmail() &&
           attendance.source == 'code' &&
           id == callerEmail() + '__' + attendance.codeId &&

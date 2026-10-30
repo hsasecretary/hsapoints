@@ -134,9 +134,9 @@ describe('previewApproval', () => {
         expect(preview.cabinetPoints).toBe(3);
         expect(preview.vePoints).toBe(3);
         expect(preview.attendances).toEqual([
-            { id: `${EMAIL}__req-r1-h1`, alreadyCounted: false, surplus: false, makeupFor: null },
-            { id: `${EMAIL}__req-r1-h2`, alreadyCounted: false, surplus: true, makeupFor: 'CT1' },
-            { id: `${EMAIL}__req-r1-h3`, alreadyCounted: false, surplus: true, makeupFor: 'GBMSEP' },
+            { id: `${EMAIL}__req-r1-h1`, alreadyCounted: false, surplus: false, makeupFor: null, requirementWaits: false },
+            { id: `${EMAIL}__req-r1-h2`, alreadyCounted: false, surplus: true, makeupFor: 'CT1', requirementWaits: false },
+            { id: `${EMAIL}__req-r1-h3`, alreadyCounted: false, surplus: true, makeupFor: 'GBMSEP', requirementWaits: false },
         ]);
         expect(preview.covers.map((missed) => [missed.codeId, missed.strike])).toEqual([['GBMSEP', false], ['CT1', true]]);
     });

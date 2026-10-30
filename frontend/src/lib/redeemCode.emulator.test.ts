@@ -3,7 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { doc, setDoc } from 'firebase/firestore';
 import { EBOARD, MEMBER, memberDoc, readPastRules, seed, signedInAs, startEmulator } from '../test/emulator';
-import { redeemCode, removeCheckIn } from './redeemCode';
+import { lookupCode, redeemCode, removeCheckIn } from './redeemCode';
 
 const TODAY = '2026-09-25';
 
@@ -86,6 +86,13 @@ describe('redeeming an event code', () => {
         expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ eventCodes: [], fallPoints: 0, gbmPointsNVE: 0 });
     });
 
+    it('keeps the Missed Event the Member picked for it to make up', async () => {
+        const result = await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM1', { today: TODAY, makeupFor: 'ret1' });
+
+        expect(result).toEqual({ ok: true });
+        expect(await readPastRules(env, `attendances/${MEMBER}__GBM1`)).toMatchObject({ codeId: 'GBM1', makeupFor: 'RET1' });
+    });
+
     it("turns away a code that doesn't exist", async () => {
         expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'NOPE', { today: TODAY }))
             .toEqual({ ok: false, reason: 'not-found' });
@@ -139,6 +146,24 @@ describe('redeeming an event code', () => {
             expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'CT1', { today: TODAY, viewingAsCabinet: true }))
                 .toEqual({ ok: true });
         });
+    });
+});
+
+describe('looking a code up before asking for a Make-up pick', () => {
+    it("gives back today's code without writing anything", async () => {
+        const result = await lookupCode(signedInAs(env, MEMBER), MEMBER, ' gbm1 ', { today: TODAY });
+
+        expect(result).toEqual({ ok: true, code: { id: 'GBM1', eventTypeId: 'gbm', eventDate: TODAY, event: 'GBM 1' } });
+        expect(await readPastRules(env, `attendances/${MEMBER}__GBM1`)).toBeUndefined();
+        expect((await readPastRules(env, 'codes/GBM1'))?.attendeeCount).toBe(0);
+    });
+
+    it('refuses a code just as redeeming it would', async () => {
+        const db = signedInAs(env, MEMBER);
+        expect(await lookupCode(db, MEMBER, 'NOPE', { today: TODAY })).toEqual({ ok: false, reason: 'not-found' });
+        expect(await lookupCode(db, MEMBER, 'GBM1', { today: '2026-09-26' })).toEqual({ ok: false, reason: 'not-active' });
+        await redeemCode(db, MEMBER, 'GBM1', { today: TODAY });
+        expect(await lookupCode(db, MEMBER, 'GBM1', { today: TODAY })).toEqual({ ok: false, reason: 'already-redeemed' });
     });
 });
 

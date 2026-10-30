@@ -3,7 +3,7 @@
 // flow that shows them is PointRequestForm.
 import type { Code, MissedEvent } from '../../../../lib/computeStanding';
 import {
-    MAX_HOURS, NOT_LISTED, type EventChoices, type RequestPreview, type TypeChoice,
+    MAX_HOURS, NOT_LISTED, requirementWaitsNotice, type EventChoices, type RequestPreview, type TypeChoice,
 } from '../../../../lib/pointRequests';
 import { eventType } from '../../../../lib/rubric';
 import { shortDate } from '../../../../lib/semester';
@@ -210,6 +210,7 @@ export function PreviewPanel({ held, preview, typeId, count, code, owed }: {
             madeUp.forEach((row) => lines.push(
                 <>It makes up <strong>{name(row.codeId)}</strong> ({shortDate(row.eventDate)}){row.strike ? ' and clears its Strike' : ''}.</>,
             ));
+            if (preview.attendances.some((attendance) => attendance.requirementWaits)) lines.push(requirementWaitsNotice(type.id));
             const spare = preview.attendances.filter((attendance) => attendance.surplus && !attendance.makeupFor).length;
             if (spare > 0 && madeUp.length > 0) {
                 lines.push(`${spare} extra hour${spare === 1 ? '' : 's'} with nothing left to make up.`);
