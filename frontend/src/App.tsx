@@ -4,6 +4,7 @@ import SignUp from './pages/auth/SignUp';
 import Login from './pages/auth/Login';
 import Dashboard from './pages/dashboard/Dashboard';
 import SiteHeader from './components/layout/SiteHeader';
+import AppUpdates from './components/layout/AppUpdates';
 import Footer from './components/layout/Footer';
 import LoadingScreen, { useMinLoadingTime } from './components/ui/LoadingScreen';
 import NotFound from './pages/NotFound';
@@ -114,6 +115,7 @@ function App() {
     return (
         <ViewAsContext.Provider value={viewAs}>
         <Router>
+            <AppUpdates />
             {showLoading ? (
                 <LoadingScreen fullPage />
             ) : (
