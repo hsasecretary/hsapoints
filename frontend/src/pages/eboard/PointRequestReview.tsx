@@ -1,7 +1,10 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { db } from '../../lib/firebase';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import {
+    collection, getDocs, doc, getDoc,
+    type DocumentData, type DocumentSnapshot, type QueryDocumentSnapshot,
+} from 'firebase/firestore';
 import MemberSearch from '../../components/members/MemberSearch';
 import type { Code } from '../../lib/computeStanding';
 import { canRevoke } from '../../lib/memberLookup';
@@ -9,12 +12,14 @@ import { displayName, type NamedMember } from '../../lib/nameSearch';
 import { NOT_LISTED } from '../../lib/pointRequests';
 import type { Revoked } from '../../lib/pointsOverview';
 import type { ReviewRequest } from '../../lib/requestReview';
+import {
+    countRequests, requestsPage, PAGE_SIZE, STATUS_FILTERS, type StatusFilter,
+} from '../../lib/requestQueue';
 import { eventType } from '../../lib/rubric';
 import ReviewPanel from './pointRequests/ReviewPanel';
 import RevokeForm from './pointRequests/RevokeForm';
 
 type StoredRequest = ReviewRequest & {
-    userName: string;
     activityName?: string;
     description?: string;
     pointsRequested?: number;
@@ -30,6 +35,26 @@ type StoredRequest = ReviewRequest & {
     [image: string]: unknown;
 };
 
+/** One status tab's loaded page, and where the next one starts. */
+type Tab = {
+    rows: StoredRequest[];
+    last?: QueryDocumentSnapshot<DocumentData>;
+    hasMore: boolean;
+};
+
+const STATUS_LABEL: Record<StatusFilter, string> = {
+    pending: 'Pending', approved: 'Approved', denied: 'Denied', all: 'All',
+};
+
+function toRequest(snap: DocumentSnapshot<DocumentData> | QueryDocumentSnapshot<DocumentData>): StoredRequest {
+    const data = snap.data();
+    return {
+        id: snap.id,
+        ...data,
+        submittedAt: data?.submittedAt?.toDate() || new Date(),
+    } as StoredRequest;
+}
+
 // What the Member picked, in words: an Event Type, a group such as OPA
 // (E-Board confirms which), or "Not listed".
 function memberPick(request: StoredRequest): string {
@@ -40,12 +65,20 @@ function memberPick(request: StoredRequest): string {
 }
 
 function PointRequestReview() {
-    const [requests, setRequests] = useState<StoredRequest[]>([]);
-    const [codes, setCodes] = useState<Code[]>([]);
+    // One entry per status tab, filled the first time that tab is opened: the
+    // collection is too big to read whole, since every request carries its
+    // photo (see lib/requestQueue).
+    const [tabs, setTabs] = useState<Record<string, Tab>>({});
+    const [counts, setCounts] = useState<Partial<Record<StatusFilter, number>>>({});
+    const [refreshKey, setRefreshKey] = useState(0);
+    // Only the review panel needs the codes, so they wait for the first Review.
+    const [codes, setCodes] = useState<Code[] | null>(null);
     const [members, setMembers] = useState<NamedMember[]>([]);
     const [membersError, setMembersError] = useState('');
+    const [requestsError, setRequestsError] = useState('');
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('pending');
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [filter, setFilter] = useState<StatusFilter>('pending');
     const [selectedImage, setSelectedImage] = useState(null);
     const [reviewing, setReviewing] = useState<string | null>(null);
     const [notice, setNotice] = useState('');
@@ -62,9 +95,12 @@ function PointRequestReview() {
     };
     const linkedCard = useRef<HTMLDivElement>(null);
     const [linkedShown, setLinkedShown] = useState(false);
+    // The linked request is read on its own: its tab may not be open, and even
+    // on the right tab it can sit past the first page.
+    const [linked, setLinked] = useState<StoredRequest | null>(null);
+    const [linkedMissing, setLinkedMissing] = useState(false);
 
     useEffect(() => {
-        fetchRequests();
         getDocs(collection(db, 'users'))
             .then((snapshot) => setMembers(snapshot.docs.map((d) => {
                 const data = d.data();
@@ -76,87 +112,155 @@ function PointRequestReview() {
             });
     }, []);
 
+    // Names come from the users read above, so the page doesn't read a user
+    // document per request on top of it.
+    const namesByEmail = useMemo(
+        () => new Map(members.map((member) => [member.email.toLowerCase(), displayName(member)])),
+        [members],
+    );
+    const nameOf = (request: StoredRequest) =>
+        namesByEmail.get(String(request.userEmail).toLowerCase()) ?? String(request.userEmail);
+
+    // A tab is cached per Member and per refresh, so picking a Member or
+    // reviewing a request re-reads rather than showing the old page.
+    const cacheKey = (status: StatusFilter) => `${refreshKey}|${memberFilter ?? ''}|${status}`;
+    const openTab = tabs[cacheKey(filter)];
+
+    useEffect(() => {
+        const key = cacheKey(filter);
+        // Already read; switching back to a tab shouldn't cost another read.
+        if (tabs[key]) {
+            setLoading(false);
+            return;
+        }
+        let cancelled = false;
+        setLoading(true);
+        setRequestsError('');
+        requestsPage(db, filter, memberFilter)
+            .then((snapshot) => {
+                if (cancelled) return;
+                const hasMore = snapshot.docs.length > PAGE_SIZE;
+                const page = hasMore ? snapshot.docs.slice(0, PAGE_SIZE) : snapshot.docs;
+                setTabs((current) => ({
+                    ...current,
+                    [key]: { rows: page.map(toRequest), last: page[page.length - 1], hasMore },
+                }));
+            })
+            .catch((error) => {
+                console.error('Error fetching requests:', error);
+                if (!cancelled) setRequestsError('Could not load point requests. Refresh to try again.');
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+        return () => { cancelled = true; };
+    }, [filter, memberFilter, refreshKey, tabs]);
+
+    useEffect(() => {
+        let cancelled = false;
+        Promise.all(STATUS_FILTERS.map(async (status) =>
+            [status, await countRequests(db, status, memberFilter)] as const))
+            .then((entries) => { if (!cancelled) setCounts(Object.fromEntries(entries)); })
+            .catch((error) => console.error('Error counting requests:', error));
+        return () => { cancelled = true; };
+    }, [memberFilter, refreshKey]);
+
     useEffect(() => {
         if (!linkedId || linkedShown) return;
-        const linked = requests.find((request) => request.id === linkedId);
-        if (!linked) return;
-        setLinkedShown(true);
-        setFilter(linked.status);
-        if (linked.status === 'pending') setReviewing(linked.id);
-        // A stale ?member= for someone else would hide the request this link named.
-        if (memberFilter && String(linked.userEmail).toLowerCase() !== memberFilter) {
-            const next = new URLSearchParams(params);
-            next.delete('member');
-            setParams(next);
-        }
-    }, [linkedId, linkedShown, requests]);
+        let cancelled = false;
+        getDoc(doc(db, 'pointRequests', linkedId))
+            .then((snapshot) => {
+                if (cancelled) return;
+                setLinkedShown(true);
+                if (!snapshot.exists()) {
+                    setLinkedMissing(true);
+                    return;
+                }
+                const request = toRequest(snapshot);
+                setLinked(request);
+                setFilter(request.status);
+                if (request.status === 'pending') openReview(request.id);
+                // A stale ?member= for someone else would hide the request this link named.
+                if (memberFilter && String(request.userEmail).toLowerCase() !== memberFilter) {
+                    const next = new URLSearchParams(params);
+                    next.delete('member');
+                    setParams(next);
+                }
+            })
+            .catch((error) => {
+                console.error('Error loading linked request:', error);
+                if (!cancelled) setLinkedShown(true);
+            });
+        return () => { cancelled = true; };
+    }, [linkedId, linkedShown]);
 
     useEffect(() => {
         if (linkedShown) linkedCard.current?.scrollIntoView({ block: 'start' });
-    }, [linkedShown]);
+    }, [linkedShown, linked]);
 
-    const fetchRequests = async () => {
+    const loadMore = async () => {
+        const key = cacheKey(filter);
+        const tab = tabs[key];
+        if (!tab?.hasMore || loadingMore) return;
+        setLoadingMore(true);
         try {
-            setLoading(true);
-            const [requestsSnapshot, codesSnapshot] = await Promise.all([
-                getDocs(collection(db, 'pointRequests')),
-                getDocs(collection(db, 'codes')),
-            ]);
-            setCodes(codesSnapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Code));
-
-            // One read per Member, not per request.
-            const emails = [...new Set(requestsSnapshot.docs.map((d) => String(d.data().userEmail)))];
-            const names = new Map(await Promise.all(emails.map(async (email) => {
-                try {
-                    const userData = (await getDoc(doc(db, 'users', email.toLowerCase()))).data();
-                    return [email, userData ? `${userData.firstName || ''} ${userData.lastName || ''}`.trim() : 'Unknown User'] as const;
-                } catch (error) {
-                    console.error('Error fetching user data for', email, error);
-                    return [email, 'Unknown User'] as const;
-                }
-            })));
-
-            const requestsData = requestsSnapshot.docs.map((docSnap) => {
-                const data = docSnap.data();
-                return {
-                    id: docSnap.id,
-                    ...data,
-                    userName: names.get(String(data.userEmail)),
-                    submittedAt: data.submittedAt?.toDate() || new Date(),
-                } as StoredRequest;
-            });
-
-            // Sort by submission date (newest first)
-            requestsData.sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
-
-            setRequests(requestsData);
+            const snapshot = await requestsPage(db, filter, memberFilter, tab.last);
+            const hasMore = snapshot.docs.length > PAGE_SIZE;
+            const page = hasMore ? snapshot.docs.slice(0, PAGE_SIZE) : snapshot.docs;
+            setTabs((current) => ({
+                ...current,
+                [key]: {
+                    rows: [...(current[key]?.rows ?? []), ...page.map(toRequest)],
+                    last: page[page.length - 1] ?? current[key]?.last,
+                    hasMore,
+                },
+            }));
         } catch (error) {
-            console.error('Error fetching requests:', error);
+            console.error('Error loading more requests:', error);
+            setRequestsError('Could not load more point requests.');
         } finally {
-            setLoading(false);
+            setLoadingMore(false);
         }
     };
 
-    // Scoped to the picked Member (if any) before the status filter, so the
-    // status dropdown's counts reflect that Member too (issue #20).
-    const memberRequests = memberFilter
-        ? requests.filter(request => String(request.userEmail).toLowerCase() === memberFilter)
-        : requests;
-    const filteredRequests = memberRequests.filter(request =>
-        filter === 'all' || request.status === filter
-    );
+    const openReview = async (id: string) => {
+        setReviewing(id);
+        setNotice('');
+        if (codes) return;
+        try {
+            const snapshot = await getDocs(collection(db, 'codes'));
+            setCodes(snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Code));
+        } catch (error) {
+            console.error('Error loading codes:', error);
+            setCodes([]);
+            setRequestsError('Could not load event codes. Refresh to try again.');
+        }
+    };
+
+    const refresh = () => {
+        setLinked(null);
+        setLinkedMissing(false);
+        setTabs({});
+        setCounts({});
+        setRefreshKey((key) => key + 1);
+    };
+
+    // The linked request belongs on this tab but may not be in the loaded page.
+    const rows = useMemo(() => {
+        const loaded = openTab?.rows ?? [];
+        if (!linked) return loaded;
+        const belongs = filter === 'all' || linked.status === filter;
+        const sameMember = !memberFilter || String(linked.userEmail).toLowerCase() === memberFilter;
+        if (!belongs || !sameMember || loaded.some((row) => row.id === linked.id)) return loaded;
+        return [linked, ...loaded];
+    }, [openTab, filter, linked, memberFilter]);
+
     const pickedMember = memberFilter ? members.find(m => m.email === memberFilter) ?? null : null;
-    // Only members who have submitted at least one Point Request show up in
-    // the autofill; the rest would just be noise to search through.
-    const membersWithRequests = useMemo(() => {
-        const emails = new Set(requests.map((request) => String(request.userEmail).toLowerCase()));
-        return members.filter((member) => emails.has(member.email));
-    }, [members, requests]);
 
     const handleReviewed = async (message: string) => {
         setReviewing(null);
         setNotice(message);
-        await fetchRequests();
+        refresh();
     };
 
     const getImageSource = (request) => {
@@ -201,7 +305,7 @@ const openImageModal = (request) => {
         }).format(date);
     };
 
-    if (loading && requests.length === 0) {
+    if (loading && !openTab) {
         return (
             <div className="point-request-review">
                 <div className="loading-message">Loading point requests...</div>
@@ -224,12 +328,8 @@ const openImageModal = (request) => {
                 ) : (
                     <>
                         <MemberSearch
-                            members={membersWithRequests}
+                            members={members}
                             onPick={(member) => setMemberFilter(member.email)}
-                            detail={(member) => {
-                                const count = requests.filter(r => String(r.userEmail).toLowerCase() === member.email).length;
-                                return `${count} request${count === 1 ? '' : 's'}`;
-                            }}
                         />
                         <p className="member-filter-section__hint">Search by name to see just one member&apos;s requests.</p>
                     </>
@@ -239,34 +339,36 @@ const openImageModal = (request) => {
 
             <div className="filter-section">
                 <label>Filter by status:</label>
-                <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-                    <option value="pending">Pending ({memberRequests.filter(r => r.status === 'pending').length})</option>
-                    <option value="approved">Approved ({memberRequests.filter(r => r.status === 'approved').length})</option>
-                    <option value="denied">Denied ({memberRequests.filter(r => r.status === 'denied').length})</option>
-                    <option value="all">All ({memberRequests.length})</option>
+                <select value={filter} onChange={(e) => setFilter(e.target.value as StatusFilter)}>
+                    {STATUS_FILTERS.map((status) => (
+                        <option key={status} value={status}>
+                            {STATUS_LABEL[status]}{counts[status] === undefined ? '' : ` (${counts[status]})`}
+                        </option>
+                    ))}
                 </select>
-                <button onClick={fetchRequests} className="refresh-button">
+                <button onClick={refresh} className="refresh-button">
                     Refresh
                 </button>
             </div>
 
             {notice && <p className="review-notice" role="status">{notice}</p>}
-            {linkedId && !loading && !requests.some((request) => request.id === linkedId) && (
+            {requestsError && <p className="review-error" role="alert">{requestsError}</p>}
+            {linkedMissing && (
                 <p className="review-notice" role="status">That Point Request no longer exists.</p>
             )}
 
-            {filteredRequests.length === 0 ? (
+            {rows.length === 0 ? (
                 <div className="no-requests">
                     No {filter === 'all' ? '' : filter} requests found.
                 </div>
             ) : (
                 <div className="requests-grid">
-                    {filteredRequests.map(request => (
+                    {rows.map(request => (
                         <div key={request.id} ref={request.id === linkedId ? linkedCard : undefined}
                             className={`request-card${request.id === linkedId ? ' is-linked' : ''}`}>
                             <div className="request-header">
                                 <div className="user-info">
-                                    <h3>{request.userName}</h3>
+                                    <h3>{nameOf(request)}</h3>
                                     <p className="email">{request.userEmail}</p>
                                 </div>
                                 <div
@@ -340,11 +442,15 @@ const openImageModal = (request) => {
                             </div>
 
                             {request.status === 'pending' && (reviewing === request.id ? (
-                                <ReviewPanel request={request} codes={codes} onReviewed={handleReviewed} />
+                                codes ? (
+                                    <ReviewPanel request={request} codes={codes} onReviewed={handleReviewed} />
+                                ) : (
+                                    <div className="loading-message">Loading event codes...</div>
+                                )
                             ) : (
                                 <div className="request-actions">
                                     <button type="button" className="refresh-button review-open-button"
-                                        onClick={() => { setReviewing(request.id); setNotice(''); }}>
+                                        onClick={() => openReview(request.id)}>
                                         Review
                                     </button>
                                 </div>
@@ -380,6 +486,14 @@ const openImageModal = (request) => {
                             )}
                         </div>
                     ))}
+                </div>
+            )}
+
+            {openTab?.hasMore && (
+                <div className="requests-more">
+                    <button type="button" className="refresh-button" onClick={loadMore} disabled={loadingMore}>
+                        {loadingMore ? 'Loading...' : `Load ${PAGE_SIZE} more`}
+                    </button>
                 </div>
             )}
 

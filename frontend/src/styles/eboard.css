@@ -1724,3 +1724,10 @@
     background: var(--hsa-teal-700); color: #ffffff; font: inherit; font-weight: 700; cursor: pointer;
 }
 .ulk .ulk-add__confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* "Load more" under the Point Request Review grid. */
+.requests-more {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.25rem;
+}
