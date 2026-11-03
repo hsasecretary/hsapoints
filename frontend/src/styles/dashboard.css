@@ -2054,3 +2054,69 @@ The list is already centred inside the frame, so it gives its cap back:
     margin: 1.25rem 0 0;
     text-align: center;
 }
+
+/* Everyone: up to five events in the next week (#98). Phone-first: each row
+   is a date tile and the title, at least 56px tall. */
+.overview .ov-upcoming {
+    margin-top: 24px;
+    text-align: left;
+}
+
+.overview .ov-upcoming__sub {
+    margin: 0 0 8px;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-muted);
+}
+
+.overview .ov-upcoming ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.overview .ov-upcoming li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 56px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+}
+
+.overview .ov-upcoming__date {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: var(--hsa-teal-100);
+    color: var(--hsa-teal-700);
+    line-height: 1.1;
+}
+
+.overview .ov-upcoming__date span {
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.overview .ov-upcoming__date b {
+    font-size: var(--hsa-text-lg);
+}
+
+.overview .ov-upcoming__name {
+    min-width: 0;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.overview .ov-upcoming__name small {
+    display: block;
+    font-weight: 400;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-muted);
+}
