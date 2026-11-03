@@ -1,17 +1,7 @@
 from collections import Counter
-from pathlib import Path
-import firebase_admin
-from firebase_admin import credentials, firestore
+from firestore_client import connect
 
-# Dynamic path resolution
-CURRENT_DIR = Path(__file__).resolve().parent
-KEY_PATH = CURRENT_DIR / "serviceAccountKey.json"
-
-if not firebase_admin._apps:
-    cred = credentials.Certificate(str(KEY_PATH))
-    firebase_admin.initialize_app(cred)
-
-db = firestore.client()
+db = connect()
 
 def backfill_attendee_counts():
     print("1. Counting code occurrences across all users...")

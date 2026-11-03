@@ -29,7 +29,6 @@ Needs `npm install` in frontend/.
 import argparse
 import datetime as dt
 import json
-import os
 import subprocess
 import sys
 import tempfile
@@ -78,21 +77,10 @@ def main():
     args = parser.parse_args()
     cutoff = args.approved_before.astimezone()  # a naive time is local
 
-    import firebase_admin
-    from firebase_admin import credentials, firestore
-    if os.environ.get("FIRESTORE_EMULATOR_HOST"):
-        # Local emulator (npm run emulator in frontend/): never the live project.
-        from google.auth.credentials import AnonymousCredentials
-        from google.cloud import firestore as cloud_firestore
-        db = cloud_firestore.Client(project="demo-hsapoints", credentials=AnonymousCredentials())
-        delete_field = cloud_firestore.DELETE_FIELD
-    else:
-        key = BASE / "serviceAccountKey.json"
-        if not key.exists():
-            sys.exit(f"Missing {key}")
-        firebase_admin.initialize_app(credentials.Certificate(str(key)))
-        db = firestore.client()
-        delete_field = firestore.DELETE_FIELD
+    from google.cloud import firestore
+    from firestore_client import connect
+    db = connect()
+    delete_field = firestore.DELETE_FIELD
 
     start, end = school_year(args.today)
     in_year = lambda row: start <= str(row.get("eventDate", "")) <= end  # noqa: E731

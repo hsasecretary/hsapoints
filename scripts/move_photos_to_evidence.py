@@ -22,13 +22,12 @@ Apply:
 Options:
   --list  prints every request, not just the counts.
 With FIRESTORE_EMULATOR_HOST set it runs against the local emulator instead of
-the live project (which needs scripts/serviceAccountKey.json).
+the live project (scripts/firestore_client.py says how it signs in to that).
 
 What it would move is worked out by scripts/evidence_plan.py, which is tested
 by scripts/test_evidence_plan.py; --apply refuses if anything looks wrong.
 """
 import argparse
-import os
 import sys
 from pathlib import Path
 
@@ -38,6 +37,7 @@ import evidence_plan  # noqa: E402
 BASE = Path(__file__).resolve().parent
 # Firestore allows 500 writes per batch and each move is two of them.
 MOVES_PER_BATCH = 200
+BATCH_BYTES = 8 * 1024 * 1024
 
 
 def load(db):
@@ -68,21 +68,10 @@ def main():
     parser.add_argument("--list", action="store_true", help="print every request, not just the counts")
     args = parser.parse_args()
 
-    import firebase_admin
-    from firebase_admin import credentials, firestore
-    if os.environ.get("FIRESTORE_EMULATOR_HOST"):
-        # Local emulator (npm run emulator in frontend/): never the live project.
-        from google.auth.credentials import AnonymousCredentials
-        from google.cloud import firestore as cloud_firestore
-        db = cloud_firestore.Client(project="demo-hsapoints", credentials=AnonymousCredentials())
-        delete_field = cloud_firestore.DELETE_FIELD
-    else:
-        key = BASE / "serviceAccountKey.json"
-        if not key.exists():
-            sys.exit(f"Missing {key}")
-        firebase_admin.initialize_app(credentials.Certificate(str(key)))
-        db = firestore.client()
-        delete_field = firestore.DELETE_FIELD
+    from google.cloud import firestore
+    from firestore_client import connect
+    db = connect()
+    delete_field = firestore.DELETE_FIELD
 
     requests, evidence = load(db)
     plan = evidence_plan.plan_moves(requests, evidence)
@@ -110,14 +99,21 @@ def main():
 
     if not args.apply or not moves:
         return
-    for i in range(0, len(moves), MOVES_PER_BATCH):
-        batch = db.batch()
-        for row in moves[i:i + MOVES_PER_BATCH]:
-            request = db.collection("pointRequests").document(row["id"])
-            batch.set(request.collection(evidence_plan.EVIDENCE_COLLECTION).document(evidence_plan.PHOTO_DOC),
-                      {"imageData": row["photo"], "userEmail": row["userEmail"]})
-            batch.update(request, {"hasPhoto": True, "imageData": delete_field})
-        batch.commit()
+    # A commit is capped at about 18MB, and old photos run near 300KB each, so
+    # a batch ends at MOVES_PER_BATCH moves or BATCH_BYTES of photo, whichever
+    # comes first.
+    batch, in_batch, batch_bytes = db.batch(), 0, 0
+    for row in moves:
+        if in_batch and (in_batch >= MOVES_PER_BATCH or batch_bytes + row["bytes"] > BATCH_BYTES):
+            batch.commit()
+            batch, in_batch, batch_bytes = db.batch(), 0, 0
+        request = db.collection("pointRequests").document(row["id"])
+        batch.set(request.collection(evidence_plan.EVIDENCE_COLLECTION).document(evidence_plan.PHOTO_DOC),
+                  {"imageData": row["photo"], "userEmail": row["userEmail"]})
+        batch.update(request, {"hasPhoto": True, "imageData": delete_field})
+        in_batch += 1
+        batch_bytes += row["bytes"]
+    batch.commit()
     print(f"Moved {len(moves)} photo(s) into pointRequests/{{id}}/evidence/photo.")
 
 

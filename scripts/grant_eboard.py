@@ -16,20 +16,11 @@ Take access away:
 """
 
 import sys
-from pathlib import Path
-import firebase_admin
-from firebase_admin import credentials, firestore
 
-# 1. Resolve Service Account Key
-BASE_DIR = Path(__file__).resolve().parent
-KEY_PATH = BASE_DIR / "serviceAccountKey.json"
+from firestore_client import connect
 
-if not KEY_PATH.exists():
-    raise FileNotFoundError(f"Missing serviceAccountKey.json at {KEY_PATH}")
-
-cred = credentials.Certificate(str(KEY_PATH))
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+# 1. Connect (firestore_client.py says how it signs in)
+db = connect()
 
 
 def set_eboard(emails, value, apply_changes):

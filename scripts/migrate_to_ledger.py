@@ -47,7 +47,6 @@ import argparse
 import datetime as dt
 import hashlib
 import json
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -549,19 +548,8 @@ def main():
     parser.add_argument("--today", type=dt.date.fromisoformat, default=dt.date.today())
     args = parser.parse_args()
 
-    import firebase_admin
-    from firebase_admin import credentials, firestore
-    if os.environ.get("FIRESTORE_EMULATOR_HOST"):
-        # Local emulator (npm run emulator in frontend/): never the live project.
-        from google.auth.credentials import AnonymousCredentials
-        from google.cloud import firestore as cloud_firestore
-        db = cloud_firestore.Client(project="demo-hsapoints", credentials=AnonymousCredentials())
-    else:
-        key = BASE / "serviceAccountKey.json"
-        if not key.exists():
-            sys.exit(f"Missing {key}")
-        firebase_admin.initialize_app(credentials.Certificate(str(key)))
-        db = firestore.client()
+    from firestore_client import connect
+    db = connect()
 
     OUT.mkdir(exist_ok=True)
     rubric = json.loads(run_node("rubric"))

@@ -1,18 +1,10 @@
-import os
-from pathlib import Path
-import firebase_admin
-from firebase_admin import credentials, firestore, auth
+from firebase_admin import auth
 
-# 1. Resolve Service Account Key
-BASE_DIR = Path(__file__).resolve().parent
-KEY_PATH = BASE_DIR / "serviceAccountKey.json"
+from firestore_client import connect
 
-if not KEY_PATH.exists():
-    raise FileNotFoundError(f"Missing serviceAccountKey.json at {KEY_PATH}")
-
-cred = credentials.Certificate(str(KEY_PATH))
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+# 1. Connect (firestore_client.py says how it signs in); this also starts the
+# Admin SDK that `auth` below uses.
+db = connect()
 
 # 2. Configuration & Preserved Accounts
 # Add any specific admin/E-Board emails you want to PRESERVE from deletion:

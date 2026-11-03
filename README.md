@@ -106,7 +106,12 @@ In VS Code, press `Ctrl + Shift + P` (or `Cmd + Shift + P` on Mac) → **Python:
 ### 5. Configure Firebase Authentication & Keys
 
 - Create a `.env.local` file in the `frontend/` directory if environment variables are required.
-- If running admin scripts locally, place your `serviceAccountKey.json` inside the repository root or `scripts/` directory.
+- Admin scripts in `scripts/` sign in with your own Google account, so there's no key to download. Install the [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) (`brew install --cask google-cloud-sdk` on a Mac), then once, as an account with access to the Firebase project:
+  ```bash
+  gcloud auth application-default login
+  gcloud auth application-default set-quota-project hsa-website-5d15a
+  ```
+  A `scripts/serviceAccountKey.json`, if present, is used instead; with `FIRESTORE_EMULATOR_HOST` set, the scripts use the local emulator. `scripts/firestore_client.py` has the details.
 
 > ⚠️ **CRITICAL SECURITY RULE:** Never commit `serviceAccountKey.json`, `.env`, or `.xlsx` files to GitHub. Always ensure they are listed in `.gitignore`.
 
@@ -137,8 +142,8 @@ hsapoints/
 ├── firestore.indexes.json     # Firestore indexes
 ├── .github/workflows/         # Deploy to Firebase Hosting on merge / preview on PR
 ├── scripts/                   # Python admin scripts (Firebase Admin SDK)
-│   ├── export_members.py
-│   └── serviceAccountKey.json (Git ignored)
+│   ├── firestore_client.py    # How every script signs in to Firestore
+│   └── export_members.py
 └── frontend/                  # The web app (React + TypeScript + Vite)
     ├── index.html             # App entry page
     ├── package.json           # Dependencies and npm scripts

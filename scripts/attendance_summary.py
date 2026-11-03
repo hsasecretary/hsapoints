@@ -1,20 +1,14 @@
 from collections import Counter
 from pathlib import Path
-import firebase_admin
-from firebase_admin import credentials, firestore
 import pandas as pd
 
-# Dynamic path resolution for serviceAccountKey.json and output file
+from firestore_client import connect
+
+# Dynamic path resolution for the output file
 CURRENT_DIR = Path(__file__).resolve().parent
-KEY_PATH = CURRENT_DIR / "serviceAccountKey.json"
 OUTPUT_FILE = CURRENT_DIR / "event_code_attendance.xlsx"
 
-# Initialize Firebase Admin SDK
-if not firebase_admin._apps:
-    cred = credentials.Certificate(str(KEY_PATH))
-    firebase_admin.initialize_app(cred)
-
-db = firestore.client()
+db = connect()
 
 def export_code_counts_to_excel():
     print("Fetching event codes and user attendance data from Firestore...")

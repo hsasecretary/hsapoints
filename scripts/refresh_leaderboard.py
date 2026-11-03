@@ -21,7 +21,6 @@ Needs `npm install` in frontend/.
 import argparse
 import datetime as dt
 import json
-import os
 import subprocess
 import sys
 import tempfile
@@ -89,21 +88,10 @@ def main():
     parser.add_argument("--today", type=dt.date.fromisoformat, default=dt.date.today())
     args = parser.parse_args()
 
-    import firebase_admin
-    from firebase_admin import credentials, firestore
-    if os.environ.get("FIRESTORE_EMULATOR_HOST"):
-        # Local emulator (npm run emulator in frontend/): never the live project.
-        from google.auth.credentials import AnonymousCredentials
-        from google.cloud import firestore as cloud_firestore
-        db = cloud_firestore.Client(project="demo-hsapoints", credentials=AnonymousCredentials())
-        server_timestamp = cloud_firestore.SERVER_TIMESTAMP
-    else:
-        key = BASE / "serviceAccountKey.json"
-        if not key.exists():
-            sys.exit(f"Missing {key}")
-        firebase_admin.initialize_app(credentials.Certificate(str(key)))
-        db = firestore.client()
-        server_timestamp = firestore.SERVER_TIMESTAMP
+    from google.cloud import firestore
+    from firestore_client import connect
+    db = connect()
+    server_timestamp = firestore.SERVER_TIMESTAMP
 
     users = {d.id: d.to_dict() or {} for d in db.collection("users").stream()}
     # Every Attendance: lib/leaderboard.ts keeps only this school year's.

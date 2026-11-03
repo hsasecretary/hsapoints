@@ -22,9 +22,9 @@ Unmark (back to the default rule for their role):
 """
 
 import sys
-from pathlib import Path
-import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import firestore
+
+from firestore_client import connect
 
 WEB_TEAM = [
     "carrascom@ufl.edu",
@@ -33,16 +33,8 @@ WEB_TEAM = [
     "h.alvarez@ufl.edu",
 ]
 
-# 1. Resolve Service Account Key
-BASE_DIR = Path(__file__).resolve().parent
-KEY_PATH = BASE_DIR / "serviceAccountKey.json"
-
-if not KEY_PATH.exists():
-    raise FileNotFoundError(f"Missing serviceAccountKey.json at {KEY_PATH}")
-
-cred = credentials.Certificate(str(KEY_PATH))
-firebase_admin.initialize_app(cred)
-db = firestore.client()
+# 1. Connect (firestore_client.py says how it signs in)
+db = connect()
 
 
 def set_web_team(emails, value, apply_changes):

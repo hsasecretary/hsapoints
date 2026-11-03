@@ -1,20 +1,11 @@
-import os
 from pathlib import Path
-import firebase_admin
-from firebase_admin import credentials, firestore
 import pandas as pd
 
-# 1. Locate credentials and initialize Firebase Admin SDK
+from firestore_client import connect
+
+# 1. Connect to Firestore (firestore_client.py says how it signs in)
 BASE_DIR = Path(__file__).resolve().parent
-KEY_PATH = BASE_DIR / "serviceAccountKey.json"
-
-if not KEY_PATH.exists():
-    raise FileNotFoundError(f"Could not find serviceAccountKey.json at: {KEY_PATH}")
-
-cred = credentials.Certificate(str(KEY_PATH))
-firebase_admin.initialize_app(cred)
-
-db = firestore.client()
+db = connect()
 
 # 2. Query all documents from the 'users' collection
 print("Fetching users from Firestore...")

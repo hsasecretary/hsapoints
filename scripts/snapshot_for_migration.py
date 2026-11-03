@@ -2,13 +2,12 @@
 point-system migration. Writes scripts/migration_snapshot.xlsx (git-ignored: contains member data)."""
 from pathlib import Path
 import json
-import firebase_admin
-from firebase_admin import credentials, firestore
 import pandas as pd
 
+from firestore_client import connect
+
 BASE = Path(__file__).resolve().parent
-firebase_admin.initialize_app(credentials.Certificate(str(BASE / "serviceAccountKey.json")))
-db = firestore.client()
+db = connect()
 
 def s(v):
     return v.isoformat() if hasattr(v, "isoformat") else v
