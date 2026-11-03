@@ -905,6 +905,17 @@
     border-radius: 12px;
 }
 
+/* The photo is read when E-Board opens it (lib/requestEvidence.ts), so the
+   modal also carries the message when there is nothing to show. */
+.point-request-review .modal-content .image-modal__error {
+    margin: 0;
+    padding: 28px 32px;
+    max-width: 32ch;
+    color: var(--hsa-ink);
+    font-weight: 600;
+    text-align: center;
+}
+
 /* A true circle (min-width/min-height reset undoes the global button rule
    in base.css, which was stretching this into a pill/oval), floated just
    outside the image corner and in the site's own teal rather than an
@@ -1724,3 +1735,10 @@
     background: var(--hsa-teal-700); color: #ffffff; font: inherit; font-weight: 700; cursor: pointer;
 }
 .ulk .ulk-add__confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* "Load more" under the Point Request Review grid. */
+.requests-more {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.25rem;
+}

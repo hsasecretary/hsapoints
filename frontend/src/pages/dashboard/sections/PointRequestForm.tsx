@@ -14,6 +14,7 @@ import {
     attendanceCount, buildPointRequest, eventChoices, missedEventName, NOT_LISTED, pickerGroups,
     previewRequest, typeChoiceFor, type RequestDraft, type TypeChoice,
 } from '../../../lib/pointRequests';
+import { savePhoto } from '../../../lib/requestEvidence';
 import { eventType, tierLabels } from '../../../lib/rubric';
 import { semesterOf, shortDate } from '../../../lib/semester';
 import { pendingMakeups, useMemberStanding } from '../useMemberStanding';
@@ -168,7 +169,25 @@ function PointRequestForm() {
         setSending(true);
         setMessage({ text: '', type: '' });
         try {
-            await addDoc(collection(db, 'pointRequests'), { ...built.data, submittedAt: serverTimestamp() });
+            // The request first, then its photo in pointRequests/{id}/evidence/photo:
+            // keeping the photo out of the request is what lets every other
+            // page read requests without downloading it (lib/requestEvidence.ts).
+            const saved = await addDoc(collection(db, 'pointRequests'), { ...built.data, submittedAt: serverTimestamp() });
+            if (built.photo) {
+                try {
+                    await savePhoto(db, saved.id, email, built.photo);
+                } catch (error) {
+                    // The request is already in: saying it failed would only
+                    // get it sent twice. E-Board reviews it without the photo.
+                    console.error('Error saving photo evidence:', error);
+                    setMessage({
+                        text: 'Request sent, but the photo did not save. E-Board may ask you for it.',
+                        type: 'success',
+                    });
+                    reset(null);
+                    return;
+                }
+            }
             setMessage({ text: 'Request sent. E-Board will review it; check My Requests for the result.', type: 'success' });
             reset(null);
         } catch (error) {
