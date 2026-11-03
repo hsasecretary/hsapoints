@@ -204,6 +204,58 @@ describe('pointRequests', () => {
         await assertFails(addDoc(collection(db, 'pointRequests'), { ...pendingRequest(MEMBER), status: 'approved' }));
         await assertFails(addDoc(collection(db, 'pointRequests'), { ...pendingRequest(MEMBER), reviewedBy: MEMBER }));
     });
+
+    // The photo lives in pointRequests/{id}/evidence/photo so that reading
+    // requests never transfers it (lib/requestEvidence.ts).
+    describe('photo evidence', () => {
+        const PHOTO = 'data:image/jpeg;base64,x';
+
+        beforeEach(async () => {
+            await seed(env, {
+                'pointRequests/req-member': { userEmail: MEMBER, status: 'pending', hasPhoto: true },
+                'pointRequests/req-other': { userEmail: OTHER_MEMBER, status: 'pending', hasPhoto: true },
+                'pointRequests/req-other/evidence/photo': { imageData: PHOTO, userEmail: OTHER_MEMBER },
+            });
+        });
+
+        it('lets a Member save the photo for a request of their own', async () => {
+            const db = signedInAs(env, MEMBER);
+            await assertSucceeds(setDoc(doc(db, 'pointRequests/req-member/evidence/photo'),
+                { imageData: PHOTO, userEmail: MEMBER }));
+            await assertSucceeds(getDoc(doc(db, 'pointRequests/req-member/evidence/photo')));
+        });
+
+        it("won't let a Member file a photo under someone else's request, or as someone else", async () => {
+            const db = signedInAs(env, MEMBER);
+            await assertFails(setDoc(doc(db, 'pointRequests/req-other/evidence/photo'),
+                { imageData: PHOTO, userEmail: MEMBER }));
+            await assertFails(setDoc(doc(db, 'pointRequests/req-member/evidence/photo'),
+                { imageData: PHOTO, userEmail: OTHER_MEMBER }));
+        });
+
+        it("won't let a Member file a photo under a request that doesn't exist", async () => {
+            const db = signedInAs(env, MEMBER);
+            await assertFails(setDoc(doc(db, 'pointRequests/req-missing/evidence/photo'),
+                { imageData: PHOTO, userEmail: MEMBER }));
+        });
+
+        it("won't let a Member read, change or delete someone else's photo", async () => {
+            const db = signedInAs(env, MEMBER);
+            await assertFails(getDoc(doc(db, 'pointRequests/req-other/evidence/photo')));
+            await assertFails(updateDoc(doc(db, 'pointRequests/req-other/evidence/photo'), { imageData: 'data:image/jpeg;base64,y' }));
+            await assertFails(deleteDoc(doc(db, 'pointRequests/req-other/evidence/photo')));
+        });
+
+        it('lets E-Board read any photo', async () => {
+            const db = signedInAs(env, EBOARD);
+            await assertSucceeds(getDoc(doc(db, 'pointRequests/req-other/evidence/photo')));
+        });
+
+        it("won't let anyone signed out read a photo", async () => {
+            const db = env.unauthenticatedContext().firestore() as unknown as Firestore;
+            await assertFails(getDoc(doc(db, 'pointRequests/req-other/evidence/photo')));
+        });
+    });
 });
 
 describe('the Leaderboard snapshot', () => {

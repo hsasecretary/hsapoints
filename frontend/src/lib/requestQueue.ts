@@ -1,8 +1,10 @@
 // Point Request Review loads one status at a time (#124 follow-up). The page
-// used to read the whole pointRequests collection on mount, which is slow
-// because every request carries its photo evidence as a ~100KB data URL in
-// `imageData` — the web SDK has no field mask, so the only way to move less
-// is to ask for fewer documents.
+// used to read the whole pointRequests collection on mount, which is slow:
+// requests carried their photo evidence as a ~100KB data URL in `imageData`,
+// and the web SDK has no field mask, so the only way to move less was to ask
+// for fewer documents. Photos now live in a subcollection of their own
+// (lib/requestEvidence.ts), but a tab still pages: an unmigrated request
+// still carries its photo, and the collection grows all year.
 import {
     collection, getCountFromServer, getDocs, limit, orderBy, query, startAfter, where,
     type DocumentData, type Firestore, type QueryDocumentSnapshot,
@@ -13,8 +15,8 @@ export type StatusFilter = 'pending' | 'approved' | 'denied' | 'all';
 
 export const STATUS_FILTERS: StatusFilter[] = ['pending', 'approved', 'denied', 'all'];
 
-/** How many requests a tab loads at a time. Photos make each document big, so
- *  this stays small and the page offers "Load more" rather than everything. */
+/** How many requests a tab loads at a time: enough to review in one sitting,
+ *  with "Load more" rather than the whole collection. */
 export const PAGE_SIZE = 25;
 
 /** One `where` on the query, as plain data so the choice of filters can be

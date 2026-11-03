@@ -231,7 +231,10 @@ export type PointRequestDoc = {
     hours?: number;
     /** One per Attendance approval writes; null is "Pick for me". */
     makeupFor: (string | null)[];
-    imageData: string;
+    /** Whether photo evidence was attached. The photo itself goes in
+     *  pointRequests/{id}/evidence/photo (see lib/requestEvidence.ts), so
+     *  reading requests never transfers it. */
+    hasPhoto: boolean;
     /** Worked out from the rubric, never chosen, for the old review page
      *  and My Requests until the review rework (#72). */
     pointsRequested: number;
@@ -243,7 +246,9 @@ export type PointRequestDoc = {
 
 export type BuildContext = { email: string; codes: Code[]; today: string };
 
-export type Built = { ok: true; data: PointRequestDoc } | { ok: false; error: string };
+/** The photo comes back beside the doc, not in it: the caller saves the
+ *  request first, then the photo under it (lib/requestEvidence.ts). */
+export type Built = { ok: true; data: PointRequestDoc; photo: string } | { ok: false; error: string };
 
 /** The hours stepper's top: more than a day's tabling is a typo. */
 export const MAX_HOURS = 8;
@@ -274,6 +279,7 @@ export function buildPointRequest(draft: RequestDraft, { email, codes, today }: 
     const count = attendanceCount({ eventTypeId, hours: draft.hours });
     return {
         ok: true,
+        photo: draft.photo,
         data: {
             userEmail: email,
             codeId: code ? code.id : null,
@@ -284,7 +290,7 @@ export function buildPointRequest(draft: RequestDraft, { email, codes, today }: 
             description: note,
             ...(type?.perHour ? { hours: count } : {}),
             makeupFor: Array.from({ length: count }, (_, i) => draft.makeupFor[i] ?? null),
-            imageData: draft.photo,
+            hasPhoto: Boolean(draft.photo),
             pointsRequested: (type?.vePoints ?? 0) * count,
             status: 'pending',
             reviewedAt: null,

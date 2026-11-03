@@ -11,6 +11,7 @@ import { canRevoke } from '../../lib/memberLookup';
 import { displayName, type NamedMember } from '../../lib/nameSearch';
 import { NOT_LISTED } from '../../lib/pointRequests';
 import type { Revoked } from '../../lib/pointsOverview';
+import { hasPhoto, legacyPhoto, loadPhoto } from '../../lib/requestEvidence';
 import type { ReviewRequest } from '../../lib/requestReview';
 import {
     countRequests, requestsPage, PAGE_SIZE, STATUS_FILTERS, type StatusFilter,
@@ -24,6 +25,8 @@ type StoredRequest = ReviewRequest & {
     description?: string;
     pointsRequested?: number;
     status: 'pending' | 'approved' | 'denied';
+    /** Photo evidence was attached; the photo itself is read on demand. */
+    hasPhoto?: boolean;
     submittedAt: Date;
     reviewedAt?: { toDate(): Date } | null;
     reviewedBy?: string | null;
@@ -66,8 +69,7 @@ function memberPick(request: StoredRequest): string {
 
 function PointRequestReview() {
     // One entry per status tab, filled the first time that tab is opened: the
-    // collection is too big to read whole, since every request carries its
-    // photo (see lib/requestQueue).
+    // collection is too big to read whole (see lib/requestQueue).
     const [tabs, setTabs] = useState<Record<string, Tab>>({});
     const [counts, setCounts] = useState<Partial<Record<StatusFilter, number>>>({});
     const [refreshKey, setRefreshKey] = useState(0);
@@ -80,6 +82,9 @@ function PointRequestReview() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [filter, setFilter] = useState<StatusFilter>('pending');
     const [selectedImage, setSelectedImage] = useState(null);
+    // The request whose photo is being fetched, and why a fetch came back empty.
+    const [photoLoading, setPhotoLoading] = useState<string | null>(null);
+    const [photoError, setPhotoError] = useState('');
     const [reviewing, setReviewing] = useState<string | null>(null);
     const [notice, setNotice] = useState('');
     // ?request={id} (from User Lookup) opens that request, whatever its status.
@@ -263,27 +268,33 @@ function PointRequestReview() {
         refresh();
     };
 
-    const getImageSource = (request) => {
-    return request.imageData ||
-           request.imageUrl ||
-           request.photoUrl ||
-           request.photoURL ||
-           request.imageURL ||
-           request.image ||
-           null;
-};
-
-const openImageModal = (request) => {
-    const imgSrc = getImageSource(request);
-    if (!imgSrc) {
-        alert("No photo evidence was attached to this request.");
-        return;
-    }
-    setSelectedImage(imgSrc);
-};
+    // The photo is not on the request (lib/requestEvidence.ts): it is read
+    // here, when E-Board asks for it, so opening a tab transfers none. A
+    // request the backfill hasn't touched still carries its own, which costs
+    // nothing more to show.
+    const openImageModal = async (request: StoredRequest) => {
+        setPhotoError('');
+        const legacy = legacyPhoto(request);
+        if (legacy) {
+            setSelectedImage(legacy);
+            return;
+        }
+        setPhotoLoading(request.id);
+        try {
+            const photo = await loadPhoto(db, request.id);
+            if (photo) setSelectedImage(photo);
+            else setPhotoError('This request says it has a photo, but none was found.');
+        } catch (error) {
+            console.error('Error loading photo evidence:', error);
+            setPhotoError('Could not load the photo. Try again.');
+        } finally {
+            setPhotoLoading(null);
+        }
+    };
 
     const closeImageModal = () => {
         setSelectedImage(null);
+        setPhotoError('');
     };
 
     const getStatusColor = (status) => {
@@ -416,13 +427,14 @@ const openImageModal = (request) => {
                             </div>
 
                             <div className="request-image">
-                                {getImageSource(request) ? (
+                                {hasPhoto(request) ? (
                                     <button
                                         type="button"
                                         onClick={() => openImageModal(request)}
                                         className="view-image-button"
+                                        disabled={photoLoading === request.id}
                                     >
-                                        📷 View Photo Evidence
+                                        {photoLoading === request.id ? 'Loading photo...' : '📷 View Photo Evidence'}
                                     </button>
                                 ) : (
                                     <button
@@ -498,11 +510,13 @@ const openImageModal = (request) => {
             )}
 
             {/* Image Modal */}
-            {selectedImage && (
+            {(selectedImage || photoError) && (
                 <div className="image-modal" onClick={closeImageModal}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <button className="close-modal" onClick={closeImageModal}>✕</button>
-                        <img src={selectedImage} alt="Request evidence" />
+                        {selectedImage
+                            ? <img src={selectedImage} alt="Request evidence" />
+                            : <p className="image-modal__error" role="alert">{photoError}</p>}
                     </div>
                 </div>
             )}

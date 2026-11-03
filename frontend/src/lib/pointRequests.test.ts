@@ -183,6 +183,9 @@ describe('buildPointRequest', () => {
 
         expect(built).toEqual({
             ok: true,
+            // The photo comes back beside the doc: the form saves it under the
+            // request, in pointRequests/{id}/evidence/photo.
+            photo: 'data:image/jpeg;base64,x',
             data: {
                 userEmail: EMAIL,
                 codeId: 'GBMSEP',
@@ -192,7 +195,7 @@ describe('buildPointRequest', () => {
                 date: '2026-09-03',
                 description: '',
                 makeupFor: [null],
-                imageData: 'data:image/jpeg;base64,x',
+                hasPhoto: true,
                 pointsRequested: 2,
                 status: 'pending',
                 reviewedAt: null,
@@ -212,7 +215,7 @@ describe('buildPointRequest', () => {
     it('lets a note stand in for the photo, but a blank note does not', () => {
         const coded = { typeChoiceId: 'gbm', codeId: 'GBMSEP', eventTypeId: 'gbm', eventDate: '2026-09-03', photo: '' };
         expect(buildPointRequest(draft({ ...coded, note: 'Sat with Ana, she can vouch' }), context))
-            .toMatchObject({ ok: true, data: { imageData: '', description: 'Sat with Ana, she can vouch' } });
+            .toMatchObject({ ok: true, photo: '', data: { hasPhoto: false, description: 'Sat with Ana, she can vouch' } });
         expect(buildPointRequest(draft({ ...coded, note: '   ' }), context)).toEqual({ ok: false, error: 'Add a photo, or say what you did.' });
         const codeless = { typeChoiceId: 'crash', eventTypeId: 'crash', eventName: 'CRASH', eventDate: '2026-10-02', photo: '' };
         expect(buildPointRequest(draft({ ...codeless, note: 'Helped run it' }), context)).toMatchObject({ ok: true });
