@@ -5,6 +5,7 @@ import { CABINET_POINTS_GOAL } from '../../lib/computeStanding';
 import { pointsOverview } from '../../lib/pointsOverview';
 import { requirementsBoard } from '../../lib/requirementsBoard';
 import { formatAccountType } from '../../lib/roles';
+import { upcomingEvents } from '../../lib/upcomingEvents';
 import CabinetGoal from './sections/CabinetGoal';
 import EventCodeForm from './sections/EventCodeForm';
 import Explainer from './sections/Explainer';
@@ -13,6 +14,7 @@ import MakeUpList from './sections/MakeUpList';
 import NewPointSystemBanner from './sections/NewPointSystemBanner';
 import PointsAndEvents from './sections/PointsAndEvents';
 import PointsSummary from './sections/PointsSummary';
+import UpcomingEvents from './sections/UpcomingEvents';
 import { pendingMakeups, useMemberStanding } from './useMemberStanding';
 
 const BUBBLES = ['points', 'how'] as const;
@@ -30,6 +32,8 @@ type Bubble = (typeof BUBBLES)[number];
 //                     the Cabinet view "By category" is the Event Type table.
 //                     Above the make-up list so they're seen.
 //   MakeUpList      — Cabinet view only: Missed Events to make up
+//   UpcomingEvents  — everyone: up to five events in the next week, from the
+//                     codes already loaded here, so no extra reads (#98)
 // Every number comes from computeStanding via useMemberStanding.
 const EXCUSE_ABSENCE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfL7rheJusXDurdtR4lfD7wMg8FmH9iwaFRll8haJRpH2i5vw/viewform';
 
@@ -54,6 +58,7 @@ function Dashboard({ email }: { email: string }) {
     const firstName = profile?.firstName;
     const overview = standing ? pointsOverview({ member, standing, attendances, codes, requests, today }) : null;
     const board = standing?.heldToCabinetRules ? requirementsBoard({ member, standing, attendances, codes, requests, today }) : null;
+    const upcoming = standing ? upcomingEvents(codes, { today, cabinetView: standing.heldToCabinetRules }) : [];
 
     return (
         <div className="overview">
@@ -115,6 +120,7 @@ function Dashboard({ email }: { email: string }) {
                             Can't make an event? <a href={EXCUSE_ABSENCE_FORM_URL} target="_blank" rel="noopener noreferrer">Fill out the Excuse Absence form</a>.
                         </p>
                     )}
+                    <UpcomingEvents events={upcoming} />
                 </>
             )}
         </div>
