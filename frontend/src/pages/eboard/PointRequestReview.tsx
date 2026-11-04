@@ -297,15 +297,6 @@ function PointRequestReview() {
         setPhotoError('');
     };
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'pending': return '#f39c12';
-            case 'approved': return '#27ae60';
-            case 'denied': return '#e74c3c';
-            default: return '#95a5a6';
-        }
-    };
-
     const formatDate = (date) => {
         return new Intl.DateTimeFormat('en-US', {
             year: 'numeric',
@@ -382,10 +373,7 @@ function PointRequestReview() {
                                     <h3>{nameOf(request)}</h3>
                                     <p className="email">{request.userEmail}</p>
                                 </div>
-                                <div
-                                    className="status-badge"
-                                    style={{ backgroundColor: getStatusColor(request.status) }}
-                                >
+                                <div className={`status-badge ${request.revoked ? 'revoked' : request.status}`}>
                                     {request.revoked ? 'REVOKED' : request.status.toUpperCase()}
                                 </div>
                             </div>
