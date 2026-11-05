@@ -142,7 +142,7 @@ function EboardMenu({ active, pending }: { active: boolean; pending: number }) {
 /** How many Excuse Requests are waiting, with a spoken label for screen readers. */
 function Count({ pending }: { pending: number }) {
     return (
-        <span className="site-header__count">
+        <span className="count-badge site-header__count">
             {pending}
             <span className="visually-hidden"> pending excuse requests</span>
         </span>

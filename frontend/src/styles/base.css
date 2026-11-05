@@ -581,6 +581,28 @@ label:has(> input[type="radio"]:focus-visible, > input[type="checkbox"]:focus-vi
     outline-offset: 2px;
 }
 
+/* Count badge: a small orange pill with a number, for "N waiting" (the pending
+   Excuse Requests on the E-Board menu and on the Requests tab). One digit is a
+   circle; more digits widen it, and the number stays centred. */
+.count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: 22px;
+    height: 22px;
+    margin-left: 8px;
+    padding: 0 7px;
+    border-radius: 999px;
+    background: var(--hsa-notice);
+    color: var(--hsa-notice-ink);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    vertical-align: middle;
+}
+
 /* Loading screen (components/ui/LoadingScreen.tsx). Used full-page before the
    header exists, and under the header while a lazily-loaded route chunk arrives
    (see the lazy() calls in App.tsx), where the height keeps the header/footer

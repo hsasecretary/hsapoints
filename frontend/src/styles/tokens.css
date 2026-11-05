@@ -98,6 +98,8 @@
     --hsa-warm-stripe-light: #fde8b8;
     --hsa-warm-bg: #fffbeb;
     --hsa-warm-bg-strong: #fef3c7;
+    --hsa-notice: #fb923c;        /* soft orange: "something is waiting" count badges */
+    --hsa-notice-ink: #431407;    /* 7.6:1 on --hsa-notice */
     --hsa-accent: #fbbf24;        /* the Check in button on the teal code box */
 
     /* ---- Type ------------------------------------------------------------
