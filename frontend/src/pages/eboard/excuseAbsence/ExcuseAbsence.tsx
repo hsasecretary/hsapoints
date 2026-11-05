@@ -83,7 +83,7 @@ function ExcuseAbsence() {
                 Member lookup
             </button>
             <button type="button" role="tab" aria-selected={tab === 'requests'} className={`eap-btn${tab === 'requests' ? ' is-on' : ''}`} onClick={() => setParams({ tab: 'requests' })}>
-                Requests{inbox.requests.length > 0 && <span className="eap-tag">{inbox.requests.length}</span>}
+                Requests{inbox.requests.length > 0 && <span className="count-badge">{inbox.requests.length}</span>}
             </button>
         </div>
     );
