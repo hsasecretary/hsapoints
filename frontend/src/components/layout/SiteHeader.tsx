@@ -5,6 +5,7 @@ import { auth, db } from '../../lib/firebase';
 import { refreshLeaderboard } from '../../lib/leaderboardRefresh';
 import { VIEW_LABELS, VIEWS } from '../../lib/viewAs';
 import { EBOARD_TOOLS } from '../../pages/eboard/eboardTools';
+import { useExcuseInbox } from '../../pages/eboard/excuseAbsence/useExcuseInbox';
 import { navItems, type NavIcon, type NavItem } from './navItems';
 import { useViewAs } from './ViewAsContext';
 
@@ -32,6 +33,8 @@ function SiteHeader({ signedIn, eboard, cabinetView }: SiteHeaderProps) {
     const headerRef = useRef<HTMLElement>(null);
     const { pathname } = useLocation();
     const items = navItems({ cabinetView });
+    // Excuse Requests waiting on E-Board: a count on the menu entry, kept live.
+    const pendingExcuses = useExcuseInbox(signedIn && eboard).requests.length;
 
     // Sticky bars must not cover the focused element (WCAG 2.4.11): the
     // header's height feeds html's scroll-padding-top (layout.css). It grows
@@ -70,9 +73,9 @@ function SiteHeader({ signedIn, eboard, cabinetView }: SiteHeaderProps) {
                                         {item.label}
                                     </NavLink>
                                 ))}
-                                {eboard && <EboardMenu active={pathname === '/eboard' || pathname.startsWith('/eboard/')} />}
+                                {eboard && <EboardMenu active={pathname === '/eboard' || pathname.startsWith('/eboard/')} pending={pendingExcuses} />}
                             </nav>
-                            <AccountMenu eboard={eboard} />
+                            <AccountMenu eboard={eboard} pending={pendingExcuses} />
                         </>
                     )}
                 </div>
@@ -114,7 +117,7 @@ function useDisclosure() {
 }
 
 /** E-Board ▾ (≥600px): the tools from eboardTools.ts. Active on /eboard/*. */
-function EboardMenu({ active }: { active: boolean }) {
+function EboardMenu({ active, pending }: { active: boolean; pending: number }) {
     const { open, setOpen, rootRef, buttonRef, onKeyDown } = useDisclosure();
 
     return (
@@ -127,25 +130,40 @@ function EboardMenu({ active }: { active: boolean }) {
                 aria-controls="eboard-menu"
                 onClick={() => setOpen((v) => !v)}
             >
-                E-Board <Caret />
+                E-Board{pending > 0 && <Count pending={pending} />} <Caret />
             </button>
             <div id="eboard-menu" className="site-header__panel" hidden={!open}>
-                <EboardToolLinks />
+                <EboardToolLinks pending={pending} />
             </div>
         </div>
     );
 }
 
-function EboardToolLinks() {
+/** How many Excuse Requests are waiting, with a spoken label for screen readers. */
+function Count({ pending }: { pending: number }) {
+    return (
+        <span className="site-header__count">
+            {pending}
+            <span className="visually-hidden"> pending excuse requests</span>
+        </span>
+    );
+}
+
+function EboardToolLinks({ pending }: { pending: number }) {
     return (
         <ul>
-            {EBOARD_TOOLS.map((tool) => (
-                <li key={tool.path}>
-                    <NavLink to={`/eboard/${tool.path}`} className="site-header__panel-link">
-                        {tool.label}
-                    </NavLink>
-                </li>
-            ))}
+            {EBOARD_TOOLS.map((tool) => {
+                // Excuse Absence opens on its request inbox when something is waiting.
+                const inbox = tool.path === 'excuse-absence' && pending > 0;
+                return (
+                    <li key={tool.path}>
+                        <NavLink to={`/eboard/${tool.path}${inbox ? '?tab=requests' : ''}`} className="site-header__panel-link">
+                            {tool.label}
+                            {inbox && <Count pending={pending} />}
+                        </NavLink>
+                    </li>
+                );
+            })}
             <li className="site-header__panel-divider">
                 <RefreshLeaderboardButton />
             </li>
@@ -199,7 +217,7 @@ function RefreshLeaderboardButton() {
 /** Account ▾, top right: "View as" for those who can switch, the E-Board
  *  tools for E-Board on phones (E-Board ▾ has them on wider screens), and
  *  Log out. */
-function AccountMenu({ eboard }: { eboard: boolean }) {
+function AccountMenu({ eboard, pending }: { eboard: boolean; pending: number }) {
     const { open, setOpen, rootRef, buttonRef, onKeyDown } = useDisclosure();
     const { own, view, canSwitch, setView } = useViewAs();
     const navigate = useNavigate();
@@ -252,7 +270,7 @@ function AccountMenu({ eboard }: { eboard: boolean }) {
                 {eboard && (
                     <nav className="site-header__tools" aria-labelledby="account-eboard">
                         <h2 id="account-eboard" className="site-header__group">E-Board</h2>
-                        <EboardToolLinks />
+                        <EboardToolLinks pending={pending} />
                     </nav>
                 )}
                 <button type="button" className="site-header__logout" onClick={logout}>

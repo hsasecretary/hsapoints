@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { computeStanding, type Code, type Member } from './computeStanding';
 import type { AbsenceMember } from './excuseAbsence';
-import { approvalFor, toExcuseRequest } from './excuseRequestsDb';
+import { approvalFor, toExcuseRequest } from './excuseRequestsdb';
 import { rubric } from './rubric';
 
 const TODAY = '2026-10-15';

@@ -23,7 +23,7 @@ export type ExcuseRequestDoc = {
     status: ExcuseRequestStatus;
     reviewedBy: string | null;
     reviewedAt: string | null;
-    /** Denial reason from E-Board (empty on pending or approved requests). */
+    /** E-Board's note: the denial reason on a denied request, an optional note on an approved one. */
     reviewNotes: string;
 };
 
@@ -87,7 +87,8 @@ export function excusableEvents({
     return codes
         .filter((code) => {
             const id = code.id?.trim();
-            if (!id || !code.eventTypeId || !code.eventDate) return false;            if (eventType(code.eventTypeId)?.tier !== 'core') return false;
+            if (!id || !code.eventTypeId || !code.eventDate) return false;
+            if (eventType(code.eventTypeId)?.tier !== 'core') return false;
             if (code.eventDate < today || code.eventDate > end) return false;
             return !taken.has(id.toUpperCase());
         })
@@ -107,8 +108,8 @@ export type ExcuseFilingDraft = {
 
 export type BuildExcuseContext = ExcusableContext & {
     email: string;
-    /** ISO timestamp passed in so filing time is stored and testable without Firestore. */
-    filedAt: string;
+    /** Passed in: serverTimestamp() when saving, a fixed value in tests. */
+    filedAt: unknown;
 };
 
 export type NewExcuseRequest = { id: string; data: Omit<ExcuseRequestDoc, 'filedAt'> & { filedAt: unknown } };

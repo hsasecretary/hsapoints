@@ -7,15 +7,17 @@ import { requirementsBoard } from '../../lib/requirementsBoard';
 import { formatAccountType } from '../../lib/roles';
 import CabinetGoal from './sections/CabinetGoal';
 import EventCodeForm from './sections/EventCodeForm';
+import ExcuseAbsenceBubble from './sections/ExcuseAbsenceBubble';
 import Explainer from './sections/Explainer';
 import ExemptSummary from './sections/ExemptSummary';
 import MakeUpList from './sections/MakeUpList';
 import NewPointSystemBanner from './sections/NewPointSystemBanner';
 import PointsAndEvents from './sections/PointsAndEvents';
 import PointsSummary from './sections/PointsSummary';
+import { useExcuseRequests } from './useExcuseRequests';
 import { pendingMakeups, useMemberStanding } from './useMemberStanding';
 
-const BUBBLES = ['points', 'how'] as const;
+const BUBBLES = ['points', 'how', 'excuse'] as const;
 type Bubble = (typeof BUBBLES)[number];
 
 // /dashboard, the Overview (#57 as revised, #59 variant A), top to bottom:
@@ -25,14 +27,14 @@ type Bubble = (typeof BUBBLES)[number];
 //   PointsSummary   — Total Points toward the goal, events attended, pending requests
 //                     (E-Board in the Cabinet view: ExemptSummary, one line in place of both bars)
 //   CabinetGoal     — Cabinet view only: Cabinet Points toward 20
-//   bubbles         — "Points & events" (PointsAndEvents) and "How it works"
-//                     (Explainer), each opening in place (?open=points|how); in
+//   bubbles         — "Points & events" (PointsAndEvents), "How it works"
+//                     (Explainer) and, in the Cabinet view, "Excuse an absence"
+//                     (ExcuseAbsenceBubble), each opening in place
+//                     (?open=points|how|excuse); in
 //                     the Cabinet view "By category" is the Event Type table.
 //                     Above the make-up list so they're seen.
 //   MakeUpList      — Cabinet view only: Missed Events to make up
 // Every number comes from computeStanding via useMemberStanding.
-const EXCUSE_ABSENCE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfL7rheJusXDurdtR4lfD7wMg8FmH9iwaFRll8haJRpH2i5vw/viewform';
-
 function Dashboard({ email }: { email: string }) {
     const { loading, member, attendances, codes, requests, pending, standing, today } = useMemberStanding(email, useViewOverride());
     const [params, setParams] = useSearchParams();
@@ -52,6 +54,9 @@ function Dashboard({ email }: { email: string }) {
 
     const profile = member as { firstName?: string; lastName?: string; cabinet?: string; eboard?: boolean; involvement?: string; webTeam?: boolean } | null;
     const firstName = profile?.firstName;
+    // Excuse Requests are for Members held to Cabinet rules, and not for E-Board in the Cabinet view.
+    const canExcuse = Boolean(standing?.heldToCabinetRules && !standing.exempt);
+    const excuseRequests = useExcuseRequests(email, canExcuse);
     const overview = standing ? pointsOverview({ member, standing, attendances, codes, requests, today }) : null;
     const board = standing?.heldToCabinetRules ? requirementsBoard({ member, standing, attendances, codes, requests, today }) : null;
 
@@ -94,6 +99,12 @@ function Dashboard({ email }: { email: string }) {
                             aria-controls={open === 'how' ? 'ov-panel-how' : undefined} onClick={() => toggle('how')}>
                             How it works
                         </button>
+                        {canExcuse && (
+                            <button type="button" className={open === 'excuse' ? 'is-on' : ''} aria-expanded={open === 'excuse'}
+                                aria-controls={open === 'excuse' ? 'ov-panel-excuse' : undefined} onClick={() => toggle('excuse')}>
+                                Excuse an absence
+                            </button>
+                        )}
                     </div>
                     {open === 'points' && (
                         <section id="ov-panel-points" className="ov-panel" aria-label="Points & events">
@@ -105,13 +116,20 @@ function Dashboard({ email }: { email: string }) {
                             <Explainer member={member} />
                         </section>
                     )}
-                    {standing.heldToCabinetRules && !standing.exempt && (
-                        <MakeUpList standing={standing} codes={codes} pendingPicks={pendingMakeups(pending)} />
+                    {open === 'excuse' && canExcuse && (
+                        <section id="ov-panel-excuse" className="ov-panel" aria-label="Excuse an absence">
+                            <ExcuseAbsenceBubble
+                                email={email}
+                                member={member}
+                                codes={codes}
+                                attendances={attendances}
+                                requests={excuseRequests}
+                                today={today}
+                            />
+                        </section>
                     )}
                     {standing.heldToCabinetRules && !standing.exempt && (
-                        <p className="overview__excuse">
-                            Can't make an event? <a href={EXCUSE_ABSENCE_FORM_URL} target="_blank" rel="noopener noreferrer">Fill out the Excuse Absence form</a>.
-                        </p>
+                        <MakeUpList standing={standing} codes={codes} pendingPicks={pendingMakeups(pending)} />
                     )}
                 </>
             )}
