@@ -34,6 +34,17 @@ export function missedEventName(codes: Code[], missed: { codeId: string; eventTy
     return codes.find((code) => code.id === missed.codeId)?.event || eventType(missed.eventTypeId)?.label || missed.codeId;
 }
 
+/**
+ * The notice for a Make-up pick on an event that would otherwise fill its
+ * Semester Requirement or HLHM (ADR-0005), after the line saying what it
+ * makes up. Shown to the Member ('you') on the request form and the code
+ * box, and to E-Board ('they') on review.
+ */
+export function requirementWaitsNotice(eventTypeId: string, who: 'you' | 'they' = 'you'): string {
+    const label = eventType(eventTypeId)?.label ?? eventTypeId;
+    return `${who === 'you' ? 'Your' : 'Their'} ${label} requirement stays open until ${who} go to another ${label} event.`;
+}
+
 /** The bubble for one Event Type. */
 export function typeChoiceFor(eventTypeId: string): TypeChoice {
     const type = rubric.find((row) => row.id === eventTypeId);
@@ -121,7 +132,9 @@ export type RequestPreview = {
     cabinetPoints: number;
     vePoints: number;
     /** One per Attendance the request would become, in hour order. */
-    attendances: { surplus: boolean; makeupFor: string | null }[];
+    /** `requirementWaits`: its pick makes it a Make-up where it would otherwise
+     *  fill its Semester Requirement or HLHM, which stays open (ADR-0005). */
+    attendances: { surplus: boolean; makeupFor: string | null; requirementWaits: boolean }[];
     /** The Missed Events it would close, oldest first, and whether each still carried a Strike. */
     covers: { codeId: string; eventTypeId: string; eventDate: string; strike: boolean }[];
 };
@@ -178,13 +191,22 @@ export function standingChange(
 ): RequestPreview {
     const before = computeStanding(member, attendances, rubric, codes, options);
     const after = computeStanding(member, [...attendances, ...wouldBe], rubric, codes, options);
+    // The same, with nothing named: what each would fill without its pick.
+    const unpicked = wouldBe.some((attendance) => attendance.makeupFor)
+        ? computeStanding(member, [...attendances, ...wouldBe.map(({ makeupFor: _, ...rest }) => rest)], rubric, codes, options)
+        : after;
     const stillOwed = new Set(after.missedEvents.filter((missed) => missed.owed).map((missed) => missed.codeId));
     return {
         cabinetPoints: after.cabinetPoints - before.cabinetPoints,
         vePoints: after.vePoints - before.vePoints,
         attendances: wouldBe.map((attendance) => {
             const surplus = after.surplus.find((row) => row.attendanceId === attendance.id);
-            return { surplus: Boolean(surplus), makeupFor: surplus?.makeupFor ?? null };
+            const surplusUnpicked = unpicked.surplus.some((row) => row.attendanceId === attendance.id);
+            return {
+                surplus: Boolean(surplus),
+                makeupFor: surplus?.makeupFor ?? null,
+                requirementWaits: Boolean(surplus?.makeupFor) && !surplusUnpicked,
+            };
         }),
         // Net of any Make-up that moved: naming a missed code closes it
         // outright, and a Surplus hour may push an older Make-up along.
@@ -209,7 +231,10 @@ export type PointRequestDoc = {
     hours?: number;
     /** One per Attendance approval writes; null is "Pick for me". */
     makeupFor: (string | null)[];
-    imageData: string;
+    /** Whether photo evidence was attached. The photo itself goes in
+     *  pointRequests/{id}/evidence/photo (see lib/requestEvidence.ts), so
+     *  reading requests never transfers it. */
+    hasPhoto: boolean;
     /** Worked out from the rubric, never chosen, for the old review page
      *  and My Requests until the review rework (#72). */
     pointsRequested: number;
@@ -221,7 +246,9 @@ export type PointRequestDoc = {
 
 export type BuildContext = { email: string; codes: Code[]; today: string };
 
-export type Built = { ok: true; data: PointRequestDoc } | { ok: false; error: string };
+/** The photo comes back beside the doc, not in it: the caller saves the
+ *  request first, then the photo under it (lib/requestEvidence.ts). */
+export type Built = { ok: true; data: PointRequestDoc; photo: string } | { ok: false; error: string };
 
 /** The hours stepper's top: more than a day's tabling is a typo. */
 export const MAX_HOURS = 8;
@@ -252,6 +279,7 @@ export function buildPointRequest(draft: RequestDraft, { email, codes, today }: 
     const count = attendanceCount({ eventTypeId, hours: draft.hours });
     return {
         ok: true,
+        photo: draft.photo,
         data: {
             userEmail: email,
             codeId: code ? code.id : null,
@@ -262,7 +290,7 @@ export function buildPointRequest(draft: RequestDraft, { email, codes, today }: 
             description: note,
             ...(type?.perHour ? { hours: count } : {}),
             makeupFor: Array.from({ length: count }, (_, i) => draft.makeupFor[i] ?? null),
-            imageData: draft.photo,
+            hasPhoto: Boolean(draft.photo),
             pointsRequested: (type?.vePoints ?? 0) * count,
             status: 'pending',
             reviewedAt: null,
