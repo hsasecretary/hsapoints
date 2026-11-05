@@ -2104,6 +2104,38 @@ The list is already centred inside the frame, so it gives its cap back:
 .overview .ov-excuse__withdraw { min-height: 36px; border: 1.5px solid var(--hsa-border); background: var(--hsa-surface); color: var(--hsa-ink-soft); }
 .overview .ov-excuse__withdraw:hover:not(:disabled) { border-color: var(--hsa-danger); color: var(--hsa-danger); }
 
+/* ---- Points > My Requests: filter chips, the Excuse absences group, and the
+   link back to the dashboard's Excuse form (sections/MyRequests.tsx). ------- */
+.my-requests .my-requests__filter { display: flex; justify-content: space-between; align-items: center; gap: 10px 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.my-requests .my-requests__chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.my-requests .my-requests__chip {
+    min-width: 0; min-height: 0; margin: 0; padding: 6px 12px; border: 1.5px solid var(--hsa-border); border-radius: 999px;
+    background: var(--hsa-surface); color: var(--hsa-ink); font: inherit; font-size: var(--hsa-text-sm); font-weight: 600; cursor: pointer;
+}
+.my-requests .my-requests__chip:hover { border-color: var(--hsa-teal-700); }
+.my-requests .my-requests__chip span { margin-left: 4px; color: var(--hsa-muted); }
+.my-requests .my-requests__chip.is-on { background: var(--hsa-teal-700); border-color: var(--hsa-teal-700); color: #fff; }
+.my-requests .my-requests__chip.is-on span { color: #fff; }
+.my-requests .my-requests__chip:focus-visible,
+.my-requests .my-requests__link:focus-visible { outline: 3px solid rgba(15, 76, 100, 0.35); outline-offset: 2px; }
+.my-requests .my-requests__link { color: var(--hsa-teal-700); font-size: var(--hsa-text-sm); font-weight: 700; text-decoration: none; }
+.my-requests .my-requests__link:hover { text-decoration: underline; }
+.my-requests .my-requests__subheading { margin: 24px 0 10px; padding-top: 18px; border-top: 1px solid var(--hsa-border-light); text-align: left; font-size: var(--hsa-text-base); color: var(--hsa-teal-700); }
+.my-requests .my-requests__none { margin: 0; color: var(--hsa-muted); font-size: var(--hsa-text-sm); }
+.my-requests .request-card__reason { margin: 8px 0 0; color: var(--hsa-ink-soft); font-size: var(--hsa-text-sm); }
+/* Withdraw sits above "Filed …", both centred in the card's right-hand column. */
+.my-requests .request-card__aside { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.my-requests .request-card__withdraw {
+    min-width: 0; min-height: 32px; margin: 0; padding: 0 14px; border: 1.5px solid var(--hsa-border); border-radius: 8px;
+    background: var(--hsa-surface); color: var(--hsa-ink-soft); font: inherit; font-size: var(--hsa-text-sm); font-weight: 700; cursor: pointer;
+}
+.my-requests .request-card__withdraw:hover:not(:disabled) { border-color: var(--hsa-danger); color: var(--hsa-danger); }
+.my-requests .request-card__withdraw:disabled { opacity: 0.5; cursor: not-allowed; }
+.my-requests .request-card__withdraw:focus-visible { outline: 3px solid rgba(15, 76, 100, 0.35); outline-offset: 2px; }
+.my-requests .my-requests__notice { margin: 0 0 14px; padding: 8px 12px; border-radius: 6px; font-size: var(--hsa-text-sm); }
+.my-requests .my-requests__notice.is-ok { background: var(--hsa-success-bg); color: var(--hsa-success-strong); }
+.my-requests .my-requests__notice.is-err { background: var(--hsa-danger-bg); color: var(--hsa-danger-strong); }
+
 /* Everyone: up to five events in the next week (#98). Phone-first: each row
    is a date tile and the title, at least 56px tall. */
 .overview .ov-upcoming {
