@@ -327,10 +327,10 @@
 }
 
 .site-header__view input {
-    width: 18px;
-    height: 18px;
-    margin: 0;
-    accent-color: var(--hsa-accent);
+    /* On the dark panel: pale outline, accent-yellow when picked. */
+    --choice-off: rgba(255, 255, 255, 0.7);
+    --choice-on: var(--hsa-accent);
+    --choice-hover: #ffffff;
 }
 
 .site-header__yours {

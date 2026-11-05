@@ -512,6 +512,75 @@ h1, h2, h3, h4, h5, h6 {
   outline-offset: 2px;
 }
 
+/* ==========================================================================
+   Choice marks: every radio and checkbox, drawn like the site's icons
+   (24px outline, 1.8 stroke, round caps). Radios are a circle with a dot,
+   checkboxes a rounded square with a check. The native input stays in the
+   page (keyboard, `required`, screen readers); only its look changes. The
+   shape is a mask, so the colour comes from --choice-off / --choice-on.
+   Skipped: the ChoiceGroup's hidden radios and role="switch" toggles.
+   ========================================================================== */
+:root {
+    --choice-radio-off: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9.2'/%3E%3C/svg%3E");
+    --choice-radio-on: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9.2'/%3E%3Ccircle cx='12' cy='12' r='4.6' fill='black' stroke='none'/%3E%3C/svg%3E");
+    --choice-check-off: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='4.5'/%3E%3C/svg%3E");
+    --choice-check-on: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='4.5'/%3E%3Cpath d='M7.5 12.5l3 3 6-6.5'/%3E%3C/svg%3E");
+}
+
+input[type="radio"]:not(.choice-group__option input),
+input[type="checkbox"]:not([role="switch"]) {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: none;
+    box-sizing: border-box;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background-color: var(--choice-off, var(--hsa-muted-light));
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+input[type="radio"]:not(.choice-group__option input) {
+    -webkit-mask: var(--choice-radio-off) center / contain no-repeat;
+    mask: var(--choice-radio-off) center / contain no-repeat;
+}
+input[type="checkbox"]:not([role="switch"]) {
+    -webkit-mask: var(--choice-check-off) center / contain no-repeat;
+    mask: var(--choice-check-off) center / contain no-repeat;
+}
+input[type="radio"]:not(.choice-group__option input):checked {
+    -webkit-mask-image: var(--choice-radio-on);
+    mask-image: var(--choice-radio-on);
+}
+input[type="checkbox"]:not([role="switch"]):checked {
+    -webkit-mask-image: var(--choice-check-on);
+    mask-image: var(--choice-check-on);
+}
+input[type="radio"]:not(.choice-group__option input):checked,
+input[type="checkbox"]:not([role="switch"]):checked {
+    background-color: var(--choice-on, var(--hsa-teal-700));
+}
+input[type="radio"]:not(.choice-group__option input):not(:checked):hover,
+input[type="checkbox"]:not([role="switch"]):not(:checked):hover {
+    background-color: var(--choice-hover, var(--hsa-teal-500));
+}
+input[type="radio"]:not(.choice-group__option input):disabled,
+input[type="checkbox"]:not([role="switch"]):disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+/* The mask would clip an outline on the input itself, so the label shows focus. */
+input[type="radio"]:not(.choice-group__option input):focus-visible,
+input[type="checkbox"]:not([role="switch"]):focus-visible {
+    outline: none;
+}
+label:has(> input[type="radio"]:focus-visible, > input[type="checkbox"]:focus-visible) {
+    outline: 3px solid rgba(15, 76, 100, 0.35);
+    outline-offset: 2px;
+}
+
 /* Loading screen (components/ui/LoadingScreen.tsx). Used full-page before the
    header exists, and under the header while a lazily-loaded route chunk arrives
    (see the lazy() calls in App.tsx), where the height keeps the header/footer
