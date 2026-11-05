@@ -5,6 +5,7 @@ import SectionTitle from '../../../components/ui/SectionTitle';
 import { useViewOverride } from '../../../components/layout/ViewAsContext';
 import { collection, query, where, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
 import type { ExcuseRequest } from '../../../lib/excuseRequests';
+import { withdrawExcuseRequest } from '../../../lib/excuseRequestsdb';
 import { shortDate } from '../../../lib/semester';
 import { useCanFileExcuse } from '../useCanFileExcuse';
 import { useExcuseRequests } from '../useExcuseRequests';
@@ -83,7 +84,8 @@ function PointCard({ request }: { request: PointRequest }) {
 
 // An Excuse Request: the event it is for, where it stands, the Member's own
 // reason, and E-Board's note (the denial reason, or an optional note on approval).
-function ExcuseCard({ request }: { request: ExcuseRequest }) {
+// A pending request can be withdrawn here, same as on the dashboard form.
+function ExcuseCard({ request, busy, onWithdraw }: { request: ExcuseRequest; busy: boolean; onWithdraw: (request: ExcuseRequest) => void }) {
     const status = EXCUSE_STATUS_CONFIG[request.status] ?? EXCUSE_STATUS_CONFIG.pending;
     return (
         <div className={`request-card ${status.className}`}>
@@ -97,11 +99,18 @@ function ExcuseCard({ request }: { request: ExcuseRequest }) {
                 <span className="status-badge">
                     {status.icon} {status.label}
                 </span>
-                {request.filedAt && (
-                    <span className="request-card__submitted">
-                        Filed {new Date(request.filedAt).toLocaleDateString()}
-                    </span>
-                )}
+                <div className="request-card__aside">
+                    {request.status === 'pending' && (
+                        <button type="button" className="request-card__withdraw" disabled={busy} onClick={() => onWithdraw(request)}>
+                            {busy ? 'Withdrawing…' : 'Withdraw'}
+                        </button>
+                    )}
+                    {request.filedAt && (
+                        <span className="request-card__submitted">
+                            Filed {new Date(request.filedAt).toLocaleDateString()}
+                        </span>
+                    )}
+                </div>
             </div>
 
             <p className="request-card__reason">{request.reason}</p>
@@ -119,6 +128,8 @@ function MyRequests() {
     const [requests, setRequests] = useState<PointRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [show, setShow] = useState<Show>('all');
+    const [withdrawing, setWithdrawing] = useState<string | null>(null);
+    const [notice, setNotice] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null);
 
     // Excuse Requests live on the dashboard form; they are listed here too, with
     // a way back to it. Only a Member who can file one gets the link and the
@@ -128,6 +139,21 @@ function MyRequests() {
     const canExcuse = useCanFileExcuse(email, useViewOverride());
     const excuses = useExcuseRequests(email, canExcuse);
     const showExcuses = canExcuse || excuses.length > 0;
+
+    const withdraw = async (request: ExcuseRequest) => {
+        if (withdrawing) return;
+        setNotice(null);
+        setWithdrawing(request.id);
+        try {
+            await withdrawExcuseRequest(db, request.id);
+            setNotice({ kind: 'ok', text: `Withdrawn: ${request.eventName}. You can file it again from the dashboard if you need to.` });
+        } catch (err) {
+            console.error('Error withdrawing excuse request:', err);
+            setNotice({ kind: 'err', text: 'Could not withdraw. E-Board may have just decided it. Refresh to see.' });
+        } finally {
+            setWithdrawing(null);
+        }
+    };
 
     useEffect(() => {
         const user = auth.currentUser;
@@ -194,7 +220,9 @@ function MyRequests() {
         <p className="my-requests__none">No excuse requests yet.</p>
     ) : (
         <div className="my-requests__list">
-            {excuses.map((request) => <ExcuseCard key={request.id} request={request} />)}
+            {excuses.map((request) => (
+                <ExcuseCard key={request.id} request={request} busy={withdrawing === request.id} onWithdraw={withdraw} />
+            ))}
         </div>
     );
 
@@ -207,6 +235,10 @@ function MyRequests() {
     return (
         <div className="my-requests">
             <SectionTitle>My Requests</SectionTitle>
+
+            {notice && (
+                <p className={`my-requests__notice is-${notice.kind}`} role={notice.kind === 'err' ? 'alert' : 'status'}>{notice.text}</p>
+            )}
 
             {showExcuses && (
                 <div className="my-requests__filter">
