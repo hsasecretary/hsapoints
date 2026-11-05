@@ -149,6 +149,41 @@ service cloud.firestore {
       }
     }
 
+    match /excuseRequests/{id} {
+      // Every Excuse Request ID starts `{email}__` (lib/excuseRequests.ts).
+      function isCallersExcuseId() {
+        let prefix = callerEmail() + '__';
+        return id.size() > prefix.size() && id[0:prefix.size()] == prefix;
+      }
+
+      allow get: if isEboard() ||
+        (signedIn() && (resource == null ? isCallersExcuseId() : resource.data.email == callerEmail()));
+      allow list: if isEboard() ||
+        (signedIn() && resource.data.email == callerEmail());
+
+      // A Member files their own pending request under `{email}__{CODE}`;
+      // since only create is allowed for a pending request, a duplicate for
+      // the same event is refused.
+      allow create: if signedIn() &&
+        request.resource.data.email == callerEmail() &&
+        id == callerEmail() + '__' + request.resource.data.codeId &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.get('reviewedBy', null) == null &&
+        request.resource.data.get('reviewedAt', null) == null &&
+        request.resource.data.get('reviewNotes', '') == '';
+
+      // A Member may withdraw their own request only while it is still pending.
+      allow delete: if isEboard() ||
+        (signedIn() &&
+         resource.data.email == callerEmail() &&
+         resource.data.status == 'pending');
+
+      // Only E-Board decides a pending request.
+      allow update: if isEboard() &&
+        resource.data.status == 'pending' &&
+        request.resource.data.status in ['approved', 'denied'];
+    }
+
     match /cabinets/{cabinetDoc} {
       allow get, list: if isEboard();
       allow create, delete: if isEboard();
