@@ -85,7 +85,9 @@ service cloud.firestore {
       function isOwnCodeAttendance() {
         let attendance = request.resource.data;
         let code = get(/databases/$(database)/documents/codes/$(attendance.codeId)).data;
-        return attendance.keys().hasOnly(['email', 'eventTypeId', 'eventDate', 'source', 'codeId']) &&
+        return attendance.keys().hasOnly(['email', 'eventTypeId', 'eventDate', 'source', 'codeId', 'makeupFor']) &&
+          // The Missed Event (a codeId) the Member picked for it to make up (#121).
+          attendance.get('makeupFor', '') is string &&
           attendance.email == callerEmail() &&
           attendance.source == 'code' &&
           id == callerEmail() + '__' + attendance.codeId &&
@@ -122,6 +124,29 @@ service cloud.firestore {
         request.resource.data.status == 'pending' &&
         request.resource.data.get('reviewedBy', null) == null;
       allow update, delete: if isEboard();
+
+      // The request's photo evidence, kept out of the request itself so that
+      // reading requests never transfers it (frontend/src/lib/requestEvidence.ts).
+      // Governed like the request: E-Board reads any, a Member reads and
+      // creates their own. `userEmail` is copied onto the photo doc so this
+      // costs no extra document read, and the request must already exist and
+      // be theirs, so nobody files a photo under someone else's request.
+      match /evidence/{photoDoc} {
+        function isOwnRequest() {
+          let path = /databases/$(database)/documents/pointRequests/$(id);
+          return exists(path) && get(path).data.userEmail == callerEmail();
+        }
+
+        allow get, list: if isEboard() ||
+          (signedIn() && resource.data.userEmail == callerEmail());
+        allow create: if signedIn() &&
+          request.resource.data.keys().hasOnly(['imageData', 'userEmail']) &&
+          request.resource.data.imageData is string &&
+          request.resource.data.userEmail == callerEmail() &&
+          isOwnRequest();
+        // A photo stands as submitted: only E-Board replaces or removes one.
+        allow update, delete: if isEboard();
+      }
     }
 
     match /excuseRequests/{id} {

@@ -723,7 +723,7 @@
 }
 
 .point-request-review .status-badge.pending,
-.point-request-review .status-badge:not(.approved):not(.denied) {
+.point-request-review .status-badge:not(.approved):not(.denied):not(.revoked) {
     background-color: #fef3c7;
     color: #92400e;
     border: 1px solid #f59e0b;
@@ -737,6 +737,14 @@
 
 .point-request-review .status-badge.denied {
     background-color: var(--hsa-danger-bg);
+    color: var(--hsa-danger-strong);
+    border: 1px solid var(--hsa-danger-border);
+}
+
+/* Approved, then taken back: read as denied, but told apart from one that was
+   never approved. Matches .ulk-status--revoked in User Lookup. */
+.point-request-review .status-badge.revoked {
+    background-color: var(--hsa-surface-sunken);
     color: var(--hsa-danger-strong);
     border: 1px solid var(--hsa-danger-border);
 }
@@ -903,6 +911,17 @@
     width: auto;
     height: auto;
     border-radius: 12px;
+}
+
+/* The photo is read when E-Board opens it (lib/requestEvidence.ts), so the
+   modal also carries the message when there is nothing to show. */
+.point-request-review .modal-content .image-modal__error {
+    margin: 0;
+    padding: 28px 32px;
+    max-width: 32ch;
+    color: var(--hsa-ink);
+    font-weight: 600;
+    text-align: center;
 }
 
 /* A true circle (min-width/min-height reset undoes the global button rule
@@ -1739,3 +1758,10 @@
 
 /* Member lookup / Requests tabs: room between the buttons, and above and below them. */
 .eap .eap-tabs { display: flex; flex-wrap: wrap; gap: 14px; margin: 20px 0 28px; }
+
+/* "Load more" under the Point Request Review grid. */
+.requests-more {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.25rem;
+}

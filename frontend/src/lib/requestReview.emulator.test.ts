@@ -18,7 +18,7 @@ afterAll(async () => {
 function pending(extra: Record<string, unknown>) {
     return {
         userEmail: MEMBER, codeId: null, typeChoiceId: 'tabling', eventTypeId: 'tabling', activityName: 'Turlington table',
-        date: '2026-10-12', description: 'Tabled', makeupFor: [null], imageData: '', pointsRequested: 1,
+        date: '2026-10-12', description: 'Tabled', makeupFor: [null], hasPhoto: false, pointsRequested: 1,
         status: 'pending', reviewedAt: null, reviewedBy: null, reviewNotes: '', ...extra,
     };
 }

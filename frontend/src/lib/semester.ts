@@ -23,6 +23,13 @@ export function fromIsoDate(isoDate: string): Date {
     return new Date(year, month - 1, day);
 }
 
+/** 'YYYY-MM-DD' moved by whole days, through local time so a DST change never skips or repeats one. */
+export function addDays(isoDate: string, days: number): string {
+    const date = fromIsoDate(isoDate);
+    date.setDate(date.getDate() + days);
+    return toIsoDate(date);
+}
+
 /** 'YYYY-MM-DD' as 'Sep 3'. */
 export function shortDate(isoDate: string): string {
     return fromIsoDate(isoDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
