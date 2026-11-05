@@ -122,6 +122,7 @@ service cloud.firestore {
         request.resource.data.status == 'pending' &&
         request.resource.data.get('reviewedBy', null) == null;
       allow update, delete: if isEboard();
+    }
 
     match /excuseRequests/{id} {
       // Every Excuse Request ID starts `{email}__` (lib/excuseRequests.ts).
@@ -157,7 +158,6 @@ service cloud.firestore {
         resource.data.status == 'pending' &&
         request.resource.data.status in ['approved', 'denied'];
     }
-
 
     match /cabinets/{cabinetDoc} {
       allow get, list: if isEboard();
