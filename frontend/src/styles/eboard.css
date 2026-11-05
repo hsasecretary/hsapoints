@@ -1724,3 +1724,15 @@
     background: var(--hsa-teal-700); color: #ffffff; font: inherit; font-weight: 700; cursor: pointer;
 }
 .ulk .ulk-add__confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ---- Excuse Request inbox  (excuseAbsence/ExcuseInbox.tsx) ------------------
+   One card per pending request; the buttons and confirm box reuse .eap-btn /
+   .eap-confirm above. */
+.eap .eap-inbox { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.eap .eap-inbox > h3 { margin: 0; text-align: left; font-size: var(--hsa-text-lg, 1.1rem); color: var(--hsa-teal-700); }
+.eap .eap-inbox__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.eap .eap-request { padding: 14px; border: 1px solid var(--hsa-border); border-radius: 8px; background: var(--hsa-surface); }
+.eap .eap-request__head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.eap .eap-request__head span { color: var(--hsa-muted); font-size: var(--hsa-text-sm); }
+.eap .eap-request__filed { margin: 2px 0 0; color: var(--hsa-muted); font-size: var(--hsa-text-xs); }
+.eap .eap-request__reason { margin: 8px 0 10px; color: var(--hsa-ink); font-size: var(--hsa-text-base); line-height: 1.45; white-space: pre-wrap; }
