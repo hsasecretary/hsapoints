@@ -106,7 +106,7 @@ export function approvalAttendances(request: ReviewRequest, code: Code | null, d
 
 export type ApprovalPreview = Omit<RequestPreview, 'attendances'> & {
     /** One per Attendance approval would write, in hour order. */
-    attendances: { id: string; alreadyCounted: boolean; surplus: boolean; makeupFor: string | null }[];
+    attendances: ({ id: string; alreadyCounted: boolean } & RequestPreview['attendances'][number])[];
 };
 
 /**
@@ -133,7 +133,7 @@ export function previewApproval(
         attendances: planned.attendances.map(({ id }) => {
             const index = added.findIndex((attendance) => attendance.id === id);
             return index < 0
-                ? { id, alreadyCounted: true, surplus: false, makeupFor: null }
+                ? { id, alreadyCounted: true, surplus: false, makeupFor: null, requirementWaits: false }
                 : { id, alreadyCounted: false, ...change.attendances[index] };
         }),
     };

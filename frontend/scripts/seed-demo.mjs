@@ -14,6 +14,16 @@ const PROJECT = 'demo-hsapoints';
 const AUTH = 'http://127.0.0.1:9099';
 const PASSWORD = 'hsa-demo-2026';
 
+// A stand-in for photo evidence, short enough to read here; a real one is a
+// ~100KB JPEG data URL from PhotoField's canvas. It lives beside the request,
+// in pointRequests/{id}/evidence/photo (src/lib/requestEvidence.ts).
+const PHOTO = `data:image/svg+xml;utf8,${encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200">'
+    + '<rect width="320" height="200" fill="#0d7680"/>'
+    + '<text x="160" y="112" fill="#ffffff" font-family="sans-serif" font-size="24"'
+    + ' text-anchor="middle">Demo photo</text></svg>',
+)}`;
+
 const CABINET = 'cabinet.demo@ufl.edu';
 const GENERAL = 'general.demo@ufl.edu';
 const EBOARD = 'eboard.demo@ufl.edu';
@@ -76,16 +86,17 @@ const docs = Object.fromEntries([
     ...['ORIENT', 'GBM1', 'CT2', 'OPA1', 'CT4', 'OPA2', 'GBM4', 'CT5'].map((id) => attended(CABINET, id)),
     ['pointRequests/demo-pending-makeup', {
         userEmail: CABINET, codeId: 'FUND1', typeChoiceId: 'hsa-fundraising', eventTypeId: 'hsa-fundraising',
-        activityName: 'Empanada Sale', date: '2026-09-14', description: '', makeupFor: ['GBM3'], imageData: '',
+        activityName: 'Empanada Sale', date: '2026-09-14', description: '', makeupFor: ['GBM3'], hasPhoto: true,
         pointsRequested: 2, status: 'pending', reviewedAt: null, reviewedBy: null, reviewNotes: '',
         submittedAt: serverTimestamp(),
     }],
+    ['pointRequests/demo-pending-makeup/evidence/photo', { imageData: PHOTO, userEmail: CABINET }],
     // Three Tabling hours for E-Board's review (#72): the first fills the
     // Semester Requirement, the other two are Make-ups.
     ['pointRequests/demo-pending-tabling', {
         userEmail: CABINET, codeId: null, typeChoiceId: 'tabling', eventTypeId: 'tabling',
         activityName: 'Turlington table', date: '2026-09-23', description: 'Tabled for the fundraiser', hours: 3,
-        makeupFor: [null, null, 'CT3'], imageData: '', pointsRequested: 3, status: 'pending', reviewedAt: null,
+        makeupFor: [null, null, 'CT3'], hasPhoto: false, pointsRequested: 3, status: 'pending', reviewedAt: null,
         reviewedBy: null, reviewNotes: '', submittedAt: serverTimestamp(),
     }],
 
@@ -93,10 +104,13 @@ const docs = Object.fromEntries([
     [`users/${GENERAL}`, user(GENERAL, 'Gabi', {})],
     ...['GBM1', 'OPA1', 'EXT1', 'GBM4'].map((id) => attended(GENERAL, id)),
     // "Not listed": E-Board picks the Event Type, attaches it to PROG1, or makes it an Adjustment.
+    // This one keeps its photo in `imageData`, the way requests did before the
+    // move: the review page falls back to it until the backfill runs
+    // (scripts/move_photos_to_evidence.py).
     ['pointRequests/demo-pending-not-listed', {
         userEmail: GENERAL, codeId: null, typeChoiceId: 'not-listed', eventTypeId: null,
         activityName: 'Salsa night setup', date: '2026-09-12', description: 'Helped set up the dance floor', makeupFor: [null],
-        imageData: '', pointsRequested: 0, status: 'pending', reviewedAt: null, reviewedBy: null, reviewNotes: '',
+        imageData: PHOTO, pointsRequested: 0, status: 'pending', reviewedAt: null, reviewedBy: null, reviewNotes: '',
         submittedAt: serverTimestamp(),
     }],
 

@@ -14,6 +14,7 @@ import {
     attendanceCount, buildPointRequest, eventChoices, missedEventName, NOT_LISTED, pickerGroups,
     previewRequest, typeChoiceFor, type RequestDraft, type TypeChoice,
 } from '../../../lib/pointRequests';
+import { savePhoto } from '../../../lib/requestEvidence';
 import { eventType, tierLabels } from '../../../lib/rubric';
 import { semesterOf, shortDate } from '../../../lib/semester';
 import { pendingMakeups, useMemberStanding } from '../useMemberStanding';
@@ -140,11 +141,11 @@ function PointRequestForm() {
         .every((type, _, all) => type.vePoints === all[0].vePoints && type.cabinetPoints === all[0].cabinetPoints);
     const pointsTypeId = typeId ?? (choice?.eventTypeIds.length && sameWorth ? choice.eventTypeIds[0] : null);
     const options = { email, today };
-    // Only a Surplus Attendance can be a Make-up. Starting from a Missed
-    // Event, the first Surplus one makes up that miss; any others (more
-    // Tabling hours) get their own pick. If none looks Surplus from here the
-    // first still names the miss, since the Member may know of an extra one
-    // the ledger doesn't show yet; E-Board settles it on review.
+    // Starting from a Missed Event, the first Attendance that's Surplus anyway
+    // makes up that miss, so no requirement is given up for it; any others
+    // (more Tabling hours) get their own pick. If none is Surplus the first
+    // names the miss anyway: a pick beats filling a requirement (ADR-0005),
+    // and the preview says which requirement stays open.
     const firstPass = choice ? previewRequest(member, attendances, codes, { ...baseDraft, makeupFor: fields.picks }, options) : null;
     const fixedIndex = from?.kind === 'missed' && from.path === 'makeup' && firstPass
         ? Math.max(0, firstPass.attendances.findIndex((attendance) => attendance.surplus))
@@ -168,7 +169,25 @@ function PointRequestForm() {
         setSending(true);
         setMessage({ text: '', type: '' });
         try {
-            await addDoc(collection(db, 'pointRequests'), { ...built.data, submittedAt: serverTimestamp() });
+            // The request first, then its photo in pointRequests/{id}/evidence/photo:
+            // keeping the photo out of the request is what lets every other
+            // page read requests without downloading it (lib/requestEvidence.ts).
+            const saved = await addDoc(collection(db, 'pointRequests'), { ...built.data, submittedAt: serverTimestamp() });
+            if (built.photo) {
+                try {
+                    await savePhoto(db, saved.id, email, built.photo);
+                } catch (error) {
+                    // The request is already in: saying it failed would only
+                    // get it sent twice. E-Board reviews it without the photo.
+                    console.error('Error saving photo evidence:', error);
+                    setMessage({
+                        text: 'Request sent, but the photo did not save. E-Board may ask you for it.',
+                        type: 'success',
+                    });
+                    reset(null);
+                    return;
+                }
+            }
             setMessage({ text: 'Request sent. E-Board will review it; check My Requests for the result.', type: 'success' });
             reset(null);
         } catch (error) {
@@ -253,7 +272,7 @@ function PointRequestForm() {
         lead = (
             <>
                 <p className="req-c__lead">Making up <strong>{startMiss.name}</strong>{startMiss.strike ? ' and its Strike' : ''}.</p>
-                <p className="req-hint">Pick what you went to. It makes up the miss if it was an extra (Surplus) event; E-Board checks when they review it.</p>
+                <p className="req-hint">Pick what you went to. It makes up the miss even if it's your first of that event this Semester, but then that requirement stays open until you go to another one. E-Board checks when they review it.</p>
                 {typePicker(pickerGroups(true).map((group) => ({
                     ...group, choices: group.choices.filter((option) => eventType(option.eventTypeIds[0]).tier !== 'core'),
                 })), true)}

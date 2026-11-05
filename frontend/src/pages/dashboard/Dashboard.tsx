@@ -5,6 +5,7 @@ import { CABINET_POINTS_GOAL } from '../../lib/computeStanding';
 import { pointsOverview } from '../../lib/pointsOverview';
 import { requirementsBoard } from '../../lib/requirementsBoard';
 import { formatAccountType } from '../../lib/roles';
+import { upcomingEvents } from '../../lib/upcomingEvents';
 import CabinetGoal from './sections/CabinetGoal';
 import EventCodeForm from './sections/EventCodeForm';
 import ExcuseAbsenceBubble from './sections/ExcuseAbsenceBubble';
@@ -15,6 +16,7 @@ import NewPointSystemBanner from './sections/NewPointSystemBanner';
 import PointsAndEvents from './sections/PointsAndEvents';
 import PointsSummary from './sections/PointsSummary';
 import { useExcuseRequests } from './useExcuseRequests';
+import UpcomingEvents from './sections/UpcomingEvents';
 import { pendingMakeups, useMemberStanding } from './useMemberStanding';
 
 const BUBBLES = ['points', 'how', 'excuse'] as const;
@@ -34,6 +36,8 @@ type Bubble = (typeof BUBBLES)[number];
 //                     the Cabinet view "By category" is the Event Type table.
 //                     Above the make-up list so they're seen.
 //   MakeUpList      — Cabinet view only: Missed Events to make up
+//   UpcomingEvents  — everyone: up to five events in the next week, from the
+//                     codes already loaded here, so no extra reads (#98)
 // Every number comes from computeStanding via useMemberStanding.
 function Dashboard({ email }: { email: string }) {
     const { loading, member, attendances, codes, requests, pending, standing, today } = useMemberStanding(email, useViewOverride());
@@ -59,6 +63,7 @@ function Dashboard({ email }: { email: string }) {
     const excuseRequests = useExcuseRequests(email, canExcuse);
     const overview = standing ? pointsOverview({ member, standing, attendances, codes, requests, today }) : null;
     const board = standing?.heldToCabinetRules ? requirementsBoard({ member, standing, attendances, codes, requests, today }) : null;
+    const upcoming = standing ? upcomingEvents(codes, { today, cabinetView: standing.heldToCabinetRules }) : [];
 
     return (
         <div className="overview">
@@ -77,7 +82,9 @@ function Dashboard({ email }: { email: string }) {
                     </div>
                 </dl>
             )}
-            <div className="overview__code"><EventCodeForm /></div>
+            <div className="overview__code">
+                <EventCodeForm member={standing ? member : null} attendances={attendances} codes={codes} pendingPicks={pendingMakeups(pending)} />
+            </div>
 
             {loading ? <p className="overview__loading" role="status">Loading your points…</p> : (
                 <>
@@ -131,6 +138,7 @@ function Dashboard({ email }: { email: string }) {
                     {standing.heldToCabinetRules && !standing.exempt && (
                         <MakeUpList standing={standing} codes={codes} pendingPicks={pendingMakeups(pending)} />
                     )}
+                    <UpcomingEvents events={upcoming} />
                 </>
             )}
         </div>

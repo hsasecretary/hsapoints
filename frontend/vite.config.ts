@@ -3,13 +3,29 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import optimizeLocales from '@react-aria/optimize-locales-plugin';
 
+// Which build this is. The page carries it (__BUILD_ID__) and so does
+// /version.json, which the app checks now and then to notice a deploy
+// (components/layout/AppUpdates.tsx). GitHub Actions builds from a commit;
+// a local build just uses the time.
+const BUILD_ID = process.env.GITHUB_SHA?.slice(0, 12) || new Date().toISOString();
+
 export default defineConfig({
   plugins: [
     react(),
     // React Aria (the Event Codes date picker) ships strings for ~30 languages;
     // the site is English-only, so keep just en-US. Must run before other plugins.
     { ...optimizeLocales.vite({ locales: ['en-US'] }), enforce: 'pre' },
+    {
+      name: 'version-file',
+      apply: 'build',
+      generateBundle() {
+        this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ build: BUILD_ID }) });
+      },
+    },
   ],
+  define: {
+    __BUILD_ID__: JSON.stringify(BUILD_ID),
+  },
   server: {
     open: true,
   },

@@ -1094,6 +1094,40 @@ The list is already centred inside the frame, so it gives its cap back:
     outline-color: var(--hsa-accent);
 }
 
+/* Second step when the code can make up a Missed Event (#121) */
+.overview .ov-code__pick {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 12px 0 0;
+}
+
+.overview .ov-code__pick label {
+    margin: 0;
+    font-weight: 600;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-surface);
+}
+
+.overview .ov-code__pick select {
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+    border: 0;
+    border-radius: 8px;
+    font-size: var(--hsa-text-base);
+}
+
+.overview .ov-code__notice {
+    margin: 0;
+    padding: 8px 12px;
+    border-left: 3px solid var(--hsa-accent);
+    border-radius: 0 6px 6px 0;
+    background: rgba(255, 255, 255, .12);
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-surface);
+}
+
 .overview .ov-code__hint {
     margin: 8px 0 0;
     font-size: var(--hsa-text-xs);
@@ -2069,3 +2103,69 @@ The list is already centred inside the frame, so it gives its cap back:
 .overview .ov-excuse__item-actions { margin-top: 10px; }
 .overview .ov-excuse__withdraw { min-height: 36px; border: 1.5px solid var(--hsa-border); background: var(--hsa-surface); color: var(--hsa-ink-soft); }
 .overview .ov-excuse__withdraw:hover:not(:disabled) { border-color: var(--hsa-danger); color: var(--hsa-danger); }
+
+/* Everyone: up to five events in the next week (#98). Phone-first: each row
+   is a date tile and the title, at least 56px tall. */
+.overview .ov-upcoming {
+    margin-top: 24px;
+    text-align: left;
+}
+
+.overview .ov-upcoming__sub {
+    margin: 0 0 8px;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-muted);
+}
+
+.overview .ov-upcoming ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.overview .ov-upcoming li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 56px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--hsa-border-light);
+}
+
+.overview .ov-upcoming__date {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: var(--hsa-teal-100);
+    color: var(--hsa-teal-700);
+    line-height: 1.1;
+}
+
+.overview .ov-upcoming__date span {
+    font-size: var(--hsa-text-xs);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.overview .ov-upcoming__date b {
+    font-size: var(--hsa-text-lg);
+}
+
+.overview .ov-upcoming__name {
+    min-width: 0;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.overview .ov-upcoming__name small {
+    display: block;
+    font-weight: 400;
+    font-size: var(--hsa-text-sm);
+    color: var(--hsa-muted);
+}
