@@ -59,8 +59,13 @@ service cloud.firestore {
         !request.resource.data.keys().hasAny(eboardOnlyMemberFields());
 
       // A Member's points are calculated from their Attendances, so they no
-      // longer write their own doc (#78); only E-Board updates it.
-      allow update: if isEboard() && absenceLogOnlyGrows();
+      // longer write their own doc (#78); only E-Board updates it. The one
+      // exception: a Member marks the new-point-system banner dismissed
+      // (NewPointSystemBanner.tsx), and can only set it, never unset it.
+      allow update: if (isEboard() && absenceLogOnlyGrows()) ||
+        (isSelf(email) &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['newPointSystemBannerDismissed']) &&
+         request.resource.data.newPointSystemBannerDismissed == true);
 
       allow delete: if isEboard();
     }

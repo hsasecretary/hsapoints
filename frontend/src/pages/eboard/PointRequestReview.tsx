@@ -388,16 +388,13 @@ function PointRequestReview() {
                                 <div className="detail-row">
                                     <strong>Event Type:</strong> {memberPick(request)}
                                 </div>
-                                {request.codeId && (
-                                    <div className="detail-row">
-                                        <strong>Code:</strong> {request.codeId}
-                                    </div>
-                                )}
-                                {request.hours > 0 && (
-                                    <div className="detail-row">
-                                        <strong>Hours:</strong> {request.hours}
-                                    </div>
-                                )}
+                                {/* Optional fields always show, so every card has the same rows. */}
+                                <div className="detail-row">
+                                    <strong>Code:</strong> {request.codeId || <span className="detail-row__none">Not specified</span>}
+                                </div>
+                                <div className="detail-row">
+                                    <strong>Hours:</strong> {request.hours > 0 ? request.hours : <span className="detail-row__none">Not specified</span>}
+                                </div>
                                 {request.status !== 'pending' && (
                                     <div className="detail-row">
                                         <strong>Points:</strong> {request.revoked ? `0 (had earned ${request.revoked.points})` : request.pointsRequested}
@@ -406,12 +403,12 @@ function PointRequestReview() {
                                 <div className="detail-row">
                                     <strong>Submitted:</strong> {formatDate(request.submittedAt)}
                                 </div>
-                                {request.description && (
-                                    <div className="description">
-                                        <strong>Description:</strong>
-                                        <p>{request.description}</p>
-                                    </div>
-                                )}
+                                <div className="description">
+                                    <strong>Description:</strong>
+                                    {request.description?.trim()
+                                        ? <p>{request.description}</p>
+                                        : <p className="description__none">Not specified</p>}
+                                </div>
                             </div>
 
                             <div className="request-image">

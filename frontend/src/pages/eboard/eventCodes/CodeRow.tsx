@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { db } from '../../../lib/firebase';
+import { isStartHour, startHourLabel } from '../../../lib/checkInWindow';
 import { deleteCode, updateCode, type CodeRow as Code } from '../../../lib/eventCodes';
 import { eventType } from '../../../lib/rubric';
 import DatePicker from './DatePicker';
 import EventTypeSelect from './EventTypeSelect';
+import StartTimeSelect from './StartTimeSelect';
 import TypeFacts from './TypeFacts';
 
 type CodeRowProps = {
@@ -28,7 +30,10 @@ function CodeRow({ code, today, open, onToggle }: CodeRowProps) {
     return (
         <li className={`code-row${open ? ' is-open' : ''}`}>
             <button type="button" className="code-row__main" onClick={onToggle} aria-expanded={open} aria-controls={detailId}>
-                <span className="code-row__date">{formatDate(code.eventDate)}</span>
+                <span className="code-row__date">
+                    {formatDate(code.eventDate)}
+                    {isStartHour(code.startHour) && <small className="code-row__time">{startHourLabel(code.startHour)}</small>}
+                </span>
                 <span className="code-row__code">{code.id}</span>
                 <span className="code-row__event">{code.event}</span>
                 <span className={`tier-chip${type ? ` tier-chip--${type.tier}` : ' tier-chip--none'}`}>
@@ -56,6 +61,8 @@ function CodeEditForm({ code, onDone }: { code: Code; onDone: () => void }) {
     const [edit, setEdit] = useState({
         event: code.event ?? '',
         eventDate: code.eventDate ?? '',
+        // Codes made before start times have none: all day.
+        startHour: isStartHour(code.startHour) ? String(code.startHour) : '',
         eventTypeId: code.eventTypeId ?? '',
         // Old codes store 'None' when no graphic was posted.
         graphicDate: code.graphicDate && code.graphicDate !== 'None' ? code.graphicDate : '',
@@ -101,12 +108,15 @@ function CodeEditForm({ code, onDone }: { code: Code; onDone: () => void }) {
                     <input id={fieldId('event')} value={edit.event} onChange={(e) => set('event', e.target.value)} />
                 </label>
                 <DatePicker label="Date" value={edit.eventDate} onChange={(iso) => set('eventDate', iso)} />
+                <label htmlFor={fieldId('start')}>Start time
+                    <StartTimeSelect id={fieldId('start')} value={edit.startHour} onChange={(hour) => set('startHour', hour)} />
+                </label>
                 <label htmlFor={fieldId('type')}>Event Type
                     <EventTypeSelect id={fieldId('type')} value={edit.eventTypeId} onChange={(id) => set('eventTypeId', id)} />
                 </label>
                 <DatePicker label="Graphic posted" optional value={edit.graphicDate} onChange={(iso) => set('graphicDate', iso)} />
             </div>
-            <TypeFacts eventTypeId={edit.eventTypeId} eventDate={edit.eventDate} />
+            <TypeFacts eventTypeId={edit.eventTypeId} eventDate={edit.eventDate} startHour={edit.startHour} />
             {code.category && !code.eventTypeId && (
                 <p className="code-edit__note">Made before Event Types. Old category: {code.category}</p>
             )}

@@ -410,6 +410,12 @@
 .ulk h3 { font-size: var(--hsa-text-xl); }
 .ulk h4 { font-size: var(--hsa-text-base); display: inline; }
 .ulk .ulk-title { margin: 0 0 16px; font-size: var(--hsa-text-3xl); color: var(--hsa-teal-700); text-align: left; }
+/* Status & Points, then Missed Events and Strikes: each its own search and Member. */
+.ulk .ulk-section + .ulk-section { margin-top: 40px; padding-top: 24px; border-top: 2px solid var(--hsa-border-light); }
+.ulk .ulk-section__title { margin: 0 0 12px; font-size: var(--hsa-text-2xl); color: var(--hsa-teal-700); text-align: left; scroll-margin-top: 80px; }
+.ulk .ulk-section { scroll-margin-top: 80px; }
+/* Missed Events and Strikes inside User Lookup: the Excuse Absence styles, without that page's own frame. */
+.ulk .eap--embedded { max-width: none; margin: 0; padding: 0; }
 .ulk .ulk-muted { color: var(--hsa-muted); font-size: var(--hsa-text-sm); margin: 8px 0; }
 .ulk .ulk-error { color: var(--hsa-danger); font-size: var(--hsa-text-sm); margin: 8px 0; }
 .ulk a { color: var(--hsa-teal-700); font-weight: 600; }
@@ -501,9 +507,20 @@
 }
 .ulk .ulk-filter.is-active { background: var(--hsa-teal-700); border-color: var(--hsa-teal-700); color: #ffffff; }
 
-/* "Remove check-ins": off by default, so a Remove button is never one stray tap away. */
-.ulk .ulk-switch { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: var(--hsa-text-sm); font-weight: 600; cursor: pointer; }
-.ulk .ulk-switch input { width: 18px; height: 18px; margin: 0; accent-color: var(--hsa-danger); }
+/* Points rows: date, name, then a red Remove (on rows that can be taken
+   away) to the left of the points. Remove only opens a confirm below the
+   row; nothing changes until that's confirmed. */
+.ulk .ulk-list--points .ulk-row { grid-template-columns: 64px minmax(0, 1fr) auto auto; }
+.ulk .ulk-list--points .ulk-row__end { grid-column: -2 / -1; }
+.ulk .ulk-remove {
+    grid-column: -3 / -2; align-self: center;
+    min-width: 0; min-height: 32px; padding: 0 12px; border: 1.5px solid var(--hsa-danger); border-radius: 6px;
+    background: var(--hsa-danger-bg); color: var(--hsa-danger-strong);
+    font: inherit; font-size: var(--hsa-text-sm); font-weight: 700; cursor: pointer;
+}
+.ulk .ulk-remove:hover, .ulk .ulk-remove[aria-expanded="true"] { background: var(--hsa-danger); color: #fff; }
+.ulk .ulk-remove:focus-visible { outline: 3px solid var(--hsa-danger-border); outline-offset: 2px; }
+.ulk .ulk-row.is-removing { background: var(--hsa-danger-bg); border-left-color: var(--hsa-danger); }
 .ulk .ulk-points-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 16px; }
 /* A Removed Check-in or revoked Point Request: crossed out, counted nowhere. */
 .ulk .ulk-row.is-taken-back { color: var(--hsa-muted); border-left-color: var(--hsa-danger-border); }
@@ -514,6 +531,11 @@
 /* Phones: two-line rows, the date above the name and the points beside it. */
 @media (max-width: 600px) {
     .ulk .ulk-row { grid-template-columns: 1fr auto; row-gap: 2px; }
+    /* Phones: Remove goes under the points instead of beside them, so the name keeps its width. */
+    .ulk .ulk-list--points .ulk-row { grid-template-columns: minmax(0, 1fr) auto; }
+    .ulk .ulk-list--points .ulk-row__name { grid-row: 2 / span 2; }
+    .ulk .ulk-list--points .ulk-row__end { grid-column: 2; grid-row: 2; }
+    .ulk .ulk-remove { grid-column: 2; grid-row: 3; justify-self: end; align-self: start; min-height: 44px; margin-top: 4px; }
     .ulk .ulk-row__date { grid-column: 1 / -1; }
     .ulk .ulk-row--total .ulk-row__date { display: none; }
     .ulk .ulk-row__form { grid-column: 1 / -1; }
@@ -655,12 +677,14 @@
 /* Requests Grid — multiple cards per row on desktop so reviewing a long
    queue doesn't mean endless vertical scrolling. auto-fit (not auto-fill)
    so a short list doesn't leave dangling empty columns. */
+/* Cards in a row stretch to the same height, with the photo and Review
+   buttons pinned to the bottom of each, so they line up across the row. */
 .point-request-review .requests-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 20px;
     margin-top: 20px;
-    align-items: start;
+    align-items: stretch;
 }
 
 /* Request Card */
@@ -671,6 +695,8 @@
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
     transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
 }
 
 .point-request-review .request-card.is-linked {
@@ -751,8 +777,13 @@
 
 /* Request Details */
 .point-request-review .request-details {
+    flex: 1 0 auto;
     margin-bottom: 18px;
 }
+
+/* An optional field the Member left empty. */
+.point-request-review .detail-row__none,
+.point-request-review .description p.description__none { color: var(--hsa-muted); font-style: italic; }
 
 .point-request-review .detail-row {
     margin-bottom: 8px;
@@ -1302,6 +1333,7 @@
 .event-codes-page .quick-add__code { flex: 0 1 140px; font-weight: 700; letter-spacing: .04em; }
 .event-codes-page .quick-add__date { flex: 0 1 160px; }
 .event-codes-page .quick-add .event-type-select { flex: 1 1 240px; }
+.event-codes-page .quick-add .start-time-select { flex: 0 1 130px; }
 .event-codes-page .quick-add__submit {
     padding: 10px 18px;
     border: none;
@@ -1381,10 +1413,15 @@
 .event-codes-page .code-week h3 { margin: 16px 0 4px; text-align: left; font-size: var(--hsa-text-xs); font-weight: 600; color: var(--hsa-muted); }
 .event-codes-page .code-week ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--hsa-border); }
 
+/* The rows lay out by the list's own width, not the window's: with the
+   filter sidebar beside it, a mid-size window leaves the list narrow. */
+.event-codes-page .code-list { container: code-list / inline-size; }
 .event-codes-page .code-row { border-bottom: 1px solid var(--hsa-border-light); background: var(--hsa-surface); }
+/* Date, code, event name, Event Type, count. Only the name stretches; the
+   type chip shortens with an ellipsis rather than run into it. */
 .event-codes-page .code-row__main {
     display: grid;
-    grid-template-columns: 110px 140px minmax(0, 1fr) 190px 96px;
+    grid-template-columns: 110px 130px minmax(0, 1fr) minmax(0, 170px) 80px;
     gap: 12px;
     align-items: center;
     width: 100%;
@@ -1401,17 +1438,22 @@
 .event-codes-page .code-row__main:hover { background: var(--hsa-surface-subtle); border: none; box-shadow: none; }
 .event-codes-page .code-row.is-open .code-row__main { background: var(--hsa-teal-100); }
 .event-codes-page .code-row__date { color: var(--hsa-muted); }
+/* A timed code's start time, on its own line under the date. */
+.event-codes-page .code-row__time { display: block; font-size: inherit; }
 .event-codes-page .code-row__code { overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: var(--hsa-teal-700); }
 .event-codes-page .code-row__count { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .event-codes-page .code-row__count small { color: var(--hsa-muted); }
 
 .event-codes-page .tier-chip {
     justify-self: start;
+    max-width: 100%;
     padding: 2px 8px;
     border-radius: 999px;
     font-size: var(--hsa-text-xs);
     font-weight: 600;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .event-codes-page .tier-chip--core { background: var(--hsa-teal-700); color: #fff; border: 1.5px solid var(--hsa-teal-700); }
 .event-codes-page .tier-chip--semester { background: var(--hsa-surface); color: var(--hsa-teal-700); border: 1.5px solid var(--hsa-teal-400); }
@@ -1493,6 +1535,14 @@
     .event-codes-page .code-facets-toggle { display: inline-block; justify-self: start; }
     .event-codes-page .code-facets { display: none; position: static; }
     .event-codes-page .code-facets.is-open { display: flex; }
+    .event-codes-page .code-edit__fields :is(label, .date-picker),
+    .event-codes-page .code-edit__fields :is(input, select) { width: 100%; }
+    .event-codes-page .code-edit__fields :is(label, .date-picker) { flex: 1 1 100%; }
+}
+
+/* A narrow list (a phone, or a mid-size window beside the filters): each
+   row stacks into code and count, then the event name, then date and type. */
+@container code-list (max-width: 660px) {
     .event-codes-page .code-row__main {
         grid-template-columns: minmax(0, 1fr) auto;
         grid-template-areas: "code count" "event event" "date type";
@@ -1503,11 +1553,10 @@
     .event-codes-page .code-row__count { grid-area: count; }
     .event-codes-page .code-row__event { grid-area: event; }
     .event-codes-page .code-row__date { grid-area: date; }
+    .event-codes-page .code-row__time { display: inline; }
+    .event-codes-page .code-row__time::before { content: ' · '; }
     .event-codes-page .code-row .tier-chip { grid-area: type; justify-self: end; }
     .event-codes-page .code-row__detail { padding-left: 8px; }
-    .event-codes-page .code-edit__fields :is(label, .date-picker),
-    .event-codes-page .code-edit__fields :is(input, select) { width: 100%; }
-    .event-codes-page .code-edit__fields :is(label, .date-picker) { flex: 1 1 100%; }
 }
 
 /* Date picker (DatePicker.tsx, React Aria; see

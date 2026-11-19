@@ -25,7 +25,7 @@ beforeEach(async () => {
     });
 });
 
-const form = { event: 'GBM 3', code: 'gbm3', eventDate: '2026-10-08', eventTypeId: 'gbm', graphicDate: '' };
+const form = { event: 'GBM 3', code: 'gbm3', eventDate: '2026-10-08', startHour: '', eventTypeId: 'gbm', graphicDate: '' };
 
 describe('adding a code', () => {
     it('saves the Event Type and no per-event point fields', async () => {
@@ -44,11 +44,12 @@ describe('adding a code', () => {
 });
 
 describe('editing a code', () => {
-    const edit = { event: 'GBM 2 (moved)', eventDate: '2026-09-11', eventTypeId: 'hlsa', graphicDate: '2026-09-01' };
+    const edit = { event: 'GBM 2 (moved)', eventDate: '2026-09-11', startHour: '', eventTypeId: 'hlsa', graphicDate: '2026-09-01' };
 
     it('saves the new details and keeps the check-in count', async () => {
         expect(await updateCode(signedInAs(env, EBOARD), 'GBM2', edit)).toEqual({ ok: true });
-        expect(await readPastRules(env, 'codes/GBM2')).toEqual({ ...edit, attendeeCount: 2 });
+        // toEqual counts `startHour: undefined` as missing: an all-day code stores no start time.
+        expect(await readPastRules(env, 'codes/GBM2')).toEqual({ ...edit, startHour: undefined, attendeeCount: 2 });
     });
 
     it("moves the code's Attendance to its new Event Type and date, and no one else's", async () => {
@@ -66,6 +67,15 @@ describe('editing a code', () => {
         await updateCode(db, 'GBM2', { ...edit, graphicDate: '' });
 
         expect(await readPastRules(env, 'codes/GBM2')).not.toHaveProperty('graphicDate');
+    });
+
+    it('saves a start time, and clears it when the code goes back to all day', async () => {
+        const db = signedInAs(env, EBOARD);
+        await updateCode(db, 'GBM2', { ...edit, startHour: '19' });
+        expect(await readPastRules(env, 'codes/GBM2')).toMatchObject({ startHour: 19 });
+
+        await updateCode(db, 'GBM2', edit);
+        expect(await readPastRules(env, 'codes/GBM2')).not.toHaveProperty('startHour');
     });
 
     it('refuses details a new code would be refused for', async () => {

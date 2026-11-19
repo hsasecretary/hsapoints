@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { filterCodes, groupByWeek, NO_EVENT_TYPE, prepareNewCode, semesterLabel, semesterOptions, suggestCode, type CodeFilters } from './eventCodes';
 
-const form = { event: ' GBM 3 ', code: 'gbm3', eventDate: '2026-10-08', eventTypeId: 'gbm', graphicDate: '' };
+const form = { event: ' GBM 3 ', code: 'gbm3', eventDate: '2026-10-08', startHour: '', eventTypeId: 'gbm', graphicDate: '' };
 
 describe('preparing a new event code', () => {
     it('stores the Event Type and none of the old per-event point fields', () => {
@@ -19,8 +19,16 @@ describe('preparing a new event code', () => {
         });
     });
 
+    it('stores a start time as its hour, and leaves it off an all-day code', () => {
+        expect(prepareNewCode({ ...form, startHour: '19' })).toMatchObject({ ok: true, data: { startHour: 19 } });
+        const allDay = prepareNewCode(form);
+        expect(allDay.ok && 'startHour' in allDay.data).toBe(false);
+    });
+
     it.each([
         ['no name', { event: '  ' }, 'Give the event a name.'],
+        ['a start time not in the list', { startHour: '3' }, 'Pick a start time from the list.'],
+        ['a start time after 10 PM', { startHour: '23' }, 'Pick a start time from the list.'],
         ['no code', { code: ' ' }, 'Give it a code.'],
         ['a code with spaces or symbols', { code: 'GBM 3!' }, 'Codes can only use letters and numbers.'],
         ['no date', { eventDate: '' }, 'Pick the event date.'],
@@ -124,5 +132,15 @@ describe('grouping the list by week', () => {
 
         expect(shape(upcoming)).toEqual([['2026-09-20', ['C']], ['2026-10-04', ['B']]]);
         expect(shape(past)).toEqual([['2026-09-20', ['F', 'D']], ['2026-09-06', ['A', 'E']]]);
+    });
+
+    it('orders one day by start time, all-day codes first', () => {
+        const codes = [
+            { id: 'A', event: 'A', eventDate: '2026-10-08', startHour: 19 },
+            { id: 'B', event: 'B', eventDate: '2026-10-08', startHour: 10 },
+            { id: 'C', event: 'C', eventDate: '2026-10-08' },
+        ];
+
+        expect(groupByWeek(codes, '2026-09-26').upcoming[0].codes.map((code) => code.id)).toEqual(['C', 'B', 'A']);
     });
 });

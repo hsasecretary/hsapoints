@@ -57,6 +57,18 @@ describe('upcomingEvents', () => {
         expect(thursday.typeLabel).toBe('GBM');
     });
 
+    it("gives each event its start time, and none for an all-day code", () => {
+        const timed = [
+            { ...code('LATE1', TODAY, 'Late GBM', 'gbm'), startHour: 19 },
+            { ...code('EARLY1', TODAY, 'Morning tabling', 'hsa-service'), startHour: 9 },
+            code('ALLDAY1', TODAY, 'All-day drive', 'hsa-service'),
+        ];
+        const shown = upcomingEvents(timed, { today: TODAY, cabinetView: false });
+        expect(shown.map((event) => [event.title, event.time])).toEqual([
+            ['All-day drive', null], ['Morning tabling', '9 AM'], ['Late GBM', '7 PM'],
+        ]);
+    });
+
     it('never carries the code, which is what Members check in with', () => {
         const shown = JSON.stringify(upcomingEvents(CODES, { today: TODAY, cabinetView: true }));
         for (const { id } of CODES) expect(shown).not.toContain(id);

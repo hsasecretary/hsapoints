@@ -42,6 +42,8 @@ export type LookupRow = {
     hours?: number;
     /** The code checked in with, whether by the Member, a Point Request or E-Board. */
     codeId: string | null;
+    /** The Attendances that make up the row (several for a Tabling entry's hours); none for an Adjustment or a row taken back. */
+    attendanceIds: string[];
     requestId: string | null;
     approvedBy: string | null;
     approvedOn: string | null;
@@ -104,6 +106,7 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
             existing.vePoints += type?.vePoints ?? 0;
             existing.cabinetPoints += type?.cabinetPoints ?? 0;
             existing.hours = (existing.hours ?? 1) + 1;
+            existing.attendanceIds.push(attendance.id);
             continue;
         }
         const code = attendance.codeId ? codeById.get(attendance.codeId.toUpperCase()) : undefined;
@@ -117,6 +120,7 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
             vePoints: type?.vePoints ?? 0,
             cabinetPoints: type?.cabinetPoints ?? 0,
             codeId: attendance.codeId ? code?.id ?? attendance.codeId.toUpperCase() : null,
+            attendanceIds: [attendance.id],
             requestId: attendance.requestId ?? null,
             ...reviewOf(attendance.requestId),
             enteredBy: attendance.enteredBy ?? null,
@@ -135,6 +139,7 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
             vePoints: adjustment.points || 0,
             cabinetPoints: 0,
             codeId: null,
+            attendanceIds: [],
             requestId: adjustment.requestId ?? null,
             ...(adjustment.by ? { approvedBy: adjustment.by, approvedOn: adjustment.date ?? null } : reviewOf(adjustment.requestId)),
             enteredBy: null,
@@ -154,6 +159,7 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
             vePoints: type?.vePoints ?? 0,
             cabinetPoints: type?.cabinetPoints ?? 0,
             codeId: removed.codeId,
+            attendanceIds: [],
             requestId: null,
             approvedBy: null,
             approvedOn: null,
@@ -178,6 +184,7 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
             vePoints: request.revoked.points,
             cabinetPoints: (type?.cabinetPoints ?? 0) * count,
             codeId: request.codeId ? request.codeId.toUpperCase() : null,
+            attendanceIds: [],
             requestId: request.id,
             approvedBy: request.revoked.approvedBy,
             approvedOn: null,
@@ -203,7 +210,7 @@ export function lookupLedger({ member, attendances, codes, requests, today }: {
     };
 }
 
-/** What removing one check-in would change, for E-Board to see before confirming. */
+/** What removing a check-in or an entered event would change, for E-Board to see before confirming. */
 export type RemovalEffect = {
     vePoints: number;
     cabinetPoints: number;
@@ -229,14 +236,19 @@ function dayAfter(isoDate: string): string {
 /** What a Member's standing is computed from, for one school year. */
 export type StandingFacts = { member: Member; attendances: Attendance[]; codes: Code[]; today: string };
 
-/** Works out a Removed Check-in's effect by computing the standing with and without its Attendance. */
+/**
+ * Works out what taking Attendance away does (a Removed Check-in, or an
+ * entered event undone, which can be several Attendances for Tabling hours)
+ * by computing the standing with and without it.
+ */
 export function checkInRemovalEffect(
     { member, attendances, codes, today }: StandingFacts,
-    attendanceId: string,
+    attendanceIds: string | string[],
 ): RemovalEffect {
-    const asOf = judgedOn(attendances.find((attendance) => attendance.id === attendanceId)?.eventDate ?? today, today);
+    const gone = new Set(typeof attendanceIds === 'string' ? [attendanceIds] : attendanceIds);
+    const asOf = judgedOn(attendances.find((attendance) => gone.has(attendance.id))?.eventDate ?? today, today);
     const before = computeStanding(member, attendances, rubric, codes, { today: asOf });
-    const after = computeStanding(member, attendances.filter((attendance) => attendance.id !== attendanceId), rubric, codes, { today: asOf });
+    const after = computeStanding(member, attendances.filter((attendance) => !gone.has(attendance.id)), rubric, codes, { today: asOf });
     const codeById = codesById(codes);
     const nameOf = (missed: MissedEvent) => codeById.get(missed.codeId.toUpperCase())?.event || missed.codeId;
     const beforeByCode = new Map(before.missedEvents.map((missed) => [missed.codeId.toUpperCase(), missed]));

@@ -190,6 +190,8 @@ describe('Entered Attendance on the ledger', () => {
         const ledger = lookupLedger({ member: generalMember, attendances: [hour(1), hour(2), hour(3)], codes: [], requests: [], today: TODAY });
 
         expect(ledger.rows).toMatchObject([{ name: 'Plaza tabling', eventType: 'Tabling', hours: 3, vePoints: 3, codeId: null, note: '' }]);
+        // Every hour's Attendance, so removing the row removes them all.
+        expect(ledger.rows[0].attendanceIds).toEqual(['m__req-eb-1-h1', 'm__req-eb-1-h2', 'm__req-eb-1-h3']);
     });
 });
 

@@ -182,6 +182,22 @@ describe('the E-Board-only member fields', () => {
     });
 });
 
+describe('the new-point-system banner', () => {
+    const FIELD = 'newPointSystemBannerDismissed';
+
+    it('lets a Member mark it dismissed on their own account', async () => {
+        await assertSucceeds(updateDoc(doc(signedInAs(env, MEMBER), 'users', MEMBER), { [FIELD]: true }));
+    });
+
+    it("won't let a Member unset it, set it on someone else, or slip another field in with it", async () => {
+        const db = signedInAs(env, MEMBER);
+        await assertFails(updateDoc(doc(db, 'users', MEMBER), { [FIELD]: false }));
+        await assertFails(updateDoc(doc(db, 'users', OTHER_MEMBER), { [FIELD]: true }));
+        await assertFails(updateDoc(doc(db, 'users', MEMBER), { [FIELD]: true, fallPoints: 50 }));
+        await assertFails(updateDoc(doc(db, 'users', MEMBER), { [FIELD]: true, eboard: true }));
+    });
+});
+
 describe('pointRequests', () => {
     /** A request as the Submit Point Request form saves it (#71). */
     function pendingRequest(email: string) {

@@ -5,11 +5,13 @@ import { eventType } from '../../../lib/rubric';
 import { toIsoDate } from '../../../lib/semester';
 import EventTypeSelect from './EventTypeSelect';
 import DatePicker from './DatePicker';
+import StartTimeSelect from './StartTimeSelect';
 import TypeFacts from './TypeFacts';
 
-const blank = { event: '', code: '', eventDate: '', eventTypeId: '', graphicDate: '' };
+const blank = { event: '', code: '', eventDate: '', startHour: '', eventTypeId: '', graphicDate: '' };
 
 // The sticky row that adds a code: name (the code fills itself in), date,
+// start time (check-in stays open three hours from it; "All day" if none),
 // Event Type, Enter. The graphic date waits under "More".
 function QuickAdd() {
     const [row, setRow] = useState({ ...blank, eventDate: toIsoDate(new Date()) });
@@ -58,6 +60,7 @@ function QuickAdd() {
                 onChange={(e) => { set('code', e.target.value.toUpperCase()); setCodeTyped(true); }} />
             <DatePicker label="Event date" hideLabel className="quick-add__date" value={row.eventDate}
                 onChange={(iso) => set('eventDate', iso)} />
+            <StartTimeSelect value={row.startHour} onChange={(hour) => set('startHour', hour)} />
             <EventTypeSelect value={row.eventTypeId} onChange={(id) => set('eventTypeId', id)} />
             <button type="submit" className="quick-add__submit" disabled={saving}>{saving ? 'Adding…' : 'Add code'}</button>
             <button type="button" className="link-button quick-add__more-toggle" onClick={() => setMore((open) => !open)}
@@ -71,7 +74,7 @@ function QuickAdd() {
             )}
             <div className="quick-add__status" role="status">
                 {status?.error ? <span className="quick-add__error">{status.text}</span>
-                    : row.eventTypeId ? <TypeFacts eventTypeId={row.eventTypeId} eventDate={row.eventDate} />
+                    : row.eventTypeId ? <TypeFacts eventTypeId={row.eventTypeId} eventDate={row.eventDate} startHour={row.startHour} />
                     : status?.text ?? 'Press Enter to add. The code fills in from the name.'}
             </div>
         </form>

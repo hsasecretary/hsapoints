@@ -6,6 +6,7 @@
 import {
     collection, deleteField, doc, getDocs, limit, query, runTransaction, updateDoc, where, writeBatch, type Firestore,
 } from 'firebase/firestore';
+import { isStartHour } from './checkInWindow';
 import { eventType, type Tier } from './rubric';
 import { currentSemester, fromIsoDate, toIsoDate } from './semester';
 
@@ -14,6 +15,8 @@ export type CodeForm = {
     /** As typed; stored uppercase as the doc ID. */
     code: string;
     eventDate: string;
+    /** The hour check-in opens (6 to 24, see lib/checkInWindow.ts), as the select holds it; '' for all day. */
+    startHour: string;
     eventTypeId: string;
     /** Optional, for reference only: it has no effect on VE Points. */
     graphicDate: string;
@@ -22,6 +25,8 @@ export type CodeForm = {
 export type CodeDoc = {
     event: string;
     eventDate: string;
+    /** Missing for an all-day code. */
+    startHour?: number;
     eventTypeId: string;
     attendeeCount: number;
     graphicDate?: string;
@@ -41,7 +46,7 @@ export function prepareNewCode(form: CodeForm): Prepared {
     return { ok: true, id, data: { ...codeDetails(form), attendeeCount: 0 } };
 }
 
-export type CodeEdit = Pick<CodeForm, 'event' | 'eventDate' | 'eventTypeId' | 'graphicDate'>;
+export type CodeEdit = Pick<CodeForm, 'event' | 'eventDate' | 'startHour' | 'eventTypeId' | 'graphicDate'>;
 
 export type SaveResult = { ok: true } | { ok: false; error: string };
 
@@ -72,8 +77,10 @@ export async function updateCode(db: Firestore, codeId: string, edit: CodeEdit):
     // commits after the code write copies the new values (redeemCode reads
     // the code in its transaction, which retries if the code changed), and
     // one that committed before it is found by the query below.
+    const details = codeDetails(edit);
     await updateDoc(doc(db, 'codes', codeId), {
-        ...codeDetails(edit),
+        ...details,
+        startHour: details.startHour ?? deleteField(),
         graphicDate: edit.graphicDate || deleteField(),
     });
     const attendance = await getDocs(query(collection(db, 'attendances'), where('codeId', '==', codeId)));
@@ -110,6 +117,7 @@ export async function deleteCode(db: Firestore, codeId: string): Promise<SaveRes
 function checkDetails(form: CodeEdit): string | null {
     if (!form.event.trim()) return 'Give the event a name.';
     if (!form.eventDate) return 'Pick the event date.';
+    if (form.startHour && !isStartHour(Number(form.startHour))) return 'Pick a start time from the list.';
     // Tabling and CRASH never get codes; they arrive only by Point Request.
     if (!eventType(form.eventTypeId)?.codeable) return 'Pick an Event Type.';
     if (form.graphicDate && form.graphicDate > form.eventDate) return "The graphic can't be posted after the event.";
@@ -120,6 +128,7 @@ function codeDetails(form: CodeEdit): Omit<CodeDoc, 'attendeeCount'> {
     return {
         event: form.event.trim(),
         eventDate: form.eventDate,
+        ...(form.startHour ? { startHour: Number(form.startHour) } : {}),
         eventTypeId: form.eventTypeId,
         ...(form.graphicDate ? { graphicDate: form.graphicDate } : {}),
     };
@@ -169,6 +178,8 @@ export type CodeRow = {
     id: string;
     event: string;
     eventDate: string;
+    /** Missing for an all-day code, which every code made before start times is. */
+    startHour?: number;
     /** Missing on codes made before Event Types, until the migration types them. */
     eventTypeId?: string | null;
     attendeeCount?: number;
@@ -217,10 +228,13 @@ export type WeekGroup<T> = {
 
 /**
  * The list's two blocks: upcoming codes (today and later) soonest first, and
- * past ones most recent first, each grouped by week.
+ * past ones most recent first, each grouped by week. On one day, all-day
+ * codes come before timed ones, and timed ones go by start time.
  */
 export function groupByWeek<T extends CodeRow>(codes: T[], today: string): { upcoming: WeekGroup<T>[]; past: WeekGroup<T>[] } {
-    const byDate = (a: T, b: T) => a.eventDate.localeCompare(b.eventDate) || a.id.localeCompare(b.id);
+    const byDate = (a: T, b: T) => a.eventDate.localeCompare(b.eventDate)
+        || (a.startHour ?? 0) - (b.startHour ?? 0)
+        || a.id.localeCompare(b.id);
     const upcoming = codes.filter((code) => code.eventDate >= today).sort(byDate);
     const past = codes.filter((code) => code.eventDate < today).sort((a, b) => byDate(b, a));
     return { upcoming: intoWeeks(upcoming), past: intoWeeks(past) };

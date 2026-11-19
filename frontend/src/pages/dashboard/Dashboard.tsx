@@ -68,7 +68,7 @@ function Dashboard({ email }: { email: string }) {
     return (
         <div className="overview">
             <h1 className="overview__title">{firstName ? `Hi, ${firstName}` : 'Dashboard'}</h1>
-            <NewPointSystemBanner onOpenGuide={openGuide} />
+            <NewPointSystemBanner email={email} member={member as Record<string, unknown> | null} onOpenGuide={openGuide} />
             {profile && (
                 <dl className="overview__info" aria-label="My information">
                     <div><dt>Name</dt><dd>{[profile.firstName, profile.lastName].filter(Boolean).join(' ') || 'N/A'}</dd></div>
