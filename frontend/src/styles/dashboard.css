@@ -1128,14 +1128,8 @@ The list is already centred inside the frame, so it gives its cap back:
     color: var(--hsa-surface);
 }
 
-.overview .ov-code__hint {
-    margin: 8px 0 0;
-    font-size: var(--hsa-text-xs);
-    color: rgba(255, 255, 255, .85);
-}
-
 .overview .ov-code__msg {
-    margin: 8px 0 0;
+    margin: 12px 0 0;
     font-size: var(--hsa-text-sm);
     font-weight: 600;
     color: #fecaca;

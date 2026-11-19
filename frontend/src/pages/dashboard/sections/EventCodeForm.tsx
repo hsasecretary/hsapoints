@@ -15,15 +15,13 @@ const refusalMessages = {
     'cabinet-only': 'This code is for Cabinet Members only.',
 };
 
-/** Why the code was turned away; outside its window, when it opens or when it closed. */
+/** Why the code was turned away: too early says when it opens; too late (3 hours on, or the next day) points to a Point Request. */
 function refusalMessage(refusal: Extract<RedeemResult, { ok: false }>): string {
-    if (refusal.reason === 'not-open' || refusal.reason === 'closed') {
-        const { opens, closes, allDay } = refusal.window;
+    if (refusal.reason === 'closed') return 'Too much time has passed from this event. You will need to submit a point request.';
+    if (refusal.reason === 'not-open') {
+        const { opens, allDay } = refusal.window;
         const day = opens.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-        if (allDay) return `This code only works on the day of its event, ${day}.`;
-        return refusal.reason === 'not-open'
-            ? `Check-in for this event opens at ${clockLabel(opens)} on ${day}.`
-            : `Check-in for this event closed at ${clockLabel(closes)}. It stays open for 3 hours from the start time.`;
+        return allDay ? `This code opens on ${day}.` : `Check-in for this event opens at ${clockLabel(opens)} on ${day}.`;
     }
     return refusalMessages[refusal.reason];
 }
@@ -130,7 +128,6 @@ function EventCodeForm({ member, attendances, codes, pendingPicks }: EventCodeFo
                     value={code}
                     onChange={handleCodeChange}
                     placeholder="Enter the code"
-                    aria-describedby="event-code-hint"
                     autoComplete="off"
                     autoCapitalize="characters"
                     spellCheck={false}
@@ -157,7 +154,6 @@ function EventCodeForm({ member, attendances, codes, pendingPicks }: EventCodeFo
                     )}
                 </div>
             )}
-            <p id="event-code-hint" className="ov-code__hint">Codes work for 3 hours from the event's start time.</p>
             {/* role=status, always present: screen readers announce the result without the user hunting for it. */}
             <p className={`ov-code__msg${message?.ok ? ' is-ok' : ''}`} role="status">{message?.text}</p>
         </form>
