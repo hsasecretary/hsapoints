@@ -1382,10 +1382,15 @@
 .event-codes-page .code-week h3 { margin: 16px 0 4px; text-align: left; font-size: var(--hsa-text-xs); font-weight: 600; color: var(--hsa-muted); }
 .event-codes-page .code-week ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--hsa-border); }
 
+/* The rows lay out by the list's own width, not the window's: with the
+   filter sidebar beside it, a mid-size window leaves the list narrow. */
+.event-codes-page .code-list { container: code-list / inline-size; }
 .event-codes-page .code-row { border-bottom: 1px solid var(--hsa-border-light); background: var(--hsa-surface); }
+/* Date, code, event name, Event Type, count. Only the name stretches; the
+   type chip shortens with an ellipsis rather than run into it. */
 .event-codes-page .code-row__main {
     display: grid;
-    grid-template-columns: 150px 140px minmax(0, 1fr) 190px 96px;
+    grid-template-columns: 110px 130px minmax(0, 1fr) minmax(0, 170px) 80px;
     gap: 12px;
     align-items: center;
     width: 100%;
@@ -1402,18 +1407,22 @@
 .event-codes-page .code-row__main:hover { background: var(--hsa-surface-subtle); border: none; box-shadow: none; }
 .event-codes-page .code-row.is-open .code-row__main { background: var(--hsa-teal-100); }
 .event-codes-page .code-row__date { color: var(--hsa-muted); }
-.event-codes-page .code-row__time { font-size: inherit; }
+/* A timed code's start time, on its own line under the date. */
+.event-codes-page .code-row__time { display: block; font-size: inherit; }
 .event-codes-page .code-row__code { overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: var(--hsa-teal-700); }
 .event-codes-page .code-row__count { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .event-codes-page .code-row__count small { color: var(--hsa-muted); }
 
 .event-codes-page .tier-chip {
     justify-self: start;
+    max-width: 100%;
     padding: 2px 8px;
     border-radius: 999px;
     font-size: var(--hsa-text-xs);
     font-weight: 600;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .event-codes-page .tier-chip--core { background: var(--hsa-teal-700); color: #fff; border: 1.5px solid var(--hsa-teal-700); }
 .event-codes-page .tier-chip--semester { background: var(--hsa-surface); color: var(--hsa-teal-700); border: 1.5px solid var(--hsa-teal-400); }
@@ -1495,6 +1504,14 @@
     .event-codes-page .code-facets-toggle { display: inline-block; justify-self: start; }
     .event-codes-page .code-facets { display: none; position: static; }
     .event-codes-page .code-facets.is-open { display: flex; }
+    .event-codes-page .code-edit__fields :is(label, .date-picker),
+    .event-codes-page .code-edit__fields :is(input, select) { width: 100%; }
+    .event-codes-page .code-edit__fields :is(label, .date-picker) { flex: 1 1 100%; }
+}
+
+/* A narrow list (a phone, or a mid-size window beside the filters): each
+   row stacks into code and count, then the event name, then date and type. */
+@container code-list (max-width: 660px) {
     .event-codes-page .code-row__main {
         grid-template-columns: minmax(0, 1fr) auto;
         grid-template-areas: "code count" "event event" "date type";
@@ -1505,11 +1522,10 @@
     .event-codes-page .code-row__count { grid-area: count; }
     .event-codes-page .code-row__event { grid-area: event; }
     .event-codes-page .code-row__date { grid-area: date; }
+    .event-codes-page .code-row__time { display: inline; }
+    .event-codes-page .code-row__time::before { content: ' · '; }
     .event-codes-page .code-row .tier-chip { grid-area: type; justify-self: end; }
     .event-codes-page .code-row__detail { padding-left: 8px; }
-    .event-codes-page .code-edit__fields :is(label, .date-picker),
-    .event-codes-page .code-edit__fields :is(input, select) { width: 100%; }
-    .event-codes-page .code-edit__fields :is(label, .date-picker) { flex: 1 1 100%; }
 }
 
 /* Date picker (DatePicker.tsx, React Aria; see

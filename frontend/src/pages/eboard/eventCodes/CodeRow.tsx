@@ -32,7 +32,7 @@ function CodeRow({ code, today, open, onToggle }: CodeRowProps) {
             <button type="button" className="code-row__main" onClick={onToggle} aria-expanded={open} aria-controls={detailId}>
                 <span className="code-row__date">
                     {formatDate(code.eventDate)}
-                    {isStartHour(code.startHour) && <small className="code-row__time"> · {startHourLabel(code.startHour)}</small>}
+                    {isStartHour(code.startHour) && <small className="code-row__time">{startHourLabel(code.startHour)}</small>}
                 </span>
                 <span className="code-row__code">{code.id}</span>
                 <span className="code-row__event">{code.event}</span>
