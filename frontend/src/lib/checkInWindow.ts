@@ -9,11 +9,11 @@ import { fromIsoDate } from './semester';
 export const CHECK_IN_HOURS = 3;
 
 /**
- * The start times E-Board picks from: 6 AM to 12 AM, on the hour. A start
- * time is stored as the hour of the event date, so 12 AM is 24: the
- * midnight that ends the event date, not the one that starts it.
+ * The start times E-Board picks from: 6 AM to 10 PM, on the hour, stored as
+ * the hour of the event date (19 is 7 PM). A 10 PM code's window runs to
+ * 1 AM the next day.
  */
-export const START_HOURS: readonly number[] = Array.from({ length: 19 }, (_, i) => i + 6);
+export const START_HOURS: readonly number[] = Array.from({ length: 17 }, (_, i) => i + 6);
 
 export type CheckInWindow = {
     opens: Date;
@@ -25,7 +25,7 @@ export type CheckInWindow = {
 /** The code's fields this needs; `startHour` is missing on all-day codes. */
 export type Timed = { eventDate: string; startHour?: number | null };
 
-/** '6 AM', '12 PM', '11 PM', '12 AM'. */
+/** '6 AM', '12 PM', '10 PM'; past midnight, '12 AM' or '1 AM'. */
 export function startHourLabel(hour: number): string {
     const suffix = hour < 12 || hour === 24 ? 'AM' : 'PM';
     return `${hour % 12 || 12} ${suffix}`;

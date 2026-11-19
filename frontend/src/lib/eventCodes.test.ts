@@ -28,6 +28,7 @@ describe('preparing a new event code', () => {
     it.each([
         ['no name', { event: '  ' }, 'Give the event a name.'],
         ['a start time not in the list', { startHour: '3' }, 'Pick a start time from the list.'],
+        ['a start time after 10 PM', { startHour: '23' }, 'Pick a start time from the list.'],
         ['no code', { code: ' ' }, 'Give it a code.'],
         ['a code with spaces or symbols', { code: 'GBM 3!' }, 'Codes can only use letters and numbers.'],
         ['no date', { eventDate: '' }, 'Pick the event date.'],

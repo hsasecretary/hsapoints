@@ -24,7 +24,7 @@ function UpcomingEvents({ events }: { events: UpcomingEvent[] }) {
                                         </time>
                                         <span className="ov-upcoming__name">
                                             {event.title}
-                                            <small>{event.dayName} · {event.typeLabel}</small>
+                                            <small>{event.dayName}{event.time && ` – ${event.time}`} · {event.typeLabel}</small>
                                         </span>
                                     </li>
                                 );

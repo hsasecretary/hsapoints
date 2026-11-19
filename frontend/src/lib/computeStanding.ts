@@ -76,6 +76,8 @@ export type Code = {
     eventTypeId?: string;
     /** 'YYYY-MM-DD'. */
     eventDate: string;
+    /** When check-in opens (lib/checkInWindow.ts); missing for an all-day code. */
+    startHour?: number;
     event?: string;
 };
 

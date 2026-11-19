@@ -3,6 +3,7 @@
 // no extra Firestore reads. An event is its code: title, date and Event Type
 // all come from codes/{CODE}. The code itself never makes it into an
 // UpcomingEvent, since it's what Members type to check in.
+import { isStartHour, startHourLabel } from './checkInWindow';
 import type { Code } from './computeStanding';
 import { eventType } from './rubric';
 import { addDays, fromIsoDate } from './semester';
@@ -20,6 +21,8 @@ export type UpcomingEvent = {
     eventDate: string;
     /** "Today", "Tomorrow" or the weekday. */
     dayName: string;
+    /** The start time, e.g. "7 PM"; null for an all-day code. */
+    time: string | null;
     /** The Event Type's label, e.g. "GBM". */
     typeLabel: string;
 };
@@ -45,9 +48,16 @@ export function upcomingEvents(codes: Code[], { today, cabinetView }: { today: s
             const type = code.eventTypeId ? eventType(code.eventTypeId) : undefined;
             if (!type || !code.eventDate || code.eventDate < today || code.eventDate > last) return [];
             if (type.cabinetOnly && !cabinetView) return [];
-            return [{ title: code.event?.trim() || type.label, eventDate: code.eventDate, typeLabel: type.label }];
+            const startHour = isStartHour(code.startHour) ? code.startHour : null;
+            return [{ title: code.event?.trim() || type.label, eventDate: code.eventDate, startHour, typeLabel: type.label }];
         })
-        .sort((a, b) => a.eventDate.localeCompare(b.eventDate) || a.title.localeCompare(b.title))
+        // A day's all-day events first, then by start time.
+        .sort((a, b) => a.eventDate.localeCompare(b.eventDate) || (a.startHour ?? 0) - (b.startHour ?? 0) || a.title.localeCompare(b.title))
         .slice(0, UPCOMING_LIMIT)
-        .map((event, i) => ({ key: `${event.eventDate}-${i}`, ...event, dayName: dayName(event.eventDate, today) }));
+        .map(({ startHour, ...event }, i) => ({
+            key: `${event.eventDate}-${i}`,
+            ...event,
+            dayName: dayName(event.eventDate, today),
+            time: startHour === null ? null : startHourLabel(startHour),
+        }));
 }
