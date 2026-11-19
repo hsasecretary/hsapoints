@@ -91,7 +91,7 @@ function ExcuseAbsence() {
     if (tab === 'requests') {
         return (
             <div className="eap">
-                <h2 className="eap-title">Excuse Absence</h2>
+                <h2 className="eap-title">Excuse Absence Review</h2>
                 {tabs}
                 <ExcuseInbox requests={inbox.requests} loading={inbox.loading} error={inbox.error} nameOf={nameOf} />
             </div>
@@ -100,7 +100,7 @@ function ExcuseAbsence() {
 
     return (
         <div className="eap">
-            <h2 className="eap-title">Excuse Absence</h2>
+            <h2 className="eap-title">Excuse Absence Review</h2>
             {tabs}
             {roster.error && <p className="eap-error" role="alert">{roster.error}</p>}
             {roster.loading && <p className="eap-empty">Loading members…</p>}

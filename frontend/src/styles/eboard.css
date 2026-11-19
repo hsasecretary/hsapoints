@@ -1302,6 +1302,7 @@
 .event-codes-page .quick-add__code { flex: 0 1 140px; font-weight: 700; letter-spacing: .04em; }
 .event-codes-page .quick-add__date { flex: 0 1 160px; }
 .event-codes-page .quick-add .event-type-select { flex: 1 1 240px; }
+.event-codes-page .quick-add .start-time-select { flex: 0 1 130px; }
 .event-codes-page .quick-add__submit {
     padding: 10px 18px;
     border: none;
@@ -1384,7 +1385,7 @@
 .event-codes-page .code-row { border-bottom: 1px solid var(--hsa-border-light); background: var(--hsa-surface); }
 .event-codes-page .code-row__main {
     display: grid;
-    grid-template-columns: 110px 140px minmax(0, 1fr) 190px 96px;
+    grid-template-columns: 150px 140px minmax(0, 1fr) 190px 96px;
     gap: 12px;
     align-items: center;
     width: 100%;
@@ -1401,6 +1402,7 @@
 .event-codes-page .code-row__main:hover { background: var(--hsa-surface-subtle); border: none; box-shadow: none; }
 .event-codes-page .code-row.is-open .code-row__main { background: var(--hsa-teal-100); }
 .event-codes-page .code-row__date { color: var(--hsa-muted); }
+.event-codes-page .code-row__time { font-size: inherit; }
 .event-codes-page .code-row__code { overflow: hidden; text-overflow: ellipsis; font-weight: 700; color: var(--hsa-teal-700); }
 .event-codes-page .code-row__count { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .event-codes-page .code-row__count small { color: var(--hsa-muted); }

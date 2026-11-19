@@ -5,6 +5,6 @@ export const EBOARD_TOOLS = [
     { path: 'event-codes', label: 'Event Codes' },
     { path: 'point-requests', label: 'Point Request Review' },
     { path: 'user-lookup', label: 'User Lookup' },
-    { path: 'excuse-absence', label: 'Excuse Absence' },
+    { path: 'excuse-absence', label: 'Excuse Absence Review' },
     { path: 'approvals', label: 'E-Board Member Approval' },
 ] as const;

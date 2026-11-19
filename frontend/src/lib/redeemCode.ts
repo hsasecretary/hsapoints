@@ -3,19 +3,23 @@
 // removing one, a Removed Check-in (see CONTEXT.md). Takes the
 // Firestore instance so tests can run it against the emulator.
 import { doc, increment, runTransaction, type Firestore, type Transaction } from 'firebase/firestore';
+import { checkInState, checkInWindow, type CheckInWindow } from './checkInWindow';
 import type { Code } from './computeStanding';
 import { isHeldToCabinetRules } from './members';
 import { eventType } from './rubric';
 
-type Refusal = { ok: false; reason: 'not-found' | 'already-redeemed' | 'removed' | 'not-active' | 'cabinet-only' };
+type Refusal =
+    | { ok: false; reason: 'not-found' | 'already-redeemed' | 'removed' | 'cabinet-only' }
+    /** Outside the code's check-in window (lib/checkInWindow.ts), which says when it opens or closed. */
+    | { ok: false; reason: 'not-open' | 'closed'; window: CheckInWindow };
 
 export type RedeemResult = { ok: true } | Refusal;
 
 export type LookupResult = { ok: true; code: Code } | Refusal;
 
 export type RedeemOptions = {
-    /** Local date as 'YYYY-MM-DD'; a code only works on its eventDate. */
-    today: string;
+    /** The device's clock: a code only works inside its check-in window. */
+    now: Date;
     /** E-Board or a Web-team Tester previewing the Cabinet Member view. */
     viewingAsCabinet?: boolean;
 };
@@ -34,11 +38,11 @@ function refs(db: Firestore, email: string, typedCode: string) {
     };
 }
 
-/** The code, if the Member may redeem it today; else why not. Reads only. */
+/** The code, if the Member may redeem it now; else why not. Reads only. */
 async function checkRedeemable(
     tx: Transaction,
     { codeId, codeRef, attendanceRef, userRef }: ReturnType<typeof refs>,
-    { today, viewingAsCabinet = false }: RedeemOptions,
+    { now, viewingAsCabinet = false }: RedeemOptions,
 ): Promise<LookupResult> {
     const code = (await tx.get(codeRef)).data();
     if (!code) return { ok: false, reason: 'not-found' };
@@ -53,7 +57,9 @@ async function checkRedeemable(
     const hasAttendance = Boolean(code.eventTypeId) && (await tx.get(attendanceRef)).exists();
     if (redeemedBeforeLedger || hasAttendance) return { ok: false, reason: 'already-redeemed' };
     if (member.removedCheckIns?.[codeId]) return { ok: false, reason: 'removed' };
-    if (code.eventDate !== today) return { ok: false, reason: 'not-active' };
+    const timed = { eventDate: code.eventDate, startHour: code.startHour };
+    const state = checkInState(timed, now);
+    if (state !== 'open') return { ok: false, reason: state, window: checkInWindow(timed) };
     if (eventType(code.eventTypeId)?.cabinetOnly && !viewingAsCabinet && !isHeldToCabinetRules(member)) {
         return { ok: false, reason: 'cabinet-only' };
     }

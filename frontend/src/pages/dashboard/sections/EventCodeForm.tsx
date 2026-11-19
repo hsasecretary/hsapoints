@@ -3,17 +3,30 @@ import { auth, db } from '../../../lib/firebase';
 import { checkInChoice, checkInOutcome, type CheckInChoice } from '../../../lib/checkIn';
 import type { Attendance, Code, Member } from '../../../lib/computeStanding';
 import { requirementWaitsNotice } from '../../../lib/pointRequests';
+import { clockLabel } from '../../../lib/checkInWindow';
 import { lookupCode, redeemCode, type RedeemResult } from '../../../lib/redeemCode';
 import { eventType } from '../../../lib/rubric';
 import { shortDate, toIsoDate } from '../../../lib/semester';
 
-const refusalMessages: Record<Extract<RedeemResult, { ok: false }>['reason'], string> = {
+const refusalMessages = {
     'not-found': 'No event has that code. Check the spelling with whoever is running the event.',
     'already-redeemed': 'You already checked in with this code.',
     'removed': 'E-Board removed your check-in for this code. See Points & events for why.',
-    'not-active': 'This code only works on the day of its event.',
     'cabinet-only': 'This code is for Cabinet Members only.',
 };
+
+/** Why the code was turned away; outside its window, when it opens or when it closed. */
+function refusalMessage(refusal: Extract<RedeemResult, { ok: false }>): string {
+    if (refusal.reason === 'not-open' || refusal.reason === 'closed') {
+        const { opens, closes, allDay } = refusal.window;
+        const day = opens.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+        if (allDay) return `This code only works on the day of its event, ${day}.`;
+        return refusal.reason === 'not-open'
+            ? `Check-in for this event opens at ${clockLabel(opens)} on ${day}.`
+            : `Check-in for this event closed at ${clockLabel(closes)}. It stays open for 3 hours from the start time.`;
+    }
+    return refusalMessages[refusal.reason];
+}
 
 type EventCodeFormProps = {
     /** Null while the Member's standing loads: checking in is then one step. */
@@ -47,10 +60,10 @@ function EventCodeForm({ member, attendances, codes, pendingPicks }: EventCodeFo
         const email = auth.currentUser.email;
         // Worked out before it's written: afterwards the dashboard's listener already has it.
         const outcome = found && member ? checkInOutcome(member, attendances, codes, found, makeupFor, { email, today }) : null;
-        const result = await redeemCode(db, email, found?.id ?? code, { today, makeupFor });
+        const result = await redeemCode(db, email, found?.id ?? code, { now: new Date(), makeupFor });
         // `=== false`: with strict off, TS won't narrow on `!result.ok`.
         if (result.ok === false) {
-            setMessage({ text: refusalMessages[result.reason], ok: false });
+            setMessage({ text: refusalMessage(result), ok: false });
             return;
         }
         setCode('');
@@ -85,9 +98,9 @@ function EventCodeForm({ member, attendances, codes, pendingPicks }: EventCodeFo
                 return;
             }
             const email = auth.currentUser.email;
-            const found = await lookupCode(db, email, code, { today });
+            const found = await lookupCode(db, email, code, { now: new Date() });
             if (found.ok === false) {
-                setMessage({ text: refusalMessages[found.reason], ok: false });
+                setMessage({ text: refusalMessage(found), ok: false });
                 return;
             }
             const choice = member ? checkInChoice(member, attendances, codes, found.code, pendingPicks, { email, today }) : null;
@@ -144,7 +157,7 @@ function EventCodeForm({ member, attendances, codes, pendingPicks }: EventCodeFo
                     )}
                 </div>
             )}
-            <p id="event-code-hint" className="ov-code__hint">Codes work only on the day of the event.</p>
+            <p id="event-code-hint" className="ov-code__hint">Codes work for 3 hours from the event's start time.</p>
             {/* role=status, always present: screen readers announce the result without the user hunting for it. */}
             <p className={`ov-code__msg${message?.ok ? ' is-ok' : ''}`} role="status">{message?.text}</p>
         </form>

@@ -6,6 +6,8 @@ import { EBOARD, MEMBER, memberDoc, readPastRules, seed, signedInAs, startEmulat
 import { lookupCode, redeemCode, removeCheckIn } from './redeemCode';
 
 const TODAY = '2026-09-25';
+// Midday on TODAY: inside an all-day code's window.
+const NOW = new Date(2026, 8, 25, 12);
 
 let env: RulesTestEnvironment;
 
@@ -31,7 +33,7 @@ beforeEach(async () => {
 
 describe('redeeming an event code', () => {
     it("records today's code as the Member's Attendance", async () => {
-        const result = await redeemCode(signedInAs(env, MEMBER), MEMBER, 'gbm1', { today: TODAY });
+        const result = await redeemCode(signedInAs(env, MEMBER), MEMBER, 'gbm1', { now: NOW });
 
         expect(result).toEqual({ ok: true });
         expect(await readPastRules(env, `attendances/${MEMBER}__GBM1`)).toEqual({
@@ -46,21 +48,21 @@ describe('redeeming an event code', () => {
     it('files the Attendance under the lowercase email the Member doc is keyed by', async () => {
         const mixedCase = 'Ana@UFL.edu';
 
-        expect(await redeemCode(signedInAs(env, mixedCase), mixedCase, 'GBM1', { today: TODAY })).toEqual({ ok: true });
+        expect(await redeemCode(signedInAs(env, mixedCase), mixedCase, 'GBM1', { now: NOW })).toEqual({ ok: true });
         expect(await readPastRules(env, `attendances/${MEMBER}__GBM1`)).toMatchObject({ email: MEMBER });
     });
 
     it('says a code already redeemed is already redeemed', async () => {
         const db = signedInAs(env, MEMBER);
-        await redeemCode(db, MEMBER, 'GBM1', { today: TODAY });
+        await redeemCode(db, MEMBER, 'GBM1', { now: NOW });
 
-        expect(await redeemCode(db, MEMBER, ' gbm1 ', { today: TODAY })).toEqual({ ok: false, reason: 'already-redeemed' });
+        expect(await redeemCode(db, MEMBER, ' gbm1 ', { now: NOW })).toEqual({ ok: false, reason: 'already-redeemed' });
     });
 
     it("bumps the code's check-in count once, however often it's redeemed, and leaves the old point counters alone", async () => {
         const db = signedInAs(env, MEMBER);
-        await redeemCode(db, MEMBER, 'GBM1', { today: TODAY });
-        await redeemCode(db, MEMBER, 'GBM1', { today: TODAY });
+        await redeemCode(db, MEMBER, 'GBM1', { now: NOW });
+        await redeemCode(db, MEMBER, 'GBM1', { now: NOW });
 
         expect((await readPastRules(env, 'codes/GBM1'))?.attendeeCount).toBe(1);
         expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ eventCodes: [], fallPoints: 0, gbmPointsVE: 0 });
@@ -69,7 +71,7 @@ describe('redeeming an event code', () => {
     it('says a code redeemed before the Attendance ledger existed is already redeemed', async () => {
         await seed(env, { [`users/${MEMBER}`]: memberDoc(MEMBER, { eventCodes: ['GBM1'], fallPoints: 2, gbmPointsVE: 2 }) });
 
-        const result = await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM1', { today: TODAY });
+        const result = await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM1', { now: NOW });
 
         expect(result).toEqual({ ok: false, reason: 'already-redeemed' });
         expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ fallPoints: 2, gbmPointsVE: 2 });
@@ -81,29 +83,45 @@ describe('redeeming an event code', () => {
         });
         const db = signedInAs(env, MEMBER);
 
-        expect(await redeemCode(db, MEMBER, 'OLD1', { today: TODAY })).toEqual({ ok: true });
+        expect(await redeemCode(db, MEMBER, 'OLD1', { now: NOW })).toEqual({ ok: true });
         expect(await readPastRules(env, `attendances/${MEMBER}__OLD1`)).toBeUndefined();
         expect(await readPastRules(env, `users/${MEMBER}`)).toMatchObject({ eventCodes: [], fallPoints: 0, gbmPointsNVE: 0 });
     });
 
     it('keeps the Missed Event the Member picked for it to make up', async () => {
-        const result = await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM1', { today: TODAY, makeupFor: 'ret1' });
+        const result = await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM1', { now: NOW, makeupFor: 'ret1' });
 
         expect(result).toEqual({ ok: true });
         expect(await readPastRules(env, `attendances/${MEMBER}__GBM1`)).toMatchObject({ codeId: 'GBM1', makeupFor: 'RET1' });
     });
 
     it("turns away a code that doesn't exist", async () => {
-        expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'NOPE', { today: TODAY }))
+        expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'NOPE', { now: NOW }))
             .toEqual({ ok: false, reason: 'not-found' });
     });
 
-    it("turns away a code on any day but its event's", async () => {
+    it("turns away an all-day code on any day but its event's", async () => {
         const db = signedInAs(env, MEMBER);
 
-        expect(await redeemCode(db, MEMBER, 'GBM1', { today: '2026-09-26' })).toEqual({ ok: false, reason: 'not-active' });
+        expect(await redeemCode(db, MEMBER, 'GBM1', { now: new Date(2026, 8, 26, 0, 5) }))
+            .toMatchObject({ ok: false, reason: 'closed' });
+        expect(await redeemCode(db, MEMBER, 'GBM1', { now: new Date(2026, 8, 24, 23, 55) }))
+            .toMatchObject({ ok: false, reason: 'not-open' });
         expect(await readPastRules(env, `attendances/${MEMBER}__GBM1`)).toBeUndefined();
         expect((await readPastRules(env, 'codes/GBM1'))?.attendeeCount).toBe(0);
+    });
+
+    it('takes a code with a start time only from then until three hours later', async () => {
+        await seed(env, { 'codes/GBM7': { event: 'GBM 7', eventTypeId: 'gbm', eventDate: TODAY, startHour: 19, attendeeCount: 0 } });
+        const db = signedInAs(env, MEMBER);
+
+        expect(await redeemCode(db, MEMBER, 'GBM7', { now: new Date(2026, 8, 25, 18, 59) }))
+            .toEqual({ ok: false, reason: 'not-open', window: { opens: new Date(2026, 8, 25, 19), closes: new Date(2026, 8, 25, 22), allDay: false } });
+        expect(await redeemCode(db, MEMBER, 'GBM7', { now: new Date(2026, 8, 25, 22) })).toMatchObject({ ok: false, reason: 'closed' });
+        expect(await readPastRules(env, `attendances/${MEMBER}__GBM7`)).toBeUndefined();
+
+        expect(await redeemCode(db, MEMBER, 'GBM7', { now: new Date(2026, 8, 25, 21, 59) })).toEqual({ ok: true });
+        expect(await readPastRules(env, `attendances/${MEMBER}__GBM7`)).toMatchObject({ eventDate: TODAY, codeId: 'GBM7' });
     });
 
     describe('a Cabinet-only code', () => {
@@ -112,7 +130,7 @@ describe('redeeming an event code', () => {
         });
 
         it('turns away a General Member', async () => {
-            const result = await redeemCode(signedInAs(env, MEMBER), MEMBER, 'CT1', { today: TODAY });
+            const result = await redeemCode(signedInAs(env, MEMBER), MEMBER, 'CT1', { now: NOW });
 
             expect(result).toEqual({ ok: false, reason: 'cabinet-only' });
             expect(await readPastRules(env, `attendances/${MEMBER}__CT1`)).toBeUndefined();
@@ -126,7 +144,7 @@ describe('redeeming an event code', () => {
         ])('lets in %s', async (_who, facts) => {
             await seed(env, { [`users/${MEMBER}`]: memberDoc(MEMBER, facts) });
 
-            expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'CT1', { today: TODAY })).toEqual({ ok: true });
+            expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'CT1', { now: NOW })).toEqual({ ok: true });
         });
 
         it.each([
@@ -136,14 +154,14 @@ describe('redeeming an event code', () => {
         ])('turns away %s', async (_who, facts) => {
             await seed(env, { [`users/${MEMBER}`]: memberDoc(MEMBER, facts) });
 
-            expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'CT1', { today: TODAY }))
+            expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'CT1', { now: NOW }))
                 .toEqual({ ok: false, reason: 'cabinet-only' });
         });
 
         it('lets in E-Board viewing as Cabinet Member', async () => {
             await seed(env, { [`users/${MEMBER}`]: memberDoc(MEMBER, { eboard: true }) });
 
-            expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'CT1', { today: TODAY, viewingAsCabinet: true }))
+            expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'CT1', { now: NOW, viewingAsCabinet: true }))
                 .toEqual({ ok: true });
         });
     });
@@ -151,7 +169,7 @@ describe('redeeming an event code', () => {
 
 describe('looking a code up before asking for a Make-up pick', () => {
     it("gives back today's code without writing anything", async () => {
-        const result = await lookupCode(signedInAs(env, MEMBER), MEMBER, ' gbm1 ', { today: TODAY });
+        const result = await lookupCode(signedInAs(env, MEMBER), MEMBER, ' gbm1 ', { now: NOW });
 
         expect(result).toEqual({ ok: true, code: { id: 'GBM1', eventTypeId: 'gbm', eventDate: TODAY, event: 'GBM 1' } });
         expect(await readPastRules(env, `attendances/${MEMBER}__GBM1`)).toBeUndefined();
@@ -160,10 +178,10 @@ describe('looking a code up before asking for a Make-up pick', () => {
 
     it('refuses a code just as redeeming it would', async () => {
         const db = signedInAs(env, MEMBER);
-        expect(await lookupCode(db, MEMBER, 'NOPE', { today: TODAY })).toEqual({ ok: false, reason: 'not-found' });
-        expect(await lookupCode(db, MEMBER, 'GBM1', { today: '2026-09-26' })).toEqual({ ok: false, reason: 'not-active' });
-        await redeemCode(db, MEMBER, 'GBM1', { today: TODAY });
-        expect(await lookupCode(db, MEMBER, 'GBM1', { today: TODAY })).toEqual({ ok: false, reason: 'already-redeemed' });
+        expect(await lookupCode(db, MEMBER, 'NOPE', { now: NOW })).toEqual({ ok: false, reason: 'not-found' });
+        expect(await lookupCode(db, MEMBER, 'GBM1', { now: new Date(2026, 8, 26, 12) })).toMatchObject({ ok: false, reason: 'closed' });
+        await redeemCode(db, MEMBER, 'GBM1', { now: NOW });
+        expect(await lookupCode(db, MEMBER, 'GBM1', { now: NOW })).toEqual({ ok: false, reason: 'already-redeemed' });
     });
 });
 
@@ -172,7 +190,7 @@ describe('E-Board removing a check-in', () => {
 
     beforeEach(async () => {
         await seed(env, { [`users/${EBOARD}`]: memberDoc(EBOARD, { eboard: true }) });
-        await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM1', { today: TODAY });
+        await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM1', { now: NOW });
     });
 
     it('deletes the Attendance, un-counts it and records why, who and when', async () => {
@@ -194,7 +212,7 @@ describe('E-Board removing a check-in', () => {
     it("won't let the Member check in with that code again", async () => {
         await removeCheckIn(signedInAs(env, EBOARD), `${MEMBER}__GBM1`, notThere);
 
-        expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM1', { today: TODAY })).toEqual({ ok: false, reason: 'removed' });
+        expect(await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM1', { now: NOW })).toEqual({ ok: false, reason: 'removed' });
         expect(await readPastRules(env, `attendances/${MEMBER}__GBM1`)).toBeUndefined();
     });
 

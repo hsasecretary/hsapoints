@@ -56,7 +56,7 @@ describe('entering an event with a code', () => {
         expect((await readPastRules(env, 'codes/GBM1'))?.attendeeCount).toBe(4);
 
         await seed(env, { 'codes/GBM2': { event: 'GBM 2', eventTypeId: 'gbm', eventDate: TODAY, attendeeCount: 0 } });
-        await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM2', { today: TODAY });
+        await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM2', { now: new Date(2026, 8, 25, 12) });
         expect(await enter({ codeId: 'GBM2' })).toMatchObject({ ok: false });
         expect((await readPastRules(env, 'codes/GBM2'))?.attendeeCount).toBe(1);
     });
