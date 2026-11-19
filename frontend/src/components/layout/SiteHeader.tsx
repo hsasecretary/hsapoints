@@ -153,11 +153,11 @@ function EboardToolLinks({ pending }: { pending: number }) {
     return (
         <ul>
             {EBOARD_TOOLS.map((tool) => {
-                // Excuse Absence opens on its request inbox when something is waiting.
+                // Excused Absence Requests shows how many are waiting.
                 const inbox = tool.path === 'excuse-absence' && pending > 0;
                 return (
                     <li key={tool.path}>
-                        <NavLink to={`/eboard/${tool.path}${inbox ? '?tab=requests' : ''}`} className="site-header__panel-link">
+                        <NavLink to={`/eboard/${tool.path}`} className="site-header__panel-link">
                             {tool.label}
                             {inbox && <Count pending={pending} />}
                         </NavLink>

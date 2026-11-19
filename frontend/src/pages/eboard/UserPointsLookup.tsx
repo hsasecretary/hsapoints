@@ -1,4 +1,4 @@
-// User Lookup (#37): one Member's standing for this school year, every point
+// User Lookup (#37), two sections. Status & Points: one Member's standing for this school year, every point
 // behind it and where it came from, and their Point Requests with who
 // reviewed them. One scrolling page (docs/research/user-lookup-eboard-ux.md);
 // numbers come from computeStanding through lib/memberLookup.ts, so they
@@ -6,8 +6,11 @@
 // attended, and take one away (a code check-in, an event E-Board entered, or
 // an approved request, revoked) from its row's Remove button; Strikes are changed on Excuse Absence and
 // pending requests reviewed on Point Request Review, each linked from here.
+// Missed Events and Strikes (StrikesLookup, moved here from Excuse Absence):
+// the At-risk list and one Member's Core Events, where Strikes are excused,
+// removed or closed. Each section has its own search and its own Member.
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
 import { removeEnteredAttendance } from '../../lib/enterAttendance';
 import { auth, db } from '../../lib/firebase';
@@ -24,6 +27,7 @@ import { shortDate } from '../../lib/semester';
 import MemberSearch from '../../components/members/MemberSearch';
 import { useMemberStanding } from '../dashboard/useMemberStanding';
 import AddEventPanel from './AddEventPanel';
+import StrikesLookup, { STRIKES_PARAM, STRIKES_SECTION_ID } from './excuseAbsence/StrikesLookup';
 import RevokeForm from './pointRequests/RevokeForm';
 
 type LookupMember = Parameters<typeof roleLine>[0] & {
@@ -72,18 +76,38 @@ function UserPointsLookup() {
     }, []);
 
     const picked = members?.find((member) => member.email === email) ?? null;
+    // Picking here keeps the Member open below in Missed Events and Strikes.
+    const pick = (member: LookupMember) => setParams((current) => {
+        const updated = new URLSearchParams(current);
+        updated.set('member', member.email);
+        return updated;
+    });
+
+    // A link to #missed-strikes (from Status & Points, or an old Excuse Absence link) lands on that section.
+    const { hash } = useLocation();
+    useEffect(() => {
+        if (hash === `#${STRIKES_SECTION_ID}`) document.getElementById(STRIKES_SECTION_ID)?.scrollIntoView();
+    }, [hash, params]);
 
     return (
         <div className="ulk">
             <h2 className="ulk-title">User Lookup</h2>
-            {membersError && <p className="ulk-error" role="alert">{membersError}</p>}
-            {!members && !membersError && <p className="ulk-muted">Loading members…</p>}
-            <MemberSearch<LookupMember> members={members ?? []} disabled={!members} detail={roleLine}
-                onPick={(member) => setParams({ member: member.email })} />
 
-            {!email && members && <p className="ulk-muted">Find a member by name to see their points and Point Requests.</p>}
-            {email && members && !picked && <p className="ulk-error" role="alert">No account found for {email}.</p>}
-            {picked && <MemberDetail key={picked.email} member={picked} />}
+            <section className="ulk-section" aria-labelledby="ulk-points-heading">
+                <h3 id="ulk-points-heading" className="ulk-section__title">Status &amp; Points</h3>
+                {membersError && <p className="ulk-error" role="alert">{membersError}</p>}
+                {!members && !membersError && <p className="ulk-muted">Loading members…</p>}
+                <MemberSearch<LookupMember> members={members ?? []} disabled={!members} detail={roleLine} onPick={pick} />
+
+                {!email && members && <p className="ulk-muted">Find a member by name to see their points and Point Requests.</p>}
+                {email && members && !picked && <p className="ulk-error" role="alert">No account found for {email}.</p>}
+                {picked && <MemberDetail key={picked.email} member={picked} />}
+            </section>
+
+            <section id={STRIKES_SECTION_ID} className="ulk-section" aria-labelledby="ulk-strikes-heading">
+                <h3 id="ulk-strikes-heading" className="ulk-section__title">Missed Events and Strikes</h3>
+                <StrikesLookup />
+            </section>
         </div>
     );
 }
@@ -183,6 +207,17 @@ function CabinetDetail({ email, standing, codes, attendances, summary }: {
     summary: LookupSummary;
 }) {
     const missed = missedEventRows(standing, codes, attendances);
+    // Opens this Member in Missed Events and Strikes below and jumps to it.
+    const [, setParams] = useSearchParams();
+    const openInStrikes = (event: React.MouseEvent) => {
+        event.preventDefault();
+        setParams((current) => {
+            const updated = new URLSearchParams(current);
+            updated.set(STRIKES_PARAM, email);
+            return updated;
+        });
+        document.getElementById(STRIKES_SECTION_ID)?.scrollIntoView({ behavior: 'smooth' });
+    };
     const unmet = (['fall', 'spring'] as const).map((semester) => ({
         semester,
         rows: standing.semesterRequirements[semester].filter((req) => !req.met),
@@ -196,7 +231,7 @@ function CabinetDetail({ email, standing, codes, attendances, summary }: {
                 </span>
             </summary>
             <p className="ulk-panel__link">
-                <Link to={`/eboard/excuse-absence?member=${encodeURIComponent(email)}`}>Open in Excuse Absence</Link> to excuse, remove a Strike or close a Missed Event.
+                <a href={`#${STRIKES_SECTION_ID}`} onClick={openInStrikes}>Open in Missed Events and Strikes</a> to excuse, remove a Strike or close a Missed Event.
             </p>
             {missed.length === 0 ? <p className="ulk-muted">No Missed Events this year.</p> : (
                 <ul className="ulk-list">
@@ -362,7 +397,7 @@ function removalText(effect: RemovalEffect, cabinet: boolean, removal: 'check-in
     const lines = [`Takes away ${plural(effect.vePoints, 'VE Point')}${cabinet ? ` and ${plural(effect.cabinetPoints, 'Cabinet Point')}` : ''}.`];
     if (effect.missed.length) lines.push(`${effect.missed.join(', ')} becomes a Missed Event.`);
     if (effect.owedAgain.length) lines.push(`It made up ${effect.owedAgain.join(', ')}, which is owed again.`);
-    if (effect.strikes > 0) lines.push(`Adds ${plural(effect.strikes, 'open Strike')}; excuse it on Excuse Absence if they had a reason.`);
+    if (effect.strikes > 0) lines.push(`Adds ${plural(effect.strikes, 'open Strike')}; excuse it under Missed Events and Strikes below if they had a reason.`);
     if (removal === 'check-in') lines.push("They can't check in with this code again.");
     return lines.join(' ');
 }

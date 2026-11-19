@@ -410,6 +410,12 @@
 .ulk h3 { font-size: var(--hsa-text-xl); }
 .ulk h4 { font-size: var(--hsa-text-base); display: inline; }
 .ulk .ulk-title { margin: 0 0 16px; font-size: var(--hsa-text-3xl); color: var(--hsa-teal-700); text-align: left; }
+/* Status & Points, then Missed Events and Strikes: each its own search and Member. */
+.ulk .ulk-section + .ulk-section { margin-top: 40px; padding-top: 24px; border-top: 2px solid var(--hsa-border-light); }
+.ulk .ulk-section__title { margin: 0 0 12px; font-size: var(--hsa-text-2xl); color: var(--hsa-teal-700); text-align: left; scroll-margin-top: 80px; }
+.ulk .ulk-section { scroll-margin-top: 80px; }
+/* Missed Events and Strikes inside User Lookup: the Excuse Absence styles, without that page's own frame. */
+.ulk .eap--embedded { max-width: none; margin: 0; padding: 0; }
 .ulk .ulk-muted { color: var(--hsa-muted); font-size: var(--hsa-text-sm); margin: 8px 0; }
 .ulk .ulk-error { color: var(--hsa-danger); font-size: var(--hsa-text-sm); margin: 8px 0; }
 .ulk a { color: var(--hsa-teal-700); font-weight: 600; }
