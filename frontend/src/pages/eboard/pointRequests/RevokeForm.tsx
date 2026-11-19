@@ -10,10 +10,13 @@ type RevokeFormProps = {
     points?: number;
     /** After it's revoked. */
     onRevoked?: (message: string) => void;
+    /** Opened by a button elsewhere (User Lookup's Remove): starts open, and Cancel hands back to it. */
+    startOpen?: boolean;
+    onCancel?: () => void;
 };
 
-function RevokeForm({ requestId, points, onRevoked }: RevokeFormProps) {
-    const [open, setOpen] = useState(false);
+function RevokeForm({ requestId, points, onRevoked, startOpen = false, onCancel }: RevokeFormProps) {
+    const [open, setOpen] = useState(startOpen);
     const [reason, setReason] = useState('');
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
@@ -51,7 +54,7 @@ function RevokeForm({ requestId, points, onRevoked }: RevokeFormProps) {
             <textarea id={`revoke-${requestId}`} rows={2} value={reason} onChange={(e) => setReason(e.target.value)} />
             {error && <p className="danger-form__error" role="alert">{error}</p>}
             <div className="danger-form__actions">
-                <button type="button" className="danger-form__cancel" disabled={saving} onClick={() => { setOpen(false); setError(''); }}>Cancel</button>
+                <button type="button" className="danger-form__cancel" disabled={saving} onClick={() => { setOpen(false); setError(''); onCancel?.(); }}>Cancel</button>
                 <button type="button" className="danger-form__confirm" disabled={saving} onClick={revoke}>
                     {saving ? 'Revoking…' : 'Revoke'}
                 </button>

@@ -3,7 +3,7 @@
 // is an attendances doc with `source: 'eboard'`, written under the same IDs
 // the other sources use (docs/adr/0002-attendance-ledger-calculated-on-read.md).
 // Takes the Firestore instance so tests can run it against the emulator.
-import { doc, increment, runTransaction, type Firestore } from 'firebase/firestore';
+import { doc, increment, runTransaction, type DocumentData, type Firestore } from 'firebase/firestore';
 import type { Attendance, Code, Member } from './computeStanding';
 import { isHeldToCabinetRules } from './members';
 import { eventType } from './rubric';
@@ -119,6 +119,31 @@ export async function enterAttendance(db: Firestore, email: string, input: Entry
 
         planned.attendances.forEach(({ id, ...data }, i) => tx.set(refs[i], data));
         if (codeRef) tx.update(codeRef, { attendeeCount: increment(1) });
+        return { ok: true } as const;
+    });
+}
+
+/**
+ * Undoes an Entered Attendance: deletes the Attendance E-Board entered (each
+ * of a Tabling entry's hours), and takes it back off its code's check-in
+ * count. Only E-Board's own entries: a code check-in is removed with a
+ * reason (removeCheckIn) and a Point Request is revoked.
+ */
+export async function removeEnteredAttendance(db: Firestore, attendanceIds: string[]): Promise<EnterResult> {
+    if (!attendanceIds.length) return { ok: false, error: 'There is no entered event to remove.' };
+    const refs = attendanceIds.map((id) => doc(db, 'attendances', id));
+
+    return runTransaction(db, async (tx) => {
+        const found: (DocumentData | undefined)[] = [];
+        for (const ref of refs) found.push((await tx.get(ref)).data());
+        if (found.some((attendance) => attendance?.source !== 'eboard')) {
+            return { ok: false, error: 'This event was not entered by E-Board, so it can\'t be removed here.' } as const;
+        }
+        const codeId: string | undefined = found[0]?.codeId;
+        const codeRef = codeId ? doc(db, 'codes', codeId.toUpperCase()) : null;
+        const codeExists = codeRef ? (await tx.get(codeRef)).exists() : false;
+        refs.forEach((ref) => tx.delete(ref));
+        if (codeRef && codeExists) tx.update(codeRef, { attendeeCount: increment(-1) });
         return { ok: true } as const;
     });
 }

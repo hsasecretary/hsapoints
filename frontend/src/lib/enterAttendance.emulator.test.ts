@@ -2,7 +2,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { RulesTestEnvironment } from '@firebase/rules-unit-testing';
 import { EBOARD, MEMBER, memberDoc, readPastRules, seed, signedInAs, startEmulator } from '../test/emulator';
-import { enterAttendance } from './enterAttendance';
+import { enterAttendance, removeEnteredAttendance } from './enterAttendance';
 import { redeemCode } from './redeemCode';
 
 const TODAY = '2026-09-25';
@@ -129,6 +129,34 @@ describe('entering an event with no code', () => {
 
     it('refuses a Cabinet-only Event Type for a Member who is not Cabinet', async () => {
         expect(await enter({ name: 'Social', date: '2026-09-12', eventTypeId: 'internal-social' })).toMatchObject({ ok: false });
+    });
+});
+
+describe('removing an entered event', () => {
+    it("deletes the Attendance and takes it off the code's check-in count", async () => {
+        await enter({ codeId: 'GBM1' });
+
+        expect(await removeEnteredAttendance(signedInAs(env, EBOARD), [`${MEMBER}__GBM1`])).toEqual({ ok: true });
+        expect(await readPastRules(env, `attendances/${MEMBER}__GBM1`)).toBeUndefined();
+        expect((await readPastRules(env, 'codes/GBM1'))?.attendeeCount).toBe(3);
+        // Not a Removed Check-in: the Member can still check in with the code.
+        expect((await readPastRules(env, `users/${MEMBER}`))?.removedCheckIns).toBeUndefined();
+    });
+
+    it("deletes every hour of a Tabling entry", async () => {
+        await enter({ name: 'Plaza table', date: '2026-09-12', eventTypeId: 'tabling', hours: 3 });
+        const hours = [1, 2, 3].map((n) => `${MEMBER}__req-eb-1-h${n}`);
+
+        expect(await removeEnteredAttendance(signedInAs(env, EBOARD), hours)).toEqual({ ok: true });
+        for (const id of hours) expect(await readPastRules(env, `attendances/${id}`)).toBeUndefined();
+    });
+
+    it("won't remove a Member's own code check-in this way", async () => {
+        await seed(env, { 'codes/GBM2': { event: 'GBM 2', eventTypeId: 'gbm', eventDate: TODAY, attendeeCount: 0 } });
+        await redeemCode(signedInAs(env, MEMBER), MEMBER, 'GBM2', { now: new Date(2026, 8, 25, 12) });
+
+        expect(await removeEnteredAttendance(signedInAs(env, EBOARD), [`${MEMBER}__GBM2`])).toMatchObject({ ok: false });
+        expect(await readPastRules(env, `attendances/${MEMBER}__GBM2`)).toBeDefined();
     });
 });
 

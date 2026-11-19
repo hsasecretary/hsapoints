@@ -3,15 +3,17 @@
 // reviewed them. One scrolling page (docs/research/user-lookup-eboard-ux.md);
 // numbers come from computeStanding through lib/memberLookup.ts, so they
 // match the Member's own dashboard. E-Board can add an event the Member
-// attended, remove a code check-in and revoke an approved request here; Strikes are changed on Excuse Absence and
+// attended, and take one away (a code check-in, an event E-Board entered, or
+// an approved request, revoked) from its row's Remove button; Strikes are changed on Excuse Absence and
 // pending requests reviewed on Point Request Review, each linked from here.
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
+import { removeEnteredAttendance } from '../../lib/enterAttendance';
 import { auth, db } from '../../lib/firebase';
 import type { Attendance, Code, Standing } from '../../lib/computeStanding';
 import {
-    checkInRemovalEffect, lookupLedger, lookupRequests, lookupSummary, missedEventRows, MISSED_STATE_LABEL, SOURCE_LABEL,
+    canRevoke, checkInRemovalEffect, lookupLedger, lookupRequests, lookupSummary, missedEventRows, MISSED_STATE_LABEL, SOURCE_LABEL,
     type LookupLedger, type LookupRequest, type LookupRow, type LookupSummary, type RemovalEffect, type StandingFacts, type TakenBack,
 } from '../../lib/memberLookup';
 import { roleLine } from '../../lib/members';
@@ -93,6 +95,7 @@ function MemberDetail({ member: profile }: { member: LookupMember }) {
     const ledger = useMemo(() => member && lookupLedger({ member, attendances, codes, requests, today }), [member, attendances, codes, requests, today]);
     const standingFacts = useMemo(() => ({ member, attendances, codes, today }), [member, attendances, codes, today]);
     const requestRows = useMemo(() => lookupRequests(requests, today), [requests, today]);
+    const revocable = useMemo(() => new Set(requests.filter(canRevoke).map((request) => request.id)), [requests]);
 
     return (
         <article className="ulk-body" aria-live="polite">
@@ -113,7 +116,7 @@ function MemberDetail({ member: profile }: { member: LookupMember }) {
                         <CabinetDetail email={profile.email} standing={standing} codes={codes} attendances={attendances} summary={summary} />
                     )}
                     <AddEventPanel email={profile.email} standingFacts={standingFacts} cabinet={summary.rules === 'cabinet'} />
-                    <Points ledger={ledger} cabinet={summary.rules === 'cabinet'} email={profile.email}
+                    <Points ledger={ledger} cabinet={summary.rules === 'cabinet'} revocable={revocable}
                         standingFacts={standingFacts} />
                     <Requests rows={requestRows} />
                 </>
@@ -237,16 +240,33 @@ const FILTERS: { value: PointsFilter; label: string; keep: (row: LookupRow) => b
     { value: 'adjustments', label: 'Adjustments', keep: (row) => row.source === 'adjustment' || Boolean(row.takenBack) },
 ];
 
-function Points({ ledger, cabinet, email, standingFacts }: { ledger: LookupLedger; cabinet: boolean; email: string; standingFacts: StandingFacts }) {
+/** How a row's points are taken away, or null when its row has no Remove button. */
+type Removal = 'check-in' | 'entry' | 'revoke';
+
+function removalOf(row: LookupRow, revocable: Set<string>): Removal | null {
+    if (row.takenBack) return null;
+    // A Point Request's points go back with the request, including an Adjustment it made.
+    if (row.requestId) return revocable.has(row.requestId) ? 'revoke' : null;
+    if (row.source === 'code') return 'check-in';
+    if (row.source === 'eboard' && row.attendanceIds.length) return 'entry';
+    return null;
+}
+
+function Points({ ledger, cabinet, revocable, standingFacts }: {
+    ledger: LookupLedger;
+    cabinet: boolean;
+    /** Approved Point Requests that can be revoked (canRevoke). */
+    revocable: Set<string>;
+    standingFacts: StandingFacts;
+}) {
     const [filter, setFilter] = useState<PointsFilter>('all');
-    // Off by default (see .ulk-switch).
-    const [removing, setRemoving] = useState(false);
+    // The row whose Remove is open: one at a time, and nothing is taken away until it's confirmed there.
+    const [openRow, setOpenRow] = useState<string | null>(null);
     const [message, setMessage] = useState('');
     const rows = ledger.rows.filter(FILTERS.find((option) => option.value === filter).keep);
-    const toggleRemoving = (on: boolean) => {
-        setRemoving(on);
-        setMessage('');
-        if (on) setFilter('codes');
+    const done = (text: string) => {
+        setOpenRow(null);
+        setMessage(text);
     };
     return (
         <details className="ulk-panel" open>
@@ -265,21 +285,15 @@ function Points({ ledger, cabinet, email, standingFacts }: { ledger: LookupLedge
                         </button>
                     ))}
                 </div>
-                <label className="ulk-switch">
-                    <input type="checkbox" role="switch" checked={removing} onChange={(e) => toggleRemoving(e.target.checked)} />
-                    Remove check-ins
-                </label>
             </div>
-            {removing && (
-                <p className="ulk-muted">
-                    Remove a code check-in the Member shouldn&apos;t have, e.g. a code used without attending. To undo a Point Request, revoke it under Point Requests.
-                </p>
-            )}
             {message && <p className="ulk-muted" role="status">{message}</p>}
             {rows.length === 0 ? <p className="ulk-muted">{filter === 'all' ? 'No points this school year yet.' : 'Nothing here this school year.'}</p> : (
-                <ul className="ulk-list">
-                    {rows.map((row) => (
-                        <li key={row.id} className={`ulk-row${row.takenBack ? ' is-taken-back' : ''}`}>
+                <ul className="ulk-list ulk-list--points">
+                    {rows.map((row) => {
+                        const removal = removalOf(row, revocable);
+                        const open = openRow === row.id;
+                        return (
+                        <li key={row.id} className={`ulk-row${row.takenBack ? ' is-taken-back' : ''}${open ? ' is-removing' : ''}`}>
                             <span className="ulk-row__date">{dateText(row.date)}</span>
                             <span className="ulk-row__name">
                                 {row.takenBack ? <s>{row.name}</s> : row.name}
@@ -294,17 +308,36 @@ function Points({ ledger, cabinet, email, standingFacts }: { ledger: LookupLedge
                                 {row.takenBack?.reason && <span className="ulk-row__detail ulk-note">“{row.takenBack.reason}”</span>}
                                 {row.note && <span className="ulk-row__detail ulk-note">“{row.note}”</span>}
                             </span>
+                            {removal && (
+                                <button type="button" className="ulk-remove" aria-expanded={open}
+                                    aria-label={`Remove ${row.name} from this Member`}
+                                    onClick={() => { setOpenRow(open ? null : row.id); setMessage(''); }}>
+                                    Remove
+                                </button>
+                            )}
                             <span className="ulk-row__end ulk-num">
                                 {row.takenBack ? <s>+{row.vePoints} VE</s> : <>{row.vePoints > 0 ? '+' : ''}{row.vePoints} VE</>}
                                 {cabinet && <small>{row.takenBack ? <s>{row.cabinetPoints} Cabinet</s> : `${row.cabinetPoints} Cabinet`}</small>}
                             </span>
-                            {removing && row.source === 'code' && !row.takenBack && (
+                            {open && (
                                 <div className="ulk-row__form">
-                                    <RemoveCheckInForm email={email} row={row} cabinet={cabinet} standingFacts={standingFacts} onRemoved={setMessage} />
+                                    {removal === 'check-in' && (
+                                        <RemoveCheckInForm row={row} cabinet={cabinet} standingFacts={standingFacts}
+                                            onRemoved={done} onCancel={() => setOpenRow(null)} />
+                                    )}
+                                    {removal === 'entry' && (
+                                        <RemoveEntryForm row={row} cabinet={cabinet} standingFacts={standingFacts}
+                                            onRemoved={done} onCancel={() => setOpenRow(null)} />
+                                    )}
+                                    {removal === 'revoke' && (
+                                        <RevokeForm requestId={row.requestId} points={row.vePoints} startOpen
+                                            onRevoked={done} onCancel={() => setOpenRow(null)} />
+                                    )}
                                 </div>
                             )}
                         </li>
-                    ))}
+                        );
+                    })}
                     {filter === 'all' && (
                         <li className="ulk-row ulk-row--total">
                             <span className="ulk-row__date" />
@@ -325,33 +358,30 @@ function Points({ ledger, cabinet, email, standingFacts }: { ledger: LookupLedge
 }
 
 /** What E-Board reads before confirming: the points, and any Missed Event, Strike or Make-up it changes. */
-function removalText(effect: RemovalEffect, cabinet: boolean): string {
+function removalText(effect: RemovalEffect, cabinet: boolean, removal: 'check-in' | 'entry'): string {
     const lines = [`Takes away ${plural(effect.vePoints, 'VE Point')}${cabinet ? ` and ${plural(effect.cabinetPoints, 'Cabinet Point')}` : ''}.`];
     if (effect.missed.length) lines.push(`${effect.missed.join(', ')} becomes a Missed Event.`);
     if (effect.owedAgain.length) lines.push(`It made up ${effect.owedAgain.join(', ')}, which is owed again.`);
     if (effect.strikes > 0) lines.push(`Adds ${plural(effect.strikes, 'open Strike')}; excuse it on Excuse Absence if they had a reason.`);
-    lines.push("They can't check in with this code again.");
+    if (removal === 'check-in') lines.push("They can't check in with this code again.");
     return lines.join(' ');
 }
 
-// Removing one code check-in (a Removed Check-in): a Remove button that opens
-// what it will change and a reason box, since the Member sees why.
-function RemoveCheckInForm({ email, row, cabinet, standingFacts, onRemoved }: {
-    email: string;
+type RemoveFormProps = {
     row: LookupRow;
     cabinet: boolean;
     standingFacts: StandingFacts;
     onRemoved: (message: string) => void;
-}) {
-    const [open, setOpen] = useState(false);
+    onCancel: () => void;
+};
+
+// Removing one code check-in (a Removed Check-in), opened by the row's
+// Remove: what it will change, and a reason box, since the Member sees why.
+function RemoveCheckInForm({ row, cabinet, standingFacts, onRemoved, onCancel }: RemoveFormProps) {
     const [reason, setReason] = useState('');
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
-    const effect = useMemo(() => (open ? checkInRemovalEffect(standingFacts, row.id) : null), [open, standingFacts, row.id]);
-
-    if (!open) {
-        return <button type="button" className="danger-form__open" onClick={() => setOpen(true)}>Remove</button>;
-    }
+    const effect = useMemo(() => checkInRemovalEffect(standingFacts, row.attendanceIds), [standingFacts, row.attendanceIds]);
 
     const remove = async () => {
         setSaving(true);
@@ -370,14 +400,52 @@ function RemoveCheckInForm({ email, row, cabinet, standingFacts, onRemoved }: {
 
     return (
         <div className="danger-form">
-            <p className="danger-form__hint">{removalText(effect, cabinet)}</p>
+            <p className="danger-form__hint">{removalText(effect, cabinet, 'check-in')}</p>
             <label htmlFor={`remove-${row.id}`}>Reason (the Member sees this)</label>
             <textarea id={`remove-${row.id}`} rows={2} value={reason} onChange={(e) => setReason(e.target.value)} />
             {error && <p className="danger-form__error" role="alert">{error}</p>}
             <div className="danger-form__actions">
-                <button type="button" className="danger-form__cancel" disabled={saving} onClick={() => { setOpen(false); setError(''); }}>Cancel</button>
+                <button type="button" className="danger-form__cancel" disabled={saving} onClick={onCancel}>Cancel</button>
                 <button type="button" className="danger-form__confirm" disabled={saving} onClick={remove}>
                     {saving ? 'Removing…' : `Remove ${row.codeId}`}
+                </button>
+            </div>
+        </div>
+    );
+}
+
+// Undoing an event E-Board entered (an Entered Attendance), opened by the
+// row's Remove: what it will change, then a confirm. It was E-Board's own
+// entry, so it goes without a reason, and the Member can still check in to
+// its code if they really attended.
+function RemoveEntryForm({ row, cabinet, standingFacts, onRemoved, onCancel }: RemoveFormProps) {
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState('');
+    const effect = useMemo(() => checkInRemovalEffect(standingFacts, row.attendanceIds), [standingFacts, row.attendanceIds]);
+
+    const remove = async () => {
+        setSaving(true);
+        setError('');
+        try {
+            const result = await removeEnteredAttendance(db, row.attendanceIds);
+            if ('error' in result) setError(result.error);
+            else onRemoved(`Removed ${row.name}, which E-Board had entered.`);
+        } catch (err) {
+            console.error('Error removing entered event:', err);
+            setError("Couldn't remove it. Try again.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <div className="danger-form">
+            <p className="danger-form__hint">{removalText(effect, cabinet, 'entry')} Undoes the entry by E-Board{row.enteredBy ? ` (${row.enteredBy})` : ''}.</p>
+            {error && <p className="danger-form__error" role="alert">{error}</p>}
+            <div className="danger-form__actions">
+                <button type="button" className="danger-form__cancel" disabled={saving} onClick={onCancel}>Cancel</button>
+                <button type="button" className="danger-form__confirm" disabled={saving} onClick={remove}>
+                    {saving ? 'Removing…' : 'Remove event'}
                 </button>
             </div>
         </div>

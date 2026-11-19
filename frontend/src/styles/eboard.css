@@ -501,9 +501,20 @@
 }
 .ulk .ulk-filter.is-active { background: var(--hsa-teal-700); border-color: var(--hsa-teal-700); color: #ffffff; }
 
-/* "Remove check-ins": off by default, so a Remove button is never one stray tap away. */
-.ulk .ulk-switch { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: var(--hsa-text-sm); font-weight: 600; cursor: pointer; }
-.ulk .ulk-switch input { width: 18px; height: 18px; margin: 0; accent-color: var(--hsa-danger); }
+/* Points rows: date, name, then a red Remove (on rows that can be taken
+   away) to the left of the points. Remove only opens a confirm below the
+   row; nothing changes until that's confirmed. */
+.ulk .ulk-list--points .ulk-row { grid-template-columns: 64px minmax(0, 1fr) auto auto; }
+.ulk .ulk-list--points .ulk-row__end { grid-column: -2 / -1; }
+.ulk .ulk-remove {
+    grid-column: -3 / -2; align-self: center;
+    min-width: 0; min-height: 32px; padding: 0 12px; border: 1.5px solid var(--hsa-danger); border-radius: 6px;
+    background: var(--hsa-danger-bg); color: var(--hsa-danger-strong);
+    font: inherit; font-size: var(--hsa-text-sm); font-weight: 700; cursor: pointer;
+}
+.ulk .ulk-remove:hover, .ulk .ulk-remove[aria-expanded="true"] { background: var(--hsa-danger); color: #fff; }
+.ulk .ulk-remove:focus-visible { outline: 3px solid var(--hsa-danger-border); outline-offset: 2px; }
+.ulk .ulk-row.is-removing { background: var(--hsa-danger-bg); border-left-color: var(--hsa-danger); }
 .ulk .ulk-points-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 16px; }
 /* A Removed Check-in or revoked Point Request: crossed out, counted nowhere. */
 .ulk .ulk-row.is-taken-back { color: var(--hsa-muted); border-left-color: var(--hsa-danger-border); }
@@ -514,6 +525,11 @@
 /* Phones: two-line rows, the date above the name and the points beside it. */
 @media (max-width: 600px) {
     .ulk .ulk-row { grid-template-columns: 1fr auto; row-gap: 2px; }
+    /* Phones: Remove goes under the points instead of beside them, so the name keeps its width. */
+    .ulk .ulk-list--points .ulk-row { grid-template-columns: minmax(0, 1fr) auto; }
+    .ulk .ulk-list--points .ulk-row__name { grid-row: 2 / span 2; }
+    .ulk .ulk-list--points .ulk-row__end { grid-column: 2; grid-row: 2; }
+    .ulk .ulk-remove { grid-column: 2; grid-row: 3; justify-self: end; align-self: start; min-height: 44px; margin-top: 4px; }
     .ulk .ulk-row__date { grid-column: 1 / -1; }
     .ulk .ulk-row--total .ulk-row__date { display: none; }
     .ulk .ulk-row__form { grid-column: 1 / -1; }
