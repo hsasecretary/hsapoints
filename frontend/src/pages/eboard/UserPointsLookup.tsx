@@ -3,7 +3,7 @@
 // reviewed them. One scrolling page (docs/research/user-lookup-eboard-ux.md);
 // numbers come from computeStanding through lib/memberLookup.ts, so they
 // match the Member's own dashboard. E-Board can add an event the Member
-// attended, remove a code check-in and revoke an approved request here; Strikes are changed on Excuse Absence and
+// attended, remove a code check-in, delete a point or revoke an approved request here; Strikes are changed on Excuse Request Review and
 // pending requests reviewed on Point Request Review, each linked from here.
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -22,6 +22,7 @@ import { shortDate } from '../../lib/semester';
 import MemberSearch from '../../components/members/MemberSearch';
 import { useMemberStanding } from '../dashboard/useMemberStanding';
 import AddEventPanel from './AddEventPanel';
+import DeletePointButton from './pointRequests/DeletePointButton';
 import RevokeForm from './pointRequests/RevokeForm';
 
 type LookupMember = Parameters<typeof roleLine>[0] & {
@@ -193,7 +194,7 @@ function CabinetDetail({ email, standing, codes, attendances, summary }: {
                 </span>
             </summary>
             <p className="ulk-panel__link">
-                <Link to={`/eboard/excuse-absence?member=${encodeURIComponent(email)}`}>Open in Excuse Absence</Link> to excuse, remove a Strike or close a Missed Event.
+                <Link to={`/eboard/excuse-absence?member=${encodeURIComponent(email)}`}>Open in Excuse Request Review</Link> to excuse, remove a Strike or close a Missed Event.
             </p>
             {missed.length === 0 ? <p className="ulk-muted">No Missed Events this year.</p> : (
                 <ul className="ulk-list">
@@ -246,7 +247,6 @@ function Points({ ledger, cabinet, email, standingFacts }: { ledger: LookupLedge
     const toggleRemoving = (on: boolean) => {
         setRemoving(on);
         setMessage('');
-        if (on) setFilter('codes');
     };
     return (
         <details className="ulk-panel" open>
@@ -267,12 +267,12 @@ function Points({ ledger, cabinet, email, standingFacts }: { ledger: LookupLedge
                 </div>
                 <label className="ulk-switch">
                     <input type="checkbox" role="switch" checked={removing} onChange={(e) => toggleRemoving(e.target.checked)} />
-                    Remove check-ins
+                    Delete points
                 </label>
             </div>
             {removing && (
                 <p className="ulk-muted">
-                    Remove a code check-in the Member shouldn&apos;t have, e.g. a code used without attending. To undo a Point Request, revoke it under Point Requests.
+                    Delete a point the Member shouldn&apos;t have. A code check-in is removed, a Point Request revoked, and a point E-Board entered deleted; the Member sees your reason for the first two.
                 </p>
             )}
             {message && <p className="ulk-muted" role="status">{message}</p>}
@@ -298,9 +298,16 @@ function Points({ ledger, cabinet, email, standingFacts }: { ledger: LookupLedge
                                 {row.takenBack ? <s>+{row.vePoints} VE</s> : <>{row.vePoints > 0 ? '+' : ''}{row.vePoints} VE</>}
                                 {cabinet && <small>{row.takenBack ? <s>{row.cabinetPoints} Cabinet</s> : `${row.cabinetPoints} Cabinet`}</small>}
                             </span>
-                            {removing && row.source === 'code' && !row.takenBack && (
+                            {/* E-Board's own entries can always be deleted; every other point once Delete points is on. */}
+                            {!row.takenBack && (removing || row.source === 'eboard') && (
                                 <div className="ulk-row__form">
-                                    <RemoveCheckInForm email={email} row={row} cabinet={cabinet} standingFacts={standingFacts} onRemoved={setMessage} />
+                                    {row.source === 'code' ? (
+                                        <RemoveCheckInForm email={email} row={row} cabinet={cabinet} standingFacts={standingFacts} onRemoved={setMessage} />
+                                    ) : row.requestId ? (
+                                        <RevokeForm requestId={row.requestId} points={row.vePoints} onRevoked={setMessage} />
+                                    ) : (
+                                        <DeletePointButton email={email} row={row} onDeleted={setMessage} />
+                                    )}
                                 </div>
                             )}
                         </li>
@@ -329,7 +336,7 @@ function removalText(effect: RemovalEffect, cabinet: boolean): string {
     const lines = [`Takes away ${plural(effect.vePoints, 'VE Point')}${cabinet ? ` and ${plural(effect.cabinetPoints, 'Cabinet Point')}` : ''}.`];
     if (effect.missed.length) lines.push(`${effect.missed.join(', ')} becomes a Missed Event.`);
     if (effect.owedAgain.length) lines.push(`It made up ${effect.owedAgain.join(', ')}, which is owed again.`);
-    if (effect.strikes > 0) lines.push(`Adds ${plural(effect.strikes, 'open Strike')}; excuse it on Excuse Absence if they had a reason.`);
+    if (effect.strikes > 0) lines.push(`Adds ${plural(effect.strikes, 'open Strike')}; excuse it on Excuse Request Review if they had a reason.`);
     lines.push("They can't check in with this code again.");
     return lines.join(' ');
 }

@@ -1692,3 +1692,7 @@
     background: var(--hsa-teal-700); color: #ffffff; font: inherit; font-weight: 700; cursor: pointer;
 }
 .ulk .ulk-add__confirm:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Excuse Request Review borrows Point Request Review's cards. It sits inside
+   .eap, which already pads the page and has its own title. */
+.eap .point-request-review { padding: 0; }
